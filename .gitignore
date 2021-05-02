@@ -1,1 +1,3 @@
-/specification/demos/react/node_modules/
+node_modules
+/.idea/
+/specification/demos/vue/.editorconfig
