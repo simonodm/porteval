@@ -74,5 +74,8 @@ _[Ss]cripts
 *.ncrunchsolution
 *.dot[Cc]over
 node_modules/
-/.idea
+.idea/
 .editorconfig
+/analysis/demos/aspnet/TransactionAPI/.vs/
+/analysis/demos/aspnet/TransactionAPI/bin/
+/analysis/demos/aspnet/TransactionAPI/obj/
