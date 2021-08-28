@@ -79,3 +79,4 @@ node_modules/
 /analysis/demos/aspnet/TransactionAPI/.vs/
 /analysis/demos/aspnet/TransactionAPI/bin/
 /analysis/demos/aspnet/TransactionAPI/obj/
+/src/server/PortEvalAPI/.vs/PortEvalAPI/DesignTimeBuild/.dtbcache.v2
