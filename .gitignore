@@ -77,3 +77,4 @@ node_modules/
 .idea/
 .editorconfig
 .vs/
+src/server/.vs/PortEval/DesignTimeBuild/.dtbcache.v2
