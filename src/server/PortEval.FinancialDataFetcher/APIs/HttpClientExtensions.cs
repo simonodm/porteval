@@ -2,6 +2,7 @@
 using PortEval.FinancialDataFetcher.Models;
 using PortEval.FinancialDataFetcher.Responses;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -34,13 +35,12 @@ namespace PortEval.FinancialDataFetcher.APIs
 
                 var response = JToken.Parse(await httpClient.GetStringAsync(queryUrl));
                 return parseFunction(response);
-
             }
             catch (Exception ex)
             {
                 return new Response<TResult>
                 {
-                    StatusCode = ex is HttpRequestException ? StatusCode.ConnectionError : StatusCode.OtherError,
+                    StatusCode = ex is HttpRequestException httpEx && httpEx.StatusCode != HttpStatusCode.NotFound ? StatusCode.ConnectionError : StatusCode.OtherError,
                     ErrorMessage = ex.Message
                 };
             }

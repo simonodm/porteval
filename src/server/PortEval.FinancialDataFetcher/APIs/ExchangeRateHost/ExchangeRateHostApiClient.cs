@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using PortEval.FinancialDataFetcher.APIs.ExchangeRate.host.Models;
 using PortEval.FinancialDataFetcher.APIs.Interfaces;
 using PortEval.FinancialDataFetcher.Models;
 using PortEval.FinancialDataFetcher.Requests;
@@ -8,9 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using ExchangeRates = PortEval.FinancialDataFetcher.Models.ExchangeRates;
+using PortEval.FinancialDataFetcher.APIs.ExchangeRateHost.Models;
 
-namespace PortEval.FinancialDataFetcher.APIs.ExchangeRate.host
+namespace PortEval.FinancialDataFetcher.APIs.ExchangeRateHost
 {
     /// <summary>
     /// ExchangeRate.host API client supporting historical and latest exchange rates.
@@ -45,16 +44,25 @@ namespace PortEval.FinancialDataFetcher.APIs.ExchangeRate.host
 
             var result = new List<ExchangeRates>();
             var anySuccessful = false;
+            var anyUnexpectedError = false;
 
             foreach (var task in tasks)
             {
                 if (task.Result.StatusCode == StatusCode.Ok) anySuccessful = true;
+                else if (task.Result.StatusCode == StatusCode.OtherError) anyUnexpectedError = true;
+
                 if (task.Result.Result != null) result.AddRange(task.Result.Result);
+            }
+
+            var resultStatusCode = StatusCode.Ok;
+            if (!anySuccessful)
+            {
+                resultStatusCode = !anyUnexpectedError ? StatusCode.OtherError : StatusCode.ConnectionError;
             }
 
             return new Response<IEnumerable<ExchangeRates>>
             {
-                StatusCode = anySuccessful ? StatusCode.Ok : StatusCode.ConnectionError,
+                StatusCode = resultStatusCode,
                 ErrorMessage = anySuccessful ? "" : "An error has occurred",
                 Result = result
             };
@@ -71,37 +79,54 @@ namespace PortEval.FinancialDataFetcher.APIs.ExchangeRate.host
             var responseModel = response.ToObject<ExchangeRatesTimeSeriesResponseModel>();
 
             var result = new List<ExchangeRates>();
-            foreach (var (dayKey, exchangeRates) in responseModel.Rates)
+            if (responseModel != null)
             {
-                result.Add(new ExchangeRates
+                foreach (var (dayKey, exchangeRates) in responseModel.Rates)
                 {
-                    Currency = responseModel.Base,
-                    Time = TimeZoneInfo.ConvertTimeToUtc(DateTime.Parse(dayKey)),
-                    Rates = exchangeRates
-                });
+                    result.Add(new ExchangeRates
+                    {
+                        Currency = responseModel.Base,
+                        Time = TimeZoneInfo.ConvertTimeToUtc(DateTime.Parse(dayKey)),
+                        Rates = exchangeRates
+                    });
+                }
+
+                return new Response<IEnumerable<ExchangeRates>>
+                {
+                    StatusCode = StatusCode.Ok,
+                    Result = result
+                };
             }
 
             return new Response<IEnumerable<ExchangeRates>>
             {
-                StatusCode = StatusCode.Ok,
-                Result = result
+                StatusCode = StatusCode.OtherError,
+                ErrorMessage = "Invalid data received."
             };
         }
 
         private Response<ExchangeRates> ParseLatestExchangeRatesResponse(JToken response)
         {
             var responseModel = response.ToObject<ExchangeRatesLatestResponseModel>();
-            var resultRates = new ExchangeRates
+            if (responseModel != null)
             {
-                Time = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now),
-                Currency = responseModel.Base,
-                Rates = responseModel.Rates
-            };
+                var resultRates = new ExchangeRates
+                {
+                    Time = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now),
+                    Currency = responseModel.Base,
+                    Rates = responseModel.Rates
+                };
+                return new Response<ExchangeRates>
+                {
+                    StatusCode = StatusCode.Ok,
+                    Result = resultRates
+                };
+            }
 
             return new Response<ExchangeRates>
             {
-                StatusCode = StatusCode.Ok,
-                Result = resultRates
+                StatusCode = StatusCode.OtherError,
+                ErrorMessage = "Invalid data received."
             };
         }
 

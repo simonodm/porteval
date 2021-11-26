@@ -36,17 +36,26 @@ namespace PortEval.FinancialDataFetcher.APIs.OpenExchangeRates
         private Response<ExchangeRates> ParseLatestExchangeRates(JToken response)
         {
             var exchangeRatesResponse = response.ToObject<LatestExchangeRatesResponseModel>();
-            var result = new ExchangeRates
+            if (exchangeRatesResponse != null)
             {
-                Currency = exchangeRatesResponse.Base,
-                Rates = exchangeRatesResponse.Rates,
-                Time = exchangeRatesResponse.Time
-            };
+                var result = new ExchangeRates
+                {
+                    Currency = exchangeRatesResponse.Base,
+                    Rates = exchangeRatesResponse.Rates,
+                    Time = exchangeRatesResponse.Time
+                };
+
+                return new Response<ExchangeRates>
+                {
+                    StatusCode = StatusCode.Ok,
+                    Result = result
+                };
+            }
 
             return new Response<ExchangeRates>
             {
-                StatusCode = StatusCode.Ok,
-                Result = result
+                StatusCode = StatusCode.OtherError,
+                ErrorMessage = "Invalid data received."
             };
         }
     }

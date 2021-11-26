@@ -149,6 +149,14 @@ namespace PortEval.FinancialDataFetcher
                         ErrorMessage = "Operation cancelled."
                     };
                 }
+                catch(Exception ex)
+                {
+                    return new TResponse
+                    {
+                        StatusCode = StatusCode.OtherError,
+                        ErrorMessage = ex.Message
+                    };
+                }
             });
         }
     }

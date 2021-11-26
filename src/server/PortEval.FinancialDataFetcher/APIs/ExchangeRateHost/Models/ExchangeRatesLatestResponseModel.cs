@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace PortEval.FinancialDataFetcher.APIs.ExchangeRate.host.Models
+namespace PortEval.FinancialDataFetcher.APIs.ExchangeRateHost.Models
 {
     internal class ExchangeRatesLatestResponseModel
     {

@@ -38,24 +38,33 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
             {
                 var prices = response.ToObject<List<TiingoPriceResponseModel>>();
                 var result = new List<PricePoint>();
-                foreach (var price in prices)
+                if (prices != null)
                 {
-                    if (price.Time > request.To) continue;
-                    if (price.Time < request.From) break;
-
-                    result.Add(new PricePoint
+                    foreach (var price in prices)
                     {
-                        Time = price.Time,
-                        Price = price.Price,
-                        Symbol = request.Symbol,
-                        CurrencyCode = "USD"
-                    });
+                        if (price.Time > request.To) continue;
+                        if (price.Time < request.From) break;
+
+                        result.Add(new PricePoint
+                        {
+                            Time = price.Time,
+                            Price = price.Price,
+                            Symbol = request.Symbol,
+                            CurrencyCode = "USD"
+                        });
+                    }
+
+                    return new Response<IEnumerable<PricePoint>>
+                    {
+                        StatusCode = StatusCode.Ok,
+                        Result = result
+                    };
                 }
 
                 return new Response<IEnumerable<PricePoint>>
                 {
-                    StatusCode = StatusCode.Ok,
-                    Result = result
+                    StatusCode = StatusCode.OtherError,
+                    ErrorMessage = "Invalid data received."
                 };
             }, _rateLimiter);
 
@@ -74,24 +83,32 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
             {
                 var responseModel = response.ToObject<List<TiingoPriceResponseModel>>();
                 var result = new List<PricePoint>();
-                foreach (var price in responseModel)
+                if (responseModel != null)
                 {
-                    if (price.Time < request.From) continue;
-                    if (price.Time > request.To) break;
-
-                    result.Add(new PricePoint
+                    foreach (var price in responseModel)
                     {
-                        Symbol = request.Symbol,
-                        Price = price.Price,
-                        Time = price.Time,
-                        CurrencyCode = "USD"
-                    });
+                        if (price.Time < request.From) continue;
+                        if (price.Time > request.To) break;
+
+                        result.Add(new PricePoint
+                        {
+                            Symbol = request.Symbol,
+                            Price = price.Price,
+                            Time = price.Time,
+                            CurrencyCode = "USD"
+                        });
+                    }
+                    return new Response<IEnumerable<PricePoint>>
+                    {
+                        StatusCode = StatusCode.Ok,
+                        Result = result
+                    };
                 }
 
                 return new Response<IEnumerable<PricePoint>>
                 {
-                    StatusCode = StatusCode.Ok,
-                    Result = result
+                    StatusCode = StatusCode.OtherError,
+                    ErrorMessage = "Invalid data received."
                 };
             }, _rateLimiter);
 
@@ -105,21 +122,26 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
             var fetchResponse = await _httpClient.FetchJson(queryUrl, response =>
             {
                 var responseModel = response.ToObject<List<TiingoLatestPriceResponseModel>>();
-                if (responseModel.Count == 0)
+                if (responseModel != null && responseModel.Count > 0)
                 {
-                    throw new ApplicationException($"Symbol {request.Symbol} not found.");
+                    var pricePoint = new PricePoint
+                    {
+                        Symbol = request.Symbol,
+                        Price = responseModel[0].Price,
+                        Time = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now),
+                        CurrencyCode = "USD"
+                    };
+                    return new Response<PricePoint>
+                    {
+                        StatusCode = StatusCode.Ok,
+                        Result = pricePoint
+                    };
                 }
-                var pricePoint = new PricePoint
-                {
-                    Symbol = request.Symbol,
-                    Price = responseModel[0].Price,
-                    Time = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now),
-                    CurrencyCode = "USD"
-                };
+
                 return new Response<PricePoint>
                 {
-                    StatusCode = StatusCode.Ok,
-                    Result = pricePoint
+                    StatusCode = StatusCode.OtherError,
+                    ErrorMessage = "Invalid data received."
                 };
             }, _rateLimiter);
 

@@ -34,7 +34,7 @@ namespace PortEval.FinancialDataFetcher.APIs.AlphaVantage
             var queryUrl = $"{_baseUrl}/query?function=TIME_SERIES_DAILY&symbol={request.Symbol}&outputsize=full&apikey={_apiKey}";
 
             return await _httpClient.FetchJson(queryUrl,
-                response => ProcessPrices(request, response.ToObject<TimeSeriesDailyResponseModel>().Prices), _rateLimiter);
+                response => ProcessPrices(request, response?.ToObject<TimeSeriesDailyResponseModel>()?.Prices), _rateLimiter);
         }
 
         public async Task<Response<IEnumerable<PricePoint>>> Process(IntradayPricesRequest request)
@@ -46,7 +46,7 @@ namespace PortEval.FinancialDataFetcher.APIs.AlphaVantage
                 $"{_baseUrl}/query?function=TIME_SERIES_INTRADAY&symbol={request.Symbol}&interval={intervalString}&outputsize=full&apikey={_apiKey}";
 
             return await _httpClient.FetchJson(queryUrl,
-                response => ProcessPrices(request, response.ToObject<TimeSeriesIntradayResponseModel>().Prices), _rateLimiter);
+                response => ProcessPrices(request, response?.ToObject<TimeSeriesIntradayResponseModel>()?.Prices), _rateLimiter);
         }
 
         public async Task<Response<PricePoint>> Process(LatestInstrumentPriceRequest request)
@@ -56,17 +56,26 @@ namespace PortEval.FinancialDataFetcher.APIs.AlphaVantage
             return await _httpClient.FetchJson(queryUrl, response =>
             {
                 var currentPriceData = response.ToObject<GlobalQuoteResponseModel>();
-                var pricePoint = new PricePoint
+                if (currentPriceData != null)
                 {
-                    Symbol = request.Symbol,
-                    Price = currentPriceData.PriceData.Price,
-                    Time = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now)
-                };
+                    var pricePoint = new PricePoint
+                    {
+                        Symbol = request.Symbol,
+                        Price = currentPriceData.PriceData.Price,
+                        Time = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now)
+                    };
+
+                    return new Response<PricePoint>
+                    {
+                        StatusCode = StatusCode.Ok,
+                        Result = pricePoint
+                    };
+                }
 
                 return new Response<PricePoint>
                 {
-                    StatusCode = StatusCode.Ok,
-                    Result = pricePoint
+                    StatusCode = StatusCode.OtherError,
+                    ErrorMessage = "Invalid data received."
                 };
             }, _rateLimiter);
         }
@@ -81,6 +90,15 @@ namespace PortEval.FinancialDataFetcher.APIs.AlphaVantage
 
         private Response<IEnumerable<PricePoint>> ProcessPrices(TimeRangeRequest request, Dictionary<string, TimeSeriesPriceDataModel> prices)
         {
+            if (prices == null)
+            {
+                return new Response<IEnumerable<PricePoint>>
+                {
+                    StatusCode = StatusCode.OtherError,
+                    ErrorMessage = "Invalid data received"
+                };
+            }
+
             var result = new List<PricePoint>();
             foreach (var (timeKey, priceData) in prices)
             {
