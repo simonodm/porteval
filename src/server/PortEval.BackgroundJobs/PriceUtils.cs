@@ -21,18 +21,19 @@ namespace PortEval.BackgroundJobs
         /// </summary>
         /// <param name="existingPriceTimes">All existing instrument prices.</param>
         /// <param name="intervalFunction">Callback to use for desired price interval calculation.</param>
-        /// <param name="currentTime">Base time to use for price interval requirements.</param>
+        /// <param name="rangeStart">Date and time to detect missing ranges from.</param>
+        /// <param name="rangeEnd">Date and time to detect missing ranges until.</param>
         /// <returns>An <c>IEnumerable</c> containing all missing time ranges.</returns>
         public static IEnumerable<TimeRange> GetMissingPriceRanges(IEnumerable<DateTime> existingPriceTimes,
-            Func<DateTime, DateTime, TimeSpan> intervalFunction, DateTime currentTime)
+            Func<DateTime, DateTime, TimeSpan> intervalFunction, DateTime rangeStart, DateTime rangeEnd)
         {
             var result = new List<TimeRange>();
             DateTime? previousPriceTime = null;
 
-            foreach (var priceTime in existingPriceTimes.Append(currentTime).OrderBy(t => t))
+            foreach (var priceTime in existingPriceTimes.Append(rangeStart).Append(rangeEnd).OrderBy(t => t))
             {
                 previousPriceTime ??= priceTime;
-                var interval = intervalFunction(currentTime, priceTime);
+                var interval = intervalFunction(rangeEnd, priceTime);
                 if (priceTime - previousPriceTime > interval)
                 {
                     result.Add(new TimeRange
@@ -54,13 +55,14 @@ namespace PortEval.BackgroundJobs
         /// the exchange is closed). For each missing time T it creates a new price point with the last available price before T.
         /// </summary>
         /// <param name="fetchedPrices">Retrieved prices.</param>
-        /// <param name="fetchStart">Base time to use for price interval requirements.</param>
+        /// <param name="rangeStart">Fetch range start.</param>
+        /// <param name="rangeEnd">Fetch range end.</param>
         /// <returns>An <c>IEnumerable</c> of supplied prices together with the filled data.</returns>
-        public static IEnumerable<PricePoint> FillMissingRangePrices(IEnumerable<PricePoint> fetchedPrices, DateTime fetchStart)
+        public static IEnumerable<PricePoint> FillMissingRangePrices(IEnumerable<PricePoint> fetchedPrices, DateTime rangeStart, DateTime rangeEnd)
         {
             var pricePoints = fetchedPrices.ToList();
             var missingRanges =
-                GetMissingPriceRanges(pricePoints.Select(p => p.Time), GetInstrumentPriceInterval, fetchStart);
+                GetMissingPriceRanges(pricePoints.Select(p => p.Time), GetInstrumentPriceInterval, rangeStart, rangeEnd);
 
             var result = new List<PricePoint>();
             foreach (var range in missingRanges)
@@ -71,7 +73,7 @@ namespace PortEval.BackgroundJobs
                 var currentTime = range.From;
                 while (currentTime < range.To)
                 {
-                    if (currentTime > range.From && currentTime < range.To)
+                    if (currentTime > range.From)
                     {
                         result.Add(new PricePoint
                         {

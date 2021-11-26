@@ -42,7 +42,7 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
         public async Task Run(int instrumentId)
         {
             _logger.LogInformation($"First price fetch for instrument {instrumentId} at {DateTime.Now}.");
-            var instrument = await _context.Instruments.AsNoTracking().FirstOrDefaultAsync(i => i.Id == instrumentId);
+            var instrument = await _context.Instruments.FirstOrDefaultAsync(i => i.Id == instrumentId);
             if (instrument == null)
             {
                 _logger.LogError($"No instrument with id {instrumentId} found.");
@@ -62,9 +62,16 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
 
             var allFetchedPrices = ConcatFetchedPrices(dailyPricesResponse, hourlyPricesResponse,
                 latestPricesResponse);
-            var pricesWithMissingRangesFilled = PriceUtils.FillMissingRangePrices(allFetchedPrices, fetchStart);
 
-            await SavePrices(instrument, pricesWithMissingRangesFilled);
+            if (allFetchedPrices.Count != 0)
+            {
+                var pricesWithMissingRangesFilled = PriceUtils.FillMissingRangePrices(
+                    allFetchedPrices,
+                    allFetchedPrices[0].Time,
+                    fetchStart);
+                await SavePrices(instrument, pricesWithMissingRangesFilled);
+            }
+
             _logger.LogInformation($"First price fetch for instrument {instrumentId} finished at {DateTime.Now}.");
         }
 
@@ -111,6 +118,8 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
             if (orderedPrices.Count > 0)
             {
                 instrument.SetTrackingFrom(orderedPrices[0].Time);
+                _context.Update(instrument);
+                await _context.SaveChangesAsync();
             }
 
             var pricesToAdd = new List<InstrumentPrice>();

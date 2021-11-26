@@ -42,8 +42,8 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
         /// <returns>A task representing the asynchronous job processing operation.</returns>
         public async Task Run()
         {
-            var startTime = DateTime.Now;
-            _logger.LogInformation($"Starting missing prices fetch at {startTime}.");
+            var currentTime = DateTime.Now;
+            _logger.LogInformation($"Starting missing prices fetch at {currentTime}.");
 
             var instruments = await _context.Instruments.AsNoTracking().ToListAsync();
 
@@ -57,10 +57,13 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                     .Select(p => p.Time)
                     .ToListAsync();
 
-                var missingRanges = PriceUtils.GetMissingPriceRanges(trackablePrices.Prepend(instrument.TrackingInfo.StartTime), PriceUtils.GetInstrumentPriceInterval, startTime);
+                var missingRanges = PriceUtils.GetMissingPriceRanges(
+                    trackablePrices, PriceUtils.GetInstrumentPriceInterval,
+                    instrument.TrackingInfo.StartTime,
+                    currentTime);
                 foreach (var range in missingRanges)
                 {
-                    await ProcessInstrumentRange(instrument, startTime, range);
+                    await ProcessInstrumentRange(instrument, currentTime, range);
                 }
             }
 
@@ -72,14 +75,14 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
         /// the prices are converted to instrument's currency beforehand.
         /// </summary>
         /// <param name="instrument">Instrument to retrieve prices for.</param>
-        /// <param name="startTime">Base time to use for interval requirements.</param>
+        /// <param name="currentTime">Base time to use for interval requirements.</param>
         /// <param name="range">Time range of missing prices.</param>
         /// <returns>A task representing the asynchronous retrieval, conversion and save operations.</returns>
-        private async Task ProcessInstrumentRange(Instrument instrument, DateTime startTime, TimeRange range)
+        private async Task ProcessInstrumentRange(Instrument instrument, DateTime currentTime, TimeRange range)
         {
             Response<IEnumerable<PricePoint>> fetchResult;
 
-            var timeDifference = startTime - range.To;
+            var timeDifference = currentTime - range.To;
             if (timeDifference < TimeSpan.FromDays(5))
             {
                 var intradayInterval = timeDifference <= TimeSpan.FromDays(1)
@@ -110,7 +113,11 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                 Time = range.From
             };
 
-            var newPricePoints = PriceUtils.FillMissingRangePrices(fetchResult.Result.Prepend(rangeStartPricePoint), startTime);
+            var newPricePoints = PriceUtils.FillMissingRangePrices(
+                fetchResult.Result.Prepend(rangeStartPricePoint),
+                range.From,
+                range.To);
+
             var pricesToAdd = new List<InstrumentPrice>();
             foreach (var pricePoint in newPricePoints)
             {

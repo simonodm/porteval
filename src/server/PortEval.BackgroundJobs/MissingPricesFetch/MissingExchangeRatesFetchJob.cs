@@ -35,8 +35,8 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
         /// <returns>A task representing the asynchronous job processing operation.</returns>
         public async Task Run()
         {
-            var startTime = DateTime.Now;
-            _logger.LogInformation($"Missing exchange rates job started at {startTime}.");
+            var currentTime = DateTime.Now;
+            _logger.LogInformation($"Missing exchange rates job started at {currentTime}.");
 
             var currencies = await _context.Currencies.AsNoTracking().ToListAsync();
             var defaultCurrency = await _context.Currencies.AsNoTracking().FirstOrDefaultAsync(c => c.IsDefault);
@@ -54,9 +54,10 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             var initialTime = new DateTime(2000, 1, 1);
 
             var missingExchangeRates = PriceUtils.GetMissingPriceRanges(
-                defaultCurrency.TrackingInfo == null ? new[] { initialTime, startTime } : exchangeRateTimes.Prepend(initialTime),
+                exchangeRateTimes,
                 PriceUtils.GetCurrencyExchangeRateInterval,
-                startTime);
+                defaultCurrency.TrackingInfo?.StartTime ?? initialTime,
+                currentTime);
 
             foreach (var range in missingExchangeRates)
             {
@@ -99,12 +100,11 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
 
                 i++;
                 // limited to 1000 days per insert to preserve application memory
-                if (i >= 1000)
-                {
-                    await _context.BulkInsertAsync(newExchangeRates);
-                    newExchangeRates.Clear();
-                    i = 0;
-                }
+                if (i < 1000) continue;
+                
+                await _context.BulkInsertAsync(newExchangeRates);
+                newExchangeRates.Clear();
+                i = 0;
             }
 
             if(newExchangeRates.Count > 0)
