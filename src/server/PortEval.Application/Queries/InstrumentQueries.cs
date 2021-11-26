@@ -97,6 +97,14 @@ namespace PortEval.Application.Queries
         /// <inheritdoc cref="IInstrumentQueries.GetInstrumentPrice"/>
         public async Task<QueryResponse<InstrumentPriceDto>> GetInstrumentPrice(int instrumentId, DateTime time)
         {
+            var instrument = await GetInstrument(instrumentId);
+            if (instrument.Status == QueryStatus.NotFound)
+            {
+                return new QueryResponse<InstrumentPriceDto>
+                {
+                    Status = QueryStatus.NotFound
+                };
+            }
             var query = InstrumentDataQueries.GetInstrumentPrice(instrumentId, time);
 
             using var connection = _connection.CreateConnection();
@@ -104,7 +112,7 @@ namespace PortEval.Application.Queries
 
             return new QueryResponse<InstrumentPriceDto>
             {
-                Status = price != null ? QueryStatus.Ok : QueryStatus.NotFound,
+                Status = QueryStatus.Ok,
                 Response = price
             };
         }
@@ -181,7 +189,9 @@ namespace PortEval.Application.Queries
             var process = new Func<DateTime, Task<EntityChartPointDto>>(async time =>
             {
                 var price = await GetInstrumentPrice(instrumentId, time);
-                if (price.Status == QueryStatus.NotFound) return null;
+                if (price.Response == null) return null;
+
+                price.Response.Time = time;
                 return await _exchangeRateQueries.ConvertChartPointCurrency(instrument.Response.CurrencyCode, currencyCode,
                     EntityChartPointDto.FromInstrumentPrice(price.Response));
             });

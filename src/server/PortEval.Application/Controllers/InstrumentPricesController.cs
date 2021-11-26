@@ -53,7 +53,7 @@ namespace PortEval.Application.Controllers
             var price = await _instrumentQueries.GetInstrumentPrice(instrumentId, time);
             if (price.Status == QueryStatus.NotFound)
             {
-                return NotFound($"Price for instrument {instrumentId} at {time} not found.");
+                return NotFound($"Instrument {instrumentId} not found.");
             }
 
             return price.Response;
@@ -68,7 +68,7 @@ namespace PortEval.Application.Controllers
             var price = await _instrumentQueries.GetInstrumentPrice(instrumentId, DateTime.Now);
             if (price.Status == QueryStatus.NotFound)
             {
-                return NotFound($"No price for instrument {instrumentId} found.");
+                return NotFound($"Instrument {instrumentId} not found.");
             }
 
             return price.Response;

@@ -61,7 +61,7 @@ namespace PortEval.Application.Controllers
             var exchangeRate = await _exchangeRateQueries.GetExchangeRateAt(codeFrom, codeTo, DateTime.Now);
             if (exchangeRate.Status == QueryStatus.NotFound)
             {
-                return NotFound($"No exchange rate from {codeFrom} to {codeTo} found.");
+                return NotFound($"Invalid currency pair: {codeFrom}, {codeTo}.");
             }
             return exchangeRate.Response;
         }
@@ -75,7 +75,7 @@ namespace PortEval.Application.Controllers
             var exchangeRate = await _exchangeRateQueries.GetExchangeRateAt(codeFrom, codeTo, time);
             if (exchangeRate.Status == QueryStatus.NotFound)
             {
-                return NotFound($"No exchange rate from {codeFrom} to {codeTo} at {time} found.");
+                return NotFound($"Invalid currency pair: {codeFrom}, {codeTo}.");
             }
 
             return exchangeRate.Response;
