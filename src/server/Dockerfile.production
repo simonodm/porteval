@@ -16,10 +16,10 @@ COPY ["PortEval.FinancialDataFetcher/PortEval.FinancialDataFetcher.csproj", "Por
 RUN dotnet restore "PortEval.Application/PortEval.Application.csproj"
 COPY . .
 WORKDIR "/app/PortEval.Application"
-RUN dotnet build "PortEval.Application.csproj" -c Debug -o /app/build
+RUN dotnet build "PortEval.Application.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "PortEval.Application.csproj" -c Debug -o /app/publish
+RUN dotnet publish "PortEval.Application.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app

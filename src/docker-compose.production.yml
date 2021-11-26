@@ -16,6 +16,7 @@ services:
     image: ${DOCKER_REGISTRY-}porteval-api:0.1
     build:
       context: ./server
+      dockerfile: Dockerfile.production
     depends_on:
       - porteval-db
     ports:
