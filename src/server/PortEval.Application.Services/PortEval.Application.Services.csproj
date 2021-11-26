@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PortEval.Application.Models\PortEval.Application.Models.csproj" />
+    <ProjectReference Include="..\PortEval.Domain\PortEval.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

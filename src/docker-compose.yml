@@ -1,0 +1,48 @@
+version: '3.4'
+
+services:
+  porteval-db:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Hw82@malzsA!
+    ports:
+      - "5433:1433"
+    volumes:
+      - porteval_db_dev:/var/opt/mssql
+
+  porteval-api:
+    image: ${DOCKER_REGISTRY-}porteval-api:dev
+    build:
+      context: ./server
+    depends_on:
+      - porteval-db
+    ports:
+      - "4680:80"
+      - "4681:443"
+    env_file:
+      - ./.env.dev
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+    volumes:
+      - porteval_dev_certificates:/root/.aspnet/https
+      
+  porteval-web:
+    image: ${DOCKER_REGISTRY-}porteval-web:dev
+    build:
+      context: ./web
+    depends_on:
+      - porteval-api
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+    - ./web:/app
+    - /app/node_modules
+
+volumes:
+    porteval_dev_certificates:
+      external: true
+    porteval_db_dev:

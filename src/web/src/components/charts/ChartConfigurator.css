@@ -1,0 +1,32 @@
+.chart-configurator {
+    text-align: center;
+}
+
+.chart-configurator-setting {
+    margin: 0 4px;
+    display: inline-block;
+    text-align: left;
+}
+
+.chart-configurator-setting label {
+    margin-right: 4px;
+    color: rgb(180, 180, 180);
+    display: block;
+    font-size: 12px;
+}
+
+.chart-configurator-setting select {
+    padding: 4px;
+}
+
+.chart-configurator-setting select option {
+    padding: 8px;
+}
+
+.chart-configurator > div {
+    display: inline-block;
+}
+
+.chart-datepicker-wrapper {
+    width: unset;
+}

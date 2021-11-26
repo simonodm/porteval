@@ -1,0 +1,12 @@
+.loading-wrapper {
+    width: 100%;
+}
+
+.loading-wrapper > * {
+    margin: 0 auto;
+}
+
+.error-wrapper {
+    font-weight: 600;
+    color: red;
+}

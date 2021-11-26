@@ -1,0 +1,118 @@
+#app {
+    display: flex;
+    justify-content: stretch;
+    flex-direction: column;
+}
+
+#main {
+    display: flex;
+    align-items: stretch;
+    align-self: stretch;
+    flex-basis: 100%;
+    width: 100%;
+}
+
+#content {
+    display: flex;
+    padding: 24px;
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+table tr {
+    border-bottom: 1px solid #e2e2e2;
+}
+
+table.entity-list {
+    margin-top: 24px;
+    margin-bottom: 24px;
+    font-size: 14px;
+}
+
+table.entity-list td, table.entity-list th {
+    padding: 6px;
+}
+
+table.entity-list th {
+    color: #757575;
+    font-size: 14px;
+    font-weight: normal;
+    border-bottom: 1px solid #000;
+}
+
+table.entity-list tbody tr:hover {
+    background-color: #ebf2fa;
+}
+
+table.entity-list-nested th {
+    border-bottom: none;
+    font-size: 0.8em;
+}
+
+table.entity-list tr.nested {
+    font-size: 10px;
+}
+
+table.entity-list-nested td {
+    font-size: 0.8em;
+}
+table.entity-list-nested td, table.entity-list-nested th {
+    padding: 4px;
+}
+
+table.entity-data td {
+    padding: 4px;
+}
+
+table.entity-data td:nth-child(2) {
+    text-align: right;
+}
+
+.btn-extra-sm {
+    padding: .2rem .4rem;
+    font-size: .7rem;
+    line-height: 1.5;
+    border-radius: .15rem;
+}
+
+.chart-picker {
+    height: 50%;
+    overflow: auto;
+    background-color: rgb(250, 250, 250);
+    padding: 8px;
+}
+
+.picker-item {
+    background-color: rgb(245, 245, 245);
+    border: 1px solid rgb(230, 230, 230);
+    padding: 8px 4px;
+    margin: 4px 0;
+    vertical-align: top;
+}
+
+.picker-item > *, .picker-item-actions > * {
+    margin: 0 4px;
+    vertical-align: top;
+}
+
+.picker-item-name {
+    font-size: 14px;
+}
+
+.picker-item-actions {
+    float: right;
+}
+
+.picker-line-color-box {
+    display: inline;
+    width: 8px;
+    height: 8px;
+}
+
+.draggable {
+    cursor: move;
+}

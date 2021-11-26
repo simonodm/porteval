@@ -1,0 +1,29 @@
+import { ChartConfig, ChartLineBase, InstrumentType } from './types';
+
+export const MAIN_COLOR = '#343a40';
+export const REFRESH_INTERVAL = 300_000;
+export const ERROR_STRING = 'An error has occured. Please try again later.';
+export const DEFAULT_CHART: ChartConfig = {
+    name: 'New chart',
+    type: 'price',
+    currencyCode: 'USD',
+    isToDate: true,
+    toDateRange: '5days',
+    lines: []
+}
+export const DEFAULT_CHART_LINE: ChartLineBase = {
+    width: 1,
+    dash: 'solid',
+    color: '#000000'
+};
+
+export const INSTRUMENT_TYPE_TO_STRING: Record<InstrumentType, string> = {
+    'stock': 'Stock',
+    'bond': 'Bond',
+    'mutualFund': 'Mutual Fund',
+    'etf': 'ETF',
+    'commodity': 'Commodity',
+    'cryptoCurrency': 'Cryptocurrency',
+    'index': 'Index',
+    'other': 'Other'
+}

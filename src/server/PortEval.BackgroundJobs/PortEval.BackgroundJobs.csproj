@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EFCore.BulkExtensions" Version="5.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PortEval.Application.Services\PortEval.Application.Services.csproj" />
+    <ProjectReference Include="..\PortEval.FinancialDataFetcher\PortEval.FinancialDataFetcher.csproj" />
+    <ProjectReference Include="..\PortEval.Infrastructure\PortEval.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

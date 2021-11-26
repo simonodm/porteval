@@ -1,0 +1,47 @@
+version: '3.4'
+
+services:
+  porteval-db:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    env_file:
+      - ./.env
+    volumes:
+      - porteval_db_prod:/var/opt/mssql
+
+  porteval-api:
+    image: ${DOCKER_REGISTRY-}porteval-api:0.1
+    build:
+      context: ./server
+    depends_on:
+      - porteval-db
+    ports:
+      - "4680:80"
+      - "4681:443"
+    env_file:
+      - ./.env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+    volumes:
+      - porteval_prod_certificates:/root/.aspnet/https
+      
+  porteval-web:
+    image: ${DOCKER_REGISTRY-}porteval-web:0.1
+    build:
+      context: ./web
+      dockerfile: Dockerfile.production
+    depends_on:
+      - porteval-api
+    ports:
+      - "8080:80"
+    volumes:
+    - ./web:/app
+
+volumes:
+    porteval_prod_certificates:
+      external: true
+    porteval_db_prod:
