@@ -83,6 +83,10 @@ namespace PortEval.Application
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PortEvalAPI v1"));
+                app.UseHangfireDashboard("/hangfire", new DashboardOptions
+                {
+                    Authorization = new [] { new HangfireDevAuthorizationFilter() }
+                });
             }
 
             app.UseCors();
