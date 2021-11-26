@@ -1,9 +1,11 @@
-﻿using PortEval.Application.Models.DTOs;
+﻿using System;
+using PortEval.Application.Models.DTOs;
 using PortEval.Application.Services.Interfaces;
 using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using System.Threading.Tasks;
+using PortEval.Application.Services.Extensions;
 
 namespace PortEval.Application.Services
 {
@@ -21,7 +23,7 @@ namespace PortEval.Application.Services
         public async Task<InstrumentPrice> AddPricePointAsync(InstrumentPriceDto options)
         {
             var instrument = await FetchInstrument(options.InstrumentId);
-            var pricePoint = instrument.AddPricePoint(options.Time, options.Price);
+            var pricePoint = instrument.AddPricePoint(options.Time.RoundDown(TimeSpan.FromMinutes(1)), options.Price);
             _instrumentRepository.Update(instrument);
             await _instrumentRepository.UnitOfWork.CommitAsync();
             return pricePoint;
