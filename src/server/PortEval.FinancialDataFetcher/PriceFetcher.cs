@@ -1,5 +1,5 @@
 ﻿using PortEval.FinancialDataFetcher.APIs.AlphaVantage;
-using PortEval.FinancialDataFetcher.APIs.ExchangeRate.host;
+using PortEval.FinancialDataFetcher.APIs.ExchangeRateHost;
 using PortEval.FinancialDataFetcher.APIs.Interfaces;
 using PortEval.FinancialDataFetcher.APIs.OpenExchangeRates;
 using PortEval.FinancialDataFetcher.APIs.Tiingo;
