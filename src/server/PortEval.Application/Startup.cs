@@ -69,11 +69,13 @@ namespace PortEval.Application
 
             services.AddAutoMapper(typeof(Startup), typeof(PortEvalDbContext), typeof(PortfolioDto));
 
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PortEvalAPI", Version = "v1" });
+                c.EnableAnnotations();
             });
+
+            services.AddSwaggerGenNewtonsoftSupport();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -98,8 +100,6 @@ namespace PortEval.Application
             app.UseRouting();
 
             app.UseAuthorization();
-
-            app.UseHangfireDashboard();
 
             app.UseEndpoints(endpoints =>
             {

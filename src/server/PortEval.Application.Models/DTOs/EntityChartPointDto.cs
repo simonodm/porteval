@@ -1,10 +1,15 @@
 ﻿using System;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace PortEval.Application.Models.DTOs
 {
+    [SwaggerSchema("Represents a single chart data point.")]
     public class EntityChartPointDto
     {
+        [SwaggerSchema("Data point time.", ReadOnly = true)]
         public DateTime Time { get; private set; }
+
+        [SwaggerSchema("Data point value.", ReadOnly = true)]
         public decimal Value { get; private set; }
 
         public EntityChartPointDto(DateTime time, decimal price)
