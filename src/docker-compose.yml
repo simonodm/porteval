@@ -10,6 +10,12 @@ services:
       - "5433:1433"
     volumes:
       - porteval_db_dev:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$${SA_PASSWORD}" -Q "SELECT 1" -b -o /dev/null
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
 
   porteval-api:
     image: ${DOCKER_REGISTRY-}porteval-api:dev
@@ -19,14 +25,11 @@ services:
       - porteval-db
     ports:
       - "4680:80"
-      - "4681:443"
     env_file:
       - ./.env.dev
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80;https://+:443
-    volumes:
-      - porteval_dev_certificates:/root/.aspnet/https
+      - ASPNETCORE_URLS=http://+:80
       
   porteval-web:
     image: ${DOCKER_REGISTRY-}porteval-web:dev
@@ -43,6 +46,4 @@ services:
     - /app/node_modules
 
 volumes:
-    porteval_dev_certificates:
-      external: true
     porteval_db_dev:

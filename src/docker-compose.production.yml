@@ -1,17 +1,6 @@
 version: '3.4'
 
 services:
-  porteval-db:
-    image: "mcr.microsoft.com/mssql/server:2019-latest"
-    environment:
-      - ACCEPT_EULA=Y
-    ports:
-      - "1433:1433"
-    env_file:
-      - ./.env
-    volumes:
-      - porteval_db_prod:/var/opt/mssql
-
   porteval-api:
     image: ${DOCKER_REGISTRY-}porteval-api:0.1
     build:
@@ -38,7 +27,7 @@ services:
     depends_on:
       - porteval-api
     ports:
-      - "8080:80"
+      - "80:80"
     volumes:
     - ./web:/app
 

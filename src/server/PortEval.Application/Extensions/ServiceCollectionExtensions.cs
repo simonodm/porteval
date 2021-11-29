@@ -71,7 +71,7 @@ namespace PortEval.Application.Extensions
         public static void ConfigureDbContext(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<PortEvalDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("PortEvalDbContext")));
+                options.UseSqlServer(configuration.GetConnectionString("PortEvalDb")));
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace PortEval.Application.Extensions
         /// <param name="configuration">ASP.NET application configuration.</param>
         public static void ConfigureHangfire(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddHangfire(h => h.UseSqlServerStorage(configuration.GetConnectionString("PortEvalDbContext"), new SqlServerStorageOptions
+            services.AddHangfire(h => h.UseSqlServerStorage(configuration.GetConnectionString("PortEvalDb"), new SqlServerStorageOptions
             {
                 CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
                 CommandTimeout = TimeSpan.FromMinutes(30),
@@ -113,9 +113,21 @@ namespace PortEval.Application.Extensions
         {
             var fetcher = new PriceFetcher();
             var tiingoKey = Environment.GetEnvironmentVariable("PORTEVAL_Tiingo_Key");
+            var alphaVantageKey = Environment.GetEnvironmentVariable("PORTEVAL_AlphaVantage_Key");
+            var openExchangeRatesKey = Environment.GetEnvironmentVariable("PORTEVAL_OpenExchangeRates_Key");
             if (tiingoKey != null)
             {
                 fetcher.AddTiingo(tiingoKey, new RateLimiter(TimeSpan.FromHours(1), 500));
+            }
+
+            if (alphaVantageKey != null)
+            {
+                fetcher.AddAlphaVantage(alphaVantageKey, new RateLimiter(TimeSpan.FromHours(1), 20));
+            }
+
+            if (openExchangeRatesKey != null)
+            {
+                fetcher.AddOpenExchangeRates(openExchangeRatesKey, new RateLimiter(TimeSpan.FromHours(3), 4));
             }
 
             fetcher.AddExchangeRateHost();

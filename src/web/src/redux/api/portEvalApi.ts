@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const portEvalApi = createApi({
-    baseQuery: fetchBaseQuery({ baseUrl: 'https://localhost:4681/api' }),
+    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4680/api' }),
     endpoints: () => ({}),
     tagTypes: [
         'Portfolios',

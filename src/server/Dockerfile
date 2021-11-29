@@ -1,7 +1,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
 WORKDIR /app
 EXPOSE 80
-EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /app
@@ -15,6 +14,7 @@ COPY ["PortEval.FinancialDataFetcher/PortEval.FinancialDataFetcher.csproj", "Por
 
 RUN dotnet restore "PortEval.Application/PortEval.Application.csproj"
 COPY . .
+RUN chmod +x ./wait-for-it.sh
 WORKDIR "/app/PortEval.Application"
 RUN dotnet build "PortEval.Application.csproj" -c Debug -o /app/build
 
@@ -24,4 +24,5 @@ RUN dotnet publish "PortEval.Application.csproj" -c Debug -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "PortEval.Application.dll"]
+COPY --from=build /app/wait-for-it.sh .
+ENTRYPOINT ["./wait-for-it.sh", "porteval-db:1433", "--timeout=120", "--", "dotnet", "PortEval.Application.dll"]

@@ -10,7 +10,7 @@ namespace PortEval.Infrastructure
 
         public PortEvalDbConnection(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("PortEvalDbContext");
+            _connectionString = configuration.GetConnectionString("PortEvalDb");
         }
 
         public IDbConnection CreateConnection() => new SqlConnection(_connectionString);
