@@ -12,7 +12,9 @@ function PortfolioListView(): JSX.Element {
             <PageHeading heading="Portfolios">
                 <button role="button" className="btn btn-success btn-sm float-right" onClick={() => setModalIsOpen(true)}>Create new portfolio</button>
             </PageHeading>
-            <PortfoliosTable />
+            <div className="col-xs-12 container-fluid">
+                <PortfoliosTable />
+            </div>
             <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>
                 <CreatePortfolioModal closeModal={() => setModalIsOpen(false)} />
             </ModalWrapper>

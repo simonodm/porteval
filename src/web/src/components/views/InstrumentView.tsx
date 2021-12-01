@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 
 import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
-import { useDeleteInstrumentPriceMutation, useGetInstrumentByIdQuery, useGetInstrumentCurrentPriceQuery, useGetInstrumentPricePageQuery } from '../../redux/api/instrumentApi';
+import { useDeleteInstrumentPriceMutation, useGetInstrumentByIdQuery, useGetInstrumentCurrentPriceQuery, useGetInstrumentPricePageQuery, usePrefetch } from '../../redux/api/instrumentApi';
 import { useParams } from 'react-router-dom';
 import { checkIsLoaded, checkIsError } from '../utils/queries';
 
@@ -14,6 +14,7 @@ import ModalWrapper from '../modals/ModalWrapper';
 import CreateInstrumentPriceModal from '../modals/CreateInstrumentPriceModal';
 import { generateDefaultInstrumentChart } from '../utils/chart';
 import PageHeading from '../ui/PageHeading';
+import PageSelector from '../ui/PageSelector';
 
 type Params = {
     instrumentId?: string;
@@ -23,9 +24,14 @@ export default function InstrumentView(): JSX.Element {
     const params = useParams<Params>();
     const instrumentId = params.instrumentId ? parseInt(params.instrumentId) : 0;
 
+    const [page, setPage] = useState(1);
+    const [pageLimit] = useState(100);
+
+    const prefetchPrices = usePrefetch('getInstrumentPricePage');
+
     const instrument = useGetInstrumentByIdQuery(instrumentId);
     const currentPrice = useGetInstrumentCurrentPriceQuery(instrumentId);
-    const prices = useGetInstrumentPricePageQuery({ instrumentId, page: 1, limit: 30 }, { pollingInterval: constants.REFRESH_INTERVAL });
+    const prices = useGetInstrumentPricePageQuery({ instrumentId, page, limit: pageLimit }, { pollingInterval: constants.REFRESH_INTERVAL });
     const currency = useGetCurrencyQuery(instrument.data?.currencyCode ?? skipToken)
     const [deletePrice, mutationStatus] = useDeleteInstrumentPriceMutation()
 
@@ -82,6 +88,14 @@ export default function InstrumentView(): JSX.Element {
                     <div className="content-heading">
                         <h5>Price history</h5>
                     </div>
+                    <div className="float-right">
+                    <PageSelector
+                            page={page}
+                            totalPages={prices.data ? prices.data.totalCount / pageLimit : 1}
+                            onPageChange={(p) => setPage(p)}
+                            prefetch={(p) => prefetchPrices({ instrumentId, page: p, limit: pageLimit })}
+                        />
+                    </div>
                     <table className="entity-list w-100">
                         <thead>
                             <tr>
@@ -113,6 +127,14 @@ export default function InstrumentView(): JSX.Element {
                             </tbody>
                         </LoadingWrapper>
                     </table>
+                    <div className="float-right">
+                        <PageSelector
+                            page={page}
+                            totalPages={prices.data ? prices.data.totalCount / pageLimit : 1}
+                            onPageChange={(p) => setPage(p)}
+                            prefetch={(p) => prefetchPrices({ instrumentId, page: p, limit: pageLimit })}
+                        />
+                    </div>
                 </div>
             </div>
             <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>

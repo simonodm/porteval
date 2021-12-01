@@ -169,5 +169,6 @@ export const {
     useAddInstrumentPriceMutation,
     useDeleteInstrumentPriceMutation,
     useGetInstrumentProfitQuery,
-    useGetInstrumentPerformanceQuery
+    useGetInstrumentPerformanceQuery,
+    usePrefetch
 } = instrumentApi;

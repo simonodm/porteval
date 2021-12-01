@@ -12,7 +12,9 @@ export default function InstrumentListView(): JSX.Element {
             <PageHeading heading="Instruments">
                 <button className="btn btn-success btn-sm float-right" onClick={() => setModalIsOpen(true)}>Create new instrument</button>
             </PageHeading>
-            <InstrumentsTable />
+            <div className="col-xs-12 container-fluid">
+                <InstrumentsTable />
+            </div>
             <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>
                 <CreateInstrumentModal closeModal={() => setModalIsOpen(false)} />
             </ModalWrapper>
