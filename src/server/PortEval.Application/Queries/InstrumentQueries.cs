@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Services.Extensions;
 
 namespace PortEval.Application.Queries
 {
@@ -186,6 +187,18 @@ namespace PortEval.Application.Queries
                 };
             }
 
+            var firstPriceTime = await GetFirstPriceTime(instrumentId);
+            if (firstPriceTime == null)
+            {
+                return new QueryResponse<IEnumerable<EntityChartPointDto>>
+                {
+                    Status = QueryStatus.Ok,
+                    Response = Enumerable.Empty<EntityChartPointDto>()
+                };
+            }
+
+            dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
+
             var process = new Func<DateTime, Task<EntityChartPointDto>>(async time =>
             {
                 var price = await GetInstrumentPrice(instrumentId, time);
@@ -229,6 +242,18 @@ namespace PortEval.Application.Queries
                 };
             }
 
+            var firstPriceTime = await GetFirstPriceTime(instrumentId);
+            if (firstPriceTime == null)
+            {
+                return new QueryResponse<IEnumerable<EntityChartPointDto>>
+                {
+                    Status = QueryStatus.Ok,
+                    Response = Enumerable.Empty<EntityChartPointDto>()
+                };
+            }
+
+            dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
+
             var calculations = await CalculationUtils.AggregateCalculations
             (
                 dateRange,
@@ -259,6 +284,18 @@ namespace PortEval.Application.Queries
                 };
             }
 
+            var firstPriceTime = await GetFirstPriceTime(instrumentId);
+            if (firstPriceTime == null)
+            {
+                return new QueryResponse<IEnumerable<EntityChartPointDto>>
+                {
+                    Status = QueryStatus.Ok,
+                    Response = Enumerable.Empty<EntityChartPointDto>()
+                };
+            }
+
+            dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
+
             var calculations = await CalculationUtils.AggregateCalculations
             (
                 dateRange,
@@ -288,6 +325,18 @@ namespace PortEval.Application.Queries
                 };
             }
 
+            var firstPriceTime = await GetFirstPriceTime(instrumentId);
+            if (firstPriceTime == null)
+            {
+                return new QueryResponse<IEnumerable<EntityChartPointDto>>
+                {
+                    Status = QueryStatus.Ok,
+                    Response = Enumerable.Empty<EntityChartPointDto>()
+                };
+            }
+
+            dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
+
             var calculations = await CalculationUtils.AggregateCalculations
             (
                 dateRange,
@@ -315,6 +364,18 @@ namespace PortEval.Application.Queries
                 };
             }
 
+            var firstPriceTime = await GetFirstPriceTime(instrumentId);
+            if (firstPriceTime == null)
+            {
+                return new QueryResponse<IEnumerable<EntityChartPointDto>>
+                {
+                    Status = QueryStatus.Ok,
+                    Response = Enumerable.Empty<EntityChartPointDto>()
+                };
+            }
+
+            dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
+
             var calculations = await CalculationUtils.AggregateCalculations
             (
                 dateRange,
@@ -327,6 +388,15 @@ namespace PortEval.Application.Queries
                 Status = QueryStatus.Ok,
                 Response = calculations
             };
+        }
+
+        private async Task<DateTime?> GetFirstPriceTime(int instrumentId)
+        {
+            var query = InstrumentDataQueries.GetFirstPriceTime(instrumentId);
+            using var connection = _connection.CreateConnection();
+            var timeModel = await connection.QueryFirstOrDefaultAsync<SingleTimeQueryModel>(query.Query, query.Params);
+
+            return timeModel?.Time;
         }
     }
 }

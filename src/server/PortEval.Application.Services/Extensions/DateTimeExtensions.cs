@@ -15,5 +15,27 @@ namespace PortEval.Application.Services.Extensions
             var ticks = time.Ticks - time.Ticks % timeSpan.Ticks;
             return new DateTime(ticks);
         }
+
+        /// <summary>
+        /// Returns the smaller <c>DateTime</c> value out of the two provided.
+        /// </summary>
+        /// <param name="time">First time.</param>
+        /// <param name="otherTime">Other time.</param>
+        /// <returns>The smaller <c>DateTime</c></returns>
+        public static DateTime GetMin(this DateTime time, DateTime otherTime)
+        {
+            return new DateTime(Math.Min(time.Ticks, otherTime.Ticks));
+        }
+
+        /// <summary>
+        /// Returns the larger <c>DateTime</c> value out of the two provided.
+        /// </summary>
+        /// <param name="time">First time.</param>
+        /// <param name="otherTime">Other time.</param>
+        /// <returns>The larger <c>DateTime</c></returns>
+        public static DateTime GetMax(this DateTime time, DateTime otherTime)
+        {
+            return new DateTime(Math.Max(time.Ticks, otherTime.Ticks));
+        }
     }
 }

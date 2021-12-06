@@ -7,7 +7,7 @@ using System.Linq;
 namespace PortEval.Application.Queries.Helpers
 {
     /// <summary>
-    /// Calculates approximate financial performance based on transactions' internal rate of return.
+    /// Calculates approximate financial performance of a tradeable entity based on transactions' internal rate of return.
     /// </summary>
     internal static class IrrPerformanceCalculator
     {
@@ -83,7 +83,7 @@ namespace PortEval.Application.Queries.Helpers
             if (difference >= TimeSpan.FromDays(3650)) return TimeSpan.FromDays(365);
             if (difference >= TimeSpan.FromDays(365)) return TimeSpan.FromDays(30);
             if (difference >= TimeSpan.FromDays(30)) return TimeSpan.FromDays(7);
-            if (difference >= TimeSpan.FromDays(1)) return TimeSpan.FromDays(1);
+            if (difference >= TimeSpan.FromDays(3)) return TimeSpan.FromDays(1);
 
             return TimeSpan.FromHours(1);
         }

@@ -3,7 +3,6 @@ using PortEval.Application.Services.Extensions;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PortEval.Application.Queries.Helpers
@@ -13,6 +12,21 @@ namespace PortEval.Application.Queries.Helpers
     /// </summary>
     internal static class CalculationUtils
     {
+        /// <summary>
+        /// Represents maximum time periods for each aggregation frequency.
+        /// </summary>
+        private static readonly Dictionary<AggregationFrequency, TimeSpan> _frequencyRangeLimits =
+            new()
+            {
+                [AggregationFrequency.FiveMin] = TimeSpan.FromDays(14),
+                [AggregationFrequency.Hour] = TimeSpan.FromDays(180),
+                [AggregationFrequency.Day] = TimeSpan.FromDays(365 * 10),
+                [AggregationFrequency.Week] = TimeSpan.FromDays(365 * 25),
+                [AggregationFrequency.Month] = TimeSpan.FromDays(365 * 50),
+                [AggregationFrequency.Year] = TimeSpan.FromDays(365 * 50)
+            };
+
+
         /// <summary>
         /// Calculates aggregated financial data in the supplied date range with the supplied frequency.
         /// </summary>
@@ -25,8 +39,10 @@ namespace PortEval.Application.Queries.Helpers
             AggregationFrequency frequency, Func<DateRangeParams, Task<TDto>> calculateValue)
         {
             var result = new List<TDto>();
-            
-            var ranges = GetAggregatedRanges(dateRange.From, dateRange.To, frequency);
+
+            var limitedRange = LimitDateRange(dateRange, frequency);
+
+            var ranges = GetAggregatedRanges(limitedRange.From, limitedRange.To, frequency);
             foreach (var range in ranges)
             {
                 var value = await calculateValue(range);
@@ -37,28 +53,6 @@ namespace PortEval.Application.Queries.Helpers
             }
 
             return result;
-        }
-
-        public static DateTime GetMax(params DateTime[] times)
-        {
-            var currentMax = DateTime.MinValue;
-            foreach (var time in times)
-            {
-                if (time > currentMax) currentMax = time;
-            }
-
-            return currentMax;
-        }
-
-        public static DateTime GetMin(params DateTime[] times)
-        {
-            var currentMin = DateTime.MaxValue;
-            foreach (var time in times)
-            {
-                if (time < currentMin) currentMin = time;
-            }
-
-            return currentMin;
         }
 
         /// <summary>
@@ -80,7 +74,7 @@ namespace PortEval.Application.Queries.Helpers
                 var range = new DateRangeParams
                 {
                     From = current,
-                    To = GetMin(nextRangeStart, to)
+                    To = nextRangeStart.GetMin(to)
                 };
                 result.Add(range);
                 current = nextRangeStart;
@@ -121,6 +115,21 @@ namespace PortEval.Application.Queries.Helpers
             }
 
             return current;
+        }
+
+        /// <summary>
+        /// Limits the supplied date range in accordance to maximum durations allowed for each frequency. This is done to avoid extreme scenarios like
+        /// processing every 5 minutes since 0001-01-01.
+        /// </summary>
+        /// <param name="range">Original date range.</param>
+        /// <param name="frequency">Aggregation frequency.</param>
+        /// <returns>Date range limited to maximum allowed values for the specified aggregation frequency.</returns>
+        private static DateRangeParams LimitDateRange(DateRangeParams range, AggregationFrequency frequency)
+        {
+            var maxDuration = _frequencyRangeLimits[frequency];
+            if (range.To - range.From <= maxDuration) return range;
+
+            return range.SetFrom(range.To - maxDuration);
         }
     }
 }
