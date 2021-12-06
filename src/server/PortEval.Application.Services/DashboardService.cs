@@ -5,7 +5,6 @@ using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.ValueObjects;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PortEval.Application.Services
@@ -27,29 +26,18 @@ namespace PortEval.Application.Services
 
             foreach (var existingItem in existingItems)
             {
-                var matchingItem = newItems.FirstOrDefault(item => ItemsAreSame(item, existingItem));
-                if (matchingItem == null)
-                {
-                    await _dashboardItemRepository.Remove(existingItem);
-                }
-                else
-                {
-                    var position = new DashboardPosition(matchingItem.DashboardPositionX, matchingItem.DashboardPositionY, matchingItem.DashboardWidth, matchingItem.DashboardHeight);
-                    existingItem.SetPosition(position);
-                    await _dashboardItemRepository.Update(existingItem);
-                }
+                await _dashboardItemRepository.Remove(existingItem);
             }
 
-            foreach (var newItem in newItems)
+            var newItemEntities = await GenerateItemEntities(newItems);
+            if (OverlapsExist(newItemEntities))
             {
-                var existingItem = existingItems.FirstOrDefault(item => ItemsAreSame(newItem, item));
-                if (existingItem == null)
-                {
-                    await ValidateChartExists(newItem.ChartId);
-                    var position = new DashboardPosition(newItem.DashboardPositionX, newItem.DashboardPositionY, newItem.DashboardWidth, newItem.DashboardHeight);
-                    var item = new DashboardChartItem(newItem.ChartId, position);
-                    _dashboardItemRepository.Add(item);
-                }
+                throw new OperationNotAllowedException("Dashboard layout overlaps detected.");
+            }
+
+            foreach (var entity in newItemEntities)
+            {
+                _dashboardItemRepository.Add(entity);
             }
 
             await _dashboardItemRepository.UnitOfWork.CommitAsync();
@@ -63,9 +51,39 @@ namespace PortEval.Application.Services
             }
         }
 
-        private bool ItemsAreSame(DashboardItemDto itemDto, DashboardItem itemEntity)
+        private async Task<List<DashboardItem>> GenerateItemEntities(IEnumerable<DashboardItemDto> items)
         {
-            return itemEntity is DashboardChartItem dashboardChartItem && itemDto.ChartId == dashboardChartItem.ChartId;
+            var result = new List<DashboardItem>();
+            foreach (var item in items)
+            {
+                await ValidateChartExists(item.ChartId);
+                var position = new DashboardPosition(item.DashboardPositionX, item.DashboardPositionY, item.DashboardWidth, item.DashboardHeight);
+                result.Add(new DashboardChartItem(item.ChartId, position));
+            }
+
+            return result;
+        }
+
+        private bool OverlapsExist(IEnumerable<DashboardItem> items)
+        {
+            var filledLayoutPositions = new HashSet<(int, int)>();
+
+            foreach (var item in items)
+            {
+                for (int i = item.Position.X; i < item.Position.X + item.Position.Width; i++)
+                {
+                    for (int j = item.Position.Y; j < item.Position.Y + item.Position.Height; j++)
+                    {
+                        if (filledLayoutPositions.Contains((i, j)))
+                        {
+                            return true;
+                        }
+                        filledLayoutPositions.Add((i, j));
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

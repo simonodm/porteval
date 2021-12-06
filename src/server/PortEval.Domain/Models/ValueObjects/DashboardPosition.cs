@@ -11,9 +11,13 @@ namespace PortEval.Domain.Models.ValueObjects
 
         public DashboardPosition(int x, int y, int width, int height)
         {
+            if (x < 0 || y < 0)
+            {
+                throw new OperationNotAllowedException("Chart dashboard item coordinates cannot be less than zero.");
+            }
             if (x >= 6 || (x + width - 1) >= 6)
             {
-                throw new OperationNotAllowedException($"Chart dashboard width must fit within 6 columns.");
+                throw new OperationNotAllowedException("Chart dashboard width must fit within 6 columns.");
             }
             X = x;
             Y = y;
@@ -25,8 +29,15 @@ namespace PortEval.Domain.Models.ValueObjects
         {
             if (other == null) return false;
 
-            return X < (other.X + other.Width) && (X + Width) > other.X && Y < (other.Y + other.Height) &&
-                   (Y + Height) > other.Y;
+            return OverlapsWith(other.X, other.Y, other.Width, other.Height);
+        }
+
+        public bool OverlapsWith(int x, int y, int width, int height)
+        {
+            return X < (x + width) &&
+                   (X + Width) > x &&
+                   Y < (y + height) &&
+                   (Y + Height) > y;
         }
     }
 }
