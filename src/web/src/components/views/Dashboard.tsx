@@ -22,46 +22,31 @@ export default function Dashboard(): JSX.Element {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [droppingItemId, setDroppingItemId] = useState(0);
 
-    const onLayoutChange = (layouts: Layout[]) => {
-        const newDashboardPositions = layouts.map(layout => ({
-            chartId: parseInt(layout.i),
-            dashboardPositionX: layout.x,
-            dashboardPositionY: layout.y,
-            dashboardWidth: layout.w,
-            dashboardHeight: layout.h
-        }));
-
-        updateLayout({
-            items: newDashboardPositions
-        });
-    }
-
-    const onDrop = (layout: Layout[], layoutItem: Layout) => {
-        if(dashboardLayout) {
-            setDashboardLayout({
-                items: [
-                    ...dashboardLayout.items,
-                    {
-                        chartId: droppingItemId,
-                        dashboardPositionX: layoutItem.x,
-                        dashboardPositionY: layoutItem.y,
-                        dashboardWidth: layoutItem.w,
-                        dashboardHeight: layoutItem.h
-                    }
-                ]
-            })
+    const saveLayout = (layout: Layout[]) => {
+        if(dashboardLayout !== undefined) {
+            const newDashboardLayout = {
+                items: layout.map(item => ({
+                    chartId: parseInt(item.i),
+                    dashboardPositionX: item.x,
+                    dashboardPositionY: item.y,
+                    dashboardWidth: item.w,
+                    dashboardHeight: item.h
+                }))
+            }
+            setDashboardLayout(newDashboardLayout);
+            updateLayout(newDashboardLayout);
         }
-        
     }
 
     const onRemove = (chartId: number) => {
         if(dashboardLayout) {
-            setDashboardLayout({
+            const newDashboardLayout = {
                 items: [
                     ...dashboardLayout.items.filter(item => item.chartId !== chartId)
                 ]
-            });
-            updateLayout(dashboardLayout);
+            }
+            setDashboardLayout(newDashboardLayout);
+            updateLayout(newDashboardLayout);
         }
     }
 
@@ -85,8 +70,9 @@ export default function Dashboard(): JSX.Element {
                 isDraggable={isEditable}
                 isResizable={isEditable}
                 isDroppable={true}
-                onLayoutChange={onLayoutChange}
-                onDrop={onDrop}>
+                onDragStop={saveLayout}
+                onResizeStop={saveLayout}
+                onDrop={saveLayout}>
                 {charts.data && dashboardLayout && charts.data.map(chart => {
                     const chartPosition = dashboardLayout.items.find(l => l.chartId === chart.id);
 

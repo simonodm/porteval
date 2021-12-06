@@ -40,8 +40,8 @@ export default function TransactionForm({
     const position = useGetPositionQuery(positionId ? { positionId } : skipToken);
     const instrumentPrice = useGetInstrumentPriceAtQuery(position.data ? { instrumentId: position.data.instrumentId, time: time.toISO() } : skipToken);
 
-    const isLoaded = checkIsLoaded(portfolios, positions, position, instrumentPrice);
-    const isError = checkIsError(portfolios, positions, position, instrumentPrice);
+    const isLoaded = checkIsLoaded(portfolios, positions, position);
+    const isError = checkIsError(portfolios, positions, position);
 
     useEffect(() => {
         if(!portfolios.isLoading && portfolios.data && portfolioId === undefined) {
