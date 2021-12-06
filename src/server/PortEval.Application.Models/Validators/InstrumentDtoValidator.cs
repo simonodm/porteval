@@ -9,13 +9,16 @@ namespace PortEval.Application.Models.Validators
         {
             RuleFor(i => i.Symbol)
                 .NotNull()
-                .MinimumLength(1);
+                .MinimumLength(1)
+                .MaximumLength(10);
             RuleFor(i => i.Name)
                 .NotNull()
-                .MinimumLength(1);
+                .MinimumLength(1)
+                .MaximumLength(32);
             RuleFor(i => i.Exchange)
                 .NotNull()
-                .MinimumLength(1);
+                .MinimumLength(1)
+                .MaximumLength(32);
             RuleFor(i => i.CurrencyCode)
                 .NotNull()
                 .Length(3);

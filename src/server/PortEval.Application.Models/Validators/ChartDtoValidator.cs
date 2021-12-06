@@ -22,13 +22,15 @@ namespace PortEval.Application.Models.Validators
                 .When(c => c.IsToDate == true);
             RuleFor(c => c.Frequency)
                 .NotNull()
-                .When(c => c.Type == ChartType.AggregatedProfit || c.Type == ChartType.AggregatedPerformance);
-            When(c => c.Type == ChartType.Profit || c.Type == ChartType.Price ||
-                           c.Type == ChartType.AggregatedProfit, () =>
+                .When(c => c.Type is ChartType.AggregatedProfit or ChartType.AggregatedPerformance);
+            When(c => c.Type is ChartType.Profit or ChartType.Price or ChartType.AggregatedProfit, () =>
                 {
                     RuleFor(c => c.CurrencyCode).NotNull();
                     RuleFor(c => c.CurrencyCode).Length(3);
                 });
+
+            RuleForEach(c => c.Lines)
+                .SetValidator(new ChartLineDtoValidator());
         }
     }
 }

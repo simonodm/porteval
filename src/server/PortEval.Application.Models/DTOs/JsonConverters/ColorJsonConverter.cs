@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.Globalization;
+using PortEval.Domain.Exceptions;
 
 namespace PortEval.Application.Models.DTOs.JsonConverters
 {
@@ -9,17 +10,16 @@ namespace PortEval.Application.Models.DTOs.JsonConverters
     {
         private Color HexToColor(string hexValue)
         {
-            if (hexValue.StartsWith('#'))
+            if (hexValue.Length == 7 &&
+                hexValue.StartsWith('#') &&
+                int.TryParse($"{hexValue[1]}{hexValue[2]}", NumberStyles.HexNumber, null, out var red) &&
+                int.TryParse($"{hexValue[3]}{hexValue[4]}", NumberStyles.HexNumber, null, out var green) &&
+                int.TryParse($"{hexValue[5]}{hexValue[6]}", NumberStyles.HexNumber, null, out var blue))
             {
-                if (int.TryParse($"{hexValue[1]}{hexValue[2]}", NumberStyles.HexNumber, null, out var red) &&
-                    int.TryParse($"{hexValue[3]}{hexValue[4]}", NumberStyles.HexNumber, null, out var green) &&
-                    int.TryParse($"{hexValue[5]}{hexValue[6]}", NumberStyles.HexNumber, null, out var blue))
-                {
-                    return Color.FromArgb(red, green, blue);
-                }
+                return Color.FromArgb(red, green, blue);
             }
 
-            throw new ArgumentException($"Invalid hex value color: {hexValue}.");
+            throw new OperationNotAllowedException($"Invalid hex value color: {hexValue}.");
         }
 
         public override void WriteJson(JsonWriter writer, Color value, JsonSerializer serializer)

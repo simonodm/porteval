@@ -17,13 +17,9 @@ namespace PortEval.Application.Models.Validators
             RuleFor(line => line.PortfolioId)
                 .NotNull()
                 .When(line => line.Type == ChartLineType.Portfolio);
-            When(line => line.Type == ChartLineType.Position, () =>
-            {
-                RuleFor(line => line.PortfolioId)
-                    .NotNull();
-                RuleFor(line => line.PositionId)
-                    .NotNull();
-            });
+            RuleFor(line => line.PositionId)
+                .NotNull()
+                .When(line => line.Type == ChartLineType.Position);
 
         }
     }
