@@ -53,7 +53,7 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
             var fiveDaysCutoffDate = fetchStart - PriceUtils.FiveDays;
             var oneDayCutoffDate = fetchStart - PriceUtils.FiveDays;
 
-            var dailyPricesResponse = await _fetcher.GetHistoricalDailyPrices(instrument.Symbol, DateTime.MinValue,
+            var dailyPricesResponse = await _fetcher.GetHistoricalDailyPrices(instrument.Symbol, new DateTime(2000, 1, 1),
                 fiveDaysCutoffDate);
             var hourlyPricesResponse = await _fetcher.GetIntradayPrices(instrument.Symbol, fiveDaysCutoffDate, oneDayCutoffDate,
                 IntradayInterval.OneHour);
@@ -114,22 +114,28 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
         /// <returns>A Task representing the asynchronous price save operation.</returns>
         private async Task SavePrices(Instrument instrument, IEnumerable<PricePoint> prices)
         {
-            var orderedPrices = prices.OrderBy(p => p.Time).ToList();
-            if (orderedPrices.Count > 0)
+            if (!prices.Any())
             {
-                instrument.SetTrackingFrom(orderedPrices[0].Time);
-                _context.Update(instrument);
-                await _context.SaveChangesAsync();
+                return;
             }
 
             var pricesToAdd = new List<InstrumentPrice>();
-            foreach (var pricePoint in orderedPrices)
+            var minTime = DateTime.Now;
+            foreach (var pricePoint in prices)
             {
                 var price = await PriceUtils.GetConvertedPricePointPrice(_context, instrument, pricePoint);
                 pricesToAdd.Add(new InstrumentPrice(pricePoint.Time, price, instrument.Id));
+
+                if (pricePoint.Time < minTime)
+                {
+                    minTime = pricePoint.Time;
+                }
             }
 
-            _context.BulkInsert(pricesToAdd);
+            instrument.SetTrackingFrom(minTime);
+            _context.Update(instrument);
+            await _context.SaveChangesAsync();
+            await _context.BulkInsertAsync(pricesToAdd);
         }
     }
 }

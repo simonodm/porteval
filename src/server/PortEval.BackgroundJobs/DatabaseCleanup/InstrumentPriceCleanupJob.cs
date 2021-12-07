@@ -70,7 +70,7 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
 
                 if (previousPrice != null && currentAnchor != previousPrice)
                 {
-                    _context.Remove(price);
+                    _context.Remove(previousPrice);
                 }
 
                 previousPrice = price;

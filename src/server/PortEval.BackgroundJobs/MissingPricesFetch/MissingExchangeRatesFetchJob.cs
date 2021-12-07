@@ -79,14 +79,10 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             var fetchResult = await _fetcher.GetHistoricalDailyExchangeRates(currency.Code, range.From, range.To);
             if (fetchResult.StatusCode != StatusCode.Ok) return;
 
-            if(currency.TrackingInfo == null)
-            {
-                await SetTrackingInfo(currency, fetchResult);
-            }
-
             var currenciesList = currencies.ToList();
             int i = 0;
             var newExchangeRates = new List<CurrencyExchangeRate>();
+            var minTime = DateTime.Now;
             foreach (var exchangeRateData in fetchResult.Result)
             {
                 if (exchangeRateData.Time < range.From || exchangeRateData.Time > range.To) continue;
@@ -96,6 +92,10 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                     if (currenciesList.FirstOrDefault(c => c.Code == targetCurrency) == null || currency.Code == targetCurrency) continue;
 
                     newExchangeRates.Add(new CurrencyExchangeRate(exchangeRateData.Time, exchangeRate, currency.Code, targetCurrency));
+                    if (exchangeRateData.Time < minTime)
+                    {
+                        minTime = exchangeRateData.Time;
+                    }
                 }
 
                 i++;
@@ -107,21 +107,17 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                 i = 0;
             }
 
+            if (currency.TrackingInfo == null && fetchResult.Result.Any())
+            {
+                currency.SetTrackingFrom(minTime);
+                _context.Update(currency);
+                await _context.SaveChangesAsync();
+            }
+
             if(newExchangeRates.Count > 0)
             {
                 await _context.BulkInsertAsync(newExchangeRates);
                 newExchangeRates.Clear();
-            }
-        }
-
-        private async Task SetTrackingInfo(Currency currency, Response<IEnumerable<ExchangeRates>> fetchResponse)
-        {
-            if(fetchResponse.Result.Any())
-            {
-                currency.SetTrackingFrom(fetchResponse.Result.OrderBy(er => er.Time).First().Time);
-                _context.Update(currency);
-                await _context.SaveChangesAsync();
-                _context.Entry(currency).State = EntityState.Detached; // Update() enables tracking on selected currency, we do not desire that for performance reasons
             }
         }
     }
