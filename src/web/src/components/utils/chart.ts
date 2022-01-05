@@ -60,11 +60,11 @@ export function getXAxisD3Format(from: DateTime, to: DateTime): (date: Date) => 
 export function calculateAppropriateChartFrequency(from: DateTime, to: DateTime): ChartFrequency {
     const diff = to.diff(from);
 
-    if(diff >= Duration.fromObject({ years: 10 })) return 'year';
-    if(diff >= Duration.fromObject({ years: 2 })) return 'month';
-    if(diff >= Duration.fromObject({ months: 6 })) return 'week';
-    if(diff >= Duration.fromObject({ days: 7 })) return 'day';
-    if(diff >= Duration.fromObject({ days: 1 })) return 'hour';
+    if(diff > Duration.fromObject({ years: 10 })) return 'year';
+    if(diff > Duration.fromObject({ years: 2 })) return 'month';
+    if(diff > Duration.fromObject({ years: 1})) return 'week';
+    if(diff > Duration.fromObject({ days: 7 })) return 'day';
+    if(diff > Duration.fromObject({ days: 1 })) return 'hour';
 
     return '5min';
 }
@@ -172,6 +172,7 @@ function getDurationFromToDateRange(toDateRange: ChartToDateRange) {
         case '6months':
             return Duration.fromObject({ months: 6 });
         case '1year':
+        default:
             return Duration.fromObject({ years: 1 });
     }
 }
