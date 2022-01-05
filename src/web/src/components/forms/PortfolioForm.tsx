@@ -32,7 +32,7 @@ export default function PortfolioForm({ name: defaultName, currencyCode: default
                     <input
                         type="text"
                         id="portfolio-name"
-                        placeholder="e.g. Apple Inc"
+                        placeholder="e.g. US stocks"
                         className="form-control"
                         value={name}
                         onChange={(e) => setName(e.target.value)} />
@@ -48,7 +48,7 @@ export default function PortfolioForm({ name: defaultName, currencyCode: default
                     <input
                         type="text"
                         id="portfolio-note"
-                        placeholder="e.g. Apple Inc"
+                        placeholder="e.g. NASDAQ stocks"
                         className="form-control"
                         value={note}
                         onChange={(e) => setNote(e.target.value)} />

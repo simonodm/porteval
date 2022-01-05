@@ -31,7 +31,7 @@ export default function InstrumentForm({ onSubmit }: Props): JSX.Element {
             <form onSubmit={(e) => { onSubmit(name, symbol, exchange, type, currencyCode); e.preventDefault() }}>
                 <div className="form-group">
                     <label htmlFor="instrument-name">Name:</label>
-                    <input type="text" id="instrument-name" placeholder="e.g. Apple Inc" className="form-control" onChange={(e) => setName(e.target.value)}></input>
+                    <input type="text" id="instrument-name" placeholder="e.g. Apple Inc." className="form-control" onChange={(e) => setName(e.target.value)}></input>
                 </div>
                 <div className="form-group">
                     <label htmlFor="instrument-symbol">Symbol:</label>
