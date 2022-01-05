@@ -17,11 +17,16 @@ export default function ModalWrapper({ children, isOpen, closeModal }: Props): J
             shouldCloseOnOverlayClick={true}
             overlayClassName="modal-overlay"
             >
-            {
-                Array.isArray(children)
-                    ? children.map(child => React.cloneElement(child, { closeModal }))
-                    : children ? React.cloneElement(children, { closeModal }) : <></>
-            }
+                <div className="modal-controls">
+                    <button className="btn btn-sm btn-danger float-right" onClick={closeModal}><i className="bi bi-x"></i></button>
+                </div>
+                <div className="modal-inner">
+                    {
+                        Array.isArray(children)
+                            ? children.map(child => React.cloneElement(child, { closeModal }))
+                            : children ? React.cloneElement(children, { closeModal }) : <></>
+                    }
+                </div>
         </ReactModal>
     )
 }

@@ -1,5 +1,17 @@
+.modal-controls button {
+    font-size: 24px;
+    line-height: 24px;
+    padding: 0px;
+}
+
 .modal-overlay {
     position: fixed;
     background-color: rgba(60, 60, 60, 0.8);
     inset: 0px;
+}
+
+.modal-inner {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
 }

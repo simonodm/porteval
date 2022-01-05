@@ -1,15 +1,11 @@
 import React from 'react';
-import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
 import { useCreatePortfolioMutation } from '../../redux/api/portfolioApi';
 import { ModalCallbacks } from '../../types';
 import PortfolioForm from '../forms/PortfolioForm';
+import { onSuccessfulResponse } from '../utils/modal';
 
 export default function CreatePortfolioModal({ closeModal }: ModalCallbacks): JSX.Element {
-    const [createPortfolio, mutationStatus] = useCreatePortfolioMutation();
-
-    const isLoaded = checkIsLoaded(mutationStatus);
-    const isError = checkIsError(mutationStatus);
+    const [createPortfolio] = useCreatePortfolioMutation();
 
     const handleSubmit = (name: string, currencyCode: string, note: string) => {
         const portfolio = {
@@ -18,12 +14,12 @@ export default function CreatePortfolioModal({ closeModal }: ModalCallbacks): JS
             note
         };
 
-        createPortfolio(portfolio).then(() => closeModal());
+        createPortfolio(portfolio).then((val) => {
+            onSuccessfulResponse(val, closeModal);
+        });
     }
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
-            <PortfolioForm onSubmit={handleSubmit} />
-        </LoadingWrapper>
+        <PortfolioForm onSubmit={handleSubmit} />
     )
 }

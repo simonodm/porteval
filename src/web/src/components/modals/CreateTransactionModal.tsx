@@ -1,10 +1,9 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 import { useAddTransactionMutation } from '../../redux/api/transactionApi';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
-import LoadingWrapper from '../ui/LoadingWrapper';
 import { ModalCallbacks } from '../../types';
 import TransactionForm from '../forms/TransactionForm';
+import { onSuccessfulResponse } from '../utils/modal';
 
 type Props = {
     portfolioId?: number;
@@ -12,10 +11,7 @@ type Props = {
 } & ModalCallbacks
 
 export default function CreateTransactionModal({ portfolioId, positionId, closeModal }: Props): JSX.Element {
-    const [createTransaction, mutationStatus] = useAddTransactionMutation();
-
-    const isLoaded = checkIsLoaded(mutationStatus);
-    const isError = checkIsError(mutationStatus);
+    const [createTransaction] = useAddTransactionMutation();
 
     const handleSubmit = (portfolioId: number, positionId: number, amount: number, price: number, time: DateTime, note: string) => {
         const transaction = {
@@ -27,12 +23,12 @@ export default function CreateTransactionModal({ portfolioId, positionId, closeM
             note
         };
 
-        createTransaction(transaction).then(() => closeModal());
+        createTransaction(transaction).then((val) => {
+            onSuccessfulResponse(val, closeModal);
+        });
     }
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
-            <TransactionForm portfolioId={portfolioId} positionId={positionId} onSubmit={handleSubmit} />
-        </LoadingWrapper>
+        <TransactionForm portfolioId={portfolioId} positionId={positionId} onSubmit={handleSubmit} />
     )
 }
