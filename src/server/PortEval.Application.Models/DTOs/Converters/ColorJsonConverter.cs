@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Globalization;
+using Newtonsoft.Json;
 using PortEval.Domain.Exceptions;
 
-namespace PortEval.Application.Models.DTOs.JsonConverters
+namespace PortEval.Application.Models.DTOs.Converters
 {
     public class ColorJsonConverter : JsonConverter<Color>
     {

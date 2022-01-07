@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using PortEval.Domain.Models.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using PortEval.Domain.Models.Enums;
 
-namespace PortEval.Application.Models.DTOs.JsonConverters
+namespace PortEval.Application.Models.DTOs.Converters
 {
     /// <summary>
     /// Handles conversion between JSON and <see cref="ToDateRange">ToDateRange</see>.

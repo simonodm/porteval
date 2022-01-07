@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using FluentValidation.AspNetCore;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
@@ -11,11 +12,12 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using PortEval.Application.Extensions;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Models.DTOs.JsonConverters;
+using PortEval.Application.Models.DTOs.Converters;
 using PortEval.Application.Models.Validators;
 using PortEval.BackgroundJobs.DatabaseCleanup;
 using PortEval.BackgroundJobs.LatestPricesFetch;
 using PortEval.BackgroundJobs.MissingPricesFetch;
+using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure;
 
 namespace PortEval.Application
@@ -44,12 +46,13 @@ namespace PortEval.Application
             services.AddControllers()
                 .AddNewtonsoftJson(options =>
                 {
+                    options.SerializerSettings.Converters.Add(new AggregationFrequencyJsonConverter());
                     options.SerializerSettings.Converters.Add(new ToDateRangeJsonConverter());
-                    options.SerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy(), false));
                     options.SerializerSettings.Converters.Add(new ColorJsonConverter());
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
                     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy(), false));
                 })
                 .AddFluentValidation(v => v.RegisterValidatorsFromAssemblyContaining<PortfolioDtoValidator>());
 
@@ -106,7 +109,14 @@ namespace PortEval.Application
                 endpoints.MapControllers();
             });
 
+            AddTypeConverter<AggregationFrequency, AggregationFrequencyTypeConverter>();
+
             ConfigureBackgroundJobs();
+        }
+
+        private void AddTypeConverter<TType, TConverterType>()
+        {
+            TypeDescriptor.AddAttributes(typeof(TType), new TypeConverterAttribute(typeof(TConverterType)));
         }
 
         private void ConfigureBackgroundJobs()
