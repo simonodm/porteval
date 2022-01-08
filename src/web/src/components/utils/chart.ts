@@ -107,7 +107,7 @@ export function generateDefaultInstrumentChart(instrument: Instrument): ChartCon
 
     const instrumentPriceChart: ChartConfig = {
         type: 'price',
-        name: `${instrument.symbol} price`,
+        name: 'New chart',
         currencyCode: `${instrument.currencyCode}`,
         isToDate: true,
         toDateRange: '5days',
@@ -128,7 +128,7 @@ export function generateDefaultPortfolioChart(portfolio: Portfolio): ChartConfig
 
     const portfolioPriceChart: ChartConfig = {
         type: 'price',
-        name: `${portfolio.name} value`,
+        name: 'New chart',
         currencyCode: `${portfolio.currencyCode}`,
         isToDate: true,
         toDateRange: '5days',
@@ -149,7 +149,7 @@ export function generateDefaultPositionChart(position: Position): ChartConfig {
 
     const positionPriceChart: ChartConfig = {
         type: 'price',
-        name: `${position.instrument.symbol} position value`,
+        name: 'New chart',
         currencyCode: position.instrument.currencyCode,
         isToDate: true,
         toDateRange: '5days',
