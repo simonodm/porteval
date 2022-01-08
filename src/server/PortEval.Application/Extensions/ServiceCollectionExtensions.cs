@@ -14,6 +14,11 @@ using PortEval.Infrastructure;
 using PortEval.Infrastructure.Repositories;
 using System;
 using System.Data;
+using PortEval.Application.Services.Interfaces.BackgroundJobs;
+using PortEval.BackgroundJobs.DatabaseCleanup;
+using PortEval.BackgroundJobs.InitialPriceFetch;
+using PortEval.BackgroundJobs.LatestPricesFetch;
+using PortEval.BackgroundJobs.MissingPricesFetch;
 
 namespace PortEval.Application.Extensions
 {
@@ -23,20 +28,11 @@ namespace PortEval.Application.Extensions
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Configures PortEval's application services and repositories.
+        /// Configures PortEval's application services.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
-        public static void ConfigureServices(this IServiceCollection services)
+        public static void AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IUnitOfWork, PortEvalDbContext>();
-
-            services.AddScoped<IInstrumentRepository, InstrumentRepository>();
-            services.AddScoped<IPortfolioRepository, PortfolioRepository>();
-            services.AddScoped<IPositionRepository, PositionRepository>();
-            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
-            services.AddScoped<IChartRepository, ChartRepository>();
-            services.AddScoped<IDashboardItemRepository, DashboardItemRepository>();
-
             services.AddScoped<IInstrumentService, InstrumentService>();
             services.AddScoped<IPortfolioService, PortfolioService>();
             services.AddScoped<IPositionService, PositionService>();
@@ -48,10 +44,40 @@ namespace PortEval.Application.Extensions
         }
 
         /// <summary>
+        /// Configures PortEval's repositories.
+        /// </summary>
+        /// <param name="services">ASP.NET service IoC container.</param>
+        public static void AddRepositories(this IServiceCollection services)
+        {
+            services.AddScoped<IUnitOfWork, PortEvalDbContext>();
+
+            services.AddScoped<IInstrumentRepository, InstrumentRepository>();
+            services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+            services.AddScoped<IPositionRepository, PositionRepository>();
+            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+            services.AddScoped<IChartRepository, ChartRepository>();
+            services.AddScoped<IDashboardItemRepository, DashboardItemRepository>();
+        }
+
+        /// <summary>
+        /// Configures PortEval's background jobs.
+        /// </summary>
+        /// <param name="services">ASP.NET services IoC container.</param>
+        public static void AddBackgroundJobs(this IServiceCollection services)
+        {
+            services.AddScoped<IInitialPriceFetchJob, InitialPriceFetchJob>();
+            services.AddScoped<ILatestPricesFetchJob, LatestPricesFetchJob>();
+            services.AddScoped<ILatestExchangeRatesFetchJob, LatestExchangeRatesFetchJob>();
+            services.AddScoped<IMissingExchangeRatesFetchJob, MissingExchangeRatesFetchJob>();
+            services.AddScoped<IMissingInstrumentPricesFetchJob, MissingInstrumentPricesFetchJob>();
+            services.AddScoped<IInstrumentPriceCleanupJob, InstrumentPriceCleanupJob>();
+        }
+
+        /// <summary>
         /// Configures PortEval's read queries.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
-        public static void ConfigureQueries(this IServiceCollection services)
+        public static void AddQueries(this IServiceCollection services)
         {
             services.AddScoped<IPortfolioQueries, PortfolioQueries>();
             services.AddScoped<IPositionQueries, PositionQueries>();

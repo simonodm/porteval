@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using PortEval.Application.Services.Interfaces.BackgroundJobs;
 
 namespace PortEval.BackgroundJobs.DatabaseCleanup
 {
@@ -17,7 +18,7 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
     ///     <item>5 minutes for prices in the last 24 hours.</item>
     /// </list>
     /// </summary>
-    public class InstrumentPriceCleanupJob
+    public class InstrumentPriceCleanupJob : IInstrumentPriceCleanupJob
     {
         private readonly PortEvalDbContext _context;
         private readonly ILogger _logger;

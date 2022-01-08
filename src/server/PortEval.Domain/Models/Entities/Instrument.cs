@@ -15,6 +15,7 @@ namespace PortEval.Domain.Models.Entities
         public string Exchange { get; private set; }
         public InstrumentType Type { get; private set; }
         public string CurrencyCode { get; private set; }
+        public bool IsTracked { get; private set; }
         public TrackingInformation TrackingInfo { get; private set; }
 
         public IReadOnlyCollection<InstrumentPrice> Prices => _prices.AsReadOnly();
@@ -27,10 +28,12 @@ namespace PortEval.Domain.Models.Entities
             Exchange = exchange;
             Type = type;
             CurrencyCode = currencyCode;
+            IsTracked = false;
         }
 
         public void SetTrackingFrom(DateTime startTime)
         {
+            IsTracked = true;
             TrackingInfo = new TrackingInformation(startTime);
         }
 

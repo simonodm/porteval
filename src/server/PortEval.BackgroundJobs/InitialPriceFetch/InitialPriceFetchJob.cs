@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Services.Interfaces.BackgroundJobs;
 
 namespace PortEval.BackgroundJobs.InitialPriceFetch
 {
@@ -21,7 +22,7 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
     ///     <item>5 minutes for prices in the last 24 hours.</item>
     /// </list>
     /// </summary>
-    public class InitialPriceFetchJob
+    public class InitialPriceFetchJob : IInitialPriceFetchJob
     {
         private readonly PortEvalDbContext _context;
         private readonly PriceFetcher _fetcher;
@@ -133,6 +134,7 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
             }
 
             instrument.SetTrackingFrom(minTime);
+            instrument.TrackingInfo.Update(DateTime.Now);
             _context.Update(instrument);
             await _context.SaveChangesAsync();
             await _context.BulkInsertAsync(pricesToAdd);

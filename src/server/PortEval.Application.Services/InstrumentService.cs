@@ -5,6 +5,8 @@ using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Hangfire;
+using PortEval.Application.Services.Interfaces.BackgroundJobs;
 
 namespace PortEval.Application.Services
 {
@@ -13,13 +15,11 @@ namespace PortEval.Application.Services
     {
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly ICurrencyRepository _currencyRepository;
-        private readonly IChartRepository _chartRepository;
 
-        public InstrumentService(IInstrumentRepository instrumentRepository, ICurrencyRepository currencyRepository, IChartRepository chartRepository)
+        public InstrumentService(IInstrumentRepository instrumentRepository, ICurrencyRepository currencyRepository)
         {
             _instrumentRepository = instrumentRepository;
             _currencyRepository = currencyRepository;
-            _chartRepository = chartRepository;
         }
 
         /// <inheritdoc cref="IInstrumentService.CreateInstrumentAsync"/>
@@ -33,6 +33,7 @@ namespace PortEval.Application.Services
             var instrument = new Instrument(options.Name, options.Symbol, options.Exchange, options.Type, options.CurrencyCode);
             var createdInstrument = _instrumentRepository.Add(instrument);
             await _instrumentRepository.UnitOfWork.CommitAsync();
+            BackgroundJob.Enqueue<IInitialPriceFetchJob>(job => job.Run(createdInstrument.Id));
             return createdInstrument;
         }
 

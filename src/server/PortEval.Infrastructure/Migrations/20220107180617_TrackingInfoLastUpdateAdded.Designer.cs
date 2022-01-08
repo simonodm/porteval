@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PortEval.Infrastructure;
 
 namespace PortEval.Infrastructure.Migrations
 {
     [DbContext(typeof(PortEvalDbContext))]
-    partial class PortEvalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220107180617_TrackingInfoLastUpdateAdded")]
+    partial class TrackingInfoLastUpdateAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1410,9 +1412,6 @@ namespace PortEval.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
-
-                    b.Property<bool>("IsTracked")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()

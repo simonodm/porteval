@@ -4,6 +4,8 @@ using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Exceptions;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
+using PortEval.Application.Services.Interfaces.BackgroundJobs;
 
 namespace PortEval.Application.Services
 {
@@ -40,6 +42,7 @@ namespace PortEval.Application.Services
                 _currencyRepository.Update(currencyEntity);
 
                 await _currencyRepository.UnitOfWork.CommitAsync();
+                BackgroundJob.Enqueue<IMissingExchangeRatesFetchJob>(job => job.Run());
             }
         }
     }

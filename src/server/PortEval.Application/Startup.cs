@@ -14,9 +14,7 @@ using PortEval.Application.Extensions;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Converters;
 using PortEval.Application.Models.Validators;
-using PortEval.BackgroundJobs.DatabaseCleanup;
-using PortEval.BackgroundJobs.LatestPricesFetch;
-using PortEval.BackgroundJobs.MissingPricesFetch;
+using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure;
 
@@ -56,19 +54,23 @@ namespace PortEval.Application
                 })
                 .AddFluentValidation(v => v.RegisterValidatorsFromAssemblyContaining<PortfolioDtoValidator>());
 
+            services.AddLogging();
+
             services.ConfigureDbContext(Configuration);
-
-            services.ConfigureDapper();
-
-            services.ConfigureServices();
-
-            services.ConfigureQueries();
-
-            services.ConfigureHangfire(Configuration);
 
             services.ConfigurePriceFetcher(Configuration);
 
-            services.AddLogging();
+            services.ConfigureDapper();
+
+            services.AddRepositories();
+
+            services.AddBackgroundJobs();
+
+            services.AddServices();
+
+            services.AddQueries();
+
+            services.ConfigureHangfire(Configuration);
 
             services.AddAutoMapper(typeof(Startup), typeof(PortEvalDbContext), typeof(PortfolioDto));
 
@@ -111,7 +113,7 @@ namespace PortEval.Application
 
             AddTypeConverter<AggregationFrequency, AggregationFrequencyTypeConverter>();
 
-            ConfigureBackgroundJobs();
+            ScheduleBackgroundJobs();
         }
 
         private void AddTypeConverter<TType, TConverterType>()
@@ -119,15 +121,15 @@ namespace PortEval.Application
             TypeDescriptor.AddAttributes(typeof(TType), new TypeConverterAttribute(typeof(TConverterType)));
         }
 
-        private void ConfigureBackgroundJobs()
+        private void ScheduleBackgroundJobs()
         {
-            RecurringJob.AddOrUpdate<LatestPricesFetchJob>("latest_prices", job => job.Run(), "*/5 * * * *");
-            RecurringJob.AddOrUpdate<LatestExchangeRatesFetchJob>("latest_exchange_rates", job => job.Run(),
+            RecurringJob.AddOrUpdate<ILatestPricesFetchJob>("latest_prices", job => job.Run(), "*/5 * * * *");
+            RecurringJob.AddOrUpdate<ILatestExchangeRatesFetchJob>("latest_exchange_rates", job => job.Run(),
                 Cron.Daily);
-            RecurringJob.AddOrUpdate<MissingInstrumentPricesFetchJob>("fetch_missing_prices", job => job.Run(), Cron.Daily);
-            RecurringJob.AddOrUpdate<MissingExchangeRatesFetchJob>("fetch_missing_exchange_rates",
+            RecurringJob.AddOrUpdate<IMissingInstrumentPricesFetchJob>("fetch_missing_prices", job => job.Run(), Cron.Daily);
+            RecurringJob.AddOrUpdate<IMissingExchangeRatesFetchJob>("fetch_missing_exchange_rates",
                 job => job.Run(), Cron.Daily);
-            RecurringJob.AddOrUpdate<InstrumentPriceCleanupJob>("db_cleanup", job => job.Run(), Cron.Daily);
+            RecurringJob.AddOrUpdate<IInstrumentPriceCleanupJob>("db_cleanup", job => job.Run(), Cron.Daily);
 
             RecurringJob.Trigger("db_cleanup");
             RecurringJob.Trigger("fetch_missing_prices");

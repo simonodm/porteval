@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Services.Interfaces.BackgroundJobs;
 
 namespace PortEval.BackgroundJobs.MissingPricesFetch
 {
@@ -23,7 +24,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
     ///     <item>5 minutes for prices in the last 24 hours.</item>
     /// </list>
     /// </summary>
-    public class MissingInstrumentPricesFetchJob
+    public class MissingInstrumentPricesFetchJob : IMissingInstrumentPricesFetchJob
     {
         private readonly PortEvalDbContext _context;
         private readonly PriceFetcher _fetcher;
@@ -49,7 +50,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
 
             foreach (var instrument in instruments)
             {
-                if (instrument.TrackingInfo == null) continue;
+                if (!instrument.IsTracked) continue;
 
                 var trackablePrices = await _context.InstrumentPrices
                     .Where(p => p.InstrumentId == instrument.Id)
@@ -65,8 +66,12 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                 {
                     await ProcessInstrumentRange(instrument, currentTime, range);
                 }
+
+                instrument.TrackingInfo.Update(currentTime);
+                _context.Instruments.Update(instrument);
             }
 
+            await _context.SaveChangesAsync(); // persist tracking info updates
             _logger.LogInformation($"Missing prices fetch finished at {DateTime.Now}.");
         }
 
@@ -134,7 +139,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                 }
             }
 
-            _context.BulkInsert(pricesToAdd);
+            await _context.BulkInsertAsync(pricesToAdd);
         }
     }
 }

@@ -7,7 +7,6 @@ using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Application.Queries.Interfaces;
 using PortEval.Application.Services.Interfaces;
-using PortEval.BackgroundJobs.InitialPriceFetch;
 using PortEval.Domain.Models.Enums;
 using System.Collections.Generic;
 using System.Linq;
@@ -177,7 +176,6 @@ namespace PortEval.Application.Controllers
             _logger.LogInformation($"Creating instrument {createRequest.Name}.");
 
             var instrument = await _instrumentService.CreateInstrumentAsync(createRequest);
-            BackgroundJob.Enqueue<InitialPriceFetchJob>(job => job.Run(instrument.Id));
 
             return CreatedAtAction("GetInstrument", new { id = instrument.Id },
                 _mapper.Map<InstrumentDto>(instrument));

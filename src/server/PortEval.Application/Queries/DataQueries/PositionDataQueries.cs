@@ -11,7 +11,7 @@ namespace PortEval.Application.Queries.DataQueries
         {
             return new QueryWrapper<IEnumerable<PositionDto>>
             {
-                Query = @"SELECT * FROM dbo.Positions 
+                Query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions 
                           INNER JOIN dbo.Instruments
                           ON Positions.InstrumentId = Instruments.Id
                           WHERE Positions.PortfolioId = @PortfolioId",
@@ -23,7 +23,7 @@ namespace PortEval.Application.Queries.DataQueries
         {
             return new QueryWrapper<PositionDto>
             {
-                Query = @"SELECT * FROM dbo.Positions
+                Query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions
                           INNER JOIN dbo.Instruments
                           ON Positions.InstrumentId = Instruments.Id
                           WHERE Positions.Id = @PositionId",

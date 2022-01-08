@@ -9,13 +9,14 @@ using System;
 using System.Threading.Tasks;
 using PortEval.Infrastructure;
 using PortEval.Application.Services.Extensions;
+using PortEval.Application.Services.Interfaces.BackgroundJobs;
 
 namespace PortEval.BackgroundJobs.LatestPricesFetch
 {
     /// <summary>
     /// Retrieves the latest available prices of all existing instruments. Each price gets rounded down to the nearest 5 minutes.
     /// </summary>
-    public class LatestPricesFetchJob
+    public class LatestPricesFetchJob : ILatestPricesFetchJob
     {
         private readonly PriceFetcher _fetcher;
         private readonly PortEvalDbContext _context;
@@ -40,20 +41,27 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
 
             foreach (var instrument in instruments)
             {
-                var fetcherResponse = await _fetcher.GetLatestInstrumentPrice(instrument.Symbol);
-                if (fetcherResponse.StatusCode != StatusCode.Ok) continue;
+                if (instrument.IsTracked)
+                {
+                    var fetcherResponse = await _fetcher.GetLatestInstrumentPrice(instrument.Symbol);
+                    if (fetcherResponse.StatusCode != StatusCode.Ok) continue;
 
-                try
-                {
-                    var pricePoint = fetcherResponse.Result;
-                    var price = await PriceUtils.GetConvertedPricePointPrice(_context, instrument,
-                        pricePoint);
-                    _context.InstrumentPrices.Add(new InstrumentPrice(startTime.RoundDown(TimeSpan.FromMinutes(5)), price, instrument.Id));
+                    try
+                    {
+                        var pricePoint = fetcherResponse.Result;
+                        var price = await PriceUtils.GetConvertedPricePointPrice(_context, instrument,
+                            pricePoint);
+                        _context.InstrumentPrices.Add(new InstrumentPrice(startTime.RoundDown(TimeSpan.FromMinutes(5)), price, instrument.Id));
+
+                        instrument.TrackingInfo.Update(startTime);
+                        _context.Instruments.Update(instrument);
+                    }
+                    catch (OperationNotAllowedException ex)
+                    {
+                        _logger.LogError(ex.Message);
+                    }
                 }
-                catch (OperationNotAllowedException ex)
-                {
-                    _logger.LogError(ex.Message);
-                }
+                
             }
 
             await _context.SaveChangesAsync();

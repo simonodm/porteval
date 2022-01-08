@@ -9,4 +9,9 @@
     <ProjectReference Include="..\PortEval.Domain\PortEval.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="EFCore.BulkExtensions" Version="5.4.1" />
+    <PackageReference Include="Hangfire" Version="1.7.28" />
+  </ItemGroup>
+
 </Project>

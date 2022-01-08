@@ -16,6 +16,9 @@ import { generateDefaultInstrumentChart } from '../utils/chart';
 import PageHeading from '../ui/PageHeading';
 import PageSelector from '../ui/PageSelector';
 
+import './InstrumentView.css';
+import { DateTime } from 'luxon';
+
 type Params = {
     instrumentId?: string;
 }
@@ -47,7 +50,13 @@ export default function InstrumentView(): JSX.Element {
 
     return (
         <LoadingWrapper isLoaded={instrumentLoaded} isError={instrumentError}>
-            <PageHeading heading={instrument.data?.name ?? 'Instrument'} />
+            <PageHeading heading={instrument.data?.name ?? 'Instrument'}>
+                { instrument.data?.isTracked  && instrument.data.lastPriceUpdate &&
+                    <span className="float-right last-updated">
+                        Prices updated: {DateTime.fromISO(instrument.data?.lastPriceUpdate).toLocaleString(DateTime.DATETIME_MED)}
+                    </span>
+                }
+            </PageHeading>
             <div className="row mb-5">
                 <div className="col-xs-12 col-md-6">
                     <h5>Data</h5>

@@ -10,13 +10,14 @@ using PortEval.Infrastructure;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Services.Interfaces.BackgroundJobs;
 
 namespace PortEval.BackgroundJobs.LatestPricesFetch
 {
     /// <summary>
     /// Retrieves the latest available exchange rates of the default currency. Each exchange rate gets rounded down to the nearest hour.
     /// </summary>
-    public class LatestExchangeRatesFetchJob
+    public class LatestExchangeRatesFetchJob : ILatestExchangeRatesFetchJob
     {
         private readonly PortEvalDbContext _context;
         private readonly PriceFetcher _fetcher;
@@ -45,6 +46,11 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
                 throw new ApplicationException("No default currency has been set.");
             }
 
+            if (defaultCurrency.TrackingInfo == null)
+            {
+                return;
+            }
+
             var exchangeRatesResponse = await _fetcher.GetLatestExchangeRates(defaultCurrency.Code);
             if (exchangeRatesResponse.StatusCode == StatusCode.Ok)
             {
@@ -57,6 +63,8 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
                 }
             }
 
+            defaultCurrency.TrackingInfo.Update(startTime);
+            _context.Update(defaultCurrency);
             await _context.SaveChangesAsync();
             _logger.LogInformation($"Latest exchange rates fetch job finished at {DateTime.Now}.");
         }

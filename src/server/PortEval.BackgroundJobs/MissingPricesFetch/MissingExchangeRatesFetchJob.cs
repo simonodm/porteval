@@ -10,13 +10,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Services.Interfaces.BackgroundJobs;
 
 namespace PortEval.BackgroundJobs.MissingPricesFetch
 {
     /// <summary>
     /// Retrieves missing exchange rates of the default currency to maintain the 1 day standard interval between rates.
     /// </summary>
-    public class MissingExchangeRatesFetchJob
+    public class MissingExchangeRatesFetchJob : IMissingExchangeRatesFetchJob
     {
         private readonly PortEvalDbContext _context;
         private readonly PriceFetcher _fetcher;
@@ -61,7 +62,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
 
             foreach (var range in missingExchangeRates)
             {
-                await ProcessCurrencyRange(currencies, defaultCurrency, range);
+                await ProcessCurrencyRange(currencies, defaultCurrency, range, currentTime);
             }
 
             _logger.LogInformation($"Missing exchange rates job finished at {DateTime.Now}.");
@@ -74,7 +75,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
         /// <param name="currency">Base currency.</param>
         /// <param name="range">Time range to retrieve data for.</param>
         /// <returns>A task representing the asynchronous exchange rate retrieval and save operations.</returns>
-        private async Task ProcessCurrencyRange(IEnumerable<Currency> currencies, Currency currency, TimeRange range)
+        private async Task ProcessCurrencyRange(IEnumerable<Currency> currencies, Currency currency, TimeRange range, DateTime startTime)
         {
             var fetchResult = await _fetcher.GetHistoricalDailyExchangeRates(currency.Code, range.From, range.To);
             if (fetchResult.StatusCode != StatusCode.Ok) return;
@@ -110,6 +111,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             if (currency.TrackingInfo == null && fetchResult.Result.Any())
             {
                 currency.SetTrackingFrom(minTime);
+                currency.TrackingInfo.Update(startTime);
                 _context.Update(currency);
                 await _context.SaveChangesAsync();
             }
