@@ -82,6 +82,10 @@ export default function InstrumentView(): JSX.Element {
                                     <td>Current price:</td>
                                     <td>{ getPriceString(currentPrice.data?.price, currency.data?.symbol) }</td>
                                 </tr>
+                                <tr>
+                                    <td>Note:</td>
+                                    <td>{ instrument.data?.note }</td>
+                                </tr>
                             </tbody>
                         </table>
                 </div>

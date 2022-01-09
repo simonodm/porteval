@@ -45,6 +45,17 @@ const instrumentApi = portEvalApi.injectEndpoints({
                     ? ['Instruments']
                     : []
         }),
+        updateInstrument: build.mutation<Instrument, Instrument>({
+            query: (data) => ({
+                url: `instruments/${data.id}`,
+                method: 'PUT',
+                body: data
+            }),
+            invalidatesTags: (result, error, arg) =>
+                !error
+                    ? [{ type: 'Instrument', id: arg.id }, 'Instruments']
+                    : []
+        }),
         deleteInstrument: build.mutation<void, number>({
             query: (id) => ({
                 url: `instruments/${id}`,
@@ -161,6 +172,7 @@ export const {
     useGetInstrumentPageQuery,
     useGetInstrumentByIdQuery,
     useCreateInstrumentMutation,
+    useUpdateInstrumentMutation,
     useDeleteInstrumentMutation,
     useGetAllInstrumentPricesQuery,
     useGetInstrumentPricePageQuery,

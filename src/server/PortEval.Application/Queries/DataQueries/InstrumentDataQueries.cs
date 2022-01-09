@@ -20,7 +20,7 @@ namespace PortEval.Application.Queries.DataQueries
         {
             return new QueryWrapper<IEnumerable<InstrumentDto>>
             {
-                Query = @"SELECT Id, Name, Symbol, Exchange, Type, CurrencyCode, IsTracked, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Instruments
+                Query = @"SELECT Id, Name, Symbol, Exchange, Type, CurrencyCode, Note, IsTracked, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Instruments
                           ORDER BY Symbol
                           OFFSET @Offset ROWS
                           FETCH NEXT @Rows ROWS ONLY",
@@ -32,7 +32,7 @@ namespace PortEval.Application.Queries.DataQueries
         {
             return new QueryWrapper<InstrumentDto>
             {
-                Query = @"SELECT Id, Name, Symbol, Exchange, Type, CurrencyCode, IsTracked, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Instruments
+                Query = @"SELECT Id, Name, Symbol, Exchange, Type, CurrencyCode, Note, IsTracked, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Instruments
                           WHERE Id = @InstrumentId",
                 Params = new { InstrumentId = instrumentId }
             };

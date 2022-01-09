@@ -5,15 +5,16 @@ import InstrumentForm from '../forms/InstrumentForm';
 import { onSuccessfulResponse } from '../utils/modal';
 
 export default function CreateInstrumentModal({ closeModal }: ModalCallbacks): JSX.Element {
-    const [ createInstrument] = useCreateInstrumentMutation();
+    const [ createInstrument ] = useCreateInstrumentMutation();
 
-    const handleSubmit = (name: string, symbol: string, exchange: string, type: InstrumentType, currencyCode: string) => {
+    const handleSubmit = (name: string, symbol: string, exchange: string, type: InstrumentType, currencyCode: string, note: string) => {
         const instrument = {
             name,
             symbol,
             exchange,
             type,
-            currencyCode
+            currencyCode,
+            note
         };
 
         createInstrument(instrument).then((val) => {

@@ -30,6 +30,9 @@ namespace PortEval.Infrastructure.Configurations
                 .Property(i => i.Type)
                 .IsRequired();
             builder
+                .Property(i => i.Note)
+                .HasMaxLength(255);
+            builder
                 .OwnsOne(i => i.TrackingInfo);
             builder
                 .Property(c => c.Version)

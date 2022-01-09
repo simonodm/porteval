@@ -26,6 +26,9 @@ namespace PortEval.Application.Models.DTOs
         [SwaggerSchema("Instrument currency code.")]
         public string CurrencyCode { get; set; }
 
+        [SwaggerSchema("Instrument note.")]
+        public string Note { get; set; }
+
         [SwaggerSchema("Whether the instrument's prices are tracked and updated automatically.")]
         public bool IsTracked { get; set; }
 

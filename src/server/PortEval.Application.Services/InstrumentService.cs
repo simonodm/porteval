@@ -3,7 +3,6 @@ using PortEval.Application.Services.Interfaces;
 using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hangfire;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
@@ -30,11 +29,27 @@ namespace PortEval.Application.Services
                 throw new ItemNotFoundException($"Currency {options.CurrencyCode} does not exist.");
             }
 
-            var instrument = new Instrument(options.Name, options.Symbol, options.Exchange, options.Type, options.CurrencyCode);
+            var instrument = new Instrument(options.Name, options.Symbol, options.Exchange, options.Type, options.CurrencyCode, options.Note);
             var createdInstrument = _instrumentRepository.Add(instrument);
             await _instrumentRepository.UnitOfWork.CommitAsync();
             BackgroundJob.Enqueue<IInitialPriceFetchJob>(job => job.Run(createdInstrument.Id));
             return createdInstrument;
+        }
+
+        /// <inheritdoc cref="IInstrumentService.UpdateInstrumentAsync"/>
+        public async Task<Instrument> UpdateInstrumentAsync(InstrumentDto options)
+        {
+            var existingInstrument = await _instrumentRepository.FindAsync(options.Id);
+            if (existingInstrument == null)
+            {
+                throw new ItemNotFoundException($"Instrument {options.Id} does not exist.");
+            }
+
+            existingInstrument.SetName(options.Name);
+            existingInstrument.SetNote(options.Note);
+            _instrumentRepository.Update(existingInstrument);
+            await _instrumentRepository.UnitOfWork.CommitAsync();
+            return existingInstrument;
         }
 
         /// <inheritdoc cref="IInstrumentService.DeleteAsync"/>

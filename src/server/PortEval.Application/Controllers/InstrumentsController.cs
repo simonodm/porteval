@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Models;
@@ -179,6 +178,21 @@ namespace PortEval.Application.Controllers
 
             return CreatedAtAction("GetInstrument", new { id = instrument.Id },
                 _mapper.Map<InstrumentDto>(instrument));
+        }
+
+        // PUT api/instruments/5
+        [HttpPut("{id}")]
+        public async Task<ActionResult<InstrumentDto>> PutInstrument(int id, [FromBody] InstrumentDto updateRequest)
+        {
+            _logger.LogInformation($"Updating instrument {updateRequest.Id}.");
+
+            if (id != updateRequest.Id)
+            {
+                return BadRequest("URL id and request body id don't match.");
+            }
+
+            var updatedInstrument = await _instrumentService.UpdateInstrumentAsync(updateRequest);
+            return _mapper.Map<InstrumentDto>(updatedInstrument);
         }
 
         // DELETE api/instruments/5

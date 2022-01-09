@@ -17,6 +17,13 @@ namespace PortEval.Application.Services.Interfaces
         public Task<Instrument> CreateInstrumentAsync(InstrumentDto options);
 
         /// <summary>
+        /// Updates an instrument according to the supplied DTO.
+        /// </summary>
+        /// <param name="options">A DTO containing client's request body.</param>
+        /// <returns>A task representing the asynchronous update operation. Task result contains updated instrument entity.</returns>
+        public Task<Instrument> UpdateInstrumentAsync(InstrumentDto options);
+
+        /// <summary>
         /// Deletes an instrument.
         /// </summary>
         /// <param name="id">Instrument ID.</param>

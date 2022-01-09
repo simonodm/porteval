@@ -26,6 +26,7 @@ export default function InstrumentsTable(): JSX.Element {
                         <th>Currency</th>
                         <th>Type</th>
                         <th>Current price</th>
+                        <th>Note</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
