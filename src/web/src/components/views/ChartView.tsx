@@ -128,7 +128,7 @@ export default function ChartView(): JSX.Element {
 
     const handleEditSave = (updatedChart: ChartConfig) => {
         setChart(updatedChart);
-        setIsChanged(true);
+        handleChartSave();
     }
 
     const handleChartSave = () => {
