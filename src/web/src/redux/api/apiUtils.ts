@@ -2,7 +2,21 @@ import { FetchArgs, FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/too
 import { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes';
 import { MaybePromise } from '@reduxjs/toolkit/dist/query/tsHelpers';
 import { ChartConfig, PaginatedResponse, ChartLine } from '../../types';
+import * as constants from '../../constants';
 
+export function truncateEntityName<T extends { name: string }>(entity: T, length = constants.API_NAME_MAX_LENGTH): T {
+    return {
+        ...entity,
+        name: entity.name.substring(0, length)
+    };
+}
+
+export function truncateEntityNote<T extends { note: string }>(entity: T, length = constants.API_NOTE_MAX_LENGTH): T {
+    return {
+        ...entity,
+        note: entity.note.substring(0, length)
+    };
+}
 
 export async function getAllPaginated<T>(
     fetchWithBQ: (arg: string | FetchArgs) => MaybePromise<QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>>,

@@ -1,5 +1,6 @@
 import { Transaction } from '../../types';
 import { CreateTransactionParameters } from './apiTypes';
+import { truncateEntityNote } from './apiUtils';
 import { portEvalApi } from './portEvalApi';
 
 const transactionApi = portEvalApi.injectEndpoints({
@@ -27,7 +28,7 @@ const transactionApi = portEvalApi.injectEndpoints({
             query: (data) => ({
                 url: `positions/${data.positionId}/transactions`,
                 method: 'POST',
-                body: data
+                body: truncateEntityNote(data)
             }),
             invalidatesTags: (result, error, arg) =>
                 !error
@@ -42,7 +43,7 @@ const transactionApi = portEvalApi.injectEndpoints({
             query: (data) => ({
                 url: `positions/${data.positionId}/transactions/${data.id}`,
                 method: 'PUT',
-                body: data
+                body: truncateEntityNote(data)
             }),
             invalidatesTags: (result, error, arg) =>
                 !error

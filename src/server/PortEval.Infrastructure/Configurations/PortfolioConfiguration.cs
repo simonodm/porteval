@@ -17,7 +17,7 @@ namespace PortEval.Infrastructure.Configurations
             builder
                 .Property(p => p.Name)
                 .IsRequired()
-                .HasMaxLength(32);
+                .HasMaxLength(64);
             builder
                 .Property(p => p.Note)
                 .HasMaxLength(255);

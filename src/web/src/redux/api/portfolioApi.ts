@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import { EntityPerformance, EntityProfit, EntityValue, Portfolio } from '../../types';
 import { CreatePortfolioParameters, DateRangeParameters } from './apiTypes';
+import { truncateEntityName, truncateEntityNote } from './apiUtils';
 import { portEvalApi } from './portEvalApi';
 
 const portfolioApi = portEvalApi.injectEndpoints({
@@ -26,7 +27,7 @@ const portfolioApi = portEvalApi.injectEndpoints({
             query: (data) => ({
                 url: 'portfolios',
                 method: 'POST',
-                body: data
+                body: truncateEntityName(truncateEntityNote(data))
             }),
             invalidatesTags: () => ['Portfolios']
         }),
@@ -34,7 +35,7 @@ const portfolioApi = portEvalApi.injectEndpoints({
             query: (data) => ({
                 url: `portfolios/${data.id}`,
                 method: 'PUT',
-                body: data
+                body: truncateEntityName(truncateEntityNote(data))
             }),
             invalidatesTags: (result, error, arg) => 
                 !error

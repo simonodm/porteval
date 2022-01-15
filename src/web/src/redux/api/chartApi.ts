@@ -1,5 +1,5 @@
 import { Chart, ChartConfig, ChartFrequency, EntityChartDataPoint, isPriceDataChart } from '../../types';
-import { buildChartLineDataBaseUrl, generateChartLinesTags } from './apiUtils';
+import { buildChartLineDataBaseUrl, generateChartLinesTags, truncateEntityName } from './apiUtils';
 import { portEvalApi } from './portEvalApi';
 import { FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/toolkit/dist/query';
 import { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes';
@@ -28,7 +28,7 @@ const chartApi = portEvalApi.injectEndpoints({
             query: (data) => ({
                 url: 'charts',
                 method: 'POST',
-                body: data
+                body: truncateEntityName(data)
             }),
             invalidatesTags: (result, error) =>
                 !error
@@ -39,7 +39,7 @@ const chartApi = portEvalApi.injectEndpoints({
             query: (data) => ({
                 url: `charts/${data.id}`,
                 method: 'PUT',
-                body: data
+                body: truncateEntityName(data)
             }),
             invalidatesTags: (result, error, arg) =>
                 !error

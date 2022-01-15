@@ -14,7 +14,7 @@ namespace PortEval.Application.Models.Validators
             RuleFor(i => i.Name)
                 .NotNull()
                 .MinimumLength(1)
-                .MaximumLength(32);
+                .MaximumLength(64);
             RuleFor(i => i.Exchange)
                 .NotNull()
                 .MinimumLength(1)

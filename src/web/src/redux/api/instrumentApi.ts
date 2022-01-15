@@ -1,7 +1,7 @@
 import { portEvalApi } from './portEvalApi';
 import { Instrument, InstrumentPrice, PaginatedResponse, EntityProfit, EntityPerformance, InstrumentPriceConfig } from '../../types';
 import { CreateInstrumentParameters, DateRangeParameters, PaginationParameters } from './apiTypes';
-import { getAllPaginated } from './apiUtils';
+import { getAllPaginated, truncateEntityName, truncateEntityNote } from './apiUtils';
 
 const instrumentApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
@@ -38,7 +38,7 @@ const instrumentApi = portEvalApi.injectEndpoints({
             query: (data) => ({
                 url: 'instruments',
                 method: 'POST',
-                body: data
+                body: truncateEntityName(truncateEntityNote(data))
             }),
             invalidatesTags: (result, error) =>
                 !error
@@ -49,7 +49,7 @@ const instrumentApi = portEvalApi.injectEndpoints({
             query: (data) => ({
                 url: `instruments/${data.id}`,
                 method: 'PUT',
-                body: data
+                body: truncateEntityName(truncateEntityNote(data))
             }),
             invalidatesTags: (result, error, arg) =>
                 !error

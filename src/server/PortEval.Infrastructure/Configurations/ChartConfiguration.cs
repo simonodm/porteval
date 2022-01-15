@@ -12,7 +12,7 @@ namespace PortEval.Infrastructure.Configurations
                 .HasKey(c => c.Id);
             builder
                 .Property(c => c.Name)
-                .HasMaxLength(32);
+                .HasMaxLength(64);
             builder
                 .OwnsOne(
                     c => c.DateRange,

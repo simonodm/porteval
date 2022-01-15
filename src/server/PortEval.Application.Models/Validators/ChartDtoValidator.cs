@@ -10,7 +10,7 @@ namespace PortEval.Application.Models.Validators
         {
             RuleFor(c => c.Name)
                 .MinimumLength(3)
-                .MaximumLength(32);
+                .MaximumLength(64);
             RuleFor(c => c.DateRangeStart)
                 .NotNull()
                 .When(c => c.IsToDate != true);

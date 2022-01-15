@@ -10,7 +10,7 @@ namespace PortEval.Application.Models.Validators
             RuleFor(p => p.Name)
                 .NotNull()
                 .MinimumLength(3)
-                .MaximumLength(32);
+                .MaximumLength(64);
             RuleFor(p => p.Note)
                 .MaximumLength(255);
             RuleFor(p => p.CurrencyCode)

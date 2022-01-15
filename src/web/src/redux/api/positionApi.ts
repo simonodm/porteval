@@ -2,6 +2,7 @@ import { DateTime } from 'luxon';
 import { EntityPerformance, EntityProfit, EntityValue, Position } from '../../types';
 import { CreatePositionParameters, DateRangeParameters } from './apiTypes';
 import { portEvalApi } from './portEvalApi';
+import { truncateEntityNote } from './apiUtils';
 
 const positionApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
@@ -26,7 +27,7 @@ const positionApi = portEvalApi.injectEndpoints({
             query: (data) => ({
                 url: 'positions',
                 method: 'POST',
-                body: data
+                body: truncateEntityNote(data)
             }),
             invalidatesTags: (result, error, arg) =>
                 result 
@@ -37,7 +38,7 @@ const positionApi = portEvalApi.injectEndpoints({
             query: (data) => ({
                 url: `positions/${data.id}`,
                 method: 'PUT',
-                body: data
+                body: truncateEntityNote(data)
             }),
             invalidatesTags: (result, error, arg) =>
                 !error
