@@ -40,7 +40,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             _logger.LogInformation($"Missing exchange rates job started at {currentTime}.");
 
             var currencies = await _context.Currencies.AsNoTracking().ToListAsync();
-            var defaultCurrency = await _context.Currencies.AsNoTracking().FirstOrDefaultAsync(c => c.IsDefault);
+            var defaultCurrency = currencies.FirstOrDefault(c => c.IsDefault);
 
             if (defaultCurrency == default)
             {

@@ -14,7 +14,7 @@ export default function PositionPickerItem({ position, line, onLineAdd, onLineRe
         <div className="picker-item">
             <span className="picker-item-name">{position.instrument.name}</span>
             {
-                line && <span className="picker-line-color-box" style={{ color: line.color }}></span>
+                line && <span className="picker-line-color-box" style={{ color: line.color }}>&#9632;</span>
             }
             <span className="picker-item-actions">
                 {

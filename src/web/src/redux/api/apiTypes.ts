@@ -1,4 +1,6 @@
 import { Instrument, Portfolio, Position, Transaction } from '../../types'
+import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query';
+import { SerializedError } from '@reduxjs/toolkit';
 
 export type CreateInstrumentParameters = Omit<Instrument, 'id'>;
 export type CreatePortfolioParameters = Omit<Portfolio, 'id'>;
@@ -36,5 +38,10 @@ export type ValidationErrorResponse = {
 export function isValidationErrorResponse(value: unknown): value is ValidationErrorResponse {
     const valueAsResponse = value as ValidationErrorResponse;
     return valueAsResponse !== undefined && valueAsResponse.errors !== undefined;
+}
+
+export function isSuccessfulResponse<T>(res: { data: T } | { error: FetchBaseQueryError | SerializedError }): res is { data: T } {
+    const resAsData = res as { data: T };
+    return resAsData !== undefined && resAsData.data !== undefined;
 }
 

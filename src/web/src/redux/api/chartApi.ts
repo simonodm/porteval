@@ -24,7 +24,7 @@ const chartApi = portEvalApi.injectEndpoints({
                     ? [{ type: 'Chart', id: arg }]
                     : []
         }),
-        createChart: build.mutation<ChartConfig, ChartConfig>({
+        createChart: build.mutation<Chart, ChartConfig>({
             query: (data) => ({
                 url: 'charts',
                 method: 'POST',

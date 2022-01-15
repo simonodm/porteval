@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useCreateChartMutation, useGetChartQuery, useUpdateChartMutation } from '../../redux/api/chartApi';
 import { checkIsLoaded, checkIsError } from '../utils/queries';
 import LoadingWrapper from '../ui/LoadingWrapper';
@@ -18,21 +18,22 @@ import { useLayoutEffect } from 'react';
 import { toast } from 'react-toastify';
 import EditChartMetaModal from '../modals/EditChartMetaModal';
 import PageHeading from '../ui/PageHeading';
+import { isSuccessfulResponse } from '../../redux/api/apiTypes';
 
 type Params = {
     chartId: string;
 }
 
 export default function ChartView(): JSX.Element {
-    const chartId = useParams<Params>().chartId;
+    const [chartId, setChartId] = useState(useParams<Params>().chartId);
     const [chart, setChart] = useState(useGetRouteState<ChartConfig>('chart'));
 
-    const chartFromState = chartId === undefined && chart !== undefined;
-    const chartQuery = useGetChartQuery(!chartFromState ? parseInt(chartId) : skipToken);
+    const chartFromState = useRef(chartId === undefined && chart !== undefined);
+    const chartQuery = useGetChartQuery(!chartFromState.current ? parseInt(chartId) : skipToken);
     const [createChart] = useCreateChartMutation();
     const [updateChart] = useUpdateChartMutation();
 
-    const [isChanged, setIsChanged] = useState(chartFromState);
+    const [isChanged, setIsChanged] = useState(chartFromState.current);
 
     const isLoaded = checkIsLoaded(chartQuery);
     const isError = checkIsError(chartQuery);
@@ -43,6 +44,7 @@ export default function ChartView(): JSX.Element {
     useLayoutEffect(() => {
         if(chartQuery?.data) {
             setChart(chartQuery.data);
+            setChartId(chartQuery.data.id.toString())
         }
     }, [chartQuery?.data])
 
@@ -128,21 +130,26 @@ export default function ChartView(): JSX.Element {
 
     const handleEditSave = (updatedChart: ChartConfig) => {
         setChart(updatedChart);
-        handleChartSave();
+        handleChartSave(updatedChart);
     }
 
-    const handleChartSave = () => {
+    const handleChartSave = (updatedChart: ChartConfig) => {
         const onSuccess = () => {
             toast.success('Saved');
             setIsChanged(false);
         }
 
-        if(chartFromState) {
-            createChart(chart).then(onSuccess);
+        if(chartFromState.current) {
+            createChart(updatedChart).then((res) => {
+                if(isSuccessfulResponse(res)) {
+                    setChartId(res.data.id.toString());
+                    onSuccess();
+                }
+            });
         }
         else {
-            chart && updateChart({
-                ...chart,
+            updateChart({
+                ...updatedChart,
                 id: parseInt(chartId)
             }).then(onSuccess);
         }
@@ -161,7 +168,7 @@ export default function ChartView(): JSX.Element {
     return (
         <LoadingWrapper isLoaded={isLoaded} isError={isError}>
             <PageHeading heading={'Chart: ' + chart?.name ?? ''}>
-                <button disabled={!isChanged} role="button" className="btn btn-primary btn-sm float-right" onClick={handleChartSave}>Save</button>
+                <button disabled={!isChanged} role="button" className="btn btn-primary btn-sm float-right" onClick={() => chart && handleChartSave(chart)}>Save</button>
                 <button role="button" className="btn btn-primary btn-sm float-right mr-1" onClick={() => setEditModalIsOpen(true)}>Rename</button>
             </PageHeading>
             <ChartLineConfigurationContext.Provider value={context}>

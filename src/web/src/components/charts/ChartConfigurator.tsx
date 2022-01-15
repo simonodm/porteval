@@ -89,7 +89,7 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
             const newChart: ChartConfig = {
                 ...currentChart,
                 isToDate: false,
-                dateRangeStart: currentChart.isToDate ? DateTime.fromJSDate(date).minus({ months: 1}).toISO() : currentChart.dateRangeStart,
+                dateRangeStart: currentChart.isToDate ? DateTime.fromJSDate(date).minus({ months: 1 }).toISO() : currentChart.dateRangeStart,
                 dateRangeEnd: date.toISOString()
             }
             setCurrentChart(newChart);

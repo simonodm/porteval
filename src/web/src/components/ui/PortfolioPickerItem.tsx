@@ -14,6 +14,9 @@ export default function PortfolioPickerItem({ portfolio, line, onLineAdd, onLine
     return (
         <div className="picker-item">
             <span className="picker-item-name">{portfolio.name}</span>
+            {
+                line && <span className="picker-line-color-box" style={{ color: line.color }}>&#9632;</span>
+            }
             <span className="picker-item-actions">
                 {
                     line

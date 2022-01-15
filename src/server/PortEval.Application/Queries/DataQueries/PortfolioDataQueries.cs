@@ -43,7 +43,7 @@ namespace PortEval.Application.Queries.DataQueries
             {
                 Query = @"SELECT PortfolioId, pTransactions.PositionId, InstrumentId, pTransactions.Id AS TransactionId, Time, Amount,
 	                          Price, Instruments.CurrencyCode AS TransactionCurrency, Portfolios.CurrencyCode AS PortfolioCurrency,
-                              posPrices.InstrumentPriceAtRangeStart, posPrices.InstrumentPriceAtRangeEnd, Note FROM dbo.Portfolios
+                              posPrices.InstrumentPriceAtRangeStart, posPrices.InstrumentPriceAtRangeEnd, dbo.Portfolios.Note FROM dbo.Portfolios
                           INNER JOIN (
 	                          SELECT Transactions.Id, PortfolioId, Time, Amount, Price, PositionId, InstrumentId FROM dbo.Positions
 	                          INNER JOIN dbo.Transactions ON PositionId = Positions.Id
