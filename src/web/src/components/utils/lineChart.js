@@ -158,7 +158,7 @@ class D3LineChart {
             .style('font-size', this._fontSize)
             .call(
                 d3.axisBottom(this._xScale)
-                    .ticks(this._xInterval ?? d3.timeWeek)
+                    .ticks(this._xInterval ? Math.min(this._xInterval(), this._width / CHART_TICK_WIDTH) : this._width / CHART_TICK_WIDTH)
                     .tickSize(10)
                     .tickFormat(this._xFormat)
             )
@@ -167,7 +167,7 @@ class D3LineChart {
             .style('font-size', this._fontSize)
             .call(
                 d3.axisLeft(this._yScale)
-                    .ticks(5)
+                    .ticks(this._height / CHART_TICK_WIDTH)
                     .tickFormat(this._yFormat)
             )
     }
@@ -178,7 +178,7 @@ class D3LineChart {
             .attr('transform', `translate(0,${this._height})`)
             .call(
                 d3.axisBottom(this._xScale)
-                    .ticks(this._xInterval ?? d3.timeWeek)
+                    .ticks(this._xInterval ? Math.min(this._xInterval(), this._width / CHART_TICK_WIDTH) : this._width / CHART_TICK_WIDTH)
                     .tickSize(-this._height)
                     .tickFormat('')
             )
@@ -192,7 +192,7 @@ class D3LineChart {
             .style('stroke-dasharray', '0')
             .call(
                 d3.axisLeft(this._yScale)
-                    .ticks(5)
+                    .ticks(this._height / CHART_TICK_WIDTH)
                     .tickSize(-this._width)
                     .tickFormat('')
             ).call(
