@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import { CHART_TICK_WIDTH } from '../../constants';
 
 export default function createChart() {
     return new D3LineChart();
@@ -27,6 +28,9 @@ class D3LineChart {
     
     _tooltip = null;
     _tooltipLine = null;
+    _tooltipCallback = null;
+
+    _renderCallback = null;
 
     _margins = { top: 0, left: 0, bottom: 0, right: 0 };
     _fontSize = 10;
@@ -73,6 +77,16 @@ class D3LineChart {
 
     withInterval(intervalFunction) {
         this._xInterval = intervalFunction;
+        return this;
+    }
+
+    withTooltipCallback(tooltipCallback) {
+        this._tooltipCallback = tooltipCallback;
+        return this;
+    }
+
+    withAdditionalRenderCallback(renderCallback) {
+        this._renderCallback = renderCallback;
         return this;
     }
 
@@ -212,6 +226,12 @@ class D3LineChart {
                 .style('stroke-dasharray', this._settings[index].strokeDashArray)
                 .attr('class', 'line')
                 .attr('d', line)
+            if(this._renderCallback) {
+                this._svg.selectAll('.custom-render')
+                    .data(this._data[index])
+                    .enter()
+                    .append(this._renderCallback())
+            }
         });
     }
 
@@ -229,36 +249,48 @@ class D3LineChart {
             .attr('height', this._height)
             .attr('opacity', 0)
 
-        const findClosestDataPointInRange = (data, time) => {
+        const findClosestDataPointsInRange = (data, time) => {
             if(data.length === 0) {
                 return null;
             }
+            let previous, current;
+
             const firstAfterIndex = data.findIndex(dataPoint => this._xParser(dataPoint[this._xKey]).getTime() >= time);
             if(firstAfterIndex === -1) {
-                return data[data.length - 1];
+                previous = data.length > 1 ? data[data.length - 1] : undefined;
+                current = data[data.length - 1];
             }
-            if(firstAfterIndex === 0) {
-                return this._xParser(data[0][this._xKey]).getTime() > time ? null : data[0];
+            else if(firstAfterIndex === 0) {
+                previous = undefined;
+                current = this._xParser(data[0][this._xKey]).getTime() > time ? null : data[0];
             }
-            var before = data[firstAfterIndex - 1];
-            var after = data[firstAfterIndex];
-            var beforeTime = this._xParser(before[this._xKey]).getTime();
-            var afterTime = this._xParser(after[this._xKey]).getTime();
-            if(time - beforeTime <= afterTime - time) {
-                return before;
+            else {
+                var before = data[firstAfterIndex - 1];
+                var after = data[firstAfterIndex];
+                var beforeTime = this._xParser(before[this._xKey]).getTime();
+                var afterTime = this._xParser(after[this._xKey]).getTime();
+                if(time - beforeTime <= afterTime - time) {
+                    previous = firstAfterIndex >= 2 ? data[firstAfterIndex - 2] : undefined;
+                    current = before;
+                }
+                else {
+                    previous = before;
+                    current = after;
+                }
             }
-            return after;
+            
+            return [previous, current];
         }
 
         const drawTooltip = (event) => {
             if(this._data.length > 0) {
-                const longestData = this._data.reduce((prev, curr) => curr.length >= prev.length ? curr : prev, []);
+                const longestLine = this._data.reduce((prev, curr) => curr.length >= prev.length ? curr : prev, []);
                 const time = Math.floor(this._xScale.invert(d3.pointer(event)[0]));
-                const dataPoint = findClosestDataPointInRange(longestData, time);
+                const [prevDataPoint, currDataPoint] = findClosestDataPointsInRange(longestLine, time);
 
-                if(!dataPoint) return;
+                if(!currDataPoint) return;
 
-                const x = this._xParser(dataPoint[this._xKey]);
+                const x = this._xParser(currDataPoint[this._xKey]);
 
                 const offsetX = event.offsetX + 45;
                 const offsetY = event.offsetY + 45
@@ -268,7 +300,7 @@ class D3LineChart {
                     .attr('x2', this._xScale(x))
                     .attr('y1', 0)
                     .attr('y2', this._height);
-                this._tooltip.html(this._xFormat(this._xParser(dataPoint[this._xKey])))
+                this._tooltip.html(this._xFormat(this._xParser(currDataPoint[this._xKey])))
                     .style('left', offsetX + 'px')
                     .style('top', offsetY + 'px')
                     .style('display', 'block')
@@ -277,9 +309,12 @@ class D3LineChart {
                     .append('div')
                     .style('color', (d, i) => this._settings[i].color)
                     .html(d => {
-                        const point = findClosestDataPointInRange(d, time);
+                        const [, point] = findClosestDataPointsInRange(d, time);
                         return this._yFormat(this._yParser(point ? point[this._yKey] : 0));
                     });
+                if(this._tooltipCallback) {
+                    this._tooltip.appendChild(this._tooltipCallback(this._xParser(prevDataPoint[this._xKey]), this._xParser(currDataPoint[this._xKey])));
+                }
             }
 
         }

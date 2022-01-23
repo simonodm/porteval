@@ -2,7 +2,7 @@ import { ChartConfig, ChartLineBase, InstrumentType } from './types';
 
 export const API_NAME_MAX_LENGTH = 64;
 export const API_NOTE_MAX_LENGTH = 255;
-export const CHART_TICK_WIDTH = 75;
+export const CHART_TICK_WIDTH = 100;
 export const MAIN_COLOR = '#343a40';
 export const REFRESH_INTERVAL = 300_000;
 export const ERROR_STRING = 'An error has occured. Please try again later.';
