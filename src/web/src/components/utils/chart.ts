@@ -100,6 +100,7 @@ export function generateDefaultInstrumentChart(instrument: Instrument): ChartCon
     const instrumentPriceLine: ChartLine = {
         instrumentId: instrument.id,
         width: 1,
+        name: instrument.symbol,
         dash: 'solid',
         color: '#0000FF',
         type: 'instrument'
@@ -121,6 +122,7 @@ export function generateDefaultPortfolioChart(portfolio: Portfolio): ChartConfig
     const portfolioPriceLine: ChartLine = {
         portfolioId: portfolio.id,
         width: 1,
+        name: portfolio.name,
         dash: 'solid',
         color: '#0000FF',
         type: 'portfolio'
@@ -142,6 +144,7 @@ export function generateDefaultPositionChart(position: Position): ChartConfig {
     const positionPriceLine: ChartLine = {
         positionId: position.id,
         width: 1,
+        name: position.instrument.symbol,
         dash: 'solid',
         color: '#0000FF',
         type: 'position'

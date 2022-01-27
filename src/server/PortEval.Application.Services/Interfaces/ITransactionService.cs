@@ -26,9 +26,8 @@ namespace PortEval.Application.Services.Interfaces
         /// <summary>
         /// Deletes a transaction.
         /// </summary>
-        /// <param name="positionId">Parent position ID.</param>
         /// <param name="transactionId">Transaction ID.</param>
         /// <returns>A task representing the asynchronous deletion operation.</returns>
-        public Task DeleteTransactionAsync(int positionId, int transactionId);
+        public Task DeleteTransactionAsync(int transactionId);
     }
 }

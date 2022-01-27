@@ -6,6 +6,7 @@ using PortEval.Application.Queries.Interfaces;
 using PortEval.Infrastructure;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using PortEval.Application.Queries.Models;
 
 namespace PortEval.Application.Queries
 {
@@ -27,9 +28,9 @@ namespace PortEval.Application.Queries
             var charts = new Dictionary<int, ChartDto>();
 
             using var connection = _connection.CreateConnection();
-            await connection.QueryAsync<ChartDto, ChartLineDto, ChartDto>(
+            await connection.QueryAsync<ChartDto, ChartLineDto, ChartLineNameModel, ChartDto>(
                 query.Query,
-                (chart, chartLine) =>
+                (chart, chartLine, lineNames) =>
                 {
                     if (!charts.ContainsKey(chart.Id))
                     {
@@ -38,12 +39,12 @@ namespace PortEval.Application.Queries
                     }
                     if (chartLine != null)
                     {
-                        charts[chart.Id].Lines.Add(AssignChartLineType(chartLine));
+                        charts[chart.Id].Lines.Add(AssignChartLineType(AssignChartLineName(chartLine, lineNames)));
                     }
                     return charts[chart.Id];
                 },
                 query.Params,
-                splitOn: "Width");
+                splitOn: "Width, NameSplit");
 
             return new QueryResponse<IEnumerable<ChartDto>>
             {
@@ -60,26 +61,35 @@ namespace PortEval.Application.Queries
             ChartDto resultChart = null;
 
             using var connection = _connection.CreateConnection();
-            await connection.QueryAsync<ChartDto, ChartLineDto, ChartDto>(
+            await connection.QueryAsync<ChartDto, ChartLineDto, ChartLineNameModel, ChartDto>(
                 query.Query,
-                (chart, chartLine) =>
+                (chart, chartLine, lineNames) =>
                 {
                     resultChart ??= chart;
                     chart.Lines = new List<ChartLineDto>();
                     if (chartLine != null)
                     {
-                        resultChart.Lines.Add(AssignChartLineType(chartLine));
+                        resultChart.Lines.Add(AssignChartLineType(AssignChartLineName(chartLine, lineNames)));
                     }
                     return resultChart;
                 },
                 query.Params,
-                splitOn: "Width");
+                splitOn: "Width, NameSplit");
 
             return new QueryResponse<ChartDto>
             {
                 Status = resultChart != null ? QueryStatus.Ok : QueryStatus.NotFound,
                 Response = resultChart
             };
+        }
+
+        private ChartLineDto AssignChartLineName(ChartLineDto chartLine, ChartLineNameModel lineNames)
+        {
+            if (lineNames.PortfolioName != null) chartLine.Name = lineNames.PortfolioName;
+            else if (lineNames.PositionName != null) chartLine.Name = lineNames.PositionName;
+            else if (lineNames.InstrumentName != null) chartLine.Name = lineNames.InstrumentName;
+
+            return chartLine;
         }
 
         private ChartLineDto AssignChartLineType(ChartLineDto chartLine)

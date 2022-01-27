@@ -3,6 +3,7 @@ using PortEval.Application.Services.Extensions;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PortEval.Application.Queries.Helpers
@@ -38,19 +39,10 @@ namespace PortEval.Application.Queries.Helpers
         public static async Task<IEnumerable<TDto>> AggregateCalculations<TDto>(DateRangeParams dateRange,
             AggregationFrequency frequency, Func<DateRangeParams, Task<TDto>> calculateValue)
         {
-            var result = new List<TDto>();
-
             var limitedRange = LimitDateRange(dateRange, frequency);
 
             var ranges = GetAggregatedRanges(limitedRange.From, limitedRange.To, frequency);
-            foreach (var range in ranges)
-            {
-                var value = await calculateValue(range);
-                if(value != null)
-                {
-                    result.Add(await calculateValue(range));
-                }
-            }
+            var result = await Task.WhenAll(ranges.Select(calculateValue));
 
             return result;
         }

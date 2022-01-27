@@ -33,7 +33,7 @@ export default function PortfolioPicker(): JSX.Element {
                         <PortfolioPickerItem
                             portfolio={portfolio}
                             line={line}
-                            onLineAdd={() => context.addPortfolioLine(portfolio.id)}
+                            onLineAdd={() => context.addPortfolioLine(portfolio)}
                             onLineRemove={() => line ? context.removeLine(line) : undefined}
                             onLineConfigure={() => line ? context.configureLine(line) : undefined}
                             onConfigurePositions={() => handleConfigure(portfolio)}/>

@@ -94,7 +94,11 @@ namespace PortEval.Application.Queries
                 };
             }
 
-            var transactions = await _transactionQueries.GetPositionTransactions(positionId,
+            var transactions = await _transactionQueries.GetTransactions(
+                new TransactionFilters
+                {
+                    PositionId = positionId
+                },
                 new DateRangeParams { 
                     From = DateTime.MinValue,
                     To = time
@@ -134,7 +138,10 @@ namespace PortEval.Application.Queries
             }
 
             var transactions =
-                await _transactionQueries.GetPositionTransactions(positionId, dateRange.SetFrom(DateTime.MinValue));
+                await _transactionQueries.GetTransactions(new TransactionFilters
+                {
+                    PositionId = positionId
+                }, dateRange.SetFrom(DateTime.MinValue));
 
             var instrumentPriceAtRangeStart =
                 (await _instrumentQueries.GetInstrumentPrice(position.Response.InstrumentId, dateRange.From)).Response?.Price ?? 0m;

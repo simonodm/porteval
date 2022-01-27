@@ -36,6 +36,16 @@ namespace PortEval.Infrastructure.Repositories
             return position;
         }
 
+        /// <inheritdoc cref="IPositionRepository.FindParentPosition"/>
+        public async Task<Position> FindParentPosition(int transactionId)
+        {
+            var transaction = await _context.Transactions
+                .Include(t => t.Position)
+                .FirstOrDefaultAsync(t => t.Id == transactionId);
+
+            return transaction?.Position;
+        }
+
         /// <inheritdoc cref="IPositionRepository.Add"/>
         public Position Add(Position position)
         {

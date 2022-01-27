@@ -6,6 +6,7 @@ import { EntityChartDataPoint } from '../../types';
 import { getXAxisD3Interval } from '../utils/chart';
 
 type LineSettings = {
+    name: string;
     color: string;
     strokeDashArray: string;
     width: number;

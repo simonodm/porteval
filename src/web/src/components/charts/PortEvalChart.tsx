@@ -21,6 +21,7 @@ export default function PortEvalChart({ chart }: Props): JSX.Element {
     const currency = useGetCurrencyQuery(isPriceDataChart(chart) ? chart.currencyCode : skipToken);
 
     const lineSettings = chart.lines.map(line => ({
+        name: line.name,
         width: line.width,
         color: line.color,
         strokeDashArray: convertDashToStrokeDashArray(line.dash)

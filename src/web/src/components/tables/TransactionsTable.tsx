@@ -1,18 +1,17 @@
 import React from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import TransactionRow from './TransactionRow';
-import { useGetTransactionsQuery } from '../../redux/api/transactionApi';
+import { useGetPositionTransactionsQuery } from '../../redux/api/transactionApi';
 import { checkIsLoaded, checkIsError } from '../utils/queries';
 import { Currency } from '../../types';
 
 type Props = {
-    portfolioId: number;
     positionId: number;
     currency?: Currency;
 }
 
-export default function TransactionsTable({ portfolioId, positionId, currency }: Props): JSX.Element {
-    const transactions = useGetTransactionsQuery({ portfolioId, positionId });
+export default function TransactionsTable({ positionId, currency }: Props): JSX.Element {
+    const transactions = useGetPositionTransactionsQuery({ positionId });
     const isLoaded = checkIsLoaded(transactions);
     const isError = checkIsError(transactions);
 

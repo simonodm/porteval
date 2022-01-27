@@ -13,17 +13,16 @@ namespace PortEval.Application.Queries.Interfaces
         /// <summary>
         /// Retrieves all transactions of the given position in the specified date range.
         /// </summary>
-        /// <param name="positionId">Parent position ID.</param>
+        /// <param name="filters">Filter settings.</param>
         /// <param name="dateRange">Date range of allowed transactions.</param>
         /// <returns>A task representing the asynchronous database query. Task result contains an <c>IEnumerable</c> of retrieved transaction DTOs.</returns>
-        public Task<QueryResponse<IEnumerable<TransactionDto>>> GetPositionTransactions(int positionId, DateRangeParams dateRange);
+        public Task<QueryResponse<IEnumerable<TransactionDto>>> GetTransactions(TransactionFilters filters, DateRangeParams dateRange);
 
         /// <summary>
         /// Retrieves the specified transaction.
         /// </summary>
-        /// <param name="positionId">Parent position ID.</param>
         /// <param name="transactionId">Transaction ID.</param>
         /// <returns>A task representing the asynchronous database query. Task result contains the retrieved transaction DTO if it exists, null otherwise.</returns>
-        public Task<QueryResponse<TransactionDto>> GetTransaction(int positionId, int transactionId);
+        public Task<QueryResponse<TransactionDto>> GetTransaction(int transactionId);
     }
 }

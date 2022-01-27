@@ -10,6 +10,7 @@ namespace PortEval.Application.Services.Interfaces.Repositories
         public Task Delete(int positionId);
         public Task<bool> Exists(int id);
         public Task<Position> FindAsync(int positionId);
+        public Task<Position> FindParentPosition(int transactionId);
         public Task<IEnumerable<Position>> ListAsync(int portfolioId);
         public Position Update(Position position);
     }

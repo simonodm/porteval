@@ -15,6 +15,7 @@ export const DEFAULT_CHART: ChartConfig = {
     lines: []
 }
 export const DEFAULT_CHART_LINE: ChartLineBase = {
+    name: '',
     width: 1,
     dash: 'solid',
     color: '#000000'

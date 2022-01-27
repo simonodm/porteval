@@ -142,6 +142,7 @@ export function isAggregatedChart(chart: ChartCategory): chart is AggregatedChar
 export type ChartLineDashType = 'solid' | 'dashed' | 'dotted';
 
 export type ChartLineBase = {
+    name: string;
     width: number;
     dash: ChartLineDashType;
     color: string;
@@ -228,10 +229,10 @@ export type ModalCallbacks = {
 
 export type ChartLineConfigurationContextType = {
     chart?: ChartConfig;
-    addInstrumentLine: (instrumentId: number) => void;
-    addPositionLine: (portfolioId: number, positionId: number) => void;
-    addPortfolioPositionLines: (portfolioId: number, positionIds: Array<number>) => void;
-    addPortfolioLine: (portfolioId: number) => void;
+    addInstrumentLine: (instrument: Instrument) => void;
+    addPositionLine: (position: Position) => void;
+    addPortfolioPositionLines: (positions: Array<Position>) => void;
+    addPortfolioLine: (portfolio: Portfolio) => void;
     configureLine: (line: ChartLine) => void;
     removeLine: (line: ChartLine) => void;
 }

@@ -23,7 +23,7 @@ export default function InstrumentPicker(): JSX.Element {
                         <InstrumentPickerItem
                             instrument={instrument}
                             line={line}
-                            onLineAdd={() => context.addInstrumentLine(instrument.id)}
+                            onLineAdd={() => context.addInstrumentLine(instrument)}
                             onLineRemove={() => line ? context.removeLine(line) : undefined}
                             onLineConfigure={line ? () => context.configureLine(line) : undefined}
                         />)

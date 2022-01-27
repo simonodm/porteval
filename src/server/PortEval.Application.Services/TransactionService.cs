@@ -44,9 +44,13 @@ namespace PortEval.Application.Services
         }
 
         /// <inheritdoc cref="ITransactionService.DeleteTransactionAsync"/>
-        public async Task DeleteTransactionAsync(int positionId, int transactionId)
+        public async Task DeleteTransactionAsync(int transactionId)
         {
-            var position = await FindPosition(positionId);
+            var position = await _positionRepository.FindParentPosition(transactionId);
+            if (position == null)
+            {
+                throw new ItemNotFoundException($"Transaction {transactionId} does not exist.");
+            }
 
             position.RemoveTransaction(transactionId);
             position.IncreaseVersion();
@@ -55,11 +59,10 @@ namespace PortEval.Application.Services
         }
 
         /// <summary>
-        /// Retrieves a position by its ID and parent portfolio's ID.
+        /// Retrieves a position by its ID.
         /// </summary>
-        /// <param name="portfolioId">Portfolio ID</param>
         /// <param name="positionId">Position ID</param>
-        /// <exception cref="ItemNotFoundException">Thrown if no portfolio or position were found with the supplied IDs.</exception>
+        /// <exception cref="ItemNotFoundException">Thrown if or position was found with the supplied ID.</exception>
         /// <returns>A task representing the asynchronous search operation. The task result contains the found position entity.</returns>
         private async Task<Position> FindPosition(int positionId)
         {

@@ -5,20 +5,42 @@ import { portEvalApi } from './portEvalApi';
 
 const transactionApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
-        getTransactions: build.query<Array<Transaction>, { portfolioId: number, positionId: number }>({
+        getPositionTransactions: build.query<Array<Transaction>, { positionId: number }>({
             query: ({ positionId }) =>
-                `positions/${positionId}/transactions`,
-            providesTags: (result, error, arg) =>
+                `transactions?positionId=${positionId}`,
+            providesTags: (result) =>
                 result
                     ? [
                         ...result.map(({ id }) => ({ type: 'Transaction' as const, id: id })),
-                        { type: 'Transactions', id: arg.positionId }
+                        { type: 'Transactions' }
                       ]
                     : []
         }),
-        getTransaction: build.query<Transaction, { positionId: number, transactionId: number }>({
-            query: ({ positionId, transactionId }) =>
-                `positions/${positionId}/transactions/${transactionId}`,
+        getPortfolioTransactions: build.query<Array<Transaction>, { portfolioId: number }>({
+            query: ({ portfolioId }) =>
+                `transactions?portfolioId=${portfolioId}`,
+            providesTags: (result) =>
+                result
+                    ? [
+                        ...result.map(({ id }) => ({ type: 'Transaction' as const, id: id })),
+                        { type: 'Transactions' }
+                      ]
+                    : []
+        }),
+        getInstrumentTransactions: build.query<Array<Transaction>, { instrumentId: number }>({
+            query: ({ instrumentId }) =>
+                `transactions?instrumentId=${instrumentId}`,
+            providesTags: (result) =>
+                result
+                    ? [
+                        ...result.map(({ id }) => ({ type: 'Transaction' as const, id: id })),
+                        { type: 'Transactions' }
+                      ]
+                    : []
+        }),
+        getTransaction: build.query<Transaction, { transactionId: number }>({
+            query: ({ transactionId }) =>
+                `transactions/${transactionId}`,
             providesTags: (result, error, arg) =>
                 result
                     ? [{ type: 'Transaction', id: arg.transactionId }]
@@ -26,7 +48,7 @@ const transactionApi = portEvalApi.injectEndpoints({
         }),
         addTransaction: build.mutation<Transaction, CreateTransactionParameters>({
             query: (data) => ({
-                url: `positions/${data.positionId}/transactions`,
+                url: 'transactions',
                 method: 'POST',
                 body: truncateEntityNote(data)
             }),
@@ -41,7 +63,7 @@ const transactionApi = portEvalApi.injectEndpoints({
         }),
         updateTransaction: build.mutation<Transaction, Transaction>({
             query: (data) => ({
-                url: `positions/${data.positionId}/transactions/${data.id}`,
+                url: `transactions/${data.id}`,
                 method: 'PUT',
                 body: truncateEntityNote(data)
             }),
@@ -51,8 +73,8 @@ const transactionApi = portEvalApi.injectEndpoints({
                     : []
         }),
         deleteTransaction: build.mutation<void, Transaction>({
-            query: ({ positionId, id }) => ({
-                url: `positions/${positionId}/transactions/${id}`,
+            query: ({ id }) => ({
+                url: `transactions/${id}`,
                 method: 'DELETE'
             }),
             invalidatesTags: (result, error, arg) =>
@@ -69,7 +91,9 @@ const transactionApi = portEvalApi.injectEndpoints({
 });
 
 export const {
-    useGetTransactionsQuery,
+    useGetPositionTransactionsQuery,
+    useGetPortfolioTransactionsQuery,
+    useGetInstrumentTransactionsQuery,
     useGetTransactionQuery,
     useAddTransactionMutation,
     useUpdateTransactionMutation,

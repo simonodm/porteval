@@ -23,7 +23,7 @@ export default function PositionPicker({ portfolio }: Props): JSX.Element {
                 !context.chart?.lines.find(line => line.type === 'position' && line.positionId === position.id)
         ) ?? [];
 
-        context.addPortfolioPositionLines(portfolio.id, positionsToAdd.map(position => position.id));
+        context.addPortfolioPositionLines(positionsToAdd);
     }
 
     return (
@@ -39,7 +39,7 @@ export default function PositionPicker({ portfolio }: Props): JSX.Element {
                     return <PositionPickerItem
                         position={position}
                         line={line}
-                        onLineAdd={() => context.addPositionLine(portfolio.id, position.id)}
+                        onLineAdd={() => context.addPositionLine(position)}
                         onLineRemove={() => line ? context.removeLine(line) : undefined}
                         onLineConfigure={() => line ? context.configureLine(line) : undefined}
                     />})}

@@ -12,7 +12,7 @@ using PortEval.Application.Queries;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("api/positions/{positionId}/transactions")]
+    [Route("api/transactions")]
     [ApiController]
     public class TransactionsController : ControllerBase
     {
@@ -29,59 +29,54 @@ namespace PortEval.Application.Controllers
             _logger = loggerFactory.CreateLogger(typeof(TransactionsController));
         }
 
-        // GET: api/portfolios/5/positions/1/transactions
+        // GET: api/transactions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TransactionDto>>> GetTransactions(int positionId, [FromQuery] DateRangeParams dateRange)
+        public async Task<ActionResult<IEnumerable<TransactionDto>>> GetTransactions([FromQuery] TransactionFilters transactionFilters, [FromQuery] DateRangeParams dateRange)
         {
-            _logger.LogInformation($"Position {positionId} transactions requested.");
+            _logger.LogInformation($"Transactions (portfolio {transactionFilters.PortfolioId}, position {transactionFilters.PositionId}, instrument {transactionFilters.InstrumentId}) requested.");
 
-            var transactions = await _transactionQueries.GetPositionTransactions(positionId, dateRange);
+            var transactions = await _transactionQueries.GetTransactions(transactionFilters, dateRange);
             if (transactions.Status == QueryStatus.NotFound)
             {
-                return NotFound($"Position {positionId} not found.");
+                return NotFound("Not found.");
             }
 
             return transactions.Response.ToList();
         }
 
-        // GET api/portfolios/5/positions/1/transactions/3
+        // GET api/transactions/3
         [HttpGet("{transactionId}")]
-        public async Task<ActionResult<TransactionDto>> GetTransaction(int positionId, int transactionId)
+        public async Task<ActionResult<TransactionDto>> GetTransaction(int transactionId)
         {
-            _logger.LogInformation($"Transaction {transactionId} of position {positionId} requested.");
+            _logger.LogInformation($"Transaction {transactionId} requested.");
 
-            var transaction = await _transactionQueries.GetTransaction(positionId, transactionId);
+            var transaction = await _transactionQueries.GetTransaction(transactionId);
             if (transaction.Status == QueryStatus.NotFound)
             {
-                return NotFound($"Transaction {transactionId} of position {positionId} not found.");
+                return NotFound($"Transaction {transactionId} not found.");
             }
 
             return transaction.Response;
         }
 
-        // POST api/portfolios/5/positions/1/transactions
+        // POST api/transactions
         [HttpPost]
-        public async Task<ActionResult<TransactionDto>> PostTransaction(int positionId, [FromBody] TransactionDto createRequest)
+        public async Task<ActionResult<TransactionDto>> PostTransaction([FromBody] TransactionDto createRequest)
         {
-            _logger.LogInformation($"Creating transaction for position {positionId}.");
+            _logger.LogInformation($"Creating transaction for position {createRequest.PositionId}.");
 
             var createdTransaction = await _transactionService.AddTransactionAsync(createRequest);
 
             return CreatedAtAction("GetTransaction",
-                new { positionId, transactionId = createdTransaction.Id },
+                new { transactionId = createdTransaction.Id },
                 _mapper.Map<TransactionDto>(createdTransaction));
         }
 
-        // PUT api/portfolios/5/positions/1/transactions/3
+        // PUT api/transactions/3
         [HttpPut("{transactionId}")]
-        public async Task<ActionResult<TransactionDto>> PutTransaction(int positionId, int transactionId, [FromBody] TransactionDto updateRequest)
+        public async Task<ActionResult<TransactionDto>> PutTransaction(int transactionId, [FromBody] TransactionDto updateRequest)
         {
-            _logger.LogInformation($"Updating transaction {transactionId} of position {positionId}.");
-
-            if (positionId != updateRequest.PositionId)
-            {
-                return BadRequest("URL position id and request body position id don't match.");
-            }
+            _logger.LogInformation($"Updating transaction {transactionId}.");
 
             if (transactionId != updateRequest.Id)
             {
@@ -93,13 +88,13 @@ namespace PortEval.Application.Controllers
             return _mapper.Map<TransactionDto>(updatedTransaction);
         }
 
-        // DELETE api/portfolios/5/positions/1/transactions/3
+        // DELETE api/transactions/3
         [HttpDelete("{transactionId}")]
-        public async Task<IActionResult> DeleteTransaction(int positionId, int transactionId)
+        public async Task<IActionResult> DeleteTransaction(int transactionId)
         {
-            _logger.LogInformation($"Deleting transaction {transactionId} of position {positionId}.");
+            _logger.LogInformation($"Deleting transaction {transactionId}.");
 
-            await _transactionService.DeleteTransactionAsync(positionId, transactionId);
+            await _transactionService.DeleteTransactionAsync(transactionId);
             return Ok();
         }
     }

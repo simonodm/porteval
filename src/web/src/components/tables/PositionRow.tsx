@@ -115,7 +115,7 @@ export default function PositionRow({ position }: Props): JSX.Element {
             { instrumentExpanded &&
                 <tr>
                     <td colSpan={14}>
-                        <TransactionsTable portfolioId={position.portfolioId} positionId={position.id} currency={currency.data} />
+                        <TransactionsTable positionId={position.id} currency={currency.data} />
                     </td>
                 </tr>
             }

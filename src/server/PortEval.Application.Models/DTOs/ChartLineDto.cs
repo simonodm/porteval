@@ -28,5 +28,8 @@ namespace PortEval.Application.Models.DTOs
 
         [SwaggerSchema("Instrument identifier for lines of type Instrument.")]
         public int? InstrumentId { get; set; }
+
+        [SwaggerSchema("Name of the entity this line represents.")]
+        public string Name { get; set; }
     }
 }

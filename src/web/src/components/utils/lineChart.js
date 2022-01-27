@@ -308,9 +308,9 @@ class D3LineChart {
                     .data(this._data).enter()
                     .append('div')
                     .style('color', (d, i) => this._settings[i].color)
-                    .html(d => {
+                    .html((d, i) => {
                         const [, point] = findClosestDataPointsInRange(d, time);
-                        return this._yFormat(this._yParser(point ? point[this._yKey] : 0));
+                        return `${this._settings[i].name}: ${this._yFormat(this._yParser(point ? point[this._yKey] : 0))}`;
                     });
                 if(this._tooltipCallback) {
                     this._tooltip.appendChild(this._tooltipCallback(this._xParser(prevDataPoint[this._xKey]), this._xParser(currDataPoint[this._xKey])));

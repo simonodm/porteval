@@ -24,18 +24,6 @@ namespace PortEval.Application.Queries.DataQueries
             };
         }
 
-        public static QueryWrapper<IEnumerable<TransactionDto>> GetPortfolioTransactions(int portfolioId)
-        {
-            return new QueryWrapper<IEnumerable<TransactionDto>>
-            {
-                Query = @"SELECT Transactions.Id, Positions.PortfolioId, Transactions.PositionId, Amount, Price, Time, Note FROM dbo.Transactions
-                          INNER JOIN dbo.Positions ON Positions.Id = Transactions.PositionId
-                          WHERE PortfolioId = @PortfolioId
-                          ORDER BY Time DESC",
-                Params = new { PortfolioId = portfolioId }
-            };
-        }
-
         public static QueryWrapper<IEnumerable<TransactionDetailsQueryModel>> GetPortfolioDetailedTransactions(
             int portfolioId, DateTime from, DateTime to)
         {

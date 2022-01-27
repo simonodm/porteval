@@ -5,7 +5,7 @@ import LoadingWrapper from '../ui/LoadingWrapper';
 import { skipToken } from '@reduxjs/toolkit/dist/query';
 import PortEvalChart from '../charts/PortEvalChart';
 import useGetRouteState from '../../hooks/useGetRouteState';
-import { ChartConfig, ChartLine, ChartLineConfigurationContextType, ChartLineInstrument, ChartLinePortfolio, ChartLinePosition } from '../../types';
+import { ChartConfig, ChartLine, ChartLineConfigurationContextType, ChartLineInstrument, ChartLinePortfolio, ChartLinePosition, Instrument, Portfolio, Position } from '../../types';
 import { useParams } from 'react-router';
 import ChartConfigurator from '../charts/ChartConfigurator';
 import PortfolioPicker from '../charts/PortfolioPicker';
@@ -48,43 +48,45 @@ export default function ChartView(): JSX.Element {
         }
     }, [chartQuery?.data])
 
-    const addInstrumentLine = (instrumentId: number) => {
+    const addInstrumentLine = (instrument: Instrument) => {
         setModalLine({
             ...constants.DEFAULT_CHART_LINE,
             type: 'instrument',
-            instrumentId
+            instrumentId: instrument.id,
+            name: instrument.name
         } as ChartLine);
 
         setLineModalIsOpen(true);
     }
 
-    const addPortfolioLine = (portfolioId: number) => {
+    const addPortfolioLine = (portfolio: Portfolio) => {
         setModalLine({
             ...constants.DEFAULT_CHART_LINE,
             type: 'portfolio',
-            portfolioId
+            portfolioId: portfolio.id,
+            name: portfolio.name
         } as ChartLine);
 
         setLineModalIsOpen(true);
     }
 
-    const addPositionLine = (portfolioId: number, positionId: number) => {
+    const addPositionLine = (position: Position) => {
         setModalLine({
             ...constants.DEFAULT_CHART_LINE,
             type: 'position',
-            portfolioId,
-            positionId
+            positionId: position.id,
+            name: position.instrument.name
         } as ChartLine);
 
         setLineModalIsOpen(true);
     }
 
-    const addPortfolioPositionLines = (portfolioId: number, positionIds: Array<number>) => {
-        const newLines = positionIds.map(id => ({
+    const addPortfolioPositionLines = (positions: Array<Position>) => {
+        const newLines = positions.map(position => ({
             ...constants.DEFAULT_CHART_LINE,
             type: 'position',
-            portfolioId,
-            positionId: id
+            positionId: position.id,
+            name: position.instrument.name
         } as ChartLine));
 
         chart && setChart({
