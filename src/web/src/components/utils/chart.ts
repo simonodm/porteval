@@ -1,7 +1,11 @@
 import * as d3 from 'd3';
 import { DateTime, Duration } from 'luxon';
-import { ChartConfig, ChartFrequency, ChartLine, ChartLineDashType, ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position } from '../../types';
-import { XAxisInterval } from '../charts/LineChart';
+import { ChartConfig, ChartFrequency, ChartLine, ChartLineDashType, ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction } from '../../types';
+import { Line, XAxisInterval } from '../charts/LineChart';
+
+type LineWithTransactions = Line & {
+    transactions: Array<Transaction>
+};
 
 export function convertDashToStrokeDashArray(dash: ChartLineDashType): string {
     switch(dash) {
@@ -160,6 +164,47 @@ export function generateDefaultPositionChart(position: Position): ChartConfig {
     };
 
     return positionPriceChart;
+}
+
+export function generateTooltipTransactionList(lines: Array<LineWithTransactions>, from: string | undefined, to: string | undefined): HTMLElement | null {
+    const convertedFrom = from && DateTime.fromISO(from);
+    const convertedTo = to && DateTime.fromISO(to);
+
+    const transactions = lines.reduce<Array<Transaction>>((prev, curr) => {
+        return prev.concat(curr.transactions.filter(t => {
+            const time = DateTime.fromISO(t.time)
+            return (convertedFrom === undefined || time >= convertedFrom) && (convertedTo === undefined || time <= convertedTo);
+        }));
+    }, [])
+
+    if(transactions.length > 0) {
+        const rootElement = document.createElement('div');
+        const transactionsHeader = document.createElement('p');
+        transactionsHeader.className = 'tooltip-transactions-header';
+        transactionsHeader.innerHTML = 'Transactions:';
+        rootElement.append(transactionsHeader);
+
+        const transactionsList = document.createElement('ul');
+        transactionsList.className = 'tooltip-transactions';
+
+        transactions.forEach(transaction => {
+            const transactionRowElement = document.createElement('li');
+            const isPurchase = transaction.amount > 0;
+            transactionRowElement.innerHTML = `${Math.abs(transaction.amount)} ${isPurchase ? 'BUY' : 'SELL'}`;
+            transactionsList.append(transactionRowElement);
+        });
+
+        rootElement.append(transactionsList);
+        return rootElement;
+    }
+
+    console.log('returning null');
+
+    return null;
+}
+
+export function generateChartLineTransactionIcons(transactions: Array<Transaction>, from: string, to: string): HTMLElement {
+    return document.createElement('span');
 }
 
 function getDurationFromToDateRange(toDateRange: ChartToDateRange) {

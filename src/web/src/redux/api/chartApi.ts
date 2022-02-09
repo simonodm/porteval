@@ -1,5 +1,5 @@
-import { Chart, ChartConfig, ChartFrequency, EntityChartDataPoint, isPriceDataChart } from '../../types';
-import { buildChartLineDataBaseUrl, generateChartLinesTags, truncateEntityName } from './apiUtils';
+import { Chart, ChartConfig, ChartFrequency, EntityChartDataPoint, isPriceDataChart, Transaction } from '../../types';
+import { buildChartLineDataBaseUrl, buildChartLineTransactionsUrl, generateChartLinesTags, truncateEntityName, generateChartTransactionTags } from './apiUtils';
 import { portEvalApi } from './portEvalApi';
 import { FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/toolkit/dist/query';
 import { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes';
@@ -72,7 +72,7 @@ const chartApi = portEvalApi.injectEndpoints({
 
                 // if all queries failed
                 if(dataPromises.length > 0 && !dataPromises.find(promise => !(promise as QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>).error)) {
-                    throw new Error('Chart line data could not be fecthed.');
+                    throw new Error('Chart line data could not be fetched.');
                 }
 
                 return {
@@ -84,6 +84,29 @@ const chartApi = portEvalApi.injectEndpoints({
                     ? generateChartLinesTags(arg.chart.lines)
                     : []
         }),
+        getChartTransactions: build.query<Array<Array<Transaction>>, { chart: ChartConfig, from: string, to: string }>({
+            queryFn: async (args, api, extraOptions, fetchWithBQ) => {
+                const transactionDataUrls = args.chart.lines.map(
+                    line => buildChartLineTransactionsUrl(line, args.from, args.to)
+                );
+
+                const dataPromises = transactionDataUrls.map(url => fetchWithBQ(url));
+                const data = await Promise.all(dataPromises);
+
+                // if all queries failed
+                if(dataPromises.length > 0 && !dataPromises.find(promise => !(promise as QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>).error)) {
+                    throw new Error('Chart line transaction data could not be fetched.');
+                }
+
+                return {
+                    data: data.map(promise => (promise as QueryReturnValue<Array<Transaction>, FetchBaseQueryError, FetchBaseQueryMeta>).data ?? [])
+                };
+            },
+            providesTags: (result, error, arg) =>
+                result
+                    ? generateChartTransactionTags(arg.chart.lines)
+                    : []
+        })
     })
 });
 
@@ -93,5 +116,6 @@ export const {
     useCreateChartMutation,
     useUpdateChartMutation,
     useDeleteChartMutation,
-    useGetChartDataQuery
+    useGetChartDataQuery,
+    useGetChartTransactionsQuery,
 } = chartApi

@@ -104,10 +104,35 @@ export function buildChartLineDataBaseUrl(chart: ChartConfig, line: ChartLine): 
     }
 }
 
+export function buildChartLineTransactionsUrl(line: ChartLine, from: string, to: string): string {
+    let entityIdQueryParam = '';
+    switch(line.type) {
+        case 'portfolio':
+            entityIdQueryParam = `portfolioId=${line.portfolioId}`;
+            break;
+        case 'instrument':
+            entityIdQueryParam = `instrumentId=${line.instrumentId}`;
+            break;
+        case 'position':
+            entityIdQueryParam = `positionId=${line.positionId}`;
+            break;
+        default:
+            throw new Error('Unknown chart line type provided.');
+            break;
+    }
+
+    return `transactions?${entityIdQueryParam}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
+}
+
 type ChartLineDataTag = {
     type: 'ChartLinePortfolio' | 'ChartLinePosition' | 'ChartLineInstrument';
     id: string | number
-}
+};
+
+type ChartLineTransactionTag = {
+    type: 'ChartLinePortfolioTransactions' | 'ChartLinePositionTransactions' | 'ChartLineInstrumentTransactions';
+    id: string | number
+};
 
 export const generateChartLinesTags = (lines: Array<ChartLine>): Array<ChartLineDataTag> => {
     return lines.map(line => {
@@ -120,6 +145,19 @@ export const generateChartLinesTags = (lines: Array<ChartLine>): Array<ChartLine
                     return { type: 'ChartLineInstrument', id: line.instrumentId };
             }
         });
+}
+
+export const generateChartTransactionTags = (lines: Array<ChartLine>): Array<ChartLineTransactionTag> => {
+    return lines.map(line => {
+        switch(line.type) {
+            case 'portfolio':
+                return { type: 'ChartLinePortfolioTransactions', id: line.portfolioId };
+            case 'position':
+                return { type: 'ChartLinePositionTransactions', id: line.positionId };
+            case 'instrument':
+                return { type: 'ChartLineInstrumentTransactions', id: line.instrumentId };
+        }
+    })
 }
 
 function buildUrl(endpointUrl: string, params: Record<string, string | number>) {

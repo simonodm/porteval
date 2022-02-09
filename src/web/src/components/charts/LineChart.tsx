@@ -5,28 +5,29 @@ import './LineChart.css';
 import { EntityChartDataPoint } from '../../types';
 import { getXAxisD3Interval } from '../utils/chart';
 
-type LineSettings = {
+export type XAxisInterval = 'hour' | 'day' | 'week' | 'month' | 'year';
+export type Line = {
     name: string;
     color: string;
     strokeDashArray: string;
     width: number;
+    data: Array<EntityChartDataPoint>
 }
-
-export type XAxisInterval = 'hour' | 'day' | 'week' | 'month' | 'year';
 
 type ChartConfig = {
     xInterval?: XAxisInterval;
     yFormat?: (yValue: number) => string;
     xFormat?: (xValue: Date) => string;
+    tooltipCallback?: (from: string, to: string) => HTMLElement | null;
+    additionalRenderCallback?: (from: string, to: string) => HTMLElement | null;
 }
 
 type Props = {
     config?: ChartConfig,
-    data: Array<Array<EntityChartDataPoint>>
-    lineSettings: Array<LineSettings>;
+    lines: Array<Line>
 }
 
-export default function LineChart({ config, data, lineSettings }: Props): JSX.Element {
+export default function LineChart({ config, lines }: Props): JSX.Element {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const parseTime = d3.isoParse;
@@ -37,14 +38,15 @@ export default function LineChart({ config, data, lineSettings }: Props): JSX.El
             containerRef.current.innerHTML = '';
 
             createChart()
-                .withData(data)
+                .withLines(lines)
                 .withXKey('time')
                 .withYKey('value')
                 .withXParser(parseTime)
                 .withXFormat(config?.xFormat ?? d3.timeFormat('%b %d'))
                 .withYFormat(config?.yFormat ?? ((y: number) => y.toString()))
-                .withLineSettings(lineSettings)
                 .withInterval(interval)
+                .withTooltipCallback(config?.tooltipCallback)
+                .withAdditionalRenderCallback(config?.additionalRenderCallback)
                 .appendTo(containerRef.current);
         }
     }
@@ -58,7 +60,7 @@ export default function LineChart({ config, data, lineSettings }: Props): JSX.El
         }
     })
 
-    useLayoutEffect(generateChart, [data, containerRef, containerRef.current?.clientHeight, containerRef.current?.clientWidth]);
+    useLayoutEffect(generateChart, [lines, containerRef, containerRef.current?.clientHeight, containerRef.current?.clientWidth]);
 
     return (
         <div ref={containerRef} className="chart">
