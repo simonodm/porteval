@@ -29,7 +29,7 @@ export function calculateXAxisInterval(from: DateTime, to: DateTime): XAxisInter
     return 'hour';
 }
 
-export function getXAxisD3Interval(interval: XAxisInterval | undefined): d3.TimeInterval {
+export function getXAxisD3Interval(interval: XAxisInterval | undefined): d3.CountableTimeInterval {
     switch(interval) {
         case 'hour':
             return d3.timeHour;
@@ -197,8 +197,6 @@ export function generateTooltipTransactionList(lines: Array<LineWithTransactions
         rootElement.append(transactionsList);
         return rootElement;
     }
-
-    console.log('returning null');
 
     return null;
 }

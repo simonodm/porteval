@@ -1,9 +1,10 @@
 import { useLayoutEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import createChart from '../utils/lineChart';
+import createChart, { RenderCallback } from '../utils/lineChart';
 import './LineChart.css';
 import { EntityChartDataPoint } from '../../types';
 import { getXAxisD3Interval } from '../utils/chart';
+import { TooltipCallback } from '../utils/lineChart';
 
 export type XAxisInterval = 'hour' | 'day' | 'week' | 'month' | 'year';
 export type Line = {
@@ -18,8 +19,8 @@ type ChartConfig = {
     xInterval?: XAxisInterval;
     yFormat?: (yValue: number) => string;
     xFormat?: (xValue: Date) => string;
-    tooltipCallback?: (from: string, to: string) => HTMLElement | null;
-    additionalRenderCallback?: (from: string, to: string) => HTMLElement | null;
+    tooltipCallback?: TooltipCallback;
+    additionalRenderCallback?: RenderCallback;
 }
 
 type Props = {
@@ -30,24 +31,27 @@ type Props = {
 export default function LineChart({ config, lines }: Props): JSX.Element {
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const parseTime = d3.isoParse;
     const interval = getXAxisD3Interval(config?.xInterval);
     
     const generateChart = () => {
         if(containerRef.current !== null) {
             containerRef.current.innerHTML = '';
 
-            createChart()
+            const chart = createChart()
                 .withLines(lines)
-                .withXKey('time')
-                .withYKey('value')
-                .withXParser(parseTime)
                 .withXFormat(config?.xFormat ?? d3.timeFormat('%b %d'))
                 .withYFormat(config?.yFormat ?? ((y: number) => y.toString()))
                 .withInterval(interval)
-                .withTooltipCallback(config?.tooltipCallback)
-                .withAdditionalRenderCallback(config?.additionalRenderCallback)
-                .appendTo(containerRef.current);
+
+            if(config?.tooltipCallback) {
+                chart.withTooltipCallback(config.tooltipCallback)
+            }
+
+            if(config?.additionalRenderCallback) {
+                chart.withAdditionalRenderCallback(config.additionalRenderCallback)
+            }
+
+            chart.appendTo(containerRef.current);
         }
     }
 

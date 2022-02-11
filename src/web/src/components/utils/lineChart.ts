@@ -1,90 +1,84 @@
 import * as d3 from 'd3';
-import { CHART_TICK_WIDTH } from '../../constants';
+import { CHART_TICK_INTERVAL } from '../../constants';
 
-export default function createChart() {
+export type Line = {
+    name: string;
+    color: string;
+    strokeDashArray: string;
+    width: number;
+    data: Array<LineData>;
+}
+
+export type LineData = {
+    time: string;
+    value: number;
+}
+
+export type TooltipCallback = (from: string | undefined, to: string | undefined) => HTMLElement | null;
+export type RenderCallback = () => HTMLElement;
+
+export default function createChart(): D3LineChart {
     return new D3LineChart();
 }
 
 class D3LineChart {
-    _lines = null;
-    _svg = null;
+    _lines: Array<Line> = [];
+    _svg: d3.Selection<SVGGElement, unknown, null, undefined> | null = null;
 
-    _xKey = 0
-    _xScale = null;
-    _xParser = d => d;
-    _xFormat = d => d;
-    _yKey = 1
-    _yScale = null;
-    _yParser = d => d;
-    _yFormat = d => d;
-    _xInterval = d3.timeDay.every(1);
+    _xScale: d3.ScaleTime<number, number> | null = null;
+    _xFormat: (x: Date) => string = d3.isoFormat;
+
+    _yScale: d3.ScaleLinear<number, number> | null = null;
+    _yFormat: (y: number) => string = (num) => `${num}`;
+
+    _xInterval = d3.timeDay;
 
     _width = 0;
     _height = 0;
 
-    _d3Lines = [];
-    _container = null;
+    _d3Lines: Array<d3.Line<LineData>> = [];
+    _container: HTMLElement | null = null;
     
-    _tooltip = null;
-    _tooltipLine = null;
-    _tooltipCallback = null;
+    _tooltip: d3.Selection<HTMLDivElement, unknown, null, undefined> | null = null;
+    _tooltipLine: d3.Selection<SVGLineElement, unknown, null, undefined> | null = null;
+    _tooltipCallback: TooltipCallback = () => null;
 
-    _renderCallback = null;
+    _renderCallback: RenderCallback | null = null;
 
     _margins = { top: 0, left: 0, bottom: 0, right: 0 };
     _fontSize = 10;
 
-    withLines(lines) {
+    withLines(lines: typeof this._lines) {
         this._lines = lines;
         return this;
     }
 
-    withXKey(xKey) {
-        this._xKey = xKey;
-        return this;
-    }
-
-    withYKey(yKey) {
-        this._yKey = yKey;
-        return this;
-    }
-
-    withXParser(xParser) {
-        this._xParser = xParser;
-        return this;
-    }
-
-    withYParser(yParser) {
-        this._yParser = yParser;
-        return this;
-    }
-
-    withXFormat(xFormat) {
+    withXFormat(xFormat: typeof this._xFormat) {
         this._xFormat = xFormat;
         return this;
     }
 
-    withYFormat(yFormat) {
+    withYFormat(yFormat: typeof this._yFormat) {
         this._yFormat = yFormat;
         return this;
     }
 
-    withInterval(intervalFunction) {
+    withInterval(intervalFunction: typeof this._xInterval) {
         this._xInterval = intervalFunction;
         return this;
     }
 
-    withTooltipCallback(tooltipCallback) {
+    withTooltipCallback(tooltipCallback: typeof this._tooltipCallback) {
         this._tooltipCallback = tooltipCallback;
         return this;
     }
 
-    withAdditionalRenderCallback(renderCallback) {
+    withAdditionalRenderCallback(renderCallback: typeof this._renderCallback) {
         this._renderCallback = renderCallback;
         return this;
     }
 
-    appendTo(container) {
+    appendTo(container: HTMLElement) {
         this._generateMargins();
         this._container = container;
         this._width = container.offsetWidth - this._margins.left - this._margins.right;
@@ -92,7 +86,7 @@ class D3LineChart {
         this._svg = d3.select(container)
             .append('svg')
             .attr('transform', `translate(${this._margins.left}, ${this._margins.top})`)
-            .attr('viewbox', [0, 0, this._width, this._height])
+            .attr('viewbox', `0, 0, ${this._width}, ${this._height}`)
             .style('width', this._width)
             .style('height', this._height)
             .style('overflow', 'visible')
@@ -113,7 +107,7 @@ class D3LineChart {
             .map(
                 line => 
                     line.data
-                        .map(d => this._yFormat(d[this._yKey]).toString().length)
+                        .map(d => this._yFormat(d.value).toString().length)
                         .reduce(
                             (prev, curr) => Math.max(prev, curr),
                             0
@@ -129,80 +123,88 @@ class D3LineChart {
         this._margins.top = 5;
     }
 
-    _getAllValuesFromKey(dataPointKey, callbackFn) {
-        let result = [];
+    _generateScales() {
+        const xValues: Array<Date> = [];
+        const yValues: Array<number> = [];
+
         this._lines.forEach(line => {
             line.data.forEach(dataPoint => {
-                result.push(callbackFn(dataPoint[dataPointKey]));
-            });
-        });
-        return result;
-    }
-
-    _generateScales() {
+                xValues.push(new Date(dataPoint.time));
+                yValues.push(dataPoint.value);
+            })
+        })
+        
         this._xScale = d3.scaleTime()
-            .domain(d3.extent(this._getAllValuesFromKey(this._xKey, this._xParser)))
+            .domain(<[Date, Date]>d3.extent(xValues))
             .range([0, this._width]);
+            
         this._yScale = d3.scaleLinear()
-            .domain(d3.extent(this._getAllValuesFromKey(this._yKey, this._yParser)))
+            .domain(<[number, number]>d3.extent(yValues))
             .range([this._height, 0]);
     }
 
     _generateD3Lines() {
         if(this._xScale && this._yScale) {
             this._lines.forEach(() => {
-                let d3Line = d3.line()
-                    .x(d => this._xScale(this._xParser(d[this._xKey])))
-                    .y(d => this._yScale(this._yParser(d[this._yKey])))
-                this._d3Lines = this._d3Lines.concat(d3Line);
+                const d3Line = d3.line<LineData>()
+                    .x(d => this._xScale!(new Date(d.time)))
+                    .y(d => this._yScale!(d.value))
+
+                this._d3Lines.push(d3Line);
             });
         }
     }
 
     _drawAxes() {
-        this._svg.append('g')
+        if(!this._xScale || !this._yScale) return;
+        this._svg?.append('g')
             .attr('class', 'x-axis')
             .attr('transform', `translate(0, ${this._height})`)
             .style('font-size', this._fontSize)
             .call(
-                d3.axisBottom(this._xScale)
-                    .ticks(this._xInterval ? Math.min(this._xInterval(), this._width / CHART_TICK_WIDTH) : this._width / CHART_TICK_WIDTH)
+                d3.axisBottom<Date>(this._xScale)
+                    .ticks(this._xInterval
+                        ? Math.min(this._xInterval.count(this._xScale.domain()[0], this._xScale.domain()[1]), this._width / CHART_TICK_INTERVAL)
+                        : this._width / CHART_TICK_INTERVAL)
                     .tickSize(10)
                     .tickFormat(this._xFormat)
             )
-        this._svg.append('g')
+        this._svg?.append('g')
             .attr('class', 'y-axis')
             .style('font-size', this._fontSize)
             .call(
-                d3.axisLeft(this._yScale)
-                    .ticks(this._height / CHART_TICK_WIDTH)
+                d3.axisLeft<number>(this._yScale)
+                    .ticks(this._height / CHART_TICK_INTERVAL)
                     .tickFormat(this._yFormat)
             )
     }
 
     _drawGridLines() {
-        this._svg.append('g')
+        if(!this._xScale || !this._yScale) return;
+        this._svg?.append('g')
             .attr('class', 'grid')
             .attr('transform', `translate(0,${this._height})`)
             .call(
-                d3.axisBottom(this._xScale)
-                    .ticks(this._xInterval ? Math.min(this._xInterval(), this._width / CHART_TICK_WIDTH) : this._width / CHART_TICK_WIDTH)
+                d3.axisBottom<Date>(this._xScale)
+                    .ticks(this._xInterval
+                        ? Math.min(this._xInterval.count(this._xScale.domain()[0], this._xScale.domain()[1]), this._width / CHART_TICK_INTERVAL)
+                        : this._width / CHART_TICK_INTERVAL)
                     .tickSize(-this._height)
-                    .tickFormat('')
+                    .tickFormat(() => '')
             )
             .call(
                 g => g.selectAll('line')
                     .style('stroke', '#efefef')
                     .style('stroke-dasharray', '0')
             );
-        this._svg.append('g')
+        this._svg?.append('g')
             .attr('class', 'grid')
             .style('stroke-dasharray', '0')
             .call(
-                d3.axisLeft(this._yScale)
-                    .ticks(this._height / CHART_TICK_WIDTH)
+                d3.axisLeft<number>(this._yScale)
+                    .ticks(this._height / CHART_TICK_INTERVAL)
                     .tickSize(-this._width)
-                    .tickFormat('')
+                    .tickFormat(() => '')
             ).call(
                 g => g.selectAll('line')
                     .style('stroke', '#efefef')
@@ -212,7 +214,7 @@ class D3LineChart {
 
     _drawDataLines() {
         this._d3Lines.forEach((line, index) => {
-            this._svg.append('path')
+            this._svg?.append('path')
                 .datum(this._lines[index].data)
                 .attr('fill', 'none')
                 .style('stroke', this._lines[index].color)
@@ -221,15 +223,16 @@ class D3LineChart {
                 .attr('class', 'line')
                 .attr('d', line)
         });
-        if(this._renderCallback) {
-            this._svg.selectAll('.custom-render')
+        if(this._renderCallback !== null) {
+            this._svg?.selectAll('.custom-render')
                 .data(this._lines)
                 .enter()
-                .append(d => this._renderCallback(d))
+                .append(() => this._renderCallback!())
         }
     }
 
     _setupTooltip() {
+        if(!this._container || !this._svg) return;
         this._tooltip = d3.select(this._container).append('div')
             .style('position', 'absolute')
             .style('background-color', '#fff')
@@ -243,13 +246,13 @@ class D3LineChart {
             .attr('height', this._height)
             .attr('opacity', 0)
 
-        const findClosestDataPointsInRange = (data, time) => {
+        const findClosestDataPoints = (data: LineData[], time: number): [LineData?, LineData?, LineData?] => {
             if(data.length === 0) {
-                return null;
+                return [undefined, undefined, undefined];
             }
             let previous, current, next;
 
-            const firstAfterIndex = data.findIndex(dataPoint => this._xParser(dataPoint[this._xKey]).getTime() >= time);
+            const firstAfterIndex = data.findIndex(dataPoint => new Date(dataPoint.time).getTime() >= time);
             if(firstAfterIndex === -1) {
                 previous = data.length > 1 ? data[data.length - 1] : undefined;
                 current = data[data.length - 1];
@@ -257,14 +260,14 @@ class D3LineChart {
             }
             else if(firstAfterIndex === 0) {
                 previous = undefined;
-                current = this._xParser(data[0][this._xKey]).getTime() > time ? null : data[0];
-                next = data.length > 1 ? data[1] : null;
+                current = new Date(data[0].time).getTime() > time ? undefined : data[0];
+                next = data.length > 1 ? data[1] : undefined;
             }
             else {
-                var before = data[firstAfterIndex - 1];
-                var after = data[firstAfterIndex];
-                var beforeTime = this._xParser(before[this._xKey]).getTime();
-                var afterTime = this._xParser(after[this._xKey]).getTime();
+                const before = data[firstAfterIndex - 1];
+                const after = data[firstAfterIndex];
+                const beforeTime = new Date(before.time).getTime();
+                const afterTime = new Date(after.time).getTime();
                 if(time - beforeTime <= afterTime - time) {
                     previous = firstAfterIndex >= 2 ? data[firstAfterIndex - 2] : undefined;
                     current = before;
@@ -273,51 +276,52 @@ class D3LineChart {
                 else {
                     previous = before;
                     current = after;
-                    next = data.length > firstAfterIndex + 1 ? data[firstAfterIndex + 1] : null;
+                    next = data.length > firstAfterIndex + 1 ? data[firstAfterIndex + 1] : undefined;
                 }
             }
             
             return [previous, current, next];
         }
 
-        const drawTooltip = (event) => {
+        const drawTooltip = (event: MouseEvent) => {
+            if(!this._xScale || !this._container || !this._tooltip || !this._tooltipLine) return;
             if(this._lines.length > 0) {
-                const longestLine = this._lines.reduce((prev, curr) => curr.data.length >= prev.length ? curr.data : prev, []);
-                const time = Math.floor(this._xScale.invert(d3.pointer(event)[0]));
-                const [, currDataPoint, nextDataPoint] = findClosestDataPointsInRange(longestLine, time);
+                const longestLine = this._lines.reduce<Array<LineData>>((prev, curr) => curr.data.length >= prev.length ? curr.data : prev, []);
+                const time = Math.floor(this._xScale.invert(d3.pointer(event)[0]).getTime());
+                const [, currDataPoint, nextDataPoint] = findClosestDataPoints(longestLine, time);
 
                 if(!currDataPoint) return;
 
-                const x = this._xParser(currDataPoint[this._xKey]);
+                const x = new Date(currDataPoint.time);
 
                 this._tooltipLine.attr('stroke', 'black')
                     .attr('x1', this._xScale(x))
                     .attr('x2', this._xScale(x))
                     .attr('y1', 0)
                     .attr('y2', this._height);
-                this._tooltip.html(this._xFormat(this._xParser(currDataPoint[this._xKey])))
+                this._tooltip.html(this._xFormat(new Date(currDataPoint.time)))
                     .style('display', 'block')
                     .selectAll()
                     .data(this._lines).enter()
                     .append('div')
                     .style('color', d => d.color)
                     .html(d => {
-                        const [, point] = findClosestDataPointsInRange(d.data, time);
-                        return `${d.name}: ${this._yFormat(this._yParser(point ? point[this._yKey] : 0))}`;
+                        const [, point] = findClosestDataPoints(d.data, time);
+                        return `${d.name}: ${this._yFormat(point ? point.value : 0)}`;
                     });
 
                 if(this._tooltipCallback) {
-                    const from = currDataPoint[this._xKey];
-                    const to = nextDataPoint ? nextDataPoint[this._xKey] : undefined;
+                    const from = currDataPoint.time;
+                    const to = nextDataPoint ? nextDataPoint.time : undefined;
                     const element = this._tooltipCallback(from, to);
 
                     if(element) {
-                        this._tooltip.node().appendChild(element);
+                        this._tooltip.node()?.appendChild(element);
                     }
                 }
 
-                const tooltipWidth = this._tooltip.node().getBoundingClientRect()['width'];
-                const tooltipHeight = this._tooltip.node().getBoundingClientRect()['height'];
+                const tooltipWidth = this._tooltip.node()?.getBoundingClientRect()['width'] ?? 0;
+                const tooltipHeight = this._tooltip.node()?.getBoundingClientRect()['height'] ?? 0;
 
                 const containerRect = this._container.getBoundingClientRect();
 

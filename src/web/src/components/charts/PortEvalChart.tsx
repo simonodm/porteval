@@ -37,7 +37,7 @@ export default function PortEvalChart({ chart }: Props): JSX.Element {
         xFormat: getXAxisD3Format(from, to),
         xInterval: calculateXAxisInterval(from, to),
         tooltipCallback: transactionData?.data
-            ? (from: string, to: string) => generateTooltipTransactionList(lines, from, to)
+            ? (from: string | undefined, to: string | undefined) => generateTooltipTransactionList(lines, from, to)
             : () => null
     };
 
