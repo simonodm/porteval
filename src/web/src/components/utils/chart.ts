@@ -1,7 +1,9 @@
 import * as d3 from 'd3';
 import { DateTime, Duration } from 'luxon';
+import { CHART_TRANSACTION_SIGN_CIRCLE_RADIUS } from '../../constants';
 import { ChartConfig, ChartFrequency, ChartLine, ChartLineDashType, ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction } from '../../types';
 import { Line, XAxisInterval } from '../charts/LineChart';
+import { RenderedDataPointInfo } from './lineChart';
 
 type LineWithTransactions = Line & {
     transactions: Array<Transaction>
@@ -167,14 +169,8 @@ export function generateDefaultPositionChart(position: Position): ChartConfig {
 }
 
 export function generateTooltipTransactionList(lines: Array<LineWithTransactions>, from: string | undefined, to: string | undefined): HTMLElement | null {
-    const convertedFrom = from && DateTime.fromISO(from);
-    const convertedTo = to && DateTime.fromISO(to);
-
     const transactions = lines.reduce<Array<Transaction>>((prev, curr) => {
-        return prev.concat(curr.transactions.filter(t => {
-            const time = DateTime.fromISO(t.time)
-            return (convertedFrom === undefined || time >= convertedFrom) && (convertedTo === undefined || time <= convertedTo);
-        }));
+        return prev.concat(findLineTransactionsInRange(curr.transactions, from, to));
     }, [])
 
     if(transactions.length > 0) {
@@ -201,8 +197,39 @@ export function generateTooltipTransactionList(lines: Array<LineWithTransactions
     return null;
 }
 
-export function generateChartLineTransactionIcons(transactions: Array<Transaction>, from: string, to: string): HTMLElement {
-    return document.createElement('span');
+export function generateChartLineTransactionIcons(dataPoint: RenderedDataPointInfo, transactions: Array<Transaction>): SVGElement {
+    const amount = getTransactionTotalAmount(transactions, dataPoint.point.time, dataPoint.nextPoint?.time);
+
+    const element = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    if(amount === 0) return element;
+
+    const color = amount < 0 ? 'red' : 'green';
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', `${dataPoint.x}`)
+    circle.setAttribute('cy', `${dataPoint.y}`)
+    circle.setAttribute('r', `${CHART_TRANSACTION_SIGN_CIRCLE_RADIUS}`);
+    circle.setAttribute('stroke', color);
+    circle.setAttribute('fill', color);
+    circle.setAttribute('stroke-width', '1');
+    element.append(circle);
+
+    return element;
+}
+
+function getTransactionTotalAmount(transactions: Array<Transaction>, from: string | undefined, to: string | undefined): number {
+    const transactionsInRange = findLineTransactionsInRange(transactions, from, to);
+    return transactionsInRange.reduce((prev, curr) => prev + curr.amount, 0);
+}
+
+function findLineTransactionsInRange(transactions: Array<Transaction>, from: string | undefined, to: string | undefined): Array<Transaction> {
+    const convertedFrom = from && DateTime.fromISO(from);
+    const convertedTo = to && DateTime.fromISO(to);
+
+    return transactions.filter(t => {
+        const time = DateTime.fromISO(t.time)
+        return (convertedFrom === undefined || time >= convertedFrom) && (convertedTo === undefined || time <= convertedTo);
+    });
 }
 
 function getDurationFromToDateRange(toDateRange: ChartToDateRange) {

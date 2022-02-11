@@ -14,8 +14,16 @@ export type LineData = {
     value: number;
 }
 
+export type RenderedDataPointInfo = {
+    x: number;
+    y: number;
+    point: LineData;
+    nextPoint: LineData | undefined;
+    lineIndex: number;
+}
+
 export type TooltipCallback = (from: string | undefined, to: string | undefined) => HTMLElement | null;
-export type RenderCallback = () => HTMLElement;
+export type RenderCallback = (dataPoint: RenderedDataPointInfo) => SVGElement;
 
 export default function createChart(): D3LineChart {
     return new D3LineChart();
@@ -221,14 +229,27 @@ class D3LineChart {
                 .style('stroke-width', this._lines[index].width)
                 .style('stroke-dasharray', this._lines[index].strokeDashArray)
                 .attr('class', 'line')
-                .attr('d', line)
+                .attr('d', line);
+
+            if(this._renderCallback !== null) {
+                this._svg?.selectAll('.custom-render')
+                    .data(this._lines[index].data)
+                    .enter()
+                    .append((dataPoint, pointIndex) => {
+                        const nextPoint = pointIndex < this._lines[index].data.length - 1 ? this._lines[index].data[pointIndex + 1] : undefined;
+
+                        const pointInfo: RenderedDataPointInfo = {
+                            x: this._xScale!(new Date(dataPoint.time)),
+                            y: this._yScale!(dataPoint.value),
+                            point: dataPoint,
+                            nextPoint: nextPoint,
+                            lineIndex: index
+                        };
+
+                        return this._renderCallback!(pointInfo);
+                    });
+            }
         });
-        if(this._renderCallback !== null) {
-            this._svg?.selectAll('.custom-render')
-                .data(this._lines)
-                .enter()
-                .append(() => this._renderCallback!())
-        }
     }
 
     _setupTooltip() {
@@ -323,10 +344,7 @@ class D3LineChart {
                 const tooltipWidth = this._tooltip.node()?.getBoundingClientRect()['width'] ?? 0;
                 const tooltipHeight = this._tooltip.node()?.getBoundingClientRect()['height'] ?? 0;
 
-                const containerRect = this._container.getBoundingClientRect();
-
-                const chartTopBound = containerRect.top;
-                const chartLeftBound = containerRect.left;
+                const [chartTopBound, chartLeftBound] = this._getContainerOffset();
 
                 const offsetXToParent = event.clientX - chartLeftBound;
                 const offsetYToParent = event.clientY - chartTopBound;
@@ -352,5 +370,12 @@ class D3LineChart {
 
         overlay.on('mousemove', drawTooltip);
         overlay.on('mouseout', removeTooltip);
+    }
+
+    _getContainerOffset(): [number, number] {
+        if(!this._container) throw new Error('Chart container has not been initialized.');
+        const containerRect = this._container.getBoundingClientRect();
+
+        return [containerRect.top, containerRect.left];
     }
 }
