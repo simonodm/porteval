@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { DateTime, Duration } from 'luxon';
-import { CHART_TRANSACTION_SIGN_CIRCLE_RADIUS } from '../../constants';
+import { CHART_TRANSACTION_SIGN_CIRCLE_RADIUS, CHART_TRANSACTION_SIGN_SIZE } from '../../constants';
 import { ChartConfig, ChartFrequency, ChartLine, ChartLineDashType, ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction } from '../../types';
 import { Line, XAxisInterval } from '../charts/LineChart';
 import { RenderedDataPointInfo } from './lineChart';
@@ -204,6 +204,7 @@ export function generateChartLineTransactionIcons(dataPoint: RenderedDataPointIn
     if(amount === 0) return element;
 
     const color = amount < 0 ? 'red' : 'green';
+    const signFn = amount < 0 ? generateMinusSignSVG : generatePlusSignSVG;
 
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', `${dataPoint.x}`)
@@ -213,6 +214,9 @@ export function generateChartLineTransactionIcons(dataPoint: RenderedDataPointIn
     circle.setAttribute('fill', color);
     circle.setAttribute('stroke-width', '1');
     element.append(circle);
+    
+    const sign = signFn(dataPoint.x, dataPoint.y, CHART_TRANSACTION_SIGN_SIZE, 'white');
+    element.append(sign);
 
     return element;
 }
@@ -230,6 +234,20 @@ function findLineTransactionsInRange(transactions: Array<Transaction>, from: str
         const time = DateTime.fromISO(t.time)
         return (convertedFrom === undefined || time >= convertedFrom) && (convertedTo === undefined || time <= convertedTo);
     });
+}
+
+function generatePlusSignSVG(x: number, y: number, size: number, color: string): SVGElement {
+    const sign = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    sign.setAttribute('d', `M ${x-size/2},${y} H ${x+size/2} M ${x},${y+size/2} V ${y-size/2}`);
+    sign.setAttribute('stroke', color);
+    return sign;
+}
+
+function generateMinusSignSVG(x: number, y: number, size: number, color: string): SVGElement {
+    const sign = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    sign.setAttribute('d', `M ${x-size/2},${y} H ${x+size/2}`);
+    sign.setAttribute('stroke', color);
+    return sign;
 }
 
 function getDurationFromToDateRange(toDateRange: ChartToDateRange) {
