@@ -5,6 +5,7 @@ using PortEval.Application.Queries.DataQueries;
 using PortEval.Application.Queries.Interfaces;
 using PortEval.Infrastructure;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PortEval.Application.Queries
@@ -26,7 +27,11 @@ namespace PortEval.Application.Queries
                 dateRange.To);
 
             using var connection = _connection.CreateConnection();
-            var transactions = await connection.QueryAsync<TransactionDto>(query.Query, query.Params);
+            var transactions = await connection.QueryAsync<TransactionDto, InstrumentDto, TransactionDto>(query.Query, (t, i) =>
+            {
+                t.Instrument = i;
+                return t;
+            }, query.Params);
 
             return new QueryResponse<IEnumerable<TransactionDto>>
             {
@@ -41,7 +46,14 @@ namespace PortEval.Application.Queries
             var query = TransactionDataQueries.GetTransaction(transactionId);
 
             using var connection = _connection.CreateConnection();
-            var transaction = await connection.QueryFirstOrDefaultAsync<TransactionDto>(query.Query, query.Params);
+            var queryResponse = await connection.QueryAsync<TransactionDto, InstrumentDto, TransactionDto>(query.Query,
+                (t, i) =>
+                {
+                    t.Instrument = i;
+                    return t;
+                }, query.Params);
+
+            var transaction = queryResponse?.FirstOrDefault();
 
             return new QueryResponse<TransactionDto>
             {

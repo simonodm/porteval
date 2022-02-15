@@ -25,6 +25,7 @@ export type Transaction = {
     id: number;
     positionId: number;
     portfolioId: number;
+    instrument: Instrument;
     time: string;
     amount: number;
     price: number;

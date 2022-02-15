@@ -15,6 +15,9 @@ namespace PortEval.Application.Models.DTOs
         [SwaggerSchema("Identifier of the portfolio to which this transaction's position belongs.")]
         public int PortfolioId { get; set; }
 
+        [SwaggerSchema("Parent instrument of the transaction.")]
+        public InstrumentDto Instrument { get; set; }
+
         [SwaggerSchema("Time of transaction.")]
         public DateTime Time { get; set; }
 

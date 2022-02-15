@@ -4,6 +4,7 @@ import { CHART_TRANSACTION_SIGN_CIRCLE_RADIUS, CHART_TRANSACTION_SIGN_SIZE } fro
 import { ChartConfig, ChartFrequency, ChartLine, ChartLineDashType, ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction } from '../../types';
 import { Line, XAxisInterval } from '../charts/LineChart';
 import { RenderedDataPointInfo } from './lineChart';
+import { getPriceString } from './string';
 
 type LineWithTransactions = Line & {
     transactions: Array<Transaction>
@@ -186,7 +187,7 @@ export function generateTooltipTransactionList(lines: Array<LineWithTransactions
         transactions.forEach(transaction => {
             const transactionRowElement = document.createElement('li');
             const isPurchase = transaction.amount > 0;
-            transactionRowElement.innerHTML = `${Math.abs(transaction.amount)} ${isPurchase ? 'BUY' : 'SELL'}`;
+            transactionRowElement.innerHTML = `${isPurchase ? 'BUY' : 'SELL'} ${Math.abs(transaction.amount)} ${transaction.instrument.symbol} @ ${getPriceString(transaction.price)}`;
             transactionsList.append(transactionRowElement);
         });
 
