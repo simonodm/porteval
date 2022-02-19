@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import TextInput from './fields/TextInput';
 
 type Props = {
     defaultName: string;
@@ -15,10 +16,7 @@ export default function ChartForm({ defaultName, onSubmit }: Props): JSX.Element
 
     return (
         <form onSubmit={handleSubmit}>
-            <div className="form-group">
-                <label htmlFor="chart-name">Chart name:</label>
-                <input type="text" id="chart-name" className="form-control" onChange={(e) => setName(e.target.value)} value={name} />
-            </div>
+            <TextInput label='Chart name' defaultValue={defaultName} onChange={(val) => setName(val)} />
             <button role="button" className="btn btn-primary">Save</button>
         </form>
     )

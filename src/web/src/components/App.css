@@ -34,7 +34,7 @@ table.entity-list {
 }
 
 table.entity-list td, table.entity-list th {
-    padding: 6px;
+    padding: 10px 5px;
 }
 
 table.entity-list th {

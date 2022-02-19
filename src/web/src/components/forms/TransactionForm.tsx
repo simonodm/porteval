@@ -6,7 +6,11 @@ import { useGetAllPortfoliosQuery } from '../../redux/api/portfolioApi';
 import { useGetPositionsQuery, useGetPositionQuery } from '../../redux/api/positionApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import { checkIsLoaded, checkIsError } from '../utils/queries';
-import DatePicker from 'react-datepicker';
+import PortfolioDropdown from './fields/PortfolioDropdown';
+import PositionDropdown from './fields/PositionDropdown';
+import NumberInput from './fields/NumberInput';
+import DateTimeSelector from './fields/DateTimeSelector';
+import TextInput from './fields/TextInput';
 
 type Props = {
     portfolioId?: number;
@@ -29,7 +33,6 @@ export default function TransactionForm({
     }: Props): JSX.Element {
     const [portfolioId, setPortfolioId] = useState<number | undefined>(defaultPortfolioId ?? undefined);
     const [positionId, setPositionId] = useState<number | undefined>(defaultPortfolioId && defaultPositionId ? defaultPositionId : undefined);
-    const [inputAmount, setInputAmount] = useState(defaultAmount?.toString() ?? '1'); // separate state for amount <input> - done to allow typing minus for negative numbers
     const [amount, setAmount] = useState<number>(defaultAmount ?? 1);
     const [price, setPrice] = useState<number>(defaultPrice ?? 0);
     const [time, setTime] = useState(defaultTime ?? DateTime.now());
@@ -65,42 +68,29 @@ export default function TransactionForm({
         }
     }, [instrumentPrice.data]);
 
-    const handlePortfolioChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newPortfolioId = parseInt(e.target.value);
-        if(!isNaN(newPortfolioId)) {
-            setPortfolioId(newPortfolioId);
-            setPositionId(undefined);
-        }
+    const handlePortfolioChange = (newPortfolioId: number) => {
+        setPortfolioId(newPortfolioId);
+        setPositionId(undefined);
     }
 
-    const handlePositionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newPositionId = parseInt(e.target.value);
-        if(!isNaN(newPositionId)) {
-            setPositionId(newPositionId);
-        }
+    const handlePositionChange = (newPositionId: number) => {
+        setPositionId(newPositionId);
     }
 
-    const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputAmount(e.target.value);
-        const parsedFloat = parseFloat(e.target.value);
-        if(parsedFloat) {
-            setAmount(parseFloat(e.target.value));
-        }
+    const handleAmountChange = (newAmount: number) => {
+        setAmount(newAmount);
     }
 
-    const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPrice(parseFloat(e.target.value));
+    const handlePriceChange = (newPrice: number) => {
+        setPrice(newPrice);
     }
 
-    const handleTimeChange = (date: Date) => {
-        const dt = DateTime.fromJSDate(date);
-        if(dt) {
-            setTime(dt);
-        }
+    const handleTimeChange = (dt: DateTime) => {
+        setTime(dt);
     }
 
-    const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNote(e.target.value);
+    const handleNoteChange = (newNote: string) => {
+        setNote(newNote);
     }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -114,59 +104,12 @@ export default function TransactionForm({
     return (
         <LoadingWrapper isLoaded={isLoaded} isError={isError}>
             <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="transaction-portfolio">Portfolio:</label>
-                    <select id="transaction-portfolio" className="form-control" disabled={defaultPortfolioId !== undefined} onChange={handlePortfolioChange}>
-                        {portfolios.data?.map(portfolio => <option value={portfolio.id} selected={portfolio.id === portfolioId}>{portfolio.name}</option>)}
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="transaction-position">Position:</label>
-                    <select disabled={positions?.data === undefined || defaultPositionId !== undefined} id="portfolio-position" className="form-control" onChange={handlePositionChange}>
-                        {positions.data?.map(position => <option value={position.id} selected={position.id === positionId}>{position.instrument.name}</option>)}
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="transaction-amount">Amount:</label>
-                    <input
-                        type="number"
-                        id="transaction-amount"
-                        className="form-control"
-                        value={inputAmount}
-                        disabled={defaultAmount !== undefined}
-                        onChange={handleAmountChange} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="transaction-price">Price:</label>
-                    <input
-                        type="number"
-                        id="transaction-price"
-                        className="form-control"
-                        value={price}
-                        disabled={defaultPrice !== undefined}
-                        onChange={handlePriceChange} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="transaction-time">Time:</label>
-                    <DatePicker
-                        selected={time.toJSDate()}
-                        onChange={handleTimeChange}
-                        showTimeSelect
-                        timeIntervals={1}
-                        dateFormat="MMM dd, yyyy, HH:mm"
-                        disabled={defaultTime !== undefined}
-                        id="transaction-time" />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="transaction-note">Note:</label>
-                    <input 
-                        type="text"
-                        id="position-note"
-                        placeholder="Note"
-                        className="form-control"
-                        value={note}
-                        onChange={handleNoteChange} />
-                </div>
+                <PortfolioDropdown portfolios={portfolios.data ?? []} defaultPortfolioId={portfolioId} onChange={handlePortfolioChange} />
+                <PositionDropdown positions={positions.data ?? []} defaultPositionId={positionId} onChange={handlePositionChange} />
+                <NumberInput label='Amount' defaultValue={defaultAmount} allowNegativeValues allowFloat onChange={handleAmountChange} />
+                <NumberInput label='Price' defaultValue={defaultPrice} allowFloat onChange={handlePriceChange} />
+                <DateTimeSelector label='Date' format='MMM dd, yyyy, HH:mm' timeInterval={1} defaultTime={defaultTime} onChange={handleTimeChange} />
+                <TextInput label='Note' defaultValue={defaultNote} onChange={handleNoteChange} />
                 <button 
                     role="button"
                     className="btn btn-primary"

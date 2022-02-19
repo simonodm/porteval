@@ -8,6 +8,7 @@ export const REFRESH_INTERVAL = 300_000;
 export const ERROR_STRING = 'An error has occured. Please try again later.';
 export const CHART_TRANSACTION_SIGN_CIRCLE_RADIUS = 4;
 export const CHART_TRANSACTION_SIGN_SIZE = 5;
+export const DEFAULT_DT_SELECTOR_FORMAT = 'yyyy/MM/dd';
 export const DEFAULT_CHART: ChartConfig = {
     name: 'New chart',
     type: 'price',

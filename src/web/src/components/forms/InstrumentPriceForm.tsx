@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
+import DateTimeSelector from './fields/DateTimeSelector';
+import NumberInput from './fields/NumberInput';
 
 type Props = {
     instrumentId: number;
@@ -18,20 +19,8 @@ export default function InstrumentPriceForm({ instrumentId, onSubmit }: Props): 
     
     return (
         <form onSubmit={handleSubmit}>
-            <div className="form-group">
-                <label htmlFor="price">Price:</label>
-                <input type="number" className="form-control" value={price} onChange={(e) => setPrice(parseFloat(e.target.value))} />
-            </div>
-            <div className="form-group">
-                <label htmlFor="date">Date:</label>
-                <DatePicker
-                    selected={time.toJSDate()}
-                    onChange={(date: Date) => setTime(DateTime.fromJSDate(date))}
-                    showTimeSelect
-                    timeIntervals={1}
-                    dateFormat="MMM dd, yyyy, HH:mm"
-                    id="date" />
-            </div>
+            <NumberInput label='Price' defaultValue={price} allowFloat allowNegativeValues onChange={(newPrice) => setPrice(newPrice)} />
+            <DateTimeSelector label='Date' defaultTime={time} enableTime timeInterval={1} format='MMM dd, yyyy, HH:mm' onChange={(newTime) => setTime(newTime)} /> 
             <button role="button" className="btn btn-primary">Save</button>
         </form>
     )
