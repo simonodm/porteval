@@ -141,7 +141,7 @@ export default function ChartView(): JSX.Element {
             setIsChanged(false);
         }
 
-        if(chartFromState.current) {
+        if(!chartId) {
             createChart(updatedChart).then((res) => {
                 if(isSuccessfulResponse(res)) {
                     setChartId(res.data.id.toString());
