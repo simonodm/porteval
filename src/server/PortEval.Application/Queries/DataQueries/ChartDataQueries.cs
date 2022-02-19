@@ -38,7 +38,7 @@ namespace PortEval.Application.Queries.DataQueries
 	                          SELECT Id, Name AS PortfolioName FROM dbo.Portfolios
                           ) as Portfolios ON Lines.PortfolioId = Portfolios.Id
                           LEFT JOIN (
-	                          SELECT Positions.Id, Symbol AS PositionName FROM dbo.Positions LEFT JOIN dbo.Instruments ON Positions.Id = Instruments.Id
+	                          SELECT Positions.Id, Symbol AS PositionName FROM dbo.Positions LEFT JOIN dbo.Instruments ON Positions.InstrumentId = Instruments.Id
                           ) AS Positions ON Lines.PositionId = Positions.Id
                           LEFT JOIN (
 	                          SELECT Id, Symbol AS InstrumentName FROM dbo.Instruments
@@ -78,7 +78,7 @@ namespace PortEval.Application.Queries.DataQueries
 	                          SELECT Id, Name AS PortfolioName FROM dbo.Portfolios
                           ) as Portfolios ON Lines.PortfolioId = Portfolios.Id
                           LEFT JOIN (
-	                          SELECT Positions.Id, Symbol AS PositionName FROM dbo.Positions LEFT JOIN dbo.Instruments ON Positions.Id = Instruments.Id
+	                          SELECT Positions.Id, Symbol AS PositionName FROM dbo.Positions LEFT JOIN dbo.Instruments ON Positions.InstrumentId = Instruments.Id
                           ) AS Positions ON Lines.PositionId = Positions.Id
                           LEFT JOIN (
 	                          SELECT Id, Symbol AS InstrumentName FROM dbo.Instruments
