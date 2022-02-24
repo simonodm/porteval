@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Chart } from '../../types';
 
 type Props = {
@@ -13,15 +14,16 @@ export default function DashboardChartPicker({ charts, onDrag }: Props): JSX.Ele
     
     return (
         <div>
-        {charts.map(chart => 
-            <div
-                key={chart.id}
-                draggable
-                className="picker-item draggable"
-                onDrag={() => handleDrag(chart.id)}
-                data-grid={{i: chart.id}}>
-                <span className="picker-item-name">{chart.name}</span>
-            </div>
+            {charts.map(chart => 
+                <div
+                    className="picker-item draggable"
+                    data-grid={{i: chart.id}}
+                    draggable
+                    key={chart.id}
+                    onDrag={() => handleDrag(chart.id)}
+                >
+                    <span className="picker-item-name">{chart.name}</span>
+                </div>
         )}
         </div>
     )

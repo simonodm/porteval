@@ -1,8 +1,11 @@
 import * as d3 from 'd3';
 import { DateTime, Duration } from 'luxon';
+
 import { CHART_TRANSACTION_SIGN_CIRCLE_RADIUS, CHART_TRANSACTION_SIGN_SIZE } from '../../constants';
-import { ChartConfig, ChartFrequency, ChartLine, ChartLineDashType, ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction } from '../../types';
+import { ChartConfig, ChartFrequency, ChartLine, ChartLineDashType,
+    ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction } from '../../types';
 import { Line, XAxisInterval } from '../charts/LineChart';
+
 import { RenderedDataPointInfo } from './lineChart';
 import { getPriceString } from './string';
 
@@ -94,8 +97,7 @@ export function getChartDateRange(chart: ChartConfig): [DateTime, DateTime] {
         const roundedTime = DateTime.fromMillis(currentTime.toMillis() - (currentTime.toMillis() % (300 * 1000)));
         from = roundedTime.minus(getDurationFromToDateRange(chart.toDateRange));
         to = roundedTime;
-    }
-    else {
+    } else {
         from = DateTime.fromISO(chart.dateRangeStart)
         to = DateTime.fromISO(chart.dateRangeEnd);
     }
@@ -169,7 +171,9 @@ export function generateDefaultPositionChart(position: Position): ChartConfig {
     return positionPriceChart;
 }
 
-export function generateTooltipTransactionList(lines: Array<LineWithTransactions>, from: string | undefined, to: string | undefined): HTMLElement | null {
+export function generateTooltipTransactionList(
+    lines: Array<LineWithTransactions>, from: string | undefined, to: string | undefined
+): HTMLElement | null {
     const transactions = lines.reduce<Array<Transaction>>((prev, curr) => {
         return prev.concat(findLineTransactionsInRange(curr.transactions, from, to));
     }, [])
@@ -187,7 +191,9 @@ export function generateTooltipTransactionList(lines: Array<LineWithTransactions
         transactions.forEach(transaction => {
             const transactionRowElement = document.createElement('li');
             const isPurchase = transaction.amount > 0;
-            transactionRowElement.innerHTML = `${isPurchase ? 'BUY' : 'SELL'} ${Math.abs(transaction.amount)} ${transaction.instrument.symbol} @ ${getPriceString(transaction.price)}`;
+            transactionRowElement.innerHTML = 
+                `${isPurchase ? 'BUY' : 'SELL'} ${Math.abs(transaction.amount)} ` +
+                `${transaction.instrument.symbol} @ ${getPriceString(transaction.price)}`;
             transactionsList.append(transactionRowElement);
         });
 
@@ -198,7 +204,9 @@ export function generateTooltipTransactionList(lines: Array<LineWithTransactions
     return null;
 }
 
-export function generateChartLineTransactionIcons(dataPoint: RenderedDataPointInfo, transactions: Array<Transaction>): SVGElement {
+export function generateChartLineTransactionIcons(
+    dataPoint: RenderedDataPointInfo, transactions: Array<Transaction>
+): SVGElement {
     const amount = getTransactionTotalAmount(transactions, dataPoint.point.time, dataPoint.nextPoint?.time);
 
     const element = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -222,18 +230,23 @@ export function generateChartLineTransactionIcons(dataPoint: RenderedDataPointIn
     return element;
 }
 
-function getTransactionTotalAmount(transactions: Array<Transaction>, from: string | undefined, to: string | undefined): number {
+function getTransactionTotalAmount(
+    transactions: Array<Transaction>, from: string | undefined, to: string | undefined
+): number {
     const transactionsInRange = findLineTransactionsInRange(transactions, from, to);
     return transactionsInRange.reduce((prev, curr) => prev + curr.amount, 0);
 }
 
-function findLineTransactionsInRange(transactions: Array<Transaction>, from: string | undefined, to: string | undefined): Array<Transaction> {
+function findLineTransactionsInRange(
+    transactions: Array<Transaction>, from: string | undefined, to: string | undefined
+): Array<Transaction> {
     const convertedFrom = from && DateTime.fromISO(from);
     const convertedTo = to && DateTime.fromISO(to);
 
     return transactions.filter(t => {
         const time = DateTime.fromISO(t.time)
-        return (convertedFrom === undefined || time >= convertedFrom) && (convertedTo === undefined || time <= convertedTo);
+        return (convertedFrom === undefined || time >= convertedFrom) &&
+               (convertedTo === undefined || time <= convertedTo);
     });
 }
 

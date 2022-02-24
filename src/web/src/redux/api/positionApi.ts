@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon';
+
 import { EntityPerformance, EntityProfit, EntityValue, Position } from '../../types';
+
 import { CreatePositionParameters, DateRangeParameters } from './apiTypes';
 import { portEvalApi } from './portEvalApi';
 import { truncateEntityNote } from './apiUtils';
@@ -64,7 +66,8 @@ const positionApi = portEvalApi.injectEndpoints({
         }),
         getPositionValue: build.query<EntityValue, { positionId: number } & DateRangeParameters>({
             query: ({ positionId, from, to }) =>
-                `positions/${positionId}/value?from=${encodeURIComponent(from ?? '')}&to=${encodeURIComponent(to ?? '')}`,
+                `positions/${positionId}/value` + 
+                    `?from=${encodeURIComponent(from ?? '')}&to=${encodeURIComponent(to ?? '')}`,
             providesTags: (result, error, arg) =>
                 result
                     ? [{ type: 'PositionCalculations', id: arg.positionId }]
@@ -72,7 +75,8 @@ const positionApi = portEvalApi.injectEndpoints({
         }),
         getPositionCurrentValue: build.query<EntityValue, { positionId: number }>({
             query: ({ positionId }) =>
-                `positions/${positionId}/value?at=${encodeURIComponent(DateTime.now().toISO())}`,
+                `positions/${positionId}/value` + 
+                    `?at=${encodeURIComponent(DateTime.now().toISO())}`,
             providesTags: (result, error, arg) =>
                 result
                     ? [{ type: 'PositionCalculations', id: arg.positionId }]
@@ -80,7 +84,8 @@ const positionApi = portEvalApi.injectEndpoints({
         }),
         getPositionProfit: build.query<EntityProfit, { positionId: number } & DateRangeParameters>({
             query: ({ positionId, from, to }) =>
-                `positions/${positionId}/profit?from=${encodeURIComponent(from ?? '')}&to=${encodeURIComponent(to ?? '')}`,
+                `positions/${positionId}/profit` + 
+                    `?from=${encodeURIComponent(from ?? '')}&to=${encodeURIComponent(to ?? '')}`,
             providesTags: (result, error, arg) =>
                 result
                     ? [{ type: 'PositionCalculations', id: arg.positionId }]
@@ -90,7 +95,8 @@ const positionApi = portEvalApi.injectEndpoints({
             query: ({ positionId }) => {
                 const to = DateTime.now();
                 const from = to.minus({ days: 1 });
-                return `positions/${positionId}/profit?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                return `positions/${positionId}/profit` + 
+                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -101,7 +107,8 @@ const positionApi = portEvalApi.injectEndpoints({
             query: ({ positionId }) => {
                 const to = DateTime.now();
                 const from = to.minus({ weeks: 1 });
-                return `positions/${positionId}/profit?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                return `positions/${positionId}/profit` + 
+                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -112,7 +119,8 @@ const positionApi = portEvalApi.injectEndpoints({
             query: ({ positionId }) => {
                 const to = DateTime.now();
                 const from = to.minus({ months: 1 });
-                return `positions/${positionId}/profit?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                return `positions/${positionId}/profit` + 
+                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -141,7 +149,8 @@ const positionApi = portEvalApi.injectEndpoints({
             query: ({ positionId }) => {
                 const to = DateTime.now();
                 const from = to.minus({ days: 1 });
-                return `positions/${positionId}/performance?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                return `positions/${positionId}/performance` + 
+                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -152,7 +161,8 @@ const positionApi = portEvalApi.injectEndpoints({
             query: ({ positionId }) => {
                 const to = DateTime.now();
                 const from = to.minus({ weeks: 1 });
-                return `positions/${positionId}/performance?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                return `positions/${positionId}/performance` + 
+                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -163,7 +173,8 @@ const positionApi = portEvalApi.injectEndpoints({
             query: ({ positionId }) => {
                 const to = DateTime.now();
                 const from = to.minus({ months: 1 });
-                return `positions/${positionId}/performance?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                return `positions/${positionId}/performance` + 
+                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
             },
             providesTags: (result, error, arg) =>
                 result

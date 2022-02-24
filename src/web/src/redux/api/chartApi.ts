@@ -1,8 +1,12 @@
-import { Chart, ChartConfig, ChartFrequency, EntityChartDataPoint, isPriceDataChart, Transaction } from '../../types';
-import { buildChartLineDataBaseUrl, buildChartLineTransactionsUrl, generateChartLinesTags, truncateEntityName, generateChartTransactionTags } from './apiUtils';
-import { portEvalApi } from './portEvalApi';
 import { FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/toolkit/dist/query';
+
 import { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes';
+
+import { Chart, ChartConfig, ChartFrequency, EntityChartDataPoint, isPriceDataChart, Transaction } from '../../types';
+
+import { buildChartLineDataBaseUrl, buildChartLineTransactionsUrl,
+    generateChartLinesTags, truncateEntityName, generateChartTransactionTags } from './apiUtils';
+import { portEvalApi } from './portEvalApi';
 
 const chartApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
@@ -12,7 +16,9 @@ const chartApi = portEvalApi.injectEndpoints({
                 result
                     ? [
                         ...result.map(({ id }) => ({ type: 'Chart' as const, id })),
-                        ...generateChartLinesTags(result.map(({ lines }) => lines).reduce((prevLines, lines) => [...prevLines, ...lines], [])),
+                        ...generateChartLinesTags(
+                            result.map(({ lines }) => lines).reduce((prevLines, lines) => [...prevLines, ...lines], [])
+                        ),
                         'Charts'
                       ]
                     : []
@@ -56,7 +62,10 @@ const chartApi = portEvalApi.injectEndpoints({
                     ? ['Charts', { type: 'Chart', id: arg }]
                     : []
         }),
-        getChartData: build.query<Array<Array<EntityChartDataPoint>>, { chart: ChartConfig, from: string, to: string, frequency: ChartFrequency }>({
+        getChartData: build.query<
+            Array<Array<EntityChartDataPoint>>,
+            { chart: ChartConfig, from: string, to: string, frequency: ChartFrequency }
+        >({
             queryFn: async (args, api, extraOptions, fetchWithBQ) => {
                 const currency = isPriceDataChart(args.chart) ? args.chart.currencyCode : undefined;
                 const linesDataUrls = args.chart.lines.map(
@@ -71,12 +80,20 @@ const chartApi = portEvalApi.injectEndpoints({
                 const data = await Promise.all(dataPromises);
 
                 // if all queries failed
-                if(dataPromises.length > 0 && !dataPromises.find(promise => !(promise as QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>).error)) {
+                if(dataPromises.length > 0 &&
+                    !dataPromises.find(promise =>
+                        !(promise as QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>).error)) {
                     throw new Error('Chart line data could not be fetched.');
                 }
 
                 return {
-                    data: data.map(promise => (promise as QueryReturnValue<Array<EntityChartDataPoint>, FetchBaseQueryError, FetchBaseQueryMeta>).data ?? [])
+                    data: data.map(
+                        promise =>
+                            (promise as QueryReturnValue<
+                                Array<EntityChartDataPoint>,
+                                FetchBaseQueryError,
+                                FetchBaseQueryMeta
+                            >).data ?? [])
                 }
             },
             providesTags: (result, error, arg) =>
@@ -94,12 +111,20 @@ const chartApi = portEvalApi.injectEndpoints({
                 const data = await Promise.all(dataPromises);
 
                 // if all queries failed
-                if(dataPromises.length > 0 && !dataPromises.find(promise => !(promise as QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>).error)) {
+                if(dataPromises.length > 0 &&
+                    !dataPromises.find(promise =>
+                        !(promise as QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>).error)) {
                     throw new Error('Chart line transaction data could not be fetched.');
                 }
 
                 return {
-                    data: data.map(promise => (promise as QueryReturnValue<Array<Transaction>, FetchBaseQueryError, FetchBaseQueryMeta>).data ?? [])
+                    data: data.map(
+                        promise =>
+                            (promise as QueryReturnValue<
+                                Array<Transaction>,
+                                FetchBaseQueryError,
+                                FetchBaseQueryMeta
+                            >).data ?? [])
                 };
             },
             providesTags: (result, error, arg) =>

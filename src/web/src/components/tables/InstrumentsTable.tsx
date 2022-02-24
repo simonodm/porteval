@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+
 import LoadingWrapper from '../ui/LoadingWrapper';
-import InstrumentRow from './InstrumentRow';
+
 
 import { checkIsLoaded, checkIsError } from '../utils/queries';
 import { useGetInstrumentPageQuery, usePrefetch } from '../../redux/api/instrumentApi';
 import PageSelector from '../ui/PageSelector';
+
+import InstrumentRow from './InstrumentRow';
 
 export default function InstrumentsTable(): JSX.Element {
     const [page, setPage] = useState(1);
@@ -16,31 +19,32 @@ export default function InstrumentsTable(): JSX.Element {
     const isError = checkIsError(instruments);
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             <div className="col-xs-12 container-fluid">
                 <table className="entity-list w-100">
                     <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Symbol</th>
-                        <th>Currency</th>
-                        <th>Type</th>
-                        <th>Current price</th>
-                        <th>Note</th>
-                        <th>Actions</th>
-                    </tr>
+                        <tr>
+                            <th>Name</th>
+                            <th>Symbol</th>
+                            <th>Currency</th>
+                            <th>Type</th>
+                            <th>Current price</th>
+                            <th>Note</th>
+                            <th>Actions</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        {instruments.data?.data.map(instrument => <InstrumentRow instrument={instrument} />)}
+                        {instruments.data?.data.map(instrument =>
+                            <InstrumentRow instrument={instrument} key={instrument.id} />)}
                     </tbody>
                 </table>
                 <div className="float-right">
                     <PageSelector
-                        page={page}
-                        totalPages={instruments.data ? instruments.data.totalCount / pageLimit : 1}
                         onPageChange={(p) => setPage(p)}
+                        page={page}
                         prefetch={(p) => prefetchInstruments({ page: p, limit: pageLimit })}
-                        />
+                        totalPages={instruments.data ? instruments.data.totalCount / pageLimit : 1}
+                    />
                 </div>
             </div>
         </LoadingWrapper>

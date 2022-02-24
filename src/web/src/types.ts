@@ -32,7 +32,8 @@ export type Transaction = {
     note: string;
 }
 
-export type InstrumentType = 'stock' | 'bond' | 'mutualFund' | 'etf' | 'commodity' | 'cryptoCurrency' | 'index' | 'other';
+export type InstrumentType = 'stock' | 'bond' | 'mutualFund' | 'etf' |
+    'commodity' | 'cryptoCurrency' | 'index' | 'other';
 
 export type Instrument = {
     id: number;

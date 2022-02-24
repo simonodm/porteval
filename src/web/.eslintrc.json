@@ -2,18 +2,37 @@
     "root": true,
     "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:@typescript-eslint/recommended",
+        "plugin:import/recommended",
+        "plugin:import/typescript",
+        "plugin:react/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": { "project": ["./tsconfig.json"] },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "import",
+        "react"
     ],
     "rules": {
         "eqeqeq": "warn",
         "quotes": [1, "single"],
         "no-prototype-builtins": "off",
-        "@typescript-eslint/no-non-null-assertion": "off"
+        "no-multiple-empty-lines": "warn",
+        "brace-style": "warn",
+        "max-len": ["warn", { "code": 120 }],
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "import/order": ["warn", {
+            "newlines-between": "always-and-inside-groups"
+        }],
+        "react/jsx-closing-bracket-location": "warn",
+        "react/jsx-closing-tag-location": "warn",
+        "react/jsx-curly-brace-presence": "warn",
+        "react/jsx-indent": "warn",
+        "react/jsx-indent-props": "warn",
+        "react/jsx-max-props-per-line": ["warn", {"maximum": 3}],
+        "react/jsx-no-useless-fragment": "warn",
+        "react/jsx-sort-props": "warn"
     },
-    "ignorePatterns": ["src/**/*.test.ts", "src/frontend/generated/*"]
+    "ignorePatterns": ["src/**/*.test.ts", "src/frontend/generated/*", "Dockerfile*", "*.md", "*.json"]
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactLoading from 'react-loading';
+
 import * as constants from '../../constants';
 import './LoadingWrapper.css';
 
@@ -13,7 +14,9 @@ export default function LoadingWrapper({ children, isLoaded, isError = false}: P
     if(!isLoaded) {
         return (
             <div className="loading-wrapper">
-                <ReactLoading type="spin" color={constants.MAIN_COLOR} height={'32px'} width={'32px'} />
+                <ReactLoading color={constants.MAIN_COLOR} height="32px" type="spin"
+                    width="32px"
+                />
             </div>
         );
     }
@@ -21,5 +24,10 @@ export default function LoadingWrapper({ children, isLoaded, isError = false}: P
         return <div className="error-wrapper">An error has occured.</div>;
     }
 
-    return <>{ children }</>;
+    return (
+        // eslint-disable-next-line react/jsx-no-useless-fragment
+        <>
+            { children }
+        </>
+    );
 }

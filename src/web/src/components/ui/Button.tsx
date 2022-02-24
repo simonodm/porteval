@@ -8,5 +8,13 @@ type Props = {
 }
 
 export default function Button({ value = 'Button', onClick, active=true }: Props): JSX.Element {
-    return <input type="button" className="button" value={value} onClick={onClick} disabled={!active} />
+    return (
+        <input
+            className="button"
+            disabled={!active}
+            onClick={onClick}
+            type="button"
+            value={value}
+        />
+    )
 }

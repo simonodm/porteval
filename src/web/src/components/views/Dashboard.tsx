@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import GridLayout, { Layout, WidthProvider } from 'react-grid-layout';
+
 import DashboardChart from '../charts/DashboardChart';
 import 'react-grid-layout/css/styles.css';
 import './Dashboard.css';
@@ -64,42 +65,64 @@ export default function Dashboard(): JSX.Element {
     return (
         <>
             <PageHeading heading="Dashboard">
-                <button role="button" className="btn btn-success btn-sm float-right" onClick={() => setIsEditable(!isEditable)}>Toggle dashboard edit</button>
-                <button role="button" className="btn btn-primary btn-sm float-right mr-1" onClick={() => { setModalIsOpen(true); setIsEditable(true) }}>Add charts</button>
+                <button
+                    className="btn btn-success btn-sm float-right"
+                    onClick={() => setIsEditable(!isEditable)}
+                    role="button"
+                >
+                    Toggle dashboard edit
+                </button>
+                <button
+                    className="btn btn-primary btn-sm float-right mr-1"
+                    onClick={() => {
+                        setModalIsOpen(true); setIsEditable(true) 
+                    }}
+                    role="button"
+                >
+                    Add charts
+                </button>
             </PageHeading>
             <ResponsiveGridLayout
                 className="layout"
                 cols={6}
-                isBounded={true}
                 droppingItem={{i: droppingItemId.toString(), w: 1, h: 1}}
+                isBounded={true}
                 isDraggable={isEditable}
-                isResizable={isEditable}
                 isDroppable={true}
+                isResizable={isEditable}
                 onDragStop={saveLayout}
+                onDrop={saveLayout}
                 onResizeStop={saveLayout}
-                onDrop={saveLayout}>
+            >
                 {charts.data && dashboardLayout && charts.data.map(chart => {
                     const chartPosition = dashboardLayout.items.find(l => l.chartId === chart.id);
 
                     if(chartPosition) {
                         return (
-                            <div key={chart.id} className={isEditable ? 'editable-grid-item' : ''} data-grid={{
+                            <div className={isEditable ? 'editable-grid-item' : ''} data-grid={{
                                 x: chartPosition.dashboardPositionX,
                                 y: chartPosition.dashboardPositionY,
                                 w: chartPosition.dashboardWidth,
                                 h: chartPosition.dashboardHeight,
                                 isBounded: true
-                            }}>
+                            }} key={chart.id}
+                            >
                                 <DashboardChart chart={chart} />
                                 { isEditable && 
-                                    <button role="button" className="btn btn-danger grid-remove-button" onClick={() => onRemove(chart.id)}>X</button>
+                                    <button
+                                        className="btn btn-danger grid-remove-button"
+                                        onClick={() => onRemove(chart.id)}
+                                        role="button"
+                                    >
+                                        X
+                                    </button>
                                 }
                             </div>
                         )
                     }
                 })}
             </ResponsiveGridLayout>
-            <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>
+            <ModalWrapper closeModal={() => setModalIsOpen(false)} isOpen={modalIsOpen}>
                 <DashboardChartPicker
                     charts={charts.data?.filter(c => !dashboardLayout?.items.find(item => item.chartId === c.id)) ?? []}
                     onDrag={handleDrag}

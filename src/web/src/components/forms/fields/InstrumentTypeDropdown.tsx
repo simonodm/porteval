@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { InstrumentType } from '../../../types';
 import * as constants from '../../../constants';
 
@@ -9,7 +10,8 @@ type Props = {
 }
 
 export default function InstrumentTypeDropdown({ value, disabled, onChange }: Props): JSX.Element {
-    const types: Array<InstrumentType> = ['stock', 'bond', 'mutualFund', 'commodity', 'cryptoCurrency', 'etf', 'index', 'other']
+    const types: Array<InstrumentType> =
+        ['stock', 'bond', 'mutualFund', 'commodity', 'cryptoCurrency', 'etf', 'index', 'other']
     const [type, setType] = useState<InstrumentType>(value ?? 'stock');
 
     const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -35,12 +37,13 @@ export default function InstrumentTypeDropdown({ value, disabled, onChange }: Pr
         <div className="form-group">
             <label htmlFor="instrument-type">Type:</label>
             <select
-                id="instrument-type"
                 className="form-control"
-                value={type}
                 disabled={disabled}
-                onChange={handleTypeChange}>
-                    {types.map(t => <option value={t}>{constants.INSTRUMENT_TYPE_TO_STRING[type]}</option>)}
+                id="instrument-type"
+                onChange={handleTypeChange}
+                value={type}
+            >
+                {types.map(t => <option key={t} value={t}>{constants.INSTRUMENT_TYPE_TO_STRING[type]}</option>)}
             </select>
         </div>
     )

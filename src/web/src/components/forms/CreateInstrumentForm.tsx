@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../utils/queries';
 import { InstrumentType } from '../../types';
+
+import { useCreateInstrumentMutation } from '../../redux/api/instrumentApi';
+
 import TextInput from './fields/TextInput';
 import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import CurrencyDropdown from './fields/CurrencyDropdown';
-import { useCreateInstrumentMutation } from '../../redux/api/instrumentApi';
 
 type Props = {
     onSuccess?: () => void;
@@ -49,18 +52,29 @@ export default function CreateInstrumentForm({ onSuccess }: Props): JSX.Element 
     }
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             <form onSubmit={handleSubmit}>
-                <TextInput label='Name' value={name} placeholder='e.g. Apple Inc.' onChange={(val) => setName(val)} />
-                <TextInput label='Symbol' value={symbol} placeholder='e.g. AAPL' onChange={(val) => setSymbol(val)} />
-                <TextInput label='Exchange' value={exchange} placeholder='e.g. NASDAQ' onChange={(val) => setExchange(val)} />
-                <InstrumentTypeDropdown value={type} onChange={(t) => setType(t)} />
-                <CurrencyDropdown currencies={currencies.data ?? []} value={currencyCode} onChange={(code) => setCurrencyCode(code)} />
-                <TextInput label='Note' value={note} onChange={(val) => setNote(val)} />
+                <TextInput label='Name' onChange={(val) => setName(val)} placeholder='e.g. Apple Inc.'
+                    value={name}
+                />
+                <TextInput label='Symbol' onChange={(val) => setSymbol(val)} placeholder='e.g. AAPL'
+                    value={symbol}
+                />
+                <TextInput label='Exchange' onChange={(val) => setExchange(val)} placeholder='e.g. NASDAQ'
+                    value={exchange}
+                />
+                <InstrumentTypeDropdown onChange={(t) => setType(t)} value={type} />
+                <CurrencyDropdown
+                    currencies={currencies.data ?? []}
+                    onChange={(code) => setCurrencyCode(code)}
+                    value={currencyCode}
+                />
+                <TextInput label='Note' onChange={(val) => setNote(val)} value={note} />
                 <button 
-                    role="button"
                     className="btn btn-primary"
-                    >Save</button>
+                    role="button"
+                >Save
+                </button>
             </form>
         </LoadingWrapper>
     )

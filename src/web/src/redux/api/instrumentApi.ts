@@ -1,5 +1,7 @@
+import { Instrument, InstrumentPrice, PaginatedResponse,
+    EntityProfit, EntityPerformance, InstrumentPriceConfig } from '../../types';
+
 import { portEvalApi } from './portEvalApi';
-import { Instrument, InstrumentPrice, PaginatedResponse, EntityProfit, EntityPerformance, InstrumentPriceConfig } from '../../types';
 import { CreateInstrumentParameters, DateRangeParameters, PaginationParameters } from './apiTypes';
 import { getAllPaginated, truncateEntityName, truncateEntityNote } from './apiUtils';
 
@@ -88,7 +90,10 @@ const instrumentApi = portEvalApi.injectEndpoints({
                     ? [{ type: 'InstrumentPrices', id: arg.instrumentId }]
                     : []
         }),
-        getInstrumentPricePage: build.query<PaginatedResponse<InstrumentPrice>, { instrumentId: number } & PaginationParameters & DateRangeParameters>({
+        getInstrumentPricePage: build.query<
+            PaginatedResponse<InstrumentPrice>,
+            { instrumentId: number } & PaginationParameters & DateRangeParameters
+        >({
             query: ({ instrumentId, from, to, page = 1, limit = 100 }) => ({
                 url: `instruments/${instrumentId}/prices` +
                     `?page=${page}` +
@@ -127,7 +132,12 @@ const instrumentApi = portEvalApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) =>
                 !error
-                    ? [{type: 'InstrumentPrices', id: arg.instrumentId}, 'PortfolioCalculations', 'PositionCalculations']
+                    ? [{
+                        type: 'InstrumentPrices',
+                        id: arg.instrumentId
+                       },
+                       'PortfolioCalculations',
+                       'PositionCalculations']
                     : []
         }),
         deleteInstrumentPrice: build.mutation<void, { instrumentId: number, priceId: number }>({

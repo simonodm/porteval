@@ -1,4 +1,5 @@
 import React, { Fragment, useState } from 'react';
+
 import PortfoliosTable from '../tables/PortfoliosTable';
 import ModalWrapper from '../modals/ModalWrapper';
 import PageHeading from '../ui/PageHeading';
@@ -10,12 +11,18 @@ function PortfolioListView(): JSX.Element {
     return (
         <Fragment>
             <PageHeading heading="Portfolios">
-                <button role="button" className="btn btn-success btn-sm float-right" onClick={() => setModalIsOpen(true)}>Create new portfolio</button>
+                <button
+                    className="btn btn-success btn-sm float-right"
+                    onClick={() => setModalIsOpen(true)}
+                    role="button"
+                >
+                    Create new portfolio
+                </button>
             </PageHeading>
             <div className="col-xs-12 container-fluid">
                 <PortfoliosTable />
             </div>
-            <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>
+            <ModalWrapper closeModal={() => setModalIsOpen(false)} isOpen={modalIsOpen}>
                 <CreatePortfolioForm onSuccess={() => setModalIsOpen(false)} />
             </ModalWrapper>
         </Fragment>

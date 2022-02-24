@@ -1,14 +1,19 @@
 import React from 'react';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
-import { ChartConfig, isPriceDataChart } from '../../types';
-import LoadingWrapper from '../ui/LoadingWrapper';
-import LineChart from './LineChart';
-import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
+
 import { skipToken } from '@reduxjs/toolkit/dist/query';
+
+import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
+import LoadingWrapper from '../ui/LoadingWrapper';
+import { ChartConfig, isPriceDataChart } from '../../types';
+import { checkIsLoaded, checkIsError } from '../utils/queries';
 import { getPriceString, getPerformanceString } from '../utils/string';
-import { convertDashToStrokeDashArray, calculateXAxisInterval, getChartDateRange, getChartFrequency, getXAxisD3Format, generateTooltipTransactionList, generateChartLineTransactionIcons } from '../utils/chart';
+import { convertDashToStrokeDashArray, calculateXAxisInterval, getChartDateRange,
+    getChartFrequency, getXAxisD3Format, generateTooltipTransactionList,
+    generateChartLineTransactionIcons } from '../utils/chart';
 import { useGetChartDataQuery, useGetChartTransactionsQuery } from '../../redux/api/chartApi';
 import { RenderedDataPointInfo } from '../utils/lineChart';
+
+import LineChart from './LineChart';
 
 type Props = {
     chart: ChartConfig;   
@@ -52,7 +57,7 @@ export default function PortEvalChart({ chart }: Props): JSX.Element {
     const isError = checkIsError(chartData, transactionData, currency);
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             <LineChart config={config} lines={lines} />
         </LoadingWrapper>
     )

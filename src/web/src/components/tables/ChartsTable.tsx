@@ -1,8 +1,11 @@
 import React from 'react';
+
 import LoadingWrapper from '../ui/LoadingWrapper';
-import ChartRow from './ChartRow';
+
 import { checkIsLoaded, checkIsError } from '../utils/queries';
 import { useGetAllChartsQuery } from '../../redux/api/chartApi';
+
+import ChartRow from './ChartRow';
 
 export default function ChartsTable(): JSX.Element {
     const charts = useGetAllChartsQuery();
@@ -11,7 +14,7 @@ export default function ChartsTable(): JSX.Element {
     const isError = checkIsError(charts);
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             <table className="w-100 entity-list">
                 <thead>
                     <tr>
@@ -20,7 +23,7 @@ export default function ChartsTable(): JSX.Element {
                     </tr>
                 </thead>
                 <tbody>
-                    {charts.data?.map(chart => <ChartRow chart={chart} />)}
+                    {charts.data?.map(chart => <ChartRow chart={chart} key={chart.id} />)}
                 </tbody>
             </table>
         </LoadingWrapper>

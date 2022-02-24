@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { Currency } from '../../../types';
 
 type Props = {
@@ -28,8 +29,10 @@ export default function CurrencyDropdown({ currencies, disabled, value, onChange
     return (
         <div className="form-group">
             <label htmlFor="currency">Currency:</label>
-            <select id="currency" className="form-control" value={currencyCode} disabled={disabled} onChange={(e) => setCurrencyCode(e.target.value)}>
-                {currencies.map(currency => <option value={currency.code}>{currency.code}</option>)}
+            <select className="form-control" disabled={disabled} id="currency"
+                onChange={(e) => setCurrencyCode(e.target.value)} value={currencyCode}
+            >
+                {currencies.map(currency => <option key={currency.code} value={currency.code}>{currency.code}</option>)}
             </select>
         </div>
     )

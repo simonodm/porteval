@@ -1,10 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
+
+import DatePicker from 'react-datepicker';
+
+import { DateTime } from 'luxon';
+
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
-import { ChartConfig, isPriceDataChart, isAggregatedChart, ChartFrequency, ChartType, ChartToDateRange } from '../../types';
+import { ChartConfig, isPriceDataChart, isAggregatedChart,
+    ChartFrequency, ChartType, ChartToDateRange } from '../../types';
 import { checkIsLoaded, checkIsError } from '../utils/queries';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import DatePicker from 'react-datepicker';
-import { DateTime } from 'luxon';
+
 import 'react-datepicker/dist/react-datepicker.css';
 import './ChartConfigurator.css';
 import { camelToProperCase } from '../utils/string';
@@ -89,7 +94,9 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
             const newChart: ChartConfig = {
                 ...currentChart,
                 isToDate: false,
-                dateRangeStart: currentChart.isToDate ? DateTime.fromJSDate(date).minus({ months: 1 }).toISO() : currentChart.dateRangeStart,
+                dateRangeStart: currentChart.isToDate
+                    ? DateTime.fromJSDate(date).minus({ months: 1 }).toISO()
+                    : currentChart.dateRangeStart,
                 dateRangeEnd: date.toISOString()
             }
             setCurrentChart(newChart);
@@ -110,14 +117,19 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
     }
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             { currentChart && 
-                <form className="chart-configurator" autoComplete="off" onSubmit={(e) => e.preventDefault() }>
+                <form autoComplete="off" className="chart-configurator" onSubmit={(e) => e.preventDefault() }>
                     <span className="chart-configurator-setting">
                         <label htmlFor="chart-type">Type:</label>
-                        <select id="chart-type" className="form-select" onChange={handleTypeChange}>
+                        <select className="form-select" id="chart-type" onChange={handleTypeChange}>
                             {types.map(type =>
-                                <option value={type} selected={currentChart.type === type}>{camelToProperCase(type)}</option>)}
+                                <option
+                                    key={type}
+                                    selected={currentChart.type === type}
+                                    value={type}
+                                >{camelToProperCase(type)}
+                                </option>)}
                         </select>
                     </span>
                     {
@@ -125,9 +137,14 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                             &&
                             <span className="chart-configurator-setting">
                                 <label htmlFor="chart-currency">Currency:</label>
-                                <select id="chart-currency" className="form-select" onChange={handleCurrencyChange}>
+                                <select className="form-select" id="chart-currency" onChange={handleCurrencyChange}>
                                     {currencies.data?.map(currency =>
-                                        <option value={currency.code} selected={currentChart.currencyCode === currency.code}>{currency.code}</option>)}
+                                        <option
+                                            key={currency.code}
+                                            selected={currentChart.currencyCode === currency.code}
+                                            value={currency.code}
+                                        >{currency.code}
+                                        </option>)}
                                 </select>
                             </span>
                     }
@@ -136,31 +153,46 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                             && 
                             <span className="chart-configurator-setting">
                                 <label htmlFor="chart-frequency">Frequency:</label>
-                                <select id="chart-frequency" className="form-select" onChange={handleFrequencyChange}>
+                                <select className="form-select" id="chart-frequency" onChange={handleFrequencyChange}>
                                     {frequencies.map(frequency =>
-                                    <option value={frequency} selected={isAggregatedChart(currentChart) && currentChart.frequency === frequency}>{camelToProperCase(frequency)}</option>)}
+                                        <option
+                                            key={frequency}
+                                            selected={
+                                                isAggregatedChart(currentChart) && currentChart.frequency === frequency
+                                            }
+                                            value={frequency}
+                                        >{camelToProperCase(frequency)}
+                                        </option>)}
                                 </select>
                             </span>
                     }
                     <span className="chart-configurator-setting">
                         <label htmlFor="chart-date-start">Range start:</label>
                         <DatePicker 
-                            selected={currentChart.isToDate ? undefined : DateTime.fromISO(currentChart.dateRangeStart).toJSDate()}
-                            onChange={handleStartDateChange}
-                            wrapperClassName="chart-datepicker-wrapper"
-                            popperClassName="chart-datepicker-popper"
                             id="chart-date-start"
-                            />
+                            onChange={handleStartDateChange}
+                            popperClassName="chart-datepicker-popper"
+                            selected={
+                                currentChart.isToDate
+                                    ? undefined
+                                    : DateTime.fromISO(currentChart.dateRangeStart).toJSDate()
+                            }
+                            wrapperClassName="chart-datepicker-wrapper"
+                        />
                     </span>
                     <span className="chart-configurator-setting">
                         <label htmlFor="chart-date-end">Range end:</label>
                         <DatePicker 
-                            selected={currentChart.isToDate ? undefined : DateTime.fromISO(currentChart.dateRangeEnd).toJSDate()}
-                            onChange={handleEndDateChange}
-                            wrapperClassName="chart-datepicker-wrapper"
-                            popperClassName="chart-datepicker-popper"
                             id="chart-date-end"
-                            />
+                            onChange={handleEndDateChange}
+                            popperClassName="chart-datepicker-popper"
+                            selected={
+                                currentChart.isToDate
+                                    ? undefined
+                                    : DateTime.fromISO(currentChart.dateRangeEnd).toJSDate()
+                            }
+                            wrapperClassName="chart-datepicker-wrapper"
+                        />
                     </span>
                     <span className="chart-configurator-setting">
                         <label htmlFor="to-date-range">To-date range</label>
@@ -168,10 +200,17 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                             {
                                 toDateRanges.map(range =>
                                     <button
-                                        type="button"
-                                        className={'btn btn-sm ' + (currentChart.isToDate && currentChart.toDateRange === range ? 'btn-dark' : 'btn-light')}
+                                        className={
+                                            'btn btn-sm ' +
+                                            (currentChart.isToDate && currentChart.toDateRange === range
+                                                ? 'btn-dark'
+                                                : 'btn-light')
+                                        }
+                                        key={range}
                                         onClick={() => handleToDateRangeChange(range)}
-                                    >{range[0] + range[1].toUpperCase()}</button>)
+                                        type="button"
+                                    >{range[0] + range[1].toUpperCase()}
+                                    </button>)
                             }
                         </div>
                     </span>

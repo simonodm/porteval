@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from 'react';
+
+import { DateTime } from 'luxon';
+
 import { useCreateInstrumentMutation, useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../utils/queries';
-import InstrumentDropdown from './fields/InstrumentDropdown';
+
 import useInstrumentPriceAutoFetchingState from '../../hooks/useInstrumentPriceAutoFetchingState';
-import { DateTime } from 'luxon';
+
 import { Instrument, InstrumentType } from '../../types';
+
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
+
+import { useAddPositionMutation } from '../../redux/api/positionApi';
+
+import InstrumentDropdown from './fields/InstrumentDropdown';
+
 import TextInput from './fields/TextInput';
 import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import NumberInput from './fields/NumberInput';
 import DateTimeSelector from './fields/DateTimeSelector';
 import CurrencyDropdown from './fields/CurrencyDropdown';
-import { useAddPositionMutation } from '../../redux/api/positionApi';
+
 
 type Props = {
     portfolioId: number;
@@ -37,7 +46,12 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
 
     const [amount, setAmount] = useState(1);
     const [time, setTime] = useState(DateTime.now());
-    const [price, setPriceFetchInstrument, setPriceFetchTime, setPrice] = useInstrumentPriceAutoFetchingState(instrumentId, DateTime.now());
+    const [
+        price,
+        setPriceFetchInstrument,
+        setPriceFetchTime,
+        setPrice
+    ] = useInstrumentPriceAutoFetchingState(instrumentId, DateTime.now());
 
     const [positionNote, setPositionNote] = useState('');
 
@@ -109,8 +123,7 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
             })
             .then(res => onSuccessfulResponse(res, handleNewInstrumentCreated))
             .then(handleCreatePosition);
-        }
-        else {
+        } else {
             handleCreatePosition();
         }        
         
@@ -118,27 +131,60 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
     }
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             <form onSubmit={handleSubmit}>
-                <InstrumentDropdown instruments={instruments.data ?? []} value={instrumentId} creatable onChange={handleInstrumentChange} onCreate={handleInstrumentCreationStart} onCancelCreate={handleInstrumentCreationCancel} />
+                <InstrumentDropdown
+                    creatable
+                    instruments={instruments.data ?? []}
+                    onCancelCreate={handleInstrumentCreationCancel}
+                    onChange={handleInstrumentChange}
+                    onCreate={handleInstrumentCreationStart}
+                    value={instrumentId}
+                />
                 { 
                     isNewInstrument &&
                     <>
-                        <TextInput label='Instrument name' placeholder='e.g. Apple Inc.' value={instrumentName} onChange={setInstrumentName} />
-                        <TextInput label='Instrument symbol' placeholder='e.g. AAPL' value={instrumentSymbol} onChange={setInstrumentSymbol} />
-                        <TextInput label='Instrument exchange' placeholder='e.g. NASDAQ' value={instrumentExchange} onChange={setInstrumentExchange} />
-                        <CurrencyDropdown currencies={currencies.data ?? []} value={instrumentCurrency} onChange={setInstrumentCurrency} />
-                        <InstrumentTypeDropdown value={instrumentType} onChange={setInstrumentType} />
+                        <TextInput
+                            label='Instrument name'
+                            onChange={setInstrumentName}
+                            placeholder='e.g. Apple Inc.'
+                            value={instrumentName}
+                        />
+                        <TextInput
+                            label='Instrument symbol'
+                            onChange={setInstrumentSymbol}
+                            placeholder='e.g. AAPL'
+                            value={instrumentSymbol}
+                        />
+                        <TextInput
+                            label='Instrument exchange'
+                            onChange={setInstrumentExchange}
+                            placeholder='e.g. NASDAQ'
+                            value={instrumentExchange}
+                        />
+                        <CurrencyDropdown
+                            currencies={currencies.data ?? []}
+                            onChange={setInstrumentCurrency}
+                            value={instrumentCurrency}
+                        />
+                        <InstrumentTypeDropdown onChange={setInstrumentType} value={instrumentType} />
                     </>
                 }
-                <NumberInput label='Amount' allowFloat value={amount} onChange={setAmount} />
-                <NumberInput label='Price' allowFloat value={price} onChange={setPrice} />
-                <DateTimeSelector label='Date' timeInterval={1} enableTime format='MMM dd, yyyy, HH:mm' value={time} onChange={handleTimeChange} />
-                <TextInput label='Note' value={positionNote} onChange={setPositionNote} />
+                <NumberInput allowFloat label='Amount' onChange={setAmount}
+                    value={amount}
+                />
+                <NumberInput allowFloat label='Price' onChange={setPrice}
+                    value={price}
+                />
+                <DateTimeSelector enableTime format='MMM dd, yyyy, HH:mm' label='Date'
+                    onChange={handleTimeChange} timeInterval={1} value={time}
+                />
+                <TextInput label='Note' onChange={setPositionNote} value={positionNote} />
                 <button 
-                    role="button"
                     className="btn btn-primary"
-                    >Save</button>
+                    role="button"
+                >Save
+                </button>
             </form>
         </LoadingWrapper>
     )

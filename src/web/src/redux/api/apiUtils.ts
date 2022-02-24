@@ -1,6 +1,7 @@
 import { FetchArgs, FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/toolkit/dist/query';
 import { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes';
 import { MaybePromise } from '@reduxjs/toolkit/dist/query/tsHelpers';
+
 import { ChartConfig, PaginatedResponse, ChartLine } from '../../types';
 import * as constants from '../../constants';
 
@@ -19,11 +20,11 @@ export function truncateEntityNote<T extends { note: string }>(entity: T, length
 }
 
 export async function getAllPaginated<T>(
-    fetchWithBQ: (arg: string | FetchArgs) => MaybePromise<QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>>,
+    fetchWithBQ: (arg: string | FetchArgs) =>
+        MaybePromise<QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>>,
     endpointUrl: string,
     params: Record<string, string> = {}
-    ): Promise<QueryReturnValue<Array<T>, FetchBaseQueryError, FetchBaseQueryMeta>>
-{
+): Promise<QueryReturnValue<Array<T>, FetchBaseQueryError, FetchBaseQueryMeta>> {
     const limit = 300;
     const response: Array<T> = [];
     let currentPage = 1;

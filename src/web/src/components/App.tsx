@@ -1,4 +1,14 @@
 import React from 'react';
+
+import { ToastContainer } from 'react-toastify';
+
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    Redirect
+} from 'react-router-dom';
+
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Dashboard from './views/Dashboard';
@@ -7,16 +17,9 @@ import InstrumentListView from './views/InstrumentListView';
 import PortfolioListView from './views/PortfolioListView';
 import SettingsView from './views/SettingsView';
 import PortfolioView from './views/PortfolioView';
-import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Redirect
-} from 'react-router-dom';
 
 import './App.css';
 import ChartListView from './views/ChartListView';
@@ -66,16 +69,16 @@ export default function App(): JSX.Element {
                 </div>
             </Router>
             <ToastContainer
-                    position="bottom-right"
-                    autoClose={5000}
-                    hideProgressBar
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                />
+                autoClose={5000}
+                closeOnClick
+                draggable
+                hideProgressBar
+                newestOnTop={false}
+                pauseOnFocusLoss
+                pauseOnHover
+                position="bottom-right"
+                rtl={false}
+            />
         </div>
     );
 }

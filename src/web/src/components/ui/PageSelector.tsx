@@ -19,18 +19,20 @@ export default function PageSelector({ page, totalPages, onPageChange, prefetch 
         <div className="page-selector">
             { page > 1 &&
                 <button
-                    role="button"
                     className="btn btn-primary btn-sm mr-1"
                     onClick={() => onPageChange(page - 1)}
-                    >Previous page
+                    role="button"
+                >
+                    Previous page
                 </button>
             }
             { page < totalPages &&
                 <button
-                    role="button"
                     className="btn btn-primary btn-sm"
                     onClick={() => onPageChange(page + 1)}
-                    >Next page
+                    role="button"
+                >
+                    Next page
                 </button>
             }
         </div>

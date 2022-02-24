@@ -29,13 +29,14 @@ export default function TextInput({ label, placeholder, disabled, value, validat
         <div className="form-group">
             <label htmlFor="transaction-note">{label}:</label>
             <input 
-                type="text"
-                id="position-note"
-                disabled={disabled}
-                placeholder={placeholder}
                 className="form-control"
+                disabled={disabled}
+                id="position-note"
+                onChange={handleTextChange}
+                placeholder={placeholder}
+                type="text"
                 value={text}
-                onChange={handleTextChange} />
+            />
         </div>
     )
 }

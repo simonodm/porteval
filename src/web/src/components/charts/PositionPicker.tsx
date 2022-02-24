@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+
 import { useGetPositionsQuery } from '../../redux/api/positionApi';
 import { Portfolio } from '../../types';
 import LoadingWrapper from '../ui/LoadingWrapper';
@@ -29,20 +30,27 @@ export default function PositionPicker({ portfolio }: Props): JSX.Element {
     return (
         <div className="chart-picker">
             <h6>Positions</h6>
-            <LoadingWrapper isLoaded={isLoaded} isError={isError}>
-                <button role="button" className="btn btn-primary" onClick={handleAddAllPositions}>Add all positions</button>
+            <LoadingWrapper isError={isError} isLoaded={isLoaded}>
+                <button
+                    className="btn btn-primary"
+                    onClick={handleAddAllPositions}
+                    role="button"
+                >Add all positions
+                </button>
                 {positions.data?.map(position => {
                     const line = context.chart?.lines.find(existingLine =>
                         existingLine.type === 'position'
                         && existingLine.positionId === position.id);
 
                     return <PositionPickerItem
-                        position={position}
+                        key={position.id}
                         line={line}
                         onLineAdd={() => context.addPositionLine(position)}
-                        onLineRemove={() => line ? context.removeLine(line) : undefined}
                         onLineConfigure={() => line ? context.configureLine(line) : undefined}
-                    />})}
+                        onLineRemove={() => line ? context.removeLine(line) : undefined}
+                        position={position}
+                           />
+})}
             </LoadingWrapper>
         </div>
     );

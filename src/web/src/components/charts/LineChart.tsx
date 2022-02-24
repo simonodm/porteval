@@ -1,10 +1,11 @@
-import { useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import createChart, { RenderCallback } from '../utils/lineChart';
+
+import createChart, { RenderCallback , TooltipCallback } from '../utils/lineChart';
 import './LineChart.css';
 import { EntityChartDataPoint } from '../../types';
 import { getXAxisD3Interval } from '../utils/chart';
-import { TooltipCallback } from '../utils/lineChart';
+
 
 export type XAxisInterval = 'hour' | 'day' | 'week' | 'month' | 'year';
 export type Line = {
@@ -64,10 +65,11 @@ export default function LineChart({ config, lines }: Props): JSX.Element {
         }
     })
 
-    useLayoutEffect(generateChart, [lines, containerRef, containerRef.current?.clientHeight, containerRef.current?.clientWidth]);
+    useLayoutEffect(generateChart,
+        [lines, containerRef, containerRef.current?.clientHeight, containerRef.current?.clientWidth]);
 
     return (
-        <div ref={containerRef} className="chart">
+        <div className="chart" ref={containerRef}>
         </div>
     )
 }

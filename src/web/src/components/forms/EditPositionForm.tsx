@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
+
 import { useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
 import { useGetAllPortfoliosQuery } from '../../redux/api/portfolioApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../utils/queries';
+
+import { useUpdatePositionMutation } from '../../redux/api/positionApi';
+
+import { Position } from '../../types';
+
 import PortfolioDropdown from './fields/PortfolioDropdown';
 import InstrumentDropdown from './fields/InstrumentDropdown';
 import TextInput from './fields/TextInput';
-import { useUpdatePositionMutation } from '../../redux/api/positionApi';
-import { Position } from '../../types';
 
 type Props = {
     position: Position;
@@ -34,15 +38,16 @@ export default function EditPositionForm({ position, onSuccess }: Props): JSX.El
     }
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             <form onSubmit={handleSubmit}>
-                <PortfolioDropdown portfolios={portfolios.data ?? []} disabled value={position.portfolioId} />
-                <InstrumentDropdown instruments={instruments.data ?? []} disabled value={position.instrumentId} />
-                <TextInput label='Note' value={note} onChange={(val) => setNote(val)} />
+                <PortfolioDropdown disabled portfolios={portfolios.data ?? []} value={position.portfolioId} />
+                <InstrumentDropdown disabled instruments={instruments.data ?? []} value={position.instrumentId} />
+                <TextInput label='Note' onChange={(val) => setNote(val)} value={note} />
                 <button 
-                    role="button"
                     className="btn btn-primary"
-                    >Save</button>
+                    role="button"
+                >Save
+                </button>
             </form>
         </LoadingWrapper>
     )

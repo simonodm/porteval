@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { Instrument } from '../../../types';
 
 type Props = {
@@ -11,7 +12,9 @@ type Props = {
     onChange?: (instrumentId: number) => void;
 }
 
-export default function InstrumentDropdown({ instruments, value, disabled, creatable, onCreate, onCancelCreate, onChange }: Props): JSX.Element {
+export default function InstrumentDropdown(
+    { instruments, value, disabled, creatable, onCreate, onCancelCreate, onChange }: Props
+): JSX.Element {
     const [instrumentId, setInstrumentId] = useState(value);
     const [creatingNew, setCreatingNew] = useState(false);
 
@@ -27,8 +30,7 @@ export default function InstrumentDropdown({ instruments, value, disabled, creat
     const handleCreateNewInstrumentCheck = () => {
         if(!creatingNew && onCreate) {
             onCreate();
-        }
-        else if(creatingNew && onCancelCreate) {
+        } else if(creatingNew && onCancelCreate) {
             onCancelCreate();
         }
 
@@ -51,15 +53,20 @@ export default function InstrumentDropdown({ instruments, value, disabled, creat
     return (
         <div className="form-group">
             <label htmlFor="instrument">Instrument:</label>
-            <select id="instrument" className="form-control" value={instrumentId} disabled={disabled || creatingNew} onChange={handleInstrumentIdChange}>
+            <select className="form-control" disabled={disabled || creatingNew} id="instrument"
+                onChange={handleInstrumentIdChange} value={instrumentId}
+            >
                 {instruments
                         .filter(instrument => instrument.type !== 'index')
-                        .map(instrument => <option value={instrument.id}>{instrument.name}</option>)}
+                        .map(instrument =>
+                            <option key={instrument.id} value={instrument.id}>{instrument.name}</option>)}
             </select>
             {
                 creatable &&
                 <>
-                    <input id="instrument-create-new" type="checkbox" checked={creatingNew} onChange={handleCreateNewInstrumentCheck} />
+                    <input checked={creatingNew} id="instrument-create-new" onChange={handleCreateNewInstrumentCheck}
+                        type="checkbox"
+                    />
                     <label htmlFor="instrument-create-new">Create new instrument</label>
                 </>
             }

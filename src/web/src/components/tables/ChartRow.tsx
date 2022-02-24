@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+
 import { checkIsLoaded, checkIsError } from '../utils/queries';
 import { useDeleteChartMutation } from '../../redux/api/chartApi';
 import { Chart } from '../../types';
@@ -16,13 +17,15 @@ export default function ChartRow({ chart }: Props): JSX.Element {
     const isError = checkIsError(mutationStatus);
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             <tr>
                 <td>
                     <Link to={`/charts/view/${chart.id}`}>{chart.name}</Link>
                 </td>
                 <td>
-                    <button role="button" className="btn btn-danger btn-extra-sm" onClick={() => deleteChart(chart.id)}>Remove</button>
+                    <button className="btn btn-danger btn-extra-sm" onClick={() => deleteChart(chart.id)} role="button">
+                        Remove
+                    </button>
                 </td>
             </tr>
         </LoadingWrapper>

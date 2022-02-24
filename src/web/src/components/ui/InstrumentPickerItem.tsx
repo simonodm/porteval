@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { ChartLine, Instrument } from '../../types';
 
 type Props = {
@@ -9,7 +10,9 @@ type Props = {
     onLineConfigure?: () => void;
 }
 
-export default function InstrumentPickerItem({ instrument, line, onLineAdd, onLineRemove, onLineConfigure }: Props): JSX.Element {
+export default function InstrumentPickerItem(
+    { instrument, line, onLineAdd, onLineRemove, onLineConfigure }: Props
+): JSX.Element {
     return (
         <div className="picker-item">
             <span className="picker-item-name">{instrument.name}</span>
@@ -19,11 +22,30 @@ export default function InstrumentPickerItem({ instrument, line, onLineAdd, onLi
             <span className="picker-item-actions">
                 {
                     line === undefined
-                        ? <button role="button" className="btn btn-primary btn-extra-sm" onClick={onLineAdd}>Add</button>
-                        : <>
-                            <button role="button" className="btn btn-danger btn-extra-sm" onClick={onLineRemove}>Remove</button>
-                            <button role="button" className="btn btn-primary btn-extra-sm" onClick={onLineConfigure}>Modify</button>
-                          </>
+                        ? 
+                            <button
+                                className="btn btn-primary btn-extra-sm"
+                                onClick={onLineAdd} role="button"
+                            >
+                                Add
+                            </button>
+                        : 
+                            <>
+                                <button
+                                    className="btn btn-danger btn-extra-sm"
+                                    onClick={onLineRemove}
+                                    role="button"
+                                >
+                                    Remove
+                                </button>
+                                <button
+                                    className="btn btn-primary btn-extra-sm"
+                                    onClick={onLineConfigure}
+                                    role="button"
+                                >
+                                    Modify
+                                </button>
+                            </>
                 }
             </span>
         </div>

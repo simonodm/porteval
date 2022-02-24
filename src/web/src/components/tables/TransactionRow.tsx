@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import { useDeleteTransactionMutation } from '../../redux/api/transactionApi';
 import { Currency, Transaction } from '../../types';
 import ModalWrapper from '../modals/ModalWrapper';
@@ -22,15 +23,22 @@ export default function TransactionRow({ transaction, currency }: Props): JSX.El
             <td>{getPriceString(transaction.price, currency?.symbol)}</td>
             <td>{transaction.note}</td>
             <td>
-                <button role="button" className="btn btn-primary btn-extra-sm mr-1" onClick={() => setModalIsOpen(true)}>Edit</button>
-                <button 
+                <button
+                    className="btn btn-primary btn-extra-sm mr-1"
+                    onClick={() => setModalIsOpen(true)}
                     role="button"
+                >
+                    Edit
+                </button>
+                <button 
                     className="btn btn-danger btn-extra-sm"
-                    onClick={() => deleteTransaction(transaction)}>
-                Remove
+                    onClick={() => deleteTransaction(transaction)}
+                    role="button"
+                >
+                    Remove
                 </button>
             </td>
-            <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>
+            <ModalWrapper closeModal={() => setModalIsOpen(false)} isOpen={modalIsOpen}>
                 <EditTransactionForm onSuccess={() => setModalIsOpen(false)} transaction={transaction} />
             </ModalWrapper>
         </tr>

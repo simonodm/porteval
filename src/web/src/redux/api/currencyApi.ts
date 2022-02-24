@@ -1,4 +1,5 @@
 import { Currency, CurrencyExchangeRate } from '../../types';
+
 import { portEvalApi } from './portEvalApi';
 
 const currencyApi = portEvalApi.injectEndpoints({
@@ -18,7 +19,8 @@ const currencyApi = portEvalApi.injectEndpoints({
                 `currencies/${codeFrom}/exchange_rates/latest`
         }),
         getExchangeRateAt: build.query<CurrencyExchangeRate, { codeFrom: string, codeTo: string, time: string }>({
-            query: ({ codeFrom, codeTo, time }) => `currencies/${codeFrom}/exchange_rates/${codeTo}/at?time=${encodeURIComponent(time)}`
+            query: ({ codeFrom, codeTo, time }) =>
+                `currencies/${codeFrom}/exchange_rates/${codeTo}/at?time=${encodeURIComponent(time)}`
         }),
         getLatestExchangeRate: build.query<CurrencyExchangeRate, { codeFrom: string, codeTo: string }>({
             query: ({ codeFrom, codeTo }) => `currencies/${codeFrom}/exchange_rates/${codeTo}/latest`

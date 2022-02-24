@@ -1,4 +1,9 @@
 import React, { Fragment } from 'react';
+
+import { useParams } from 'react-router-dom';
+
+import { skipToken } from '@reduxjs/toolkit/dist/query';
+
 import PortfoliosTableHeaders from '../tables/PortfoliosTableHeaders';
 import PositionRows from '../tables/PositionRows';
 import LoadingWrapper from '../ui/LoadingWrapper';
@@ -8,9 +13,8 @@ import useGetPortfolioToDateProfitsQueryWrapper from '../../hooks/useGetPortfoli
 import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
 import { useGetPortfolioByIdQuery, useGetPortfolioCurrentValueQuery } from '../../redux/api/portfolioApi';
 import { checkIsLoaded, checkIsError } from '../utils/queries';
-import { useParams } from 'react-router-dom';
 
-import { skipToken } from '@reduxjs/toolkit/dist/query';
+
 import { getPerformanceString, getPriceString } from '../utils/string';
 import * as constants from '../../constants';
 import PortEvalChart from '../charts/PortEvalChart';
@@ -42,7 +46,7 @@ export default function PortfolioView(): JSX.Element {
             <div className="row mb-5">
                 <div className="col-xs-12 col-sm-6">
                     <h5>Data</h5>
-                    <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+                    <LoadingWrapper isError={isError} isLoaded={isLoaded}>
                         <table className="entity-data w-100">
                             <tbody>
                                 <tr>
@@ -97,7 +101,7 @@ export default function PortfolioView(): JSX.Element {
                         <tbody>
                             { portfolio.data
                                 ? <PositionRows portfolioId={portfolio.data?.id} />
-                                : <Fragment />
+                                : null
                             }
                         </tbody>
                     </table>

@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactModal from 'react-modal';
+
 import './ModalWrapper.css';
 import { ModalCallbacks } from '../../types';
 
@@ -13,20 +14,22 @@ export default function ModalWrapper({ children, isOpen, closeModal }: Props): J
         <ReactModal
             isOpen={isOpen}
             onRequestClose={closeModal}
+            overlayClassName="modal-overlay"
             shouldCloseOnEsc={true}
             shouldCloseOnOverlayClick={true}
-            overlayClassName="modal-overlay"
-            >
-                <div className="modal-controls">
-                    <button className="btn btn-sm btn-danger float-right" onClick={closeModal}><i className="bi bi-x"></i></button>
-                </div>
-                <div className="modal-inner">
-                    {
-                        Array.isArray(children)
-                            ? children.map(child => React.cloneElement(child, { closeModal }))
-                            : children ? React.cloneElement(children, { closeModal }) : <></>
-                    }
-                </div>
+        >
+            <div className="modal-controls">
+                <button className="btn btn-sm btn-danger float-right" onClick={closeModal}>
+                    <i className="bi bi-x"></i>
+                </button>
+            </div>
+            <div className="modal-inner">
+                {
+                    Array.isArray(children)
+                        ? children.map(child => React.cloneElement(child, { closeModal }))
+                        : children ? React.cloneElement(children, { closeModal }) : null
+                }
+            </div>
         </ReactModal>
     )
 }

@@ -1,4 +1,5 @@
 import { Transaction } from '../../types';
+
 import { CreateTransactionParameters } from './apiTypes';
 import { truncateEntityNote } from './apiUtils';
 import { portEvalApi } from './portEvalApi';

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { Portfolio } from '../../../types';
 
 type Props = {
@@ -35,8 +36,10 @@ export default function PortfolioDropdown({ portfolios, disabled, value, onChang
     return (
         <div className="form-group">
             <label htmlFor="portfolio">Portfolio:</label>
-            <select id="portfolio" className="form-control" value={portfolioId} disabled={disabled} onChange={handlePortfolioChange}>
-                {portfolios.map(portfolio => <option value={portfolio.id}>{portfolio.name}</option>)}
+            <select className="form-control" disabled={disabled} id="portfolio"
+                onChange={handlePortfolioChange} value={portfolioId}
+            >
+                {portfolios.map(portfolio => <option key={portfolio.id} value={portfolio.id}>{portfolio.name}</option>)}
             </select>
         </div>
     )

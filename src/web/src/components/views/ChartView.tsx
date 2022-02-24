@@ -1,12 +1,20 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState , useLayoutEffect } from 'react';
+
+import { skipToken } from '@reduxjs/toolkit/dist/query';
+
+import { useParams } from 'react-router';
+
+import { toast } from 'react-toastify';
+
 import { useCreateChartMutation, useGetChartQuery, useUpdateChartMutation } from '../../redux/api/chartApi';
 import { checkIsLoaded, checkIsError } from '../utils/queries';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { skipToken } from '@reduxjs/toolkit/dist/query';
 import PortEvalChart from '../charts/PortEvalChart';
 import useGetRouteState from '../../hooks/useGetRouteState';
-import { ChartConfig, ChartLine, ChartLineConfigurationContextType, ChartLineInstrument, ChartLinePortfolio, ChartLinePosition, Instrument, Portfolio, Position } from '../../types';
-import { useParams } from 'react-router';
+import { ChartConfig, ChartLine, ChartLineConfigurationContextType,
+    ChartLineInstrument, ChartLinePortfolio, ChartLinePosition, Instrument, Portfolio, Position } from '../../types';
+
+
 import ChartConfigurator from '../charts/ChartConfigurator';
 import PortfolioPicker from '../charts/PortfolioPicker';
 import InstrumentPicker from '../charts/InstrumentPicker';
@@ -14,8 +22,8 @@ import ModalWrapper from '../modals/ModalWrapper';
 import ChartLineConfigurator from '../charts/ChartLineConfigurator';
 import * as constants from '../../constants';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
-import { useLayoutEffect } from 'react';
-import { toast } from 'react-toastify';
+
+
 import PageHeading from '../ui/PageHeading';
 import { isSuccessfulResponse } from '../../redux/api/apiTypes';
 import EditChartMetaForm from '../forms/EditChartMetaForm';
@@ -122,9 +130,12 @@ export default function ChartView(): JSX.Element {
             ...chart,
             lines: [...chart.lines.filter(existingLine =>
                 existingLine.type !== line.type
-                || (existingLine.type === 'instrument' && existingLine.instrumentId !== (line as ChartLineInstrument).instrumentId)
-                || (existingLine.type === 'portfolio' && existingLine.portfolioId !== (line as ChartLinePortfolio).portfolioId)
-                || (existingLine.type === 'position' && existingLine.positionId !== (line as ChartLinePosition).positionId)),
+                || (existingLine.type === 'instrument' &&
+                    existingLine.instrumentId !== (line as ChartLineInstrument).instrumentId)
+                || (existingLine.type === 'portfolio' &&
+                    existingLine.portfolioId !== (line as ChartLinePortfolio).portfolioId)
+                || (existingLine.type === 'position' &&
+                    existingLine.positionId !== (line as ChartLinePosition).positionId)),
                 line]
             });
         setIsChanged(true);
@@ -149,8 +160,7 @@ export default function ChartView(): JSX.Element {
                     onSuccess();
                 }
             });
-        }
-        else {
+        } else {
             updateChart({
                 ...updatedChart,
                 id: parseInt(chartId)
@@ -169,10 +179,23 @@ export default function ChartView(): JSX.Element {
     }
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             <PageHeading heading={'Chart: ' + chart?.name ?? ''}>
-                <button disabled={!isChanged} role="button" className="btn btn-primary btn-sm float-right" onClick={() => chart && handleChartSave(chart)}>Save</button>
-                <button role="button" className="btn btn-primary btn-sm float-right mr-1" onClick={() => setEditModalIsOpen(true)}>Rename</button>
+                <button
+                    className="btn btn-primary btn-sm float-right"
+                    disabled={!isChanged}
+                    onClick={() => chart && handleChartSave(chart)}
+                    role="button"
+                >
+                    Save
+                </button>
+                <button
+                    className="btn btn-primary btn-sm float-right mr-1"
+                    onClick={() => setEditModalIsOpen(true)}
+                    role="button"
+                >
+                    Rename
+                </button>
             </PageHeading>
             <ChartLineConfigurationContext.Provider value={context}>
                 { chart &&
@@ -184,11 +207,11 @@ export default function ChartView(): JSX.Element {
                             <PortEvalChart chart={chart} />
                         </div>
                         
-                            <div className="col-xs-12 col-md-4 container-fluid w-100">
-                                <PortfolioPicker />
-                                <InstrumentPicker />
-                            </div>
-                        <ModalWrapper isOpen={lineModalIsOpen} closeModal={() => setLineModalIsOpen(false)}>
+                        <div className="col-xs-12 col-md-4 container-fluid w-100">
+                            <PortfolioPicker />
+                            <InstrumentPicker />
+                        </div>
+                        <ModalWrapper closeModal={() => setLineModalIsOpen(false)} isOpen={lineModalIsOpen}>
                             {
                                 modalLine &&
                                     <ChartLineConfigurator
@@ -197,7 +220,7 @@ export default function ChartView(): JSX.Element {
                                     />
                             }
                         </ModalWrapper>
-                        <ModalWrapper isOpen={editModalIsOpen} closeModal={() => setEditModalIsOpen(false)}>
+                        <ModalWrapper closeModal={() => setEditModalIsOpen(false)} isOpen={editModalIsOpen}>
                             <EditChartMetaForm chart={chart} onSave={handleEditSave} />
                         </ModalWrapper>
                     </div>

@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+
 import { useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, checkIsError } from '../utils/queries';
 import InstrumentPickerItem from '../ui/InstrumentPickerItem';
@@ -16,16 +17,19 @@ export default function InstrumentPicker(): JSX.Element {
     return (
         <div className="chart-picker">
             <h6>Instruments</h6>
-            <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+            <LoadingWrapper isError={isError} isLoaded={isLoaded}>
                 {instruments.data?.map(instrument => {
-                    const line = context.chart?.lines.find(line => line.type === 'instrument' && line.instrumentId === instrument.id);
+                    const line = context.chart?.lines.find(
+                        line => line.type === 'instrument' && line.instrumentId === instrument.id
+                    );
                     return (
                         <InstrumentPickerItem
                             instrument={instrument}
+                            key={instrument.id}
                             line={line}
                             onLineAdd={() => context.addInstrumentLine(instrument)}
-                            onLineRemove={() => line ? context.removeLine(line) : undefined}
                             onLineConfigure={line ? () => context.configureLine(line) : undefined}
+                            onLineRemove={() => line ? context.removeLine(line) : undefined}
                         />)
                     })}
             </LoadingWrapper>

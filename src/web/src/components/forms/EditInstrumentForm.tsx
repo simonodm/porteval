@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
+
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../utils/queries';
 import { Instrument, InstrumentType } from '../../types';
+
+import { useUpdateInstrumentMutation } from '../../redux/api/instrumentApi';
+
 import TextInput from './fields/TextInput';
 import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import CurrencyDropdown from './fields/CurrencyDropdown';
-import { useUpdateInstrumentMutation } from '../../redux/api/instrumentApi';
 
 type Props = {
     instrument: Instrument;
@@ -42,18 +45,23 @@ export default function EditInstrumentForm({ instrument, onSuccess }: Props): JS
     }
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             <form onSubmit={handleSubmit}>
-                <TextInput label='Name' value={name} onChange={(val) => setName(val)} />
-                <TextInput label='Symbol' disabled value={symbol} onChange={(val) => setSymbol(val)} />
-                <TextInput label='Exchange' value={exchange} onChange={(val) => setExchange(val)} />
-                <InstrumentTypeDropdown value={type} disabled onChange={(t) => setType(t)} />
-                <CurrencyDropdown currencies={currencies.data ?? []} disabled value={currencyCode} onChange={(code) => setCurrencyCode(code)} />
-                <TextInput label='Note' value={note} onChange={(val) => setNote(val)} />
+                <TextInput label='Name' onChange={(val) => setName(val)} value={name} />
+                <TextInput disabled label='Symbol' onChange={(val) => setSymbol(val)}
+                    value={symbol}
+                />
+                <TextInput label='Exchange' onChange={(val) => setExchange(val)} value={exchange} />
+                <InstrumentTypeDropdown disabled onChange={(t) => setType(t)} value={type} />
+                <CurrencyDropdown currencies={currencies.data ?? []} disabled onChange={(code) => setCurrencyCode(code)}
+                    value={currencyCode}
+                />
+                <TextInput label='Note' onChange={(val) => setNote(val)} value={note} />
                 <button 
-                    role="button"
                     className="btn btn-primary"
-                    >Save</button>
+                    role="button"
+                >Save
+                </button>
             </form>
         </LoadingWrapper>
     )

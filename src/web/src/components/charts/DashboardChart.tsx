@@ -1,5 +1,7 @@
 import React from 'react'
+
 import { Chart } from '../../types'
+
 import PortEvalChart from './PortEvalChart';
 import './DashboardChart.css';
 

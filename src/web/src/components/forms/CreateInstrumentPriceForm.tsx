@@ -1,10 +1,14 @@
 import { DateTime } from 'luxon';
 import React, { useState } from 'react';
+
 import { useAddInstrumentPriceMutation } from '../../redux/api/instrumentApi';
+
+import { checkIsLoaded, onSuccessfulResponse } from '../utils/queries';
+
+import LoadingWrapper from '../ui/LoadingWrapper';
+
 import DateTimeSelector from './fields/DateTimeSelector';
 import NumberInput from './fields/NumberInput';
-import { checkIsLoaded, onSuccessfulResponse } from '../utils/queries';
-import LoadingWrapper from '../ui/LoadingWrapper';
 
 type Props = {
     instrumentId: number;
@@ -32,9 +36,13 @@ export default function CreateInstrumentPriceForm({ instrumentId, onSuccess }: P
     return (
         <LoadingWrapper isLoaded={isLoaded}>
             <form onSubmit={handleSubmit}>
-                <NumberInput label='Price' value={price} allowFloat allowNegativeValues onChange={(newPrice) => setPrice(newPrice)} />
-                <DateTimeSelector label='Date' value={time} enableTime timeInterval={1} format='MMM dd, yyyy, HH:mm' onChange={(newTime) => setTime(newTime)} /> 
-                <button role="button" className="btn btn-primary">Save</button>
+                <NumberInput allowFloat allowNegativeValues label='Price'
+                    onChange={(newPrice) => setPrice(newPrice)} value={price}
+                />
+                <DateTimeSelector enableTime format='MMM dd, yyyy, HH:mm' label='Date'
+                    onChange={(newTime) => setTime(newTime)} timeInterval={1} value={time}
+                /> 
+                <button className="btn btn-primary" role="button">Save</button>
             </form>
         </LoadingWrapper>        
     )

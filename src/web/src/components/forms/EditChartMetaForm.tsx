@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+
 import { ChartConfig } from '../../types';
+
 import TextInput from './fields/TextInput';
 
 type Props = {
@@ -20,8 +22,8 @@ export default function EditChartMetaForm({ chart, onSave }: Props): JSX.Element
 
     return (
         <form onSubmit={handleSubmit}>
-            <TextInput label='Chart name' value={chart.name} onChange={(val) => setName(val)} />
-            <button role="button" className="btn btn-primary">Save</button>
+            <TextInput label='Chart name' onChange={(val) => setName(val)} value={chart.name} />
+            <button className="btn btn-primary" role="button">Save</button>
         </form>
     )
 }

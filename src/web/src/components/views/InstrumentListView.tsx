@@ -1,4 +1,5 @@
 import React, { useState, Fragment } from 'react';
+
 import InstrumentsTable from '../tables/InstrumentsTable';
 import ModalWrapper from '../modals/ModalWrapper';
 import PageHeading from '../ui/PageHeading';
@@ -10,12 +11,17 @@ export default function InstrumentListView(): JSX.Element {
     return (
         <Fragment>
             <PageHeading heading="Instruments">
-                <button className="btn btn-success btn-sm float-right" onClick={() => setModalIsOpen(true)}>Create new instrument</button>
+                <button
+                    className="btn btn-success btn-sm float-right"
+                    onClick={() => setModalIsOpen(true)}
+                >
+                    Create new instrument
+                </button>
             </PageHeading>
             <div className="col-xs-12 container-fluid">
                 <InstrumentsTable />
             </div>
-            <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>
+            <ModalWrapper closeModal={() => setModalIsOpen(false)} isOpen={modalIsOpen}>
                 <CreateInstrumentForm onSuccess={() => setModalIsOpen(false)} />
             </ModalWrapper>
         </Fragment>

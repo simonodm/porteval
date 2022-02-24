@@ -1,9 +1,12 @@
 import React from 'react';
+
 import LoadingWrapper from '../ui/LoadingWrapper';
-import PositionRow from './PositionRow';
+
 
 import { checkIsLoaded, checkIsError } from '../utils/queries';
 import { useGetPositionsQuery } from '../../redux/api/positionApi';
+
+import PositionRow from './PositionRow';
 
 type Props = {
     portfolioId: number;
@@ -15,7 +18,7 @@ export default function PositionRows({ portfolioId }: Props): JSX.Element {
     const isError = checkIsError(positions);
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             {positions.data?.map(position => <PositionRow key={`position_${position.id}`} position={position} />)}
         </LoadingWrapper>
     )

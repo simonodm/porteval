@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { Position } from '../../../types';
 
 type Props = {
@@ -35,8 +36,11 @@ export default function PositionDropdown({ positions, disabled, value, onChange 
     return (
         <div className="form-group">
             <label htmlFor="position">Instrument:</label>
-            <select disabled={disabled} value={positionId} id="portfolio-position" className="form-control" onChange={handlePositionChange}>
-                {positions.map(position => <option value={position.id}>{position.instrument.name}</option>)}
+            <select className="form-control" disabled={disabled} id="portfolio-position"
+                onChange={handlePositionChange} value={positionId}
+            >
+                {positions.map(position =>
+                    <option key={position.id} value={position.id}>{position.instrument.name}</option>)}
             </select>
         </div>
     )

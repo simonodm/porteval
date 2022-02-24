@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { ChartLineConfigurationContextType } from '../types';
 
 const ChartLineConfigurationContext = React.createContext<ChartLineConfigurationContextType>({

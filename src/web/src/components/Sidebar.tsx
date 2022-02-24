@@ -5,22 +5,22 @@ import React from 'react';
 
 export default function Sidebar(): JSX.Element {
     return (
-        <nav id="sidebar" className="bg-dark">
+        <nav className="bg-dark" id="sidebar">
             <ul className="list-unstyled">
                 <li>
-                    <NavLink to="/dashboard" activeClassName="active">Dashboard</NavLink>
+                    <NavLink activeClassName="active" to="/dashboard">Dashboard</NavLink>
                 </li>
                 <li>
-                    <NavLink to="/portfolios" activeClassName="active">Portfolios</NavLink>
+                    <NavLink activeClassName="active" to="/portfolios">Portfolios</NavLink>
                 </li>
                 <li>
-                    <NavLink to="/instruments" activeClassName="active">Instruments</NavLink>
+                    <NavLink activeClassName="active" to="/instruments">Instruments</NavLink>
                 </li>
                 <li>
-                    <NavLink to="/charts" activeClassName="active">Charts</NavLink>
+                    <NavLink activeClassName="active" to="/charts">Charts</NavLink>
                 </li>
                 <li>
-                    <NavLink to="/settings" activeClassName="active">Settings</NavLink>
+                    <NavLink activeClassName="active" to="/settings">Settings</NavLink>
                 </li>
             </ul>
         </nav>

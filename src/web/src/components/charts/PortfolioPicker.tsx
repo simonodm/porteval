@@ -1,12 +1,15 @@
 import React, { useContext, useState } from 'react';
+
 import { useGetAllPortfoliosQuery } from '../../redux/api/portfolioApi';
 import { Portfolio } from '../../types';
 import { checkIsLoaded, checkIsError } from '../utils/queries';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PortfolioPickerItem from '../ui/PortfolioPickerItem';
 import ModalWrapper from '../modals/ModalWrapper';
-import ChartPortfolioConfigurator from './ChartPortfolioConfigurator';
+
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
+
+import ChartPortfolioConfigurator from './ChartPortfolioConfigurator';
 
 export default function PortfolioPicker(): JSX.Element {
     const context = useContext(ChartLineConfigurationContext);
@@ -25,22 +28,26 @@ export default function PortfolioPicker(): JSX.Element {
     return (
         <div className="chart-picker">
             <h6>Portfolios</h6>
-            <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+            <LoadingWrapper isError={isError} isLoaded={isLoaded}>
                 {portfolios.data?.map(portfolio => {
-                    const line = context.chart?.lines.find(existingLine => existingLine.type === 'portfolio' && existingLine.portfolioId === portfolio.id)
+                    const line = context.chart?.lines.find(
+                        existingLine => existingLine.type === 'portfolio' && existingLine.portfolioId === portfolio.id
+                    );
 
                     return (
                         <PortfolioPickerItem
-                            portfolio={portfolio}
+                            key={portfolio.id}
                             line={line}
+                            onConfigurePositions={() => handleConfigure(portfolio)}
                             onLineAdd={() => context.addPortfolioLine(portfolio)}
-                            onLineRemove={() => line ? context.removeLine(line) : undefined}
                             onLineConfigure={() => line ? context.configureLine(line) : undefined}
-                            onConfigurePositions={() => handleConfigure(portfolio)}/>
+                            onLineRemove={() => line ? context.removeLine(line) : undefined}
+                            portfolio={portfolio}
+                        />
                     )
                 })}
             </LoadingWrapper>
-            <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>
+            <ModalWrapper closeModal={() => setModalIsOpen(false)} isOpen={modalIsOpen}>
                 {
                     modalPortfolio && <ChartPortfolioConfigurator portfolio={modalPortfolio} />
                 }

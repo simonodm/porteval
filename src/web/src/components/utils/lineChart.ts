@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+
 import { CHART_TICK_INTERVAL } from '../../constants';
 
 export type Line = {
@@ -172,7 +173,13 @@ class D3LineChart {
             .call(
                 d3.axisBottom<Date>(this._xScale)
                     .ticks(this._xInterval
-                        ? Math.min(this._xInterval.count(this._xScale.domain()[0], this._xScale.domain()[1]), this._width / CHART_TICK_INTERVAL)
+                        ? Math.min(
+                            this._xInterval.count(
+                                this._xScale.domain()[0],
+                                this._xScale.domain()[1]
+                            ),
+                            this._width / CHART_TICK_INTERVAL
+                          )
                         : this._width / CHART_TICK_INTERVAL)
                     .tickSize(10)
                     .tickFormat(this._xFormat)
@@ -195,7 +202,13 @@ class D3LineChart {
             .call(
                 d3.axisBottom<Date>(this._xScale)
                     .ticks(this._xInterval
-                        ? Math.min(this._xInterval.count(this._xScale.domain()[0], this._xScale.domain()[1]), this._width / CHART_TICK_INTERVAL)
+                        ? Math.min(
+                            this._xInterval.count(
+                                this._xScale.domain()[0],
+                                this._xScale.domain()[1]
+                            ),
+                            this._width / CHART_TICK_INTERVAL
+                          )
                         : this._width / CHART_TICK_INTERVAL)
                     .tickSize(-this._height)
                     .tickFormat(() => '')
@@ -236,7 +249,10 @@ class D3LineChart {
                     .data(this._lines[index].data)
                     .enter()
                     .append((dataPoint, pointIndex) => {
-                        const nextPoint = pointIndex < this._lines[index].data.length - 1 ? this._lines[index].data[pointIndex + 1] : undefined;
+                        const nextPoint =
+                            pointIndex < this._lines[index].data.length - 1
+                                ? this._lines[index].data[pointIndex + 1]
+                                : undefined;
 
                         const pointInfo: RenderedDataPointInfo = {
                             x: this._xScale!(new Date(dataPoint.time)),
@@ -278,13 +294,11 @@ class D3LineChart {
                 previous = data.length > 1 ? data[data.length - 1] : undefined;
                 current = data[data.length - 1];
                 next = undefined;
-            }
-            else if(firstAfterIndex === 0) {
+            } else if(firstAfterIndex === 0) {
                 previous = undefined;
                 current = new Date(data[0].time).getTime() > time ? undefined : data[0];
                 next = data.length > 1 ? data[1] : undefined;
-            }
-            else {
+            } else {
                 const before = data[firstAfterIndex - 1];
                 const after = data[firstAfterIndex];
                 const beforeTime = new Date(before.time).getTime();
@@ -293,8 +307,7 @@ class D3LineChart {
                     previous = firstAfterIndex >= 2 ? data[firstAfterIndex - 2] : undefined;
                     current = before;
                     next = data[firstAfterIndex];
-                }
-                else {
+                } else {
                     previous = before;
                     current = after;
                     next = data.length > firstAfterIndex + 1 ? data[firstAfterIndex + 1] : undefined;
@@ -307,7 +320,9 @@ class D3LineChart {
         const drawTooltip = (event: MouseEvent) => {
             if(!this._xScale || !this._container || !this._tooltip || !this._tooltipLine) return;
             if(this._lines.length > 0) {
-                const longestLine = this._lines.reduce<Array<LineData>>((prev, curr) => curr.data.length >= prev.length ? curr.data : prev, []);
+                const longestLine = this._lines.reduce<Array<LineData>>(
+                    (prev, curr) => curr.data.length >= prev.length ? curr.data : prev, []
+                );
                 const time = Math.floor(this._xScale.invert(d3.pointer(event)[0]).getTime());
                 const [, currDataPoint, nextDataPoint] = findClosestDataPoints(longestLine, time);
 
@@ -349,8 +364,12 @@ class D3LineChart {
                 const offsetXToParent = event.clientX - chartLeftBound;
                 const offsetYToParent = event.clientY - chartTopBound;
 
-                const posX = offsetXToParent + tooltipWidth >= this._width ? offsetXToParent - tooltipWidth - 5 : offsetXToParent + 5;
-                const posY = offsetYToParent + tooltipHeight >= this._height ? offsetYToParent - tooltipHeight - 5 : offsetYToParent + 5;
+                const posX = offsetXToParent + tooltipWidth >= this._width
+                    ? offsetXToParent - tooltipWidth - 5
+                    : offsetXToParent + 5;
+                const posY = offsetYToParent + tooltipHeight >= this._height
+                    ? offsetYToParent - tooltipHeight - 5
+                    : offsetYToParent + 5;
 
                 this._tooltip
                     .style('top', posY + 'px')

@@ -1,12 +1,15 @@
 import { DateTime } from 'luxon';
 import React, { useState } from 'react';
+
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../utils/queries';
 import { useUpdateTransactionMutation } from '../../redux/api/transactionApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
+
+import { Transaction } from '../../types';
+
 import DateTimeSelector from './fields/DateTimeSelector';
 import NumberInput from './fields/NumberInput';
 import TextInput from './fields/TextInput';
-import { Transaction } from '../../types';
 
 type Props = {
     transaction: Transaction;
@@ -34,16 +37,23 @@ export default function EditTransactionForm({ transaction, onSuccess }: Props): 
     }
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             <form onSubmit={handleSubmit}>
-                <NumberInput label='Amount' disabled value={transaction.amount} allowNegativeValues allowFloat />
-                <NumberInput label='Price' disabled value={transaction.price} allowFloat />
-                <DateTimeSelector label='Date' format='MMM dd, yyyy, HH:mm' timeInterval={1} disabled value={DateTime.fromISO(transaction.time)} />
-                <TextInput label='Note' value={note} onChange={handleNoteChange} />
+                <NumberInput allowFloat allowNegativeValues disabled
+                    label='Amount' value={transaction.amount}
+                />
+                <NumberInput allowFloat disabled label='Price'
+                    value={transaction.price}
+                />
+                <DateTimeSelector disabled format='MMM dd, yyyy, HH:mm' label='Date'
+                    timeInterval={1} value={DateTime.fromISO(transaction.time)}
+                />
+                <TextInput label='Note' onChange={handleNoteChange} value={note} />
                 <button 
-                    role="button"
                     className="btn btn-primary"
-                    >Save</button>
+                    role="button"
+                >Save
+                </button>
             </form>
         </LoadingWrapper>
     )

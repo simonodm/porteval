@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import TextInput from './fields/TextInput';
-import CurrencyDropdown from './fields/CurrencyDropdown';
+
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../utils/queries';
 import { useCreatePortfolioMutation } from '../../redux/api/portfolioApi';
+
+import CurrencyDropdown from './fields/CurrencyDropdown';
+import TextInput from './fields/TextInput';
 
 type Props = {
     onSuccess?: () => void;
@@ -42,15 +44,22 @@ export default function CreatePortfolioForm({ onSuccess }: Props): JSX.Element {
     }
 
     return (
-        <LoadingWrapper isLoaded={isLoaded} isError={isError}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             <form onSubmit={handleSubmit}>
-                <TextInput label='Name' placeholder='e.g. US stocks' value={name} onChange={(val) => setName(val)} />
-                <CurrencyDropdown currencies={currencies.data!} value={currencyCode} onChange={(code) => setCurrencyCode(code)} />
-                <TextInput label='Note' value={note} onChange={(val) => setNote(val)} />
+                <TextInput label='Name' onChange={(val) => setName(val)} placeholder='e.g. US stocks'
+                    value={name}
+                />
+                <CurrencyDropdown
+                    currencies={currencies.data!}
+                    onChange={(code) => setCurrencyCode(code)}
+                    value={currencyCode}
+                />
+                <TextInput label='Note' onChange={(val) => setNote(val)} value={note} />
                 <button 
-                    role="button"
                     className="btn btn-primary"
-                    >Save</button>
+                    role="button"
+                >Save
+                </button>
             </form>
         </LoadingWrapper>
         

@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon';
+
 import { EntityPerformance, EntityProfit, EntityValue, Portfolio } from '../../types';
+
 import { CreatePortfolioParameters, DateRangeParameters } from './apiTypes';
 import { truncateEntityName, truncateEntityNote } from './apiUtils';
 import { portEvalApi } from './portEvalApi';
@@ -89,7 +91,8 @@ const portfolioApi = portEvalApi.injectEndpoints({
             query: (id) => {
                 const to = DateTime.now();
                 const from = to.minus({ days: 1 });
-                return `portfolios/${id}/profit?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                return `portfolios/${id}/profit` +
+                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -100,7 +103,8 @@ const portfolioApi = portEvalApi.injectEndpoints({
             query: (id) => {
                 const to = DateTime.now();
                 const from = to.minus({ weeks: 1 });
-                return `portfolios/${id}/profit?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                return `portfolios/${id}/profit` + 
+                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -111,7 +115,8 @@ const portfolioApi = portEvalApi.injectEndpoints({
             query: (id) => {
                 const to = DateTime.now();
                 const from = to.minus({ months: 1 });
-                return `portfolios/${id}/profit?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                return `portfolios/${id}/profit` + 
+                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -139,7 +144,8 @@ const portfolioApi = portEvalApi.injectEndpoints({
             query: (id) => {
                 const to = DateTime.now();
                 const from = to.minus({ days: 1 });
-                return `portfolios/${id}/performance?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                return `portfolios/${id}/performance` + 
+                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -150,7 +156,8 @@ const portfolioApi = portEvalApi.injectEndpoints({
             query: (id) => {
                 const to = DateTime.now();
                 const from = to.minus({ weeks: 1 });
-                return `portfolios/${id}/performance?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                return `portfolios/${id}/performance` + 
+                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -161,7 +168,8 @@ const portfolioApi = portEvalApi.injectEndpoints({
             query: (id) => {
                 const to = DateTime.now();
                 const from = to.minus({ months: 1 });
-                return `portfolios/${id}/performance?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                return `portfolios/${id}/performance` + 
+                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
             },
             providesTags: (result, error, arg) =>
                 result

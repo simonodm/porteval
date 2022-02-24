@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
+
 import { portEvalApi } from './api/portEvalApi';
 import { rtkQueryErrorDisplay } from './middleware/rtkQueryErrorDisplay';
 

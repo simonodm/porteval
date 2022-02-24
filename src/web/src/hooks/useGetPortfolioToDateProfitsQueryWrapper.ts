@@ -1,3 +1,5 @@
+import { skipToken } from '@reduxjs/toolkit/dist/query';
+
 import { checkIsLoaded } from '../components/utils/queries';
 import {
     useGetPortfolioLastDayProfitQuery,
@@ -7,9 +9,10 @@ import {
 } from '../redux/api/portfolioApi';
 import { ToDateFinancialDataQueryResponse } from '../types';
 import * as constants from '../constants';
-import { skipToken } from '@reduxjs/toolkit/dist/query';
 
-export default function useGetPortfolioToDateProfitsQueryWrapper(portfolioId: number, skip?: boolean): ToDateFinancialDataQueryResponse {
+export default function useGetPortfolioToDateProfitsQueryWrapper(
+    portfolioId: number, skip?: boolean
+): ToDateFinancialDataQueryResponse {
     const options = { pollingInterval: constants.REFRESH_INTERVAL };
 
     const profitDaily = useGetPortfolioLastDayProfitQuery(skip ? skipToken : portfolioId, options);
