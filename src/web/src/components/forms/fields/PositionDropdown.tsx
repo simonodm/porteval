@@ -1,28 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Position } from '../../../types';
 
 type Props = {
     positions: Array<Position>;
-    defaultPositionId?: number;
-    onChange: (positionId: number) => void;
+    disabled?: boolean;
+    value?: number;
+    onChange?: (positionId: number) => void;
 }
 
-export default function PositionDropdown({ positions, defaultPositionId, onChange }: Props): JSX.Element {
-    const [positionId, setPositionId] = useState(defaultPositionId);
+export default function PositionDropdown({ positions, disabled, value, onChange }: Props): JSX.Element {
+    const [positionId, setPositionId] = useState(value ?? (positions.length > 0 ? positions[0].id : undefined));
 
     const handlePositionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newPositionId = parseInt(e.target.value);
         if(!isNaN(newPositionId)) {
             setPositionId(newPositionId);
-            onChange(newPositionId);
+            onChange && onChange(newPositionId);
         }
     }
+
+    useEffect(() => {
+        if(value !== undefined) {
+            setPositionId(value);
+        }
+    }, [value]);
+
+    useEffect(() => {
+        if(!positionId && positions.length > 0) {
+            setPositionId(positions[0].id);
+            onChange && onChange(positions[0].id);
+        }
+    }, [positions]);
 
     return (
         <div className="form-group">
             <label htmlFor="position">Instrument:</label>
-            <select disabled={defaultPositionId !== undefined} id="portfolio-position" className="form-control" onChange={handlePositionChange}>
-                {positions.map(position => <option value={position.id} selected={position.id === positionId}>{position.instrument.name}</option>)}
+            <select disabled={disabled} value={positionId} id="portfolio-position" className="form-control" onChange={handlePositionChange}>
+                {positions.map(position => <option value={position.id}>{position.instrument.name}</option>)}
             </select>
         </div>
     )

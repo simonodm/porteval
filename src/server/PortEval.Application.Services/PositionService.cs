@@ -1,10 +1,10 @@
-﻿using PortEval.Application.Models.DTOs;
+﻿using System;
+using PortEval.Application.Models.DTOs;
 using PortEval.Application.Services.Interfaces;
 using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PortEval.Application.Services
@@ -15,29 +15,30 @@ namespace PortEval.Application.Services
         private readonly IPortfolioRepository _portfolioRepository;
         private readonly IPositionRepository _positionRepository;
         private readonly IInstrumentRepository _instrumentRepository;
-        private readonly IChartRepository _chartRepository;
 
         public PositionService(IPortfolioRepository portfolioRepository,
-            IPositionRepository positionRepository, IInstrumentRepository instrumentRepository, IChartRepository chartRepository)
+            IPositionRepository positionRepository, IInstrumentRepository instrumentRepository)
         {
             _instrumentRepository = instrumentRepository;
             _positionRepository = positionRepository;
             _portfolioRepository = portfolioRepository;
-            _chartRepository = chartRepository;
         }
 
-        /// <inheritdoc cref="IPositionService.AddPositionAsync"/>
-        public async Task<Position> AddPositionAsync(PositionDto options)
+        /// <inheritdoc cref="IPositionService.OpenPositionAsync"/>
+        public async Task<Position> OpenPositionAsync(PositionDto options)
         {
             await ValidatePortfolioExists(options.PortfolioId);
 
             var instrument = await FetchInstrument(options.InstrumentId);
-            if(instrument.Type == InstrumentType.Index)
+            if (instrument.Type == InstrumentType.Index)
             {
                 throw new OperationNotAllowedException($"Cannot create a position for an instrument of type: index.");
             }
 
+
             var createdPosition = new Position(options.PortfolioId, options.InstrumentId, options.Note);
+            createdPosition.AddTransaction(options.InitialTransaction.Amount, options.InitialTransaction.Price,
+                options.InitialTransaction.Time);
             _positionRepository.Add(createdPosition);
             await _positionRepository.UnitOfWork.CommitAsync();
             return createdPosition;

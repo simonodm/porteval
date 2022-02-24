@@ -9,7 +9,7 @@ import { generateDefaultInstrumentChart } from '../utils/chart';
 import { NavLink } from 'react-router-dom';
 import * as constants from '../../constants';
 import ModalWrapper from '../modals/ModalWrapper';
-import EditInstrumentModal from '../modals/EditInstrumentModal';
+import EditInstrumentForm from '../forms/EditInstrumentForm';
 
 type Props = {
     instrument: Instrument;
@@ -46,7 +46,7 @@ export default function InstrumentRow({ instrument }: Props): JSX.Element {
             </td>
         </tr>
         <ModalWrapper isOpen={isModalOpen} closeModal={() => setIsModalOpen(false)}>
-            <EditInstrumentModal instrument={instrument} closeModal={() => setIsModalOpen(false)} />
+            <EditInstrumentForm instrument={instrument} onSuccess={() => setIsModalOpen(false)} />
         </ModalWrapper></>
     );
 }

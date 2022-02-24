@@ -1,8 +1,8 @@
 import React, { useState, Fragment } from 'react';
 import InstrumentsTable from '../tables/InstrumentsTable';
-import CreateInstrumentModal from '../modals/CreateInstrumentModal';
 import ModalWrapper from '../modals/ModalWrapper';
 import PageHeading from '../ui/PageHeading';
+import CreateInstrumentForm from '../forms/CreateInstrumentForm';
 
 export default function InstrumentListView(): JSX.Element {
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -16,7 +16,7 @@ export default function InstrumentListView(): JSX.Element {
                 <InstrumentsTable />
             </div>
             <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>
-                <CreateInstrumentModal closeModal={() => setModalIsOpen(false)} />
+                <CreateInstrumentForm onSuccess={() => setModalIsOpen(false)} />
             </ModalWrapper>
         </Fragment>
     )

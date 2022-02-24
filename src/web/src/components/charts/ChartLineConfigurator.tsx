@@ -4,10 +4,9 @@ import { ChartLineDashType, ChartLineInstrument, ChartLine } from '../../types';
 type Props = {
     line: ChartLine;
     onSave: (line: ChartLineInstrument) => void;
-    closeModal: () => void;
 }
 
-export default function ChartLineConfiguratorModal({ line: lineProp, closeModal, onSave }: Props): JSX.Element {
+export default function ChartLineConfigurator({ line: lineProp, onSave }: Props): JSX.Element {
     const dashTypes: Array<ChartLineDashType> = ['solid', 'dashed', 'dotted'];
     const [line, setLine] = useState(lineProp);
 
@@ -34,7 +33,6 @@ export default function ChartLineConfiguratorModal({ line: lineProp, closeModal,
 
     const handleSubmit = () => {
         onSave(line as ChartLineInstrument);
-        closeModal();
     }
 
     return (

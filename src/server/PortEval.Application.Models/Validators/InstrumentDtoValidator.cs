@@ -8,19 +8,19 @@ namespace PortEval.Application.Models.Validators
         public InstrumentDtoValidator()
         {
             RuleFor(i => i.Symbol)
-                .NotNull()
+                .NotEmpty()
                 .MinimumLength(1)
                 .MaximumLength(10);
             RuleFor(i => i.Name)
-                .NotNull()
+                .NotEmpty()
                 .MinimumLength(1)
                 .MaximumLength(64);
             RuleFor(i => i.Exchange)
-                .NotNull()
+                .NotEmpty()
                 .MinimumLength(1)
                 .MaximumLength(32);
             RuleFor(i => i.CurrencyCode)
-                .NotNull()
+                .NotEmpty()
                 .Length(3);
             RuleFor(i => i.Note)
                 .MaximumLength(255);

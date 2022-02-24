@@ -11,13 +11,13 @@ import { getDateTimeLocaleString, getPerformanceString, getPriceString } from '.
 import * as constants from '../../constants';
 import PortEvalChart from '../charts/PortEvalChart';
 import ModalWrapper from '../modals/ModalWrapper';
-import CreateInstrumentPriceModal from '../modals/CreateInstrumentPriceModal';
 import { generateDefaultInstrumentChart } from '../utils/chart';
 import PageHeading from '../ui/PageHeading';
 import PageSelector from '../ui/PageSelector';
 
 import './InstrumentView.css';
 import { DateTime } from 'luxon';
+import CreateInstrumentPriceForm from '../forms/CreateInstrumentPriceForm';
 
 type Params = {
     instrumentId?: string;
@@ -151,7 +151,7 @@ export default function InstrumentView(): JSX.Element {
                 </div>
             </div>
             <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>
-                { instrument.data && <CreateInstrumentPriceModal instrument={instrument.data} closeModal={() => setModalIsOpen(false)} /> }
+                { instrument.data && <CreateInstrumentPriceForm instrumentId={instrument.data.id} onSuccess={() => setModalIsOpen(false)} /> }
             </ModalWrapper>
         </LoadingWrapper>
     )

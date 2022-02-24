@@ -8,10 +8,10 @@ namespace PortEval.Application.Models.Validators
         public CurrencyDtoValidator()
         {
             RuleFor(c => c.Code)
-                .NotNull()
+                .NotEmpty()
                 .Length(3);
             RuleFor(c => c.IsDefault)
-                .NotNull();
+                .NotEmpty();
             RuleFor(c => c.Name)
                 .MaximumLength(64);
             RuleFor(c => c.Symbol)

@@ -11,14 +11,14 @@ import ChartConfigurator from '../charts/ChartConfigurator';
 import PortfolioPicker from '../charts/PortfolioPicker';
 import InstrumentPicker from '../charts/InstrumentPicker';
 import ModalWrapper from '../modals/ModalWrapper';
-import ChartLineConfiguratorModal from '../modals/ChartLineConfiguratorModal';
+import ChartLineConfigurator from '../charts/ChartLineConfigurator';
 import * as constants from '../../constants';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
 import { useLayoutEffect } from 'react';
 import { toast } from 'react-toastify';
-import EditChartMetaModal from '../modals/EditChartMetaModal';
 import PageHeading from '../ui/PageHeading';
 import { isSuccessfulResponse } from '../../redux/api/apiTypes';
+import EditChartMetaForm from '../forms/EditChartMetaForm';
 
 type Params = {
     chartId: string;
@@ -128,6 +128,7 @@ export default function ChartView(): JSX.Element {
                 line]
             });
         setIsChanged(true);
+        setLineModalIsOpen(false);
     }
 
     const handleEditSave = (updatedChart: ChartConfig) => {
@@ -190,15 +191,14 @@ export default function ChartView(): JSX.Element {
                         <ModalWrapper isOpen={lineModalIsOpen} closeModal={() => setLineModalIsOpen(false)}>
                             {
                                 modalLine &&
-                                    <ChartLineConfiguratorModal
+                                    <ChartLineConfigurator
                                         line={modalLine}
                                         onSave={(line) => handleLineSave(line)}
-                                        closeModal={() => setLineModalIsOpen(false)}
                                     />
                             }
                         </ModalWrapper>
                         <ModalWrapper isOpen={editModalIsOpen} closeModal={() => setEditModalIsOpen(false)}>
-                            <EditChartMetaModal chart={chart} onSave={handleEditSave} closeModal={() => setEditModalIsOpen(false)} />
+                            <EditChartMetaForm chart={chart} onSave={handleEditSave} />
                         </ModalWrapper>
                     </div>
                 }

@@ -10,11 +10,11 @@ import { checkIsLoaded, checkIsError } from '../utils/queries';
 
 import { Position } from '../../types';
 import { getPerformanceString, getPriceString } from '../utils/string';
-import CreateTransactionModal from '../modals/CreateTransactionModal';
 import ModalWrapper from '../modals/ModalWrapper';
-import EditPositionModal from '../modals/EditPositionModal';
 import { NavLink } from 'react-router-dom';
 import { generateDefaultPositionChart } from '../utils/chart';
+import CreateTransactionForm from '../forms/CreateTransactionForm';
+import EditPositionForm from '../forms/EditPositionForm';
 
 type Props = {
     position: Position
@@ -121,10 +121,10 @@ export default function PositionRow({ position }: Props): JSX.Element {
             }
             </>
             <ModalWrapper isOpen={createModalIsOpen} closeModal={() => setCreateModalIsOpen(false)}>
-                <CreateTransactionModal closeModal={() => setCreateModalIsOpen(false)} portfolioId={position.portfolioId} positionId={position.id} />
+                <CreateTransactionForm onSuccess={() => setCreateModalIsOpen(false)} positionId={position.id} />
             </ModalWrapper>
             <ModalWrapper isOpen={updateModalIsOpen} closeModal={() => setUpdateModalIsOpen(false)}>
-                <EditPositionModal closeModal={() => setUpdateModalIsOpen(false)} position={position} />
+                <EditPositionForm onSuccess={() => setUpdateModalIsOpen(false)} position={position} />
             </ModalWrapper>
         </>
     )

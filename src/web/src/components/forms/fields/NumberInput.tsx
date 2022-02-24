@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type Props = {
     label?: string;
-    defaultValue?: number;
+    value?: number;
+    disabled?: boolean;
     allowNegativeValues?: boolean;
     allowFloat?: boolean;
     validator?: (num: number) => boolean;
-    onChange: (num: number) => void;
+    onChange?: (num: number) => void;
 }
 
-export default function NumberInput({ label, defaultValue, allowNegativeValues, allowFloat, validator, onChange }: Props): JSX.Element {
-    const [numberText, setNumberText] = useState(defaultValue?.toString() ?? '0');
-    const [number, setNumber] = useState(defaultValue ?? 0);
+export default function NumberInput({ label, value, disabled, allowNegativeValues, allowFloat, validator, onChange }: Props): JSX.Element {
+    const [numberText, setNumberText] = useState(value?.toString() ?? '0');
+    const [number, setNumber] = useState(value ?? 0);
 
     const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let resultTextValue;
@@ -35,10 +36,17 @@ export default function NumberInput({ label, defaultValue, allowNegativeValues, 
         if(!isNaN(newNumber)) {
             if(validator === undefined || validator(number)) {
                 setNumber(newNumber);
-                onChange(newNumber);
+                onChange && onChange(newNumber);
             }
         }
     }
+
+    useEffect(() => {
+        if(value !== undefined) {
+            setNumberText(value.toString());
+            setNumber(value);
+        }
+    }, [value]);
 
     return (
         <div className="form-group">
@@ -48,7 +56,7 @@ export default function NumberInput({ label, defaultValue, allowNegativeValues, 
                 id={label?.toLowerCase().replaceAll(' ', '-')}
                 className="form-control"
                 value={numberText}
-                disabled={defaultValue !== undefined}
+                disabled={disabled}
                 onChange={handleNumberChange} />
         </div>
     )    

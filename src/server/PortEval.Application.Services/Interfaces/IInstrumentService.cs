@@ -1,6 +1,7 @@
 ﻿using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Models.Entities;
 using System.Threading.Tasks;
+using PortEval.Domain.Exceptions;
 
 namespace PortEval.Application.Services.Interfaces
 {
@@ -12,14 +13,14 @@ namespace PortEval.Application.Services.Interfaces
         /// <summary>
         /// Creates an instrument according to the supplied DTO.
         /// </summary>
-        /// <param name="options">A DTO containing client's request body.</param>
+        /// <param name="options">A DTO containing instrument data.</param>
         /// <returns>A task representing the asynchronous creation operation. Task result contains newly created instrument entity.</returns>
         public Task<Instrument> CreateInstrumentAsync(InstrumentDto options);
 
         /// <summary>
         /// Updates an instrument according to the supplied DTO.
         /// </summary>
-        /// <param name="options">A DTO containing client's request body.</param>
+        /// <param name="options">A DTO containing instrument data.</param>
         /// <returns>A task representing the asynchronous update operation. Task result contains updated instrument entity.</returns>
         public Task<Instrument> UpdateInstrumentAsync(InstrumentDto options);
 

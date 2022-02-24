@@ -8,11 +8,18 @@ namespace PortEval.Application.Models.Validators
         public PositionDtoValidator()
         {
             RuleFor(p => p.PortfolioId)
-                .NotNull();
+                .NotEmpty();
             RuleFor(p => p.InstrumentId)
-                .NotNull();
+                .NotEmpty();
             RuleFor(p => p.Note)
                 .MaximumLength(255);
+
+            When(p => p.InitialTransaction != default, () =>
+            {
+                RuleFor(p => p.InitialTransaction.Amount).NotEmpty().GreaterThan(0);
+                RuleFor(p => p.InitialTransaction.Price).NotEmpty().GreaterThan(0);
+                RuleFor(p => p.InitialTransaction.Time).NotEmpty();
+            });
         }
     }
 }

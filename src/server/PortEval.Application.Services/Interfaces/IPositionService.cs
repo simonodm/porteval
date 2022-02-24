@@ -10,11 +10,11 @@ namespace PortEval.Application.Services.Interfaces
     public interface IPositionService
     {
         /// <summary>
-        /// Creates a position according to the supplied DTO.
+        /// Opens a new position according to the supplied DTO.
         /// </summary>
         /// <param name="options">A DTO containing client's request body.</param>
-        /// <returns>A task representing the asynchronous creation operation. Task result contains newly created position entity.</returns>
-        public Task<Position> AddPositionAsync(PositionDto options);
+        /// <returns>A task representing the asynchronous creation operation. Task result contains newly opened position entity.</returns>
+        public Task<Position> OpenPositionAsync(PositionDto options);
 
         /// <summary>
         /// Modifies a position according to the supplied DTO.

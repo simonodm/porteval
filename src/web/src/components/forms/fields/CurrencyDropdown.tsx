@@ -3,22 +3,33 @@ import { Currency } from '../../../types';
 
 type Props = {
     currencies: Array<Currency>;
-    defaultCurrency?: string;
-    onChange: (currencyCode: string) => void
+    disabled?: boolean;
+    value?: string;
+    onChange?: (currencyCode: string) => void
 }
 
-export default function CurrencyDropdown({ currencies, defaultCurrency, onChange }: Props): JSX.Element {
-    const [currencyCode, setCurrencyCode] = useState(defaultCurrency ?? (currencies.find(c => c.isDefault)?.code ?? 'USD'));
+export default function CurrencyDropdown({ currencies, disabled, value, onChange }: Props): JSX.Element {
+    const [currencyCode, setCurrencyCode] = useState(value);
 
     useEffect(() => {
-        onChange(currencyCode);
-    }, [currencyCode]);
+        if(value !== undefined) {
+            setCurrencyCode(value);
+            onChange && onChange(value);
+        }
+    }, [value]);
+
+    useEffect(() => {
+        if(!currencyCode && currencies.length > 0) {
+            setCurrencyCode(currencies[0].code);
+            onChange && onChange(currencies[0].code);
+        }
+    })
 
     return (
         <div className="form-group">
             <label htmlFor="currency">Currency:</label>
-            <select id="currency" className="form-control" onChange={(e) => setCurrencyCode(e.target.value)}>
-                {currencies.map(currency => <option selected={currency.isDefault}>{currency.code}</option>)}
+            <select id="currency" className="form-control" value={currencyCode} disabled={disabled} onChange={(e) => setCurrencyCode(e.target.value)}>
+                {currencies.map(currency => <option value={currency.code}>{currency.code}</option>)}
             </select>
         </div>
     )

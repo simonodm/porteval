@@ -13,9 +13,9 @@ import { useState } from 'react';
 import { Portfolio } from '../../types';
 import { getPriceString, getPerformanceString } from '../utils/string';
 import ModalWrapper from '../modals/ModalWrapper';
-import CreatePositionModal from '../modals/CreatePositionModal';
-import EditPortfolioModal from '../modals/EditPortfolioModal';
 import { generateDefaultPortfolioChart } from '../utils/chart';
+import EditPortfolioForm from '../forms/EditPortfolioForm';
+import OpenPositionForm from '../forms/OpenPositionForm';
 
 type Props = {
     portfolio: Portfolio,
@@ -93,7 +93,7 @@ export default function PortfolioRow({ portfolio }: Props): JSX.Element {
                 <td></td>
                 <td>{portfolio.note}</td>
                 <td>
-                    <button role="button" className="btn btn-primary btn-extra-sm mr-1" onClick={() => setCreateModalIsOpen(true)}>Add position</button>
+                    <button role="button" className="btn btn-primary btn-extra-sm mr-1" onClick={() => setCreateModalIsOpen(true)}>Open position</button>
                     <button role="button" className="btn btn-primary btn-extra-sm mr-1" onClick={() => setUpdateModalIsOpen(true)}>Edit</button>
                     <NavLink className="btn btn-primary btn-extra-sm mr-1" to={{pathname: '/charts/view', state: {chart: generateDefaultPortfolioChart(portfolio)}}}>Chart</NavLink>
                     <button role="button" className="btn btn-danger btn-extra-sm" onClick={() => { deletePortfolio(portfolio.id); setIsRemoved(true) }}>Remove</button>
@@ -105,10 +105,10 @@ export default function PortfolioRow({ portfolio }: Props): JSX.Element {
             }
             </>
             <ModalWrapper isOpen={createModalIsOpen} closeModal={() => setCreateModalIsOpen(false)}>
-                <CreatePositionModal closeModal={() => setCreateModalIsOpen(false)} portfolioId={portfolio.id} />
+                <OpenPositionForm onSuccess={() => setCreateModalIsOpen(false)} portfolioId={portfolio.id} />
             </ModalWrapper>
             <ModalWrapper isOpen={updateModalIsOpen} closeModal={() => setUpdateModalIsOpen(false)}>
-                <EditPortfolioModal closeModal={() => setUpdateModalIsOpen(false)} portfolio={portfolio} />
+                <EditPortfolioForm onSuccess={() => setUpdateModalIsOpen(false)} portfolio={portfolio} />
             </ModalWrapper>
         </>
     )

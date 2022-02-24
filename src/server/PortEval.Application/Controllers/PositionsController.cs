@@ -180,7 +180,7 @@ namespace PortEval.Application.Controllers
             _logger.LogInformation($"Creating position for portfolio {createRequest.PortfolioId}.");
 
             var createdPosition =
-                await _positionService.AddPositionAsync(createRequest);
+                await _positionService.OpenPositionAsync(createRequest);
             return CreatedAtAction("GetPosition", new { positionId = createdPosition.Id },
                 _mapper.Map<PositionDto>(createdPosition));
         }

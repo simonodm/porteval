@@ -8,13 +8,13 @@ namespace PortEval.Application.Models.Validators
         public PortfolioDtoValidator()
         {
             RuleFor(p => p.Name)
-                .NotNull()
+                .NotEmpty()
                 .MinimumLength(3)
                 .MaximumLength(64);
             RuleFor(p => p.Note)
                 .MaximumLength(255);
             RuleFor(p => p.CurrencyCode)
-                .NotNull()
+                .NotEmpty()
                 .Length(3);
         }
     }

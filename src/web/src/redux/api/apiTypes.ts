@@ -4,8 +4,10 @@ import { SerializedError } from '@reduxjs/toolkit';
 
 export type CreateInstrumentParameters = Omit<Instrument, 'id'>;
 export type CreatePortfolioParameters = Omit<Portfolio, 'id'>;
-export type CreatePositionParameters = Omit<Position, 'id' | 'instrument'>;
-export type CreateTransactionParameters = Omit<Transaction, 'id' | 'instrument'>;
+export type CreatePositionParameters = Omit<Position, 'id' | 'instrument'> & {
+    initialTransaction: Omit<CreateTransactionParameters, 'positionId'>;
+}
+export type CreateTransactionParameters = Omit<Transaction, 'id' | 'instrument' | 'portfolioId'>;
 
 export type PaginationParameters = {
     page?: number;

@@ -1,15 +1,14 @@
 import React from 'react';
-import { Chart, ModalCallbacks } from '../../types';
+import { Chart } from '../../types';
 
 type Props = {
     charts: Array<Chart>;
     onDrag: (id: number) => void;
-} & ModalCallbacks
+}
 
-export default function DashboardChartPickerModal({ charts, onDrag, closeModal }: Props): JSX.Element {   
+export default function DashboardChartPicker({ charts, onDrag }: Props): JSX.Element {   
     const handleDrag = (id: number) => {
         onDrag(id);
-        closeModal();
     }
     
     return (

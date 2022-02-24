@@ -12,13 +12,13 @@ namespace PortEval.Application.Models.Validators
                 .GreaterThanOrEqualTo(1)
                 .LessThanOrEqualTo(8);
             RuleFor(line => line.InstrumentId)
-                .NotNull()
+                .NotEmpty()
                 .When(line => line.Type == ChartLineType.Instrument);
             RuleFor(line => line.PortfolioId)
-                .NotNull()
+                .NotEmpty()
                 .When(line => line.Type == ChartLineType.Portfolio);
             RuleFor(line => line.PositionId)
-                .NotNull()
+                .NotEmpty()
                 .When(line => line.Type == ChartLineType.Position);
 
         }

@@ -6,7 +6,7 @@ import './Dashboard.css';
 import { useGetDashboardLayoutQuery, useUpdateDashboardLayoutMutation } from '../../redux/api/dashboardApi';
 import { useGetAllChartsQuery } from '../../redux/api/chartApi';
 import ModalWrapper from '../modals/ModalWrapper';
-import DashboardChartPickerModal from '../modals/DashboardChartPickerModal';
+import DashboardChartPicker from '../charts/DashboardChartPicker';
 import PageHeading from '../ui/PageHeading';
 
 const ResponsiveGridLayout = WidthProvider(GridLayout);
@@ -21,6 +21,11 @@ export default function Dashboard(): JSX.Element {
     const [isEditable, setIsEditable] = useState(false);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [droppingItemId, setDroppingItemId] = useState(0);
+
+    const handleDrag = (id: number) => {
+        setDroppingItemId(id);
+        setModalIsOpen(false);
+    }
 
     const saveLayout = (layout: Layout[]) => {
         if(dashboardLayout !== undefined) {
@@ -95,10 +100,9 @@ export default function Dashboard(): JSX.Element {
                 })}
             </ResponsiveGridLayout>
             <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>
-                <DashboardChartPickerModal
+                <DashboardChartPicker
                     charts={charts.data?.filter(c => !dashboardLayout?.items.find(item => item.chartId === c.id)) ?? []}
-                    onDrag={(id) => setDroppingItemId(id)}
-                    closeModal={() => setModalIsOpen(false)}
+                    onDrag={handleDrag}
                 />
             </ModalWrapper>
         </>

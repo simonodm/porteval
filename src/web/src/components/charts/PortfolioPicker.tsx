@@ -5,7 +5,7 @@ import { checkIsLoaded, checkIsError } from '../utils/queries';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PortfolioPickerItem from '../ui/PortfolioPickerItem';
 import ModalWrapper from '../modals/ModalWrapper';
-import ChartPortfolioConfiguratorModal from '../modals/ChartPortfolioConfiguratorModal';
+import ChartPortfolioConfigurator from './ChartPortfolioConfigurator';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
 
 export default function PortfolioPicker(): JSX.Element {
@@ -42,7 +42,7 @@ export default function PortfolioPicker(): JSX.Element {
             </LoadingWrapper>
             <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>
                 {
-                    modalPortfolio && <ChartPortfolioConfiguratorModal portfolio={modalPortfolio} />
+                    modalPortfolio && <ChartPortfolioConfigurator portfolio={modalPortfolio} />
                 }
             </ModalWrapper>
         </div>

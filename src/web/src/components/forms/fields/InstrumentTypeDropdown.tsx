@@ -1,21 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InstrumentType } from '../../../types';
 import * as constants from '../../../constants';
 
 type Props = {
-    defaultType?: InstrumentType;
-    onChange: (type: InstrumentType) => void;
+    value?: InstrumentType;
+    disabled?: boolean;
+    onChange?: (type: InstrumentType) => void;
 }
 
-export default function InstrumentTypeDropdown({ defaultType, onChange }: Props): JSX.Element {
+export default function InstrumentTypeDropdown({ value, disabled, onChange }: Props): JSX.Element {
     const types: Array<InstrumentType> = ['stock', 'bond', 'mutualFund', 'commodity', 'cryptoCurrency', 'etf', 'index', 'other']
-    const [ type, setType ] = useState<InstrumentType>(defaultType ?? 'stock');
+    const [type, setType] = useState<InstrumentType>(value ?? 'stock');
 
     const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const type = e.target.value as InstrumentType;
         setType(type)
-        onChange(type);
+        onChange && onChange(type);
     }
+
+    useEffect(() => {
+        if(value !== undefined) {
+            setType(value);
+        }
+    }, [value]);
+
+    useEffect(() => {
+        if(value === undefined) {
+            setType('stock');
+            onChange && onChange('stock');
+        }
+    }, [])
 
     return (
         <div className="form-group">
@@ -23,10 +37,10 @@ export default function InstrumentTypeDropdown({ defaultType, onChange }: Props)
             <select
                 id="instrument-type"
                 className="form-control"
-                defaultValue={type}
-                disabled={defaultType !== undefined}
+                value={type}
+                disabled={disabled}
                 onChange={handleTypeChange}>
-                    {types.map(type => <option value={type}>{constants.INSTRUMENT_TYPE_TO_STRING[type]}</option>)}
+                    {types.map(t => <option value={t}>{constants.INSTRUMENT_TYPE_TO_STRING[type]}</option>)}
             </select>
         </div>
     )

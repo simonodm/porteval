@@ -53,10 +53,10 @@ const transactionApi = portEvalApi.injectEndpoints({
                 body: truncateEntityNote(data)
             }),
             invalidatesTags: (result, error, arg) =>
-                !error
+                !error && result
                     ? [
                         { type: 'Transactions', id: arg.positionId },
-                        { type: 'PortfolioCalculations', id: arg.portfolioId },
+                        { type: 'PortfolioCalculations', id: result.portfolioId },
                         { type: 'PositionCalculations', id: arg.positionId }
                       ]
                     : []

@@ -3,7 +3,7 @@ import { useDeleteTransactionMutation } from '../../redux/api/transactionApi';
 import { Currency, Transaction } from '../../types';
 import ModalWrapper from '../modals/ModalWrapper';
 import { getDateTimeLocaleString, getPriceString } from '../utils/string';
-import EditTransactionModal from '../modals/EditTransactionModal';
+import EditTransactionForm from '../forms/EditTransactionForm';
 
 type Props = {
     transaction: Transaction;
@@ -31,7 +31,7 @@ export default function TransactionRow({ transaction, currency }: Props): JSX.El
                 </button>
             </td>
             <ModalWrapper isOpen={modalIsOpen} closeModal={() => setModalIsOpen(false)}>
-                <EditTransactionModal closeModal={() => setModalIsOpen(false)} transaction={transaction} />
+                <EditTransactionForm onSuccess={() => setModalIsOpen(false)} transaction={transaction} />
             </ModalWrapper>
         </tr>
     )

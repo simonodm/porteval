@@ -12,20 +12,20 @@ namespace PortEval.Application.Models.Validators
                 .MinimumLength(3)
                 .MaximumLength(64);
             RuleFor(c => c.DateRangeStart)
-                .NotNull()
+                .NotEmpty()
                 .When(c => c.IsToDate != true);
             RuleFor(c => c.DateRangeEnd)
-                .NotNull()
+                .NotEmpty()
                 .When(c => c.IsToDate != true);
             RuleFor(c => c.ToDateRange)
-                .NotNull()
+                .NotEmpty()
                 .When(c => c.IsToDate == true);
             RuleFor(c => c.Frequency)
-                .NotNull()
+                .NotEmpty()
                 .When(c => c.Type is ChartType.AggregatedProfit or ChartType.AggregatedPerformance);
             When(c => c.Type is ChartType.Profit or ChartType.Price or ChartType.AggregatedProfit, () =>
                 {
-                    RuleFor(c => c.CurrencyCode).NotNull();
+                    RuleFor(c => c.CurrencyCode).NotEmpty();
                     RuleFor(c => c.CurrencyCode).Length(3);
                 });
 

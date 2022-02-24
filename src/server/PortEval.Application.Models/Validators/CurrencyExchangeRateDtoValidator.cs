@@ -8,10 +8,10 @@ namespace PortEval.Application.Models.Validators
         public CurrencyExchangeRateDtoValidator()
         {
             RuleFor(r => r.CurrencyFromCode)
-                .NotNull()
+                .NotEmpty()
                 .Length(3);
             RuleFor(r => r.CurrencyToCode)
-                .NotNull()
+                .NotEmpty()
                 .Length(3);
             RuleFor(r => r.ExchangeRate)
                 .GreaterThan(0);

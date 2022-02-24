@@ -8,16 +8,14 @@ namespace PortEval.Application.Models.Validators
         public TransactionDtoValidator()
         {
             RuleFor(t => t.PositionId)
-                .NotNull();
-            RuleFor(t => t.PortfolioId)
-                .NotNull();
+                .NotEmpty();
             RuleFor(t => t.Amount)
-                .NotNull();
+                .NotEmpty();
             RuleFor(t => t.Price)
-                .NotNull()
+                .NotEmpty()
                 .GreaterThan(0);
             RuleFor(t => t.Time)
-                .NotNull();
+                .NotEmpty();
             RuleFor(t => t.Note)
                 .MaximumLength(255);
         }

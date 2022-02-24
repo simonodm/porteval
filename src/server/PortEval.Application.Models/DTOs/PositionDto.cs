@@ -19,5 +19,8 @@ namespace PortEval.Application.Models.DTOs
 
         [SwaggerSchema("Instrument which this position represents.")]
         public InstrumentDto Instrument { get; set; }
+
+        [SwaggerSchema("Initial transaction for initial position open.")]
+        public TransactionDto InitialTransaction { get; set; }
     }
 }
