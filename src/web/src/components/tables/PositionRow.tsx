@@ -7,13 +7,13 @@ import useGetPositionToDatePerformanceQueryWrapper from '../../hooks/useGetPosit
 import useGetPositionToDateProfitsQueryWrapper from '../../hooks/useGetPositionToDateProfitsQueryWrapper';
 import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
 import { useDeletePositionMutation } from '../../redux/api/positionApi';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
 import { Position } from '../../types';
-import { getPerformanceString, getPriceString } from '../utils/string';
+import { getPerformanceString, getPriceString } from '../../utils/string';
 import ModalWrapper from '../modals/ModalWrapper';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { generateDefaultPositionChart } from '../utils/chart';
+import { generateDefaultPositionChart } from '../../utils/chart';
 import CreateTransactionForm from '../forms/CreateTransactionForm';
 import EditPositionForm from '../forms/EditPositionForm';
 

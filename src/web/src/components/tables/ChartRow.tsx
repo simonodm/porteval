@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useDeleteChartMutation } from '../../redux/api/chartApi';
 import { Chart } from '../../types';
 import LoadingWrapper from '../ui/LoadingWrapper';

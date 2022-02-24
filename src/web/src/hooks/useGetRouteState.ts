@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router';
+ import { useLocation } from 'react-router';
 
 export default function useGetRouteState<T>(propName: string): T | undefined {
     const location = useLocation<{ [propName: string]: T }>();

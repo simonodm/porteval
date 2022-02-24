@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useGetPositionQuery } from '../../redux/api/positionApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../utils/queries';
+import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
 
 import useInstrumentPriceAutoFetchingState from '../../hooks/useInstrumentPriceAutoFetchingState';
 

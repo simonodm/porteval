@@ -1,10 +1,10 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-import createChart, { RenderCallback , TooltipCallback } from '../utils/lineChart';
+import createChart, { RenderCallback , TooltipCallback } from '../../utils/lineChart';
 import './LineChart.css';
 import { EntityChartDataPoint } from '../../types';
-import { getXAxisD3Interval } from '../utils/chart';
+import { getXAxisD3Interval } from '../../utils/chart';
 
 
 export type XAxisInterval = 'hour' | 'day' | 'week' | 'month' | 'year';

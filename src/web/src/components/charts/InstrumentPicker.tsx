@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 
 import { useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import InstrumentPickerItem from '../ui/InstrumentPickerItem';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';

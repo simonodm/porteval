@@ -3,13 +3,13 @@ import { skipToken } from '@reduxjs/toolkit/dist/query';
 import { toast } from 'react-toastify';
 
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useGetAllKnownCurrenciesQuery, useGetLatestExchangeRatesQuery,
     useUpdateCurrencyMutation } from '../../redux/api/currencyApi';
 
 import './SettingsView.css';
 
-import { getPriceString } from '../utils/string';
+import { getPriceString } from '../../utils/string';
 import { Currency } from '../../types';
 
 import PageHeading from '../ui/PageHeading';

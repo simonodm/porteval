@@ -3,12 +3,12 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
 import { useDeleteInstrumentMutation, useGetInstrumentCurrentPriceQuery } from '../../redux/api/instrumentApi';
 import { Instrument } from '../../types';
-import { getPriceString } from '../utils/string';
-import { generateDefaultInstrumentChart } from '../utils/chart';
+import { getPriceString } from '../../utils/string';
+import { generateDefaultInstrumentChart } from '../../utils/chart';
 import * as constants from '../../constants';
 import ModalWrapper from '../modals/ModalWrapper';
 import EditInstrumentForm from '../forms/EditInstrumentForm';

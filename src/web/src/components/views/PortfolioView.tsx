@@ -12,13 +12,13 @@ import useGetPortfolioToDatePerformanceQueryWrapper from '../../hooks/useGetPort
 import useGetPortfolioToDateProfitsQueryWrapper from '../../hooks/useGetPortfolioToDateProfitsQueryWrapper';
 import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
 import { useGetPortfolioByIdQuery, useGetPortfolioCurrentValueQuery } from '../../redux/api/portfolioApi';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
 
-import { getPerformanceString, getPriceString } from '../utils/string';
+import { getPerformanceString, getPriceString } from '../../utils/string';
 import * as constants from '../../constants';
 import PortEvalChart from '../charts/PortEvalChart';
-import { generateDefaultPortfolioChart } from '../utils/chart';
+import { generateDefaultPortfolioChart } from '../../utils/chart';
 import PageHeading from '../ui/PageHeading';
 
 type Params = {

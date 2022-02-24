@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import { useAddInstrumentPriceMutation } from '../../redux/api/instrumentApi';
 
-import { checkIsLoaded, onSuccessfulResponse } from '../utils/queries';
+import { checkIsLoaded, onSuccessfulResponse } from '../../utils/queries';
 
 import LoadingWrapper from '../ui/LoadingWrapper';
 

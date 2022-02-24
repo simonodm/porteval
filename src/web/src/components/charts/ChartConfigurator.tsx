@@ -7,12 +7,12 @@ import { DateTime } from 'luxon';
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { ChartConfig, isPriceDataChart, isAggregatedChart,
     ChartFrequency, ChartType, ChartToDateRange } from '../../types';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import LoadingWrapper from '../ui/LoadingWrapper';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import './ChartConfigurator.css';
-import { camelToProperCase } from '../utils/string';
+import { camelToProperCase } from '../../utils/string';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
 
 type Props = {

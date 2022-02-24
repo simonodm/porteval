@@ -1,6 +1,6 @@
 import { skipToken } from '@reduxjs/toolkit/dist/query';
 
-import { checkIsLoaded } from '../components/utils/queries';
+import { checkIsLoaded } from '../utils/queries';
 import {
     useGetPortfolioLastDayProfitQuery,
     useGetPortfolioLastMonthProfitQuery,

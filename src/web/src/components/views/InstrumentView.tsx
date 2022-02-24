@@ -11,14 +11,14 @@ import LoadingWrapper from '../ui/LoadingWrapper';
 import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
 import { useDeleteInstrumentPriceMutation, useGetInstrumentByIdQuery, useGetInstrumentCurrentPriceQuery,
     useGetInstrumentPricePageQuery, usePrefetch } from '../../redux/api/instrumentApi';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
 
-import { getDateTimeLocaleString, getPerformanceString, getPriceString } from '../utils/string';
+import { getDateTimeLocaleString, getPerformanceString, getPriceString } from '../../utils/string';
 import * as constants from '../../constants';
 import PortEvalChart from '../charts/PortEvalChart';
 import ModalWrapper from '../modals/ModalWrapper';
-import { generateDefaultInstrumentChart } from '../utils/chart';
+import { generateDefaultInstrumentChart } from '../../utils/chart';
 import PageHeading from '../ui/PageHeading';
 import PageSelector from '../ui/PageSelector';
 

@@ -3,7 +3,7 @@ import React from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 
 import { useGetPositionTransactionsQuery } from '../../redux/api/transactionApi';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { Currency } from '../../types';
 
 import TransactionRow from './TransactionRow';

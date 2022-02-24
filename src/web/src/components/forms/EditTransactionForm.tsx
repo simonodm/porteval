@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import React, { useState } from 'react';
 
-import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../utils/queries';
+import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
 import { useUpdateTransactionMutation } from '../../redux/api/transactionApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
 

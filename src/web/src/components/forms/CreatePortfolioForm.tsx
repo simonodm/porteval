@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../utils/queries';
+import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
 import { useCreatePortfolioMutation } from '../../redux/api/portfolioApi';
 
 import CurrencyDropdown from './fields/CurrencyDropdown';

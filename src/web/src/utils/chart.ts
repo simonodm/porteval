@@ -1,10 +1,10 @@
 import * as d3 from 'd3';
 import { DateTime, Duration } from 'luxon';
 
-import { CHART_TRANSACTION_SIGN_CIRCLE_RADIUS, CHART_TRANSACTION_SIGN_SIZE } from '../../constants';
+import { CHART_TRANSACTION_SIGN_CIRCLE_RADIUS, CHART_TRANSACTION_SIGN_SIZE } from '../constants';
 import { ChartConfig, ChartFrequency, ChartLine, ChartLineDashType,
-    ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction } from '../../types';
-import { Line, XAxisInterval } from '../charts/LineChart';
+    ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction } from '../types';
+import { Line, XAxisInterval } from '../components/charts/LineChart';
 
 import { RenderedDataPointInfo } from './lineChart';
 import { getPriceString } from './string';

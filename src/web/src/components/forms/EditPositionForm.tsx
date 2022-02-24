@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
 import { useGetAllPortfoliosQuery } from '../../redux/api/portfolioApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../utils/queries';
+import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
 
 import { useUpdatePositionMutation } from '../../redux/api/positionApi';
 

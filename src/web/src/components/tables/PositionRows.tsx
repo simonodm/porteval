@@ -3,7 +3,7 @@ import React from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 
 
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useGetPositionsQuery } from '../../redux/api/positionApi';
 
 import PositionRow from './PositionRow';

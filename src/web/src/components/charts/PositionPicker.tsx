@@ -5,7 +5,7 @@ import { Portfolio } from '../../types';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PositionPickerItem from '../ui/PositionPickerItem';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
 type Props = {
     portfolio: Portfolio;

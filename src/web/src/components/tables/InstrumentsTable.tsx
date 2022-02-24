@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 
 
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useGetInstrumentPageQuery, usePrefetch } from '../../redux/api/instrumentApi';
 import PageSelector from '../ui/PageSelector';
 

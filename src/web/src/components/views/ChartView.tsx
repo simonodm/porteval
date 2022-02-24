@@ -7,7 +7,7 @@ import { useParams } from 'react-router';
 import { toast } from 'react-toastify';
 
 import { useCreateChartMutation, useGetChartQuery, useUpdateChartMutation } from '../../redux/api/chartApi';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PortEvalChart from '../charts/PortEvalChart';
 import useGetRouteState from '../../hooks/useGetRouteState';

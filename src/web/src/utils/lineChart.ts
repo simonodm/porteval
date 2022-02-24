@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-import { CHART_TICK_INTERVAL } from '../../constants';
+import { CHART_TICK_INTERVAL } from '../constants';
 
 export type Line = {
     name: string;

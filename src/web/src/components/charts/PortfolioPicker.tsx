@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 
 import { useGetAllPortfoliosQuery } from '../../redux/api/portfolioApi';
 import { Portfolio } from '../../types';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PortfolioPickerItem from '../ui/PortfolioPickerItem';
 import ModalWrapper from '../modals/ModalWrapper';

@@ -5,13 +5,13 @@ import { skipToken } from '@reduxjs/toolkit/dist/query';
 import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import { ChartConfig, isPriceDataChart } from '../../types';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
-import { getPriceString, getPerformanceString } from '../utils/string';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
+import { getPriceString, getPerformanceString } from '../../utils/string';
 import { convertDashToStrokeDashArray, calculateXAxisInterval, getChartDateRange,
     getChartFrequency, getXAxisD3Format, generateTooltipTransactionList,
-    generateChartLineTransactionIcons } from '../utils/chart';
+    generateChartLineTransactionIcons } from '../../utils/chart';
 import { useGetChartDataQuery, useGetChartTransactionsQuery } from '../../redux/api/chartApi';
-import { RenderedDataPointInfo } from '../utils/lineChart';
+import { RenderedDataPointInfo } from '../../utils/lineChart';
 
 import LineChart from './LineChart';
 

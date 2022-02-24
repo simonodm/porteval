@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../utils/queries';
+import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
 import { Instrument, InstrumentType } from '../../types';
 
 import { useUpdateInstrumentMutation } from '../../redux/api/instrumentApi';

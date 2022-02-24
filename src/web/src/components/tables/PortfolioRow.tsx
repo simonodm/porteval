@@ -6,15 +6,15 @@ import LoadingWrapper from '../ui/LoadingWrapper';
 
 import useGetPortfolioToDatePerformanceQueryWrapper from '../../hooks/useGetPortfolioToDatePerformanceQueryWrapper';
 import useGetPortfolioToDateProfitsQueryWrapper from '../../hooks/useGetPortfolioToDateProfitsQueryWrapper';
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
 import { useDeletePortfolioMutation } from '../../redux/api/portfolioApi';
 
 
 import { Portfolio } from '../../types';
-import { getPriceString, getPerformanceString } from '../utils/string';
+import { getPriceString, getPerformanceString } from '../../utils/string';
 import ModalWrapper from '../modals/ModalWrapper';
-import { generateDefaultPortfolioChart } from '../utils/chart';
+import { generateDefaultPortfolioChart } from '../../utils/chart';
 import EditPortfolioForm from '../forms/EditPortfolioForm';
 import OpenPositionForm from '../forms/OpenPositionForm';
 

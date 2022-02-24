@@ -2,7 +2,7 @@ import React from 'react';
 
 import LoadingWrapper from '../ui/LoadingWrapper';
 
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useGetAllChartsQuery } from '../../redux/api/chartApi';
 
 import ChartRow from './ChartRow';

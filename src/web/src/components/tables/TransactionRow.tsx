@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useDeleteTransactionMutation } from '../../redux/api/transactionApi';
 import { Currency, Transaction } from '../../types';
 import ModalWrapper from '../modals/ModalWrapper';
-import { getDateTimeLocaleString, getPriceString } from '../utils/string';
+import { getDateTimeLocaleString, getPriceString } from '../../utils/string';
 import EditTransactionForm from '../forms/EditTransactionForm';
 
 type Props = {

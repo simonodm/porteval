@@ -2,7 +2,7 @@ import React from 'react';
 
 import LoadingWrapper from '../ui/LoadingWrapper';
 
-import { checkIsLoaded, checkIsError } from '../utils/queries';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
 import { useGetAllPortfoliosQuery } from '../../redux/api/portfolioApi';
 
