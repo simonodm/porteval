@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { ChartLineDashType, ChartLineInstrument, ChartLine } from '../../types';
+import { API_MAX_CHART_LINE_WIDTH } from '../../constants';
 
 type Props = {
     line: ChartLine;
@@ -40,8 +41,8 @@ export default function ChartLineConfigurator({ line: lineProp, onSave }: Props)
         <form onSubmit={handleSubmit}>
             <div className="form-group">
                 <label htmlFor="width">Width:</label>
-                <input className="form-control" id="width" onChange={(e) => handleWidthChange(parseInt(e.target.value))}
-                    type="number" value={line.width}
+                <input className="form-control" id="width" max={API_MAX_CHART_LINE_WIDTH}
+                    onChange={(e) => handleWidthChange(parseInt(e.target.value))} type="number" value={line.width}
                 />
             </div>
             <div className="form-group">

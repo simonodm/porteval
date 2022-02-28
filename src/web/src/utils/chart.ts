@@ -275,7 +275,5 @@ function getDurationFromToDateRange(toDateRange: ChartToDateRange) {
             return Duration.fromObject({ months: toDateRange.value });
         case 'year':
             return Duration.fromObject({ years: toDateRange.value });
-        default:
-            throw new Error(`Unknown chart toDateRange unit supplied: ${toDateRange.unit}.`)
     }
 }

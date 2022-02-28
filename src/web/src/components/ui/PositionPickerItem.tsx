@@ -1,6 +1,8 @@
 import React from 'react';
 
 import { ChartLine, Position } from '../../types';
+import LinePreview from '../charts/LinePreview';
+import { LINE_PREVIEW_LENGTH } from '../../constants';
 
 type Props = {
     position: Position;
@@ -17,7 +19,7 @@ export default function PositionPickerItem(
         <div className="picker-item">
             <span className="picker-item-name">{position.instrument.name}</span>
             {
-                line && <span className="picker-line-color-box" style={{ color: line.color }}>&#9632;</span>
+                line && <LinePreview length={LINE_PREVIEW_LENGTH} line={line} />
             }
             <span className="picker-item-actions">
                 {
