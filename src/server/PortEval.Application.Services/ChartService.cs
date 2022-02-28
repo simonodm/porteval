@@ -129,7 +129,7 @@ namespace PortEval.Application.Services
         {
             if (options.IsToDate != null && (bool)options.IsToDate)
             {
-                if (options.ToDateRange != null) return new ChartDateRange((ToDateRange)options.ToDateRange);
+                if (options.ToDateRange != null) return new ChartDateRange(options.ToDateRange);
                 throw new OperationNotAllowedException(
                     $"{nameof(options.ToDateRange)} cannot be null when {nameof(options.IsToDate)} is true.");
             }

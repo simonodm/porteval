@@ -31,7 +31,7 @@ namespace PortEval.Domain.Models.Entities
         public Chart(string name)
         {
             Name = name;
-            DateRange = new ChartDateRange(ToDateRange.OneYear);
+            DateRange = new ChartDateRange(new ToDateRange(DateRangeUnit.YEAR, 1));
             TypeConfiguration = ChartTypeSettings.PerformanceChart();
         }
 

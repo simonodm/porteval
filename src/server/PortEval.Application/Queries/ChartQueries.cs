@@ -7,6 +7,7 @@ using PortEval.Infrastructure;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using PortEval.Application.Queries.Models;
+using PortEval.Domain.Models.ValueObjects;
 
 namespace PortEval.Application.Queries
 {
@@ -28,15 +29,17 @@ namespace PortEval.Application.Queries
             var charts = new Dictionary<int, ChartDto>();
 
             using var connection = _connection.CreateConnection();
-            await connection.QueryAsync<ChartDto, ChartLineDto, ChartLineNameModel, ChartDto>(
+            await connection.QueryAsync<ChartDto, ToDateRangeQueryModel, ChartLineDto, ChartLineNameModel, ChartDto>(
                 query.Query,
-                (chart, chartLine, lineNames) =>
+                (chart, tdr, chartLine, lineNames) =>
                 {
                     if (!charts.ContainsKey(chart.Id))
                     {
                         charts[chart.Id] = chart;
                         chart.Lines = new List<ChartLineDto>();
                     }
+
+                    charts[chart.Id].ToDateRange = new ToDateRange(tdr.ToDateRangeUnit, tdr.ToDateRangeValue);
                     if (chartLine != null)
                     {
                         charts[chart.Id].Lines.Add(AssignChartLineType(AssignChartLineName(chartLine, lineNames)));
@@ -44,7 +47,7 @@ namespace PortEval.Application.Queries
                     return charts[chart.Id];
                 },
                 query.Params,
-                splitOn: "Width, NameSplit");
+                splitOn: "ToDateRangeSplit, Width, NameSplit");
 
             return new QueryResponse<IEnumerable<ChartDto>>
             {
@@ -61,12 +64,14 @@ namespace PortEval.Application.Queries
             ChartDto resultChart = null;
 
             using var connection = _connection.CreateConnection();
-            await connection.QueryAsync<ChartDto, ChartLineDto, ChartLineNameModel, ChartDto>(
+            await connection.QueryAsync<ChartDto, ToDateRangeQueryModel, ChartLineDto, ChartLineNameModel, ChartDto>(
                 query.Query,
-                (chart, chartLine, lineNames) =>
+                (chart, tdr, chartLine, lineNames) =>
                 {
                     resultChart ??= chart;
                     chart.Lines = new List<ChartLineDto>();
+
+                    chart.ToDateRange = new ToDateRange(tdr.ToDateRangeUnit, tdr.ToDateRangeValue);
                     if (chartLine != null)
                     {
                         resultChart.Lines.Add(AssignChartLineType(AssignChartLineName(chartLine, lineNames)));
@@ -74,7 +79,7 @@ namespace PortEval.Application.Queries
                     return resultChart;
                 },
                 query.Params,
-                splitOn: "Width, NameSplit");
+                splitOn: "ToDateRangeSplit, Width, NameSplit");
 
             return new QueryResponse<ChartDto>
             {

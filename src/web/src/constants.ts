@@ -1,4 +1,4 @@
-import { ChartConfig, ChartLineBase, InstrumentType } from './types';
+import { ChartConfig, ChartLineBase, InstrumentType, ChartToDateRange } from './types';
 
 export const API_NAME_MAX_LENGTH = 64;
 export const API_NOTE_MAX_LENGTH = 255;
@@ -9,12 +9,16 @@ export const ERROR_STRING = 'An error has occured. Please try again later.';
 export const CHART_TRANSACTION_SIGN_CIRCLE_RADIUS = 4;
 export const CHART_TRANSACTION_SIGN_SIZE = 5;
 export const DEFAULT_DT_SELECTOR_FORMAT = 'yyyy/MM/dd';
+export const DEFAULT_CHART_TODATE_RANGE: ChartToDateRange = {
+    unit: 'day',
+    value: 5
+};
 export const DEFAULT_CHART: ChartConfig = {
     name: 'New chart',
     type: 'price',
     currencyCode: 'USD',
     isToDate: true,
-    toDateRange: '5days',
+    toDateRange: DEFAULT_CHART_TODATE_RANGE,
     lines: []
 }
 export const DEFAULT_CHART_LINE: ChartLineBase = {

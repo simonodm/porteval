@@ -1,7 +1,8 @@
 import * as d3 from 'd3';
 import { DateTime, Duration } from 'luxon';
 
-import { CHART_TRANSACTION_SIGN_CIRCLE_RADIUS, CHART_TRANSACTION_SIGN_SIZE } from '../constants';
+import { DEFAULT_CHART_TODATE_RANGE, CHART_TRANSACTION_SIGN_CIRCLE_RADIUS,
+    CHART_TRANSACTION_SIGN_SIZE } from '../constants';
 import { ChartConfig, ChartFrequency, ChartLine, ChartLineDashType,
     ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction } from '../types';
 import { Line, XAxisInterval } from '../components/charts/LineChart';
@@ -120,7 +121,7 @@ export function generateDefaultInstrumentChart(instrument: Instrument): ChartCon
         name: 'New chart',
         currencyCode: `${instrument.currencyCode}`,
         isToDate: true,
-        toDateRange: '5days',
+        toDateRange: DEFAULT_CHART_TODATE_RANGE,
         lines: [instrumentPriceLine]
     }
 
@@ -142,7 +143,7 @@ export function generateDefaultPortfolioChart(portfolio: Portfolio): ChartConfig
         name: 'New chart',
         currencyCode: `${portfolio.currencyCode}`,
         isToDate: true,
-        toDateRange: '5days',
+        toDateRange: DEFAULT_CHART_TODATE_RANGE,
         lines: [portfolioPriceLine]
     }
 
@@ -164,7 +165,7 @@ export function generateDefaultPositionChart(position: Position): ChartConfig {
         name: 'New chart',
         currencyCode: position.instrument.currencyCode,
         isToDate: true,
-        toDateRange: '5days',
+        toDateRange: DEFAULT_CHART_TODATE_RANGE,
         lines: [positionPriceLine]
     };
 
@@ -265,19 +266,16 @@ function generateMinusSignSVG(x: number, y: number, size: number, color: string)
 }
 
 function getDurationFromToDateRange(toDateRange: ChartToDateRange) {
-    switch(toDateRange) {
-        case '1day':
-            return Duration.fromObject({ days: 1 });
-        case '5days':
-            return Duration.fromObject({ days: 5 });
-        case '1month':
-            return Duration.fromObject({ months: 1 });
-        case '3months':
-            return Duration.fromObject({ months: 3 });
-        case '6months':
-            return Duration.fromObject({ months: 6 });
-        case '1year':
+    switch(toDateRange.unit) {
+        case 'day':
+            return Duration.fromObject({ days: toDateRange.value });
+        case 'week':
+            return Duration.fromObject({ weeks: toDateRange.value})
+        case 'month':
+            return Duration.fromObject({ months: toDateRange.value });
+        case 'year':
+            return Duration.fromObject({ years: toDateRange.value });
         default:
-            return Duration.fromObject({ years: 1 });
+            throw new Error(`Unknown chart toDateRange unit supplied: ${toDateRange.unit}.`)
     }
 }

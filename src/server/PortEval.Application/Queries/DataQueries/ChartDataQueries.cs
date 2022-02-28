@@ -5,7 +5,7 @@ namespace PortEval.Application.Queries.DataQueries
 {
     internal static class ChartDataQueries
     {
-        // Chart queries have a surrogate column called NameSplit as a workaround to Dapper not splitting on NULL columns.
+        // Chart queries have surrogate columns called ToDateRangeSplit and NameSplit as a workaround to Dapper not splitting on NULL columns.
 
         public static QueryWrapper<IEnumerable<ChartDto>> GetCharts()
         {
@@ -19,7 +19,9 @@ namespace PortEval.Application.Queries.DataQueries
 		                          DateRangeStart,
 		                          DateRangeEnd,
 		                          IsToDate,
-		                          ToDateRange,
+                                  '' AS ToDateRangeSplit,
+		                          ToDateRangeUnit,
+                                  ToDateRangeValue,
 		                          Width,
 		                          Dash,
 		                          Color,
@@ -59,7 +61,9 @@ namespace PortEval.Application.Queries.DataQueries
 		                          DateRangeStart,
 		                          DateRangeEnd,
 		                          IsToDate,
-		                          ToDateRange,
+                                  '' AS ToDateRangeSplit,
+		                          ToDateRangeUnit,
+                                  ToDateRangeValue,
 		                          Width,
 		                          Dash,
 		                          Color,

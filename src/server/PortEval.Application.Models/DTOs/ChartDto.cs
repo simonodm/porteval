@@ -1,8 +1,8 @@
-﻿using PortEval.Domain.Models.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using PortEval.Domain.Models.Enums;
+using PortEval.Domain.Models.ValueObjects;
 using Swashbuckle.AspNetCore.Annotations;
-
 
 namespace PortEval.Application.Models.DTOs
 {
@@ -26,7 +26,7 @@ namespace PortEval.Application.Models.DTOs
         public bool? IsToDate { get; set; }
 
         [SwaggerSchema("Determines the range in which the chart displays data until the current date and time. Only applicable when IsToDate is set to true.")]
-        public ToDateRange? ToDateRange { get; set; }
+        public ToDateRange ToDateRange { get; set; }
 
         [SwaggerSchema("Chart type. Determines what data it displays.")]
         public ChartType Type { get; set; }

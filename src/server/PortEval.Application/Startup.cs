@@ -45,7 +45,6 @@ namespace PortEval.Application
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.Converters.Add(new AggregationFrequencyJsonConverter());
-                    options.SerializerSettings.Converters.Add(new ToDateRangeJsonConverter());
                     options.SerializerSettings.Converters.Add(new ColorJsonConverter());
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;

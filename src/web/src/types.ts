@@ -73,7 +73,10 @@ export type CurrencyExchangeRate = {
 }
 
 export type ChartType = 'price' | 'profit' | 'performance' | 'aggregatedProfit' | 'aggregatedPerformance';
-export type ChartToDateRange = '1day' | '5days' | '1month' | '3months' | '6months' | '1year';
+export type ChartToDateRange = {
+    unit: 'day' | 'week' | 'month' | 'year';
+    value: number;
+};
 export type ChartFrequency = '5min' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
 type ChartBase = {

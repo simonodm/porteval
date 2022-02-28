@@ -9,12 +9,12 @@ namespace PortEval.Domain.Models.ValueObjects
         public DateTime? Start { get; private set; }
         public DateTime? End { get; private set; }
         public bool IsToDate { get; private set; }
-        public ToDateRange? ToDateRange { get; private set; }
+        public ToDateRange ToDateRange { get; private set; }
 
         public ChartDateRange()
         {
             IsToDate = true;
-            ToDateRange = Enums.ToDateRange.OneDay;
+            ToDateRange = new ToDateRange(DateRangeUnit.DAY, 1);
         }
 
         public ChartDateRange(DateTime start, DateTime end)

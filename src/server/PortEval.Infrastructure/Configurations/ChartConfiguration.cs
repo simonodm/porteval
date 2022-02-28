@@ -18,8 +18,14 @@ namespace PortEval.Infrastructure.Configurations
                     c => c.DateRange,
                     d =>
                     {
-                        d.Property(dr => dr.ToDateRange)
-                            .HasColumnName("ToDateRange");
+                        d.OwnsOne(dr => dr.ToDateRange,
+                            tdr =>
+                            {
+                                tdr.Property(tdr2 => tdr2.Unit)
+                                    .HasColumnName("ToDateRangeUnit");
+                                tdr.Property(tdr2 => tdr2.Value)
+                                    .HasColumnName("ToDateRangeValue");
+                            });
                         d.Property(dr => dr.Start)
                             .HasColumnName("DateRangeStart");
                         d.Property(dr => dr.End)

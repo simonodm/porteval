@@ -22,7 +22,14 @@ type Props = {
 export default function ChartConfigurator({ onChange }: Props): JSX.Element {
     const frequencies: ChartFrequency[] = ['day', 'week', 'month', 'year'];
     const types: ChartType[] = ['price', 'profit', 'performance', 'aggregatedProfit', 'aggregatedPerformance'];
-    const toDateRanges: ChartToDateRange[] = ['1day', '5days', '1month', '3months', '6months', '1year'];
+    const toDateRanges: ChartToDateRange[] = [
+        {unit: 'day', value: 1},
+        {unit: 'day', value: 5},
+        {unit: 'month', value: 1},
+        {unit: 'month', value: 3},
+        {unit: 'month', value: 6},
+        {unit: 'year', value: 1}
+    ];
 
     const context = useContext(ChartLineConfigurationContext);
 
@@ -206,10 +213,10 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                                                 ? 'btn-dark'
                                                 : 'btn-light')
                                         }
-                                        key={range}
+                                        key={range.value + range.unit}
                                         onClick={() => handleToDateRangeChange(range)}
                                         type="button"
-                                    >{range[0] + range[1].toUpperCase()}
+                                    >{range.value + range.unit[0].toUpperCase()}
                                     </button>)
                             }
                         </div>
