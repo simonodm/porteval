@@ -65,7 +65,7 @@ namespace PortEval.Application.Queries
 
         /// <inheritdoc cref="IInstrumentQueries.GetInstrumentPrices"/>
         public async Task<QueryResponse<PaginatedResponse<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId,
-            PaginationParams pagination, DateRangeParams dateRange)
+            PaginationParams pagination, DateRangeParams dateRange, AggregationFrequency frequency = AggregationFrequency.FiveMin)
         {
             var instrument = await GetInstrument(instrumentId);
             if (instrument.Status == QueryStatus.NotFound)
@@ -77,9 +77,9 @@ namespace PortEval.Application.Queries
             }
 
             var pricePageQuery =
-                InstrumentDataQueries.GetInstrumentPrices(instrumentId, dateRange.From, dateRange.To, pagination);
+                InstrumentDataQueries.GetInstrumentPrices(instrumentId, dateRange.From, dateRange.To, pagination, frequency);
             var totalCountQuery =
-                InstrumentDataQueries.GetInstrumentPriceCount(instrumentId, dateRange.From, dateRange.To);
+                InstrumentDataQueries.GetInstrumentPriceCount(instrumentId, dateRange.From, dateRange.To, frequency);
 
             using var connection = _connection.CreateConnection();
             var totalCount = await connection.QueryFirstAsync<int>(totalCountQuery.Query, totalCountQuery.Params);

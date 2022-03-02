@@ -42,7 +42,7 @@ export default function InstrumentView(): JSX.Element {
     const instrument = useGetInstrumentByIdQuery(instrumentId);
     const currentPrice = useGetInstrumentCurrentPriceQuery(instrumentId);
     const prices = useGetInstrumentPricePageQuery(
-        { instrumentId, page, limit: pageLimit },
+        { instrumentId, page, limit: pageLimit, frequency: 'day' },
         { pollingInterval: constants.REFRESH_INTERVAL }
     );
     const currency = useGetCurrencyQuery(instrument.data?.currencyCode ?? skipToken)
@@ -124,7 +124,8 @@ export default function InstrumentView(): JSX.Element {
                         <PageSelector
                             onPageChange={(p) => setPage(p)}
                             page={page}
-                            prefetch={(p) => prefetchPrices({ instrumentId, page: p, limit: pageLimit })}
+                            prefetch={(p) => 
+                                prefetchPrices({ instrumentId, page: p, limit: pageLimit, frequency: 'day' })}
                             totalPages={prices.data ? prices.data.totalCount / pageLimit : 1}
                         />
                     </div>
@@ -170,7 +171,8 @@ export default function InstrumentView(): JSX.Element {
                         <PageSelector
                             onPageChange={(p) => setPage(p)}
                             page={page}
-                            prefetch={(p) => prefetchPrices({ instrumentId, page: p, limit: pageLimit })}
+                            prefetch={(p) => 
+                                prefetchPrices({ instrumentId, page: p, limit: pageLimit, frequency: 'day' })}
                             totalPages={prices.data ? prices.data.totalCount / pageLimit : 1}
                         />
                     </div>

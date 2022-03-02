@@ -93,6 +93,7 @@ export default function Dashboard(): JSX.Element {
                 onDragStop={saveLayout}
                 onDrop={saveLayout}
                 onResizeStop={saveLayout}
+                rowHeight={150}
             >
                 {charts.data && dashboardLayout && charts.data.map(chart => {
                     const chartPosition = dashboardLayout.items.find(l => l.chartId === chart.id);

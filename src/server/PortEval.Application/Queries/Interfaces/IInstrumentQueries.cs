@@ -36,8 +36,10 @@ namespace PortEval.Application.Queries.Interfaces
         /// <param name="instrumentId">ID of the instrument to retrieve prices of.</param>
         /// <param name="pagination">Pagination parameters</param>
         /// <param name="dateRange">Date range to retrieve prices for.</param>
+        /// <param name="frequency">Desired interval between prices.</param>
         /// <returns>A task representing the asynchronous database query. Task result contains an <c>IEnumerable</c> of price DTOs.</returns>
-        Task<QueryResponse<PaginatedResponse<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId, PaginationParams pagination, DateRangeParams dateRange);
+        Task<QueryResponse<PaginatedResponse<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId, PaginationParams pagination,
+            DateRangeParams dateRange, AggregationFrequency frequency = AggregationFrequency.FiveMin);
 
         /// <summary>
         /// Retrieves the last available price of the instrument before or equal to the specified time.

@@ -3,6 +3,7 @@ using PortEval.Application.Models.QueryParams;
 using PortEval.Application.Queries.Models;
 using System;
 using System.Collections.Generic;
+using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Application.Queries.DataQueries
 {
@@ -38,26 +39,43 @@ namespace PortEval.Application.Queries.DataQueries
             };
         }
 
-        public static QueryWrapper<int> GetInstrumentPriceCount(int instrumentId, DateTime from, DateTime to)
+        public static QueryWrapper<int> GetInstrumentPriceCount(int instrumentId, DateTime from, DateTime to, AggregationFrequency frequency)
         {
+            var partitionCalc = GetInstrumentPriceIntervalPartitionCalc(frequency);
             return new QueryWrapper<int>
             {
-                Query = @"SELECT COUNT(Id) FROM dbo.InstrumentPrices
-                          WHERE InstrumentId = @InstrumentId
-                          AND Time >= @TimeFrom
-                          AND Time <= @TimeTo",
+                Query = @$"WITH added_row_number AS (
+	                          SELECT *, ROW_NUMBER() OVER(
+                                  PARTITION BY {partitionCalc}
+                                  ORDER BY [Time]) AS row_number
+                              FROM dbo.InstrumentPrices
+                              WHERE InstrumentId = @InstrumentId
+                              AND Time >= @TimeFrom
+                              AND Time <= @TimeTo
+                          )
+                          SELECT COUNT(*) FROM added_row_number
+                          WHERE row_number = 1",
                 Params = new { InstrumentId = instrumentId, TimeFrom = from, TimeTo = to }
             };
         }
 
-        public static QueryWrapper<IEnumerable<InstrumentPriceDto>> GetInstrumentPrices(int instrumentId, DateTime from, DateTime to, PaginationParams pagination)
+        public static QueryWrapper<IEnumerable<InstrumentPriceDto>> GetInstrumentPrices(int instrumentId, DateTime from, DateTime to,
+            PaginationParams pagination, AggregationFrequency frequency)
         {
+            var partitionCalc = GetInstrumentPriceIntervalPartitionCalc(frequency);
             return new QueryWrapper<IEnumerable<InstrumentPriceDto>>
             {
-                Query = @"SELECT * FROM dbo.InstrumentPrices
-                          WHERE InstrumentId = @InstrumentId
-                          AND Time >= @TimeFrom
-                          AND Time <= @TimeTo
+                Query = @$"WITH added_row_number AS (
+	                          SELECT *, ROW_NUMBER() OVER(
+                                  PARTITION BY {partitionCalc}
+                                  ORDER BY [Time]) AS row_number
+                              FROM dbo.InstrumentPrices
+                              WHERE InstrumentId = @InstrumentId
+                              AND Time >= @TimeFrom
+                              AND Time <= @TimeTo
+                          )
+                          SELECT * FROM added_row_number
+                          WHERE row_number = 1
                           ORDER BY Time DESC
                           OFFSET @Offset ROWS
                           FETCH NEXT @Rows ROWS ONLY",
@@ -91,6 +109,20 @@ namespace PortEval.Application.Queries.DataQueries
                 Query = @"SELECT MIN(Time) AS Time FROM dbo.InstrumentPrices
                           WHERE InstrumentId = @InstrumentId",
                 Params = new { InstrumentId = instrumentId }
+            };
+        }
+
+        private static string GetInstrumentPriceIntervalPartitionCalc(AggregationFrequency frequency)
+        {
+            return frequency switch
+            {
+                AggregationFrequency.FiveMin => "DATEADD(minute, 5 * (DATEDIFF(minute, '', [Time]) / 5), '')",
+                AggregationFrequency.Day => "DATEADD(day, DATEDIFF(day, '', [Time]), '')",
+                AggregationFrequency.Hour => "DATEADD(hour, DATEDIFF(hour, '', [Time]), '')",
+                AggregationFrequency.Week => "DATEADD(week, DATEDIFF(week, '', [Time]), '')",
+                AggregationFrequency.Month => "DATEADD(month, DATEDIFF(month, '', [Time]), '')",
+                AggregationFrequency.Year => "DATEADD(year, DATEDIFF(year, '', [Time]), '')",
+                _ => throw new Exception($"Unknown aggregation frequency supplied: {frequency}.")
             };
         }
     }

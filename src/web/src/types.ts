@@ -77,7 +77,7 @@ export type ChartToDateRange = {
     unit: 'day' | 'week' | 'month' | 'year';
     value: number;
 };
-export type ChartFrequency = '5min' | 'hour' | 'day' | 'week' | 'month' | 'year';
+export type AggregationFrequency = '5min' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
 type ChartBase = {
     name: string;
@@ -102,12 +102,12 @@ export type PerformanceChart = ChartBase & {
 export type AggregatedProfitChart = ChartBase & {
     type: 'aggregatedProfit';
     currencyCode: string;
-    frequency: ChartFrequency;
+    frequency: AggregationFrequency;
 }
 
 export type AggregatedPerformanceChart = ChartBase & {
     type: 'aggregatedPerformance';
-    frequency: ChartFrequency;
+    frequency: AggregationFrequency;
 }
 
 export type PriceDataChart = PriceChart | ProfitChart | AggregatedProfitChart;
@@ -219,13 +219,11 @@ export type ToDateFinancialDataQueryResponse = {
     isLoading: boolean;
 }
 
-export type AggregationFrequency = 'day' | 'week' | 'month' | 'year';
-
 export type ChartLineDataQueryParams = {
     line: ChartLine;
     from: string;
     to: string;
-    frequency: AggregationFrequency;
+    frequency: Omit<AggregationFrequency, '5min' | 'hour'>;
 }
 
 export type ModalCallbacks = {

@@ -6,7 +6,7 @@ import { DateTime } from 'luxon';
 
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { ChartConfig, isPriceDataChart, isAggregatedChart,
-    ChartFrequency, ChartType, ChartToDateRange } from '../../types';
+    AggregationFrequency, ChartType, ChartToDateRange } from '../../types';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import LoadingWrapper from '../ui/LoadingWrapper';
 
@@ -20,7 +20,7 @@ type Props = {
 }
 
 export default function ChartConfigurator({ onChange }: Props): JSX.Element {
-    const frequencies: ChartFrequency[] = ['day', 'week', 'month', 'year'];
+    const frequencies: AggregationFrequency[] = ['day', 'week', 'month', 'year'];
     const types: ChartType[] = ['price', 'profit', 'performance', 'aggregatedProfit', 'aggregatedPerformance'];
     const toDateRanges: ChartToDateRange[] = [
         {unit: 'day', value: 1},
@@ -77,7 +77,7 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
 
     const handleFrequencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         if(currentChart && isAggregatedChart(currentChart)) {
-            const newChart = {...currentChart, frequency: e.target.value as ChartFrequency};
+            const newChart = {...currentChart, frequency: e.target.value as AggregationFrequency};
             setCurrentChart(newChart);
             onChange && onChange(newChart);
         }

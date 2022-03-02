@@ -2,7 +2,8 @@ import { FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/toolkit/dist/q
 
 import { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes';
 
-import { Chart, ChartConfig, ChartFrequency, EntityChartDataPoint, isPriceDataChart, Transaction } from '../../types';
+import { Chart, ChartConfig, AggregationFrequency,
+    EntityChartDataPoint, isPriceDataChart, Transaction } from '../../types';
 
 import { buildChartLineDataBaseUrl, buildChartLineTransactionsUrl,
     generateChartLinesTags, truncateEntityName, generateChartTransactionTags } from './apiUtils';
@@ -64,7 +65,7 @@ const chartApi = portEvalApi.injectEndpoints({
         }),
         getChartData: build.query<
             Array<Array<EntityChartDataPoint>>,
-            { chart: ChartConfig, from: string, to: string, frequency: ChartFrequency }
+            { chart: ChartConfig, from: string, to: string, frequency: AggregationFrequency }
         >({
             queryFn: async (args, api, extraOptions, fetchWithBQ) => {
                 const currency = isPriceDataChart(args.chart) ? args.chart.currencyCode : undefined;

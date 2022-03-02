@@ -1,5 +1,5 @@
 import { Instrument, InstrumentPrice, PaginatedResponse,
-    EntityProfit, EntityPerformance, InstrumentPriceConfig } from '../../types';
+    EntityProfit, EntityPerformance, InstrumentPriceConfig, AggregationFrequency } from '../../types';
 
 import { portEvalApi } from './portEvalApi';
 import { CreateInstrumentParameters, DateRangeParameters, PaginationParameters } from './apiTypes';
@@ -92,12 +92,13 @@ const instrumentApi = portEvalApi.injectEndpoints({
         }),
         getInstrumentPricePage: build.query<
             PaginatedResponse<InstrumentPrice>,
-            { instrumentId: number } & PaginationParameters & DateRangeParameters
+            { instrumentId: number } & PaginationParameters & DateRangeParameters & { frequency: AggregationFrequency }
         >({
-            query: ({ instrumentId, from, to, page = 1, limit = 100 }) => ({
+            query: ({ instrumentId, from, to, frequency, page = 1, limit = 100 }) => ({
                 url: `instruments/${instrumentId}/prices` +
                     `?page=${page}` +
                     `&limit=${limit}` +
+                    `&frequency=${frequency}` +
                     `${from ? `&from=${encodeURIComponent(from)}` : ''}` +
                     `${to ? `&to=${encodeURIComponent(to)}` : ''}`
             }),

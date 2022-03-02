@@ -9,6 +9,7 @@ using PortEval.Application.Services.Interfaces;
 using System;
 using System.Threading.Tasks;
 using PortEval.Application.Queries;
+using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Application.Controllers
 {
@@ -31,11 +32,12 @@ namespace PortEval.Application.Controllers
 
         // GET: api/instruments/1/prices
         [HttpGet]
-        public async Task<ActionResult<PaginatedResponse<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId, [FromQuery] DateRangeParams dateRange, [FromQuery] PaginationParams pagination)
+        public async Task<ActionResult<PaginatedResponse<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId,
+            [FromQuery] DateRangeParams dateRange, [FromQuery] PaginationParams pagination, [FromQuery] AggregationFrequency frequency = AggregationFrequency.FiveMin)
         {
             _logger.LogInformation($"Prices requested for instrument {instrumentId} (page {pagination.Page}, limit {pagination.Limit}).");
 
-            var prices = await _instrumentQueries.GetInstrumentPrices(instrumentId, pagination, dateRange);
+            var prices = await _instrumentQueries.GetInstrumentPrices(instrumentId, pagination, dateRange, frequency);
             if (prices.Status == QueryStatus.NotFound)
             {
                 return NotFound($"Instrument {instrumentId} not found.");

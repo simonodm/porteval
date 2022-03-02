@@ -3,12 +3,13 @@ import { DateTime, Duration } from 'luxon';
 
 import { DEFAULT_CHART_TODATE_RANGE, CHART_TRANSACTION_SIGN_CIRCLE_RADIUS,
     CHART_TRANSACTION_SIGN_SIZE } from '../constants';
-import { ChartConfig, ChartFrequency, ChartLine, ChartLineDashType,
+import { ChartConfig, AggregationFrequency, ChartLine, ChartLineDashType,
     ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction } from '../types';
 import { Line, XAxisInterval } from '../components/charts/LineChart';
 
 import { RenderedDataPointInfo } from './lineChart';
 import { getPriceString } from './string';
+import removeDuplicates from './array';
 
 type LineWithTransactions = Line & {
     transactions: Array<Transaction>
@@ -68,7 +69,7 @@ export function getXAxisD3Format(from: DateTime, to: DateTime): (date: Date) => 
     return d3.timeFormat('%H:%M');
 }
 
-export function calculateAppropriateChartFrequency(from: DateTime, to: DateTime): ChartFrequency {
+export function calculateAppropriateChartFrequency(from: DateTime, to: DateTime): AggregationFrequency {
     const diff = to.diff(from);
 
     if(diff > Duration.fromObject({ years: 10 })) return 'year';
@@ -80,7 +81,7 @@ export function calculateAppropriateChartFrequency(from: DateTime, to: DateTime)
     return '5min';
 }
 
-export function getChartFrequency(chart: ChartConfig): ChartFrequency {
+export function getChartFrequency(chart: ChartConfig): AggregationFrequency {
     if(isAggregatedChart(chart)) {
         return chart.frequency;
     }
@@ -175,9 +176,11 @@ export function generateDefaultPositionChart(position: Position): ChartConfig {
 export function generateTooltipTransactionList(
     lines: Array<LineWithTransactions>, from: string | undefined, to: string | undefined
 ): HTMLElement | null {
-    const transactions = lines.reduce<Array<Transaction>>((prev, curr) => {
+    let transactions = lines.reduce<Array<Transaction>>((prev, curr) => {
         return prev.concat(findLineTransactionsInRange(curr.transactions, from, to));
     }, [])
+
+    transactions = removeDuplicates(transactions, t => t.id);
 
     if(transactions.length > 0) {
         const rootElement = document.createElement('div');
