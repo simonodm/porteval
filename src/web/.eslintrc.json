@@ -34,5 +34,12 @@
         "react/jsx-no-useless-fragment": "warn",
         "react/jsx-sort-props": "warn"
     },
-    "ignorePatterns": ["src/**/*.test.ts", "src/frontend/generated/*", "Dockerfile*", "*.md", "*.json"]
+    "ignorePatterns": ["src/**/*.test.ts", "src/frontend/generated/*", "Dockerfile*", "*.md", "*.json"],
+    "settings": {
+        "import/resolver": {
+            "node": {
+                "extensions": [".js", ".jsx", ".d.ts", ".ts", ".tsx"]
+            }
+        }
+    }
 }

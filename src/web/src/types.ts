@@ -185,6 +185,10 @@ export type DashboardLayout = {
     items: Array<DashboardChartItem>;
 }
 
+export type Exchange = {
+    name: string;
+}
+
 export type EntityValue = {
     value: number;
     time: string;

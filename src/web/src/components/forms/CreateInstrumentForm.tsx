@@ -7,9 +7,12 @@ import { InstrumentType } from '../../types';
 
 import { useCreateInstrumentMutation } from '../../redux/api/instrumentApi';
 
+import { useGetAllKnownExchangesQuery } from '../../redux/api/exchangeApi';
+
 import TextInput from './fields/TextInput';
 import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import CurrencyDropdown from './fields/CurrencyDropdown';
+import ExchangeDropdown from './fields/ExchangeDropdown';
 
 type Props = {
     onSuccess?: () => void;
@@ -17,6 +20,7 @@ type Props = {
 
 export default function CreateInstrumentForm({ onSuccess }: Props): JSX.Element {
     const currencies = useGetAllKnownCurrenciesQuery();
+    const exchanges = useGetAllKnownExchangesQuery();
     const [createInstrument, mutationStatus] = useCreateInstrumentMutation();
 
     const [name, setName] = useState('');
@@ -26,7 +30,7 @@ export default function CreateInstrumentForm({ onSuccess }: Props): JSX.Element 
     const [note, setNote] = useState('');
     const [type, setType] = useState<InstrumentType>('stock');
 
-    const isLoaded = checkIsLoaded(currencies, mutationStatus);
+    const isLoaded = checkIsLoaded(currencies, exchanges, mutationStatus);
     const isError = checkIsError(currencies);
 
     useEffect(() => {
@@ -60,9 +64,7 @@ export default function CreateInstrumentForm({ onSuccess }: Props): JSX.Element 
                 <TextInput label='Symbol' onChange={(val) => setSymbol(val)} placeholder='e.g. AAPL'
                     value={symbol}
                 />
-                <TextInput label='Exchange' onChange={(val) => setExchange(val)} placeholder='e.g. NASDAQ'
-                    value={exchange}
-                />
+                <ExchangeDropdown exchanges={exchanges.data ?? []} onChange={(e) => setExchange(e.name)} />
                 <InstrumentTypeDropdown onChange={(t) => setType(t)} value={type} />
                 <CurrencyDropdown
                     currencies={currencies.data ?? []}

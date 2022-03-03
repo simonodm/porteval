@@ -25,6 +25,7 @@ export const portEvalApi = createApi({
         'ChartLinePortfolioTransactions',
         'ChartLinePositionTransactions',
         'Chart',
-        'DashboardLayout'
+        'DashboardLayout',
+        'Exchanges'
     ]
 });

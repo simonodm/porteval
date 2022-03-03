@@ -44,7 +44,7 @@ const instrumentApi = portEvalApi.injectEndpoints({
             }),
             invalidatesTags: (result, error) =>
                 !error
-                    ? ['Instruments']
+                    ? ['Instruments', 'Exchanges']
                     : []
         }),
         updateInstrument: build.mutation<Instrument, Instrument>({
@@ -70,6 +70,7 @@ const instrumentApi = portEvalApi.injectEndpoints({
                         'PortfolioCalculations',
                         'PositionCalculations',
                         'Charts',
+                        'Exchanges',
                         { type: 'Instrument', id: arg },
                         { type: 'InstrumentCalculations', id: arg }
                     ]

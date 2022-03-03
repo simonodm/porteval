@@ -31,6 +31,12 @@ namespace PortEval.Application.Queries.Interfaces
         Task<QueryResponse<InstrumentDto>> GetInstrument(int instrumentId);
 
         /// <summary>
+        /// Retrieves a list of all exchanges used in existing instruments.
+        /// </summary>
+        /// <returns>A task representing the asynchronous database query. Task result contains an <c>IEnumerable</c> of exchange DTOs.</returns>
+        Task<QueryResponse<IEnumerable<ExchangeDto>>> GetKnownExchanges();
+
+        /// <summary>
         /// Retrieves instrument prices in the specified date range ordered by price time, descending. The result is paginated.
         /// </summary>
         /// <param name="instrumentId">ID of the instrument to retrieve prices of.</param>

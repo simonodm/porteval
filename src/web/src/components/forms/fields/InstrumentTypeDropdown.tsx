@@ -43,7 +43,7 @@ export default function InstrumentTypeDropdown({ value, disabled, onChange }: Pr
                 onChange={handleTypeChange}
                 value={type}
             >
-                {types.map(t => <option key={t} value={t}>{constants.INSTRUMENT_TYPE_TO_STRING[type]}</option>)}
+                {types.map(t => <option key={t} value={t}>{constants.INSTRUMENT_TYPE_TO_STRING[t]}</option>)}
             </select>
         </div>
     )
