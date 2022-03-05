@@ -7,7 +7,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Interfaces
     /// <summary>
     /// Represents an API which can retrieve latest exchange rates.
     /// </summary>
-    public interface ILatestExchangeRatesFinancialApiClient : IFinancialApiClient<LatestExchangeRatesRequest, Response<ExchangeRates>>
+    public interface ILatestExchangeRatesFinancialApi : IFinancialApi<LatestExchangeRatesRequest, Response<ExchangeRates>>
     {
     }
 }

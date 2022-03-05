@@ -6,9 +6,9 @@ using System.Collections.Generic;
 namespace PortEval.FinancialDataFetcher.APIs.Interfaces
 {
     /// <summary>
-    /// Represents an API client which can retrieve historical daily exchange rates.
+    /// Represents an API which can retrieve instruments' intraday prices.
     /// </summary>
-    public interface IHistoricalDailyExchangeRatesFinancialApiClient : IFinancialApiClient<HistoricalDailyExchangeRatesRequest, Response<IEnumerable<ExchangeRates>>>
+    public interface IIntradayFinancialApi : IFinancialApi<IntradayPricesRequest, Response<IEnumerable<PricePoint>>>
     {
     }
 }

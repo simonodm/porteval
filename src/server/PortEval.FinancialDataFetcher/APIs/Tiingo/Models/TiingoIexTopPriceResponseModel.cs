@@ -2,7 +2,7 @@
 
 namespace PortEval.FinancialDataFetcher.APIs.Tiingo.Models
 {
-    internal class TiingoLatestPriceResponseModel
+    internal class TiingoIexTopPriceResponseModel
     {
         [JsonProperty("last", Required = Required.Always)]
         public decimal Price { get; set; }

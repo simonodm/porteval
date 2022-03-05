@@ -17,8 +17,8 @@ namespace PortEval.FinancialDataFetcher
     /// <typeparam name="TRequest">Request type</typeparam>
     /// <typeparam name="TResponse">Response type</typeparam>
     internal class RequestHandler<TClient, TRequest, TResponse>
-        where TClient : class, IFinancialApiClient<TRequest, TResponse>
-        where TRequest : Request
+        where TClient : class, IFinancialApi<TRequest, TResponse>
+        where TRequest : IRequest
         where TResponse : IResponse, new()
     {
         private readonly TRequest _request;

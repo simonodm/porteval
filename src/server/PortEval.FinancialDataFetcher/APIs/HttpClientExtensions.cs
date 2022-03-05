@@ -15,12 +15,10 @@ namespace PortEval.FinancialDataFetcher.APIs
         /// </summary>
         /// <param name="httpClient">HttpClient to use for the fetch</param>
         /// <param name="queryUrl">URL to fetch</param>
-        /// <param name="parseFunction">Callback to parse the JSON response</param>
         /// <param name="rateLimiter">Request rate limiter</param>
         /// <typeparam name="TResult">Target response type after parsing.</typeparam>
         /// <returns>A Response object containing the operation status and parsed data if the operation was successful.</returns>
-        public static async Task<Response<TResult>> FetchJson<TResult>(this HttpClient httpClient, string queryUrl,
-            Func<JToken, Response<TResult>> parseFunction, RateLimiter rateLimiter = null)
+        public static async Task<Response<TResult>> FetchJson<TResult>(this HttpClient httpClient, string queryUrl, RateLimiter rateLimiter = null)
         {
             try
             {
@@ -33,8 +31,15 @@ namespace PortEval.FinancialDataFetcher.APIs
                     };
                 }
 
-                var response = JToken.Parse(await httpClient.GetStringAsync(queryUrl));
-                return parseFunction(response);
+                var responseToken = JToken.Parse(await httpClient.GetStringAsync(queryUrl));
+                var response = responseToken.ToObject<TResult>();
+                var isValidResponse = response != null;
+                return new Response<TResult>
+                {
+                    StatusCode = isValidResponse ? StatusCode.Ok : StatusCode.OtherError,
+                    ErrorMessage = isValidResponse ? "" : "Invalid data received.",
+                    Result = response
+                };
             }
             catch (Exception ex)
             {

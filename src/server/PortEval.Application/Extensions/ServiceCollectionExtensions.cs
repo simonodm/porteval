@@ -139,16 +139,10 @@ namespace PortEval.Application.Extensions
         {
             var fetcher = new PriceFetcher();
             var tiingoKey = Environment.GetEnvironmentVariable("PORTEVAL_Tiingo_Key");
-            var alphaVantageKey = Environment.GetEnvironmentVariable("PORTEVAL_AlphaVantage_Key");
             var openExchangeRatesKey = Environment.GetEnvironmentVariable("PORTEVAL_OpenExchangeRates_Key");
             if (tiingoKey != null)
             {
                 fetcher.AddTiingo(tiingoKey, new RateLimiter(TimeSpan.FromHours(1), 500));
-            }
-
-            if (alphaVantageKey != null)
-            {
-                fetcher.AddAlphaVantage(alphaVantageKey, new RateLimiter(TimeSpan.FromHours(1), 20));
             }
 
             if (openExchangeRatesKey != null)

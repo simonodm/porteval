@@ -3,7 +3,7 @@
     /// <summary>
     /// Request for the latest available exchange rates of the supplied currency.
     /// </summary>
-    public class LatestExchangeRatesRequest : Request
+    public class LatestExchangeRatesRequest : CurrencyDataRequest
     {
     }
 }

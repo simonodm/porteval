@@ -1,5 +1,4 @@
-﻿using PortEval.FinancialDataFetcher.APIs.AlphaVantage;
-using PortEval.FinancialDataFetcher.APIs.ExchangeRateHost;
+﻿using PortEval.FinancialDataFetcher.APIs.ExchangeRateHost;
 using PortEval.FinancialDataFetcher.APIs.Interfaces;
 using PortEval.FinancialDataFetcher.APIs.OpenExchangeRates;
 using PortEval.FinancialDataFetcher.APIs.Tiingo;
@@ -19,7 +18,7 @@ namespace PortEval.FinancialDataFetcher
     public class PriceFetcher
     {
         private readonly HttpClient _httpClient;
-        private readonly List<IFinancialApiClient> _registeredClients = new List<IFinancialApiClient>();
+        private readonly List<IFinancialApi> _registeredClients = new List<IFinancialApi>();
 
         /// <summary>
         /// Initializes the price fetcher.
@@ -30,24 +29,13 @@ namespace PortEval.FinancialDataFetcher
         }
 
         /// <summary>
-        /// Adds Alpha Vantage to available APIs. 
-        /// </summary>
-        /// <param name="apiKey">AlphaVantage API key</param>
-        /// <param name="rateLimiter">Request rate limiter</param>
-        public void AddAlphaVantage(string apiKey, RateLimiter rateLimiter = null)
-        {
-            var client = new AlphaVantageApiClient(_httpClient, apiKey, rateLimiter);
-            _registeredClients.Add(client);
-        }
-
-        /// <summary>
         /// Adds OpenExchangeRates to available APIs.
         /// </summary>
         /// <param name="apiKey">OpenExchangeRates API key</param>
         /// <param name="rateLimiter">Request rate limiter</param>
         public void AddOpenExchangeRates(string apiKey, RateLimiter rateLimiter = null)
         {
-            var client = new OpenExchangeRatesApiClient(_httpClient, apiKey, rateLimiter);
+            var client = new OpenExchangeRatesApi(_httpClient, apiKey, rateLimiter);
             _registeredClients.Add(client);
         }
 
@@ -57,7 +45,7 @@ namespace PortEval.FinancialDataFetcher
         /// <param name="rateLimiter">Request rate limiter</param>
         public void AddExchangeRateHost(RateLimiter rateLimiter = null)
         {
-            var client = new ExchangeRateHostApiClient(_httpClient, rateLimiter);
+            var client = new ExchangeRateHostApi(_httpClient, rateLimiter);
             _registeredClients.Add(client);
         }
 
@@ -68,7 +56,7 @@ namespace PortEval.FinancialDataFetcher
         /// <param name="rateLimiter">Request rate limiter</param>
         public void AddTiingo(string apiKey, RateLimiter rateLimiter = null)
         {
-            var client = new TiingoApiClient(_httpClient, apiKey, rateLimiter);
+            var client = new TiingoApi(_httpClient, apiKey, rateLimiter);
             _registeredClients.Add(client);
         }
 
@@ -89,7 +77,7 @@ namespace PortEval.FinancialDataFetcher
                 To = TimeZoneInfo.ConvertTimeToUtc(to)
             };
 
-            return await ProcessRequest<IHistoricalDailyFinancialApiClient, HistoricalDailyInstrumentPricesRequest,
+            return await ProcessRequest<IHistoricalDailyFinancialApi, HistoricalDailyInstrumentPricesRequest,
                 IEnumerable<PricePoint>>(request);
         }
 
@@ -112,7 +100,7 @@ namespace PortEval.FinancialDataFetcher
                 Interval = interval
             };
 
-            return await ProcessRequest<IIntradayFinancialApiClient, IntradayPricesRequest, IEnumerable<PricePoint>>(request);
+            return await ProcessRequest<IIntradayFinancialApi, IntradayPricesRequest, IEnumerable<PricePoint>>(request);
         }
 
         /// <summary>
@@ -127,7 +115,7 @@ namespace PortEval.FinancialDataFetcher
                 Symbol = symbol
             };
 
-            return await ProcessRequest<ILatestPriceFinancialApiClient, LatestInstrumentPriceRequest, PricePoint>(request);
+            return await ProcessRequest<ILatestPriceFinancialApi, LatestInstrumentPriceRequest, PricePoint>(request);
         }
 
         /// <summary>
@@ -139,10 +127,10 @@ namespace PortEval.FinancialDataFetcher
         {
             var request = new LatestExchangeRatesRequest
             {
-                Symbol = baseCurrency
+                CurrencyCode = baseCurrency
             };
 
-            return await ProcessRequest<ILatestExchangeRatesFinancialApiClient, LatestExchangeRatesRequest,
+            return await ProcessRequest<ILatestExchangeRatesFinancialApi, LatestExchangeRatesRequest,
                 ExchangeRates>(request);
         }
 
@@ -157,12 +145,12 @@ namespace PortEval.FinancialDataFetcher
         {
             var request = new HistoricalDailyExchangeRatesRequest
             {
-                Symbol = baseCurrency,
+                CurrencyCode = baseCurrency,
                 From = TimeZoneInfo.ConvertTimeToUtc(from),
                 To = TimeZoneInfo.ConvertTimeToUtc(to)
             };
 
-            return await ProcessRequest<IHistoricalDailyExchangeRatesFinancialApiClient,
+            return await ProcessRequest<IHistoricalDailyExchangeRatesFinancialApi,
                 HistoricalDailyExchangeRatesRequest, IEnumerable<ExchangeRates>>(request);
         }
 
@@ -175,8 +163,8 @@ namespace PortEval.FinancialDataFetcher
         /// <typeparam name="TResult">Response data type</typeparam>
         /// <returns></returns>
         private async Task<Response<TResult>> ProcessRequest<TClient, TRequest, TResult>(TRequest request)
-            where TClient : class, IFinancialApiClient<TRequest, Response<TResult>>
-            where TRequest : Request
+            where TClient : class, IFinancialApi<TRequest, Response<TResult>>
+            where TRequest : IRequest
         {
             var eligibleApis = new List<TClient>();
             foreach (var client in _registeredClients)

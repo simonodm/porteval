@@ -7,15 +7,15 @@ namespace PortEval.FinancialDataFetcher.APIs.Interfaces
     /// <summary>
     /// Represents an API client.
     /// </summary>
-    public interface IFinancialApiClient { }
+    public interface IFinancialApi { }
 
     /// <summary>
     /// Represents an API client supporting a given request type.
     /// </summary>
     /// <typeparam name="TRequest">Request type which the client can process</typeparam>
     /// <typeparam name="TResponse">Response object type which the client returns for the given <c>TRequest</c></typeparam>
-    public interface IFinancialApiClient<TRequest, TResponse> : IFinancialApiClient
-        where TRequest : Request
+    public interface IFinancialApi<TRequest, TResponse> : IFinancialApi
+        where TRequest : IRequest
         where TResponse : IResponse
     {
         /// <summary>
