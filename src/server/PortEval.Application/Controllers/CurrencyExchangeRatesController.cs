@@ -25,11 +25,11 @@ namespace PortEval.Application.Controllers
 
         // GET: api/currencies/USD/exchange_rates?time=2021-01-01T12:00:00Z
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CurrencyExchangeRateDto>>> GetExchangeRates(string codeFrom, [FromQuery] DateTime time)
+        public async Task<ActionResult<IEnumerable<CurrencyExchangeRateDto>>> GetExchangeRates(string codeFrom, [FromQuery] DateTime? time)
         {
             _logger.LogInformation($"Requesting {codeFrom} exchange rates at {time}.");
 
-            var exchangeRates = await _exchangeRateQueries.GetExchangeRates(codeFrom, time);
+            var exchangeRates = await _exchangeRateQueries.GetExchangeRates(codeFrom, time ?? DateTime.Now);
             if (exchangeRates.Status == QueryStatus.NotFound)
             {
                 return NotFound($"Currency {codeFrom} not found.");
