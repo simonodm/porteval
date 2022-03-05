@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using PortEval.Domain.Models.Enums;
 
 namespace PortEval.FinancialDataFetcher.APIs.Tiingo
@@ -94,9 +93,9 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
         private async Task<Response<IEnumerable<PricePoint>>> GetTiingoIexHistoricalPrices(string symbol, DateTime from,
             DateTime to, IntradayInterval? interval = null)
         {
-            var startDate = from.ToString("yyyy-M-d");
-            var endDate = to.ToString("yyyy-M-d");
-            string resampleFreq = null;
+            var startDate = from.Date.AddDays(1).ToString("yyyy-M-d");
+            var endDate = to.Date.AddDays(1).ToString("yyyy-M-d");
+            string resampleFreq = "1day";
             if (interval != null)
             {
                 resampleFreq = interval == IntradayInterval.FiveMinutes ? "5min" : "60min";
@@ -107,6 +106,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
             urlBuilder.AddQueryParam("startDate", startDate);
             urlBuilder.AddQueryParam("endDate", endDate);
             urlBuilder.AddQueryParam("resampleFreq", resampleFreq);
+            urlBuilder.AddQueryParam("token", _apiKey);
 
             var result = await _httpClient.FetchJson<IEnumerable<TiingoPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
 
@@ -154,18 +154,19 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
         {
             var urlBuilder = new QueryUrlBuilder($"{TIINGO_CRYPTO_BASE_URL}/top");
             urlBuilder.AddQueryParam("tickers", ticker + currency);
+            urlBuilder.AddQueryParam("token", _apiKey);
 
-            var result = await _httpClient.FetchJson<TiingoCryptoTopPriceResponseModel>(urlBuilder.ToString(), _rateLimiter);
+            var result = await _httpClient.FetchJson<IEnumerable<TiingoCryptoTopPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
 
             return new Response<PricePoint>
             {
                 StatusCode = result.StatusCode,
                 ErrorMessage = result.ErrorMessage,
-                Result = result.Result != null 
+                Result = result.Result?.First()?.Data?.Any() != null
                     ? new PricePoint
                     {
                         CurrencyCode = "USD",
-                        Price = result.Result.Data.LastPrice,
+                        Price = result.Result.First().Data.First().LastPrice,
                         Symbol = ticker,
                         Time = DateTime.Now
                     }
@@ -176,27 +177,88 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
         private async Task<Response<IEnumerable<PricePoint>>> GetTiingoCryptoHistoricalPrices(string ticker, string currency,
             DateTime from, DateTime to, IntradayInterval? interval = null)
         {
-            var startDate = from.ToString("yyyy-M-d");
-            var endDate = to.ToString("yyyy-M-d");
+            // Tiingo crypto endpoint returns prices only in range startDate + (approximately) 5730 days, so multiple downloads need to be done in case
+            // endDate - startDate is longer than that range.
+
+            // The logic below downloads the prices iteratively, waiting for the previous download to finish to calculate the next time range to download. It keeps
+            // attempting to download such ranges until one of the following happens:
+            //  a) all the data until the end of the requested time range has been downloaded
+            //  b) last 2 downloaded price ranges ended on the same date and time (in case price data ends before the requested time range end)
+            //  c) a download fails
+            //
+            // After which it returns all the successfully retrieved prices.
+            //
+            // Specifically, if an attempted download is successful but returns empty data, there is a possibility d) that its range start + Tiingo date range limit
+            // is still earlier than the first available price data. In that case the algorithm below adds 5000 days to the current start date and attempts again until
+            // the end of the requested time range is reached (or a download succeeds).
+
+            var endDate = to.Date.AddDays(1).ToString("yyyy-M-d");
             string resampleFreq = "1day";
             if (interval != null)
             {
                 resampleFreq = interval == IntradayInterval.FiveMinutes ? "5min" : "60min";
             }
 
-            var urlBuilder = new QueryUrlBuilder($"{TIINGO_CRYPTO_BASE_URL}/prices");
-            urlBuilder.AddQueryParam("tickers", ticker + currency);
-            urlBuilder.AddQueryParam("startDate", startDate);
-            urlBuilder.AddQueryParam("endDate", endDate);
-            urlBuilder.AddQueryParam("resampleFreq", resampleFreq);
+            List<TiingoPriceResponseModel> prices = new List<TiingoPriceResponseModel>();
+            var lastPriceTime = from;
+            var anySuccessful = false;
+            var anyUnexpectedError = false;
 
-            var result = await _httpClient.FetchJson<TiingoCryptoPriceResponseModel>(urlBuilder.ToString(), _rateLimiter);
+            while (true)
+            {
+                var urlBuilder = new QueryUrlBuilder($"{TIINGO_CRYPTO_BASE_URL}/prices");
+                urlBuilder.AddQueryParam("tickers", ticker + currency);
+                urlBuilder.AddQueryParam("startDate", lastPriceTime.ToString("yyyy-M-d"));
+                urlBuilder.AddQueryParam("endDate", endDate);
+                urlBuilder.AddQueryParam("resampleFreq", resampleFreq);
+                urlBuilder.AddQueryParam("token", _apiKey);
+
+                var result = await _httpClient.FetchJson<IEnumerable<TiingoCryptoPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
+
+                if (result.StatusCode == StatusCode.Ok)
+                {
+                    anySuccessful = true;
+                    if (result.Result?.FirstOrDefault()?.Data?.FirstOrDefault() != null)
+                    {
+                        if (result.Result.First().Data.Last().Time == lastPriceTime) // b)
+                        {
+                            break;
+                        }
+
+                        prices.AddRange(result.Result.First().Data);
+                        lastPriceTime = prices[^1].Time;
+                        if (lastPriceTime >= to - ResampleFreqToTimeSpan(resampleFreq)) // a)
+                        {
+                            break;
+                        }
+                    }
+                    else if (prices.Count == 0 && lastPriceTime < to - TimeSpan.FromDays(5000)) // d)
+                    {
+                        lastPriceTime += TimeSpan.FromDays(5000);
+                    }
+                    else // c)
+                    {
+                        break;
+                    }
+                }
+                else // c)
+                {
+                    if (result.StatusCode == StatusCode.OtherError) anyUnexpectedError = true;
+                    break;
+                }
+            }
+
+            var resultStatusCode = StatusCode.Ok;
+            if (!anySuccessful)
+            {
+                resultStatusCode = !anyUnexpectedError ? StatusCode.OtherError : StatusCode.ConnectionError;
+            }
 
             return new Response<IEnumerable<PricePoint>>
             {
-                StatusCode = result.StatusCode,
-                ErrorMessage = result.ErrorMessage,
-                Result = result.Result?.Data
+                StatusCode = resultStatusCode,
+                ErrorMessage = anySuccessful ? "" : "An error has occurred",
+                Result = prices
                     .Where(price => price.Time >= from && price.Time <= to)
                     .Select(price => new PricePoint
                     {
@@ -206,6 +268,21 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                         Time = price.Time
                     })
             };
+        }
+
+        private TimeSpan ResampleFreqToTimeSpan(string resampleFreq)
+        {
+            switch (resampleFreq)
+            {
+                case "5min":
+                    return TimeSpan.FromMinutes(5);
+                case "60min":
+                    return TimeSpan.FromMinutes(60);
+                case "1day":
+                    return TimeSpan.FromDays(1);
+                default:
+                    throw new Exception($"Unrecognized resample frequency provided: {resampleFreq}.");
+            }
         }
     }
 }

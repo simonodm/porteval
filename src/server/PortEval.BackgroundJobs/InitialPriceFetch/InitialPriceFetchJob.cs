@@ -54,11 +54,11 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
             var fiveDaysCutoffDate = fetchStart - PriceUtils.FiveDays;
             var oneDayCutoffDate = fetchStart - PriceUtils.FiveDays;
 
-            var dailyPricesResponse = await _fetcher.GetHistoricalDailyPrices(instrument.Symbol, new DateTime(2000, 1, 1),
+            var dailyPricesResponse = await _fetcher.GetHistoricalDailyPrices(instrument, new DateTime(2000, 1, 1),
                 fiveDaysCutoffDate);
-            var hourlyPricesResponse = await _fetcher.GetIntradayPrices(instrument.Symbol, fiveDaysCutoffDate, oneDayCutoffDate,
+            var hourlyPricesResponse = await _fetcher.GetIntradayPrices(instrument, fiveDaysCutoffDate, oneDayCutoffDate,
                 IntradayInterval.OneHour);
-            var latestPricesResponse = await _fetcher.GetIntradayPrices(instrument.Symbol, oneDayCutoffDate, fetchStart,
+            var latestPricesResponse = await _fetcher.GetIntradayPrices(instrument, oneDayCutoffDate, fetchStart,
                 IntradayInterval.FiveMinutes);
 
             var allFetchedPrices = ConcatFetchedPrices(dailyPricesResponse, hourlyPricesResponse,

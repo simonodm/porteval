@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using PortEval.Domain.Models.Entities;
+using PortEval.Domain.Models.Enums;
 
 namespace PortEval.FinancialDataFetcher
 {
@@ -63,16 +65,18 @@ namespace PortEval.FinancialDataFetcher
         /// <summary>
         /// Retrieves historical daily prices of the supplied symbol in the supplied range.
         /// </summary>
-        /// <param name="symbol">Symbol to retrieve prices for.</param>
+        /// <param name="instrument">Instrument to retrieve prices for.</param>
         /// <param name="from">Date range start</param>
         /// <param name="to">Date range end</param>
         /// <returns>A Response object containing operation status and historical prices if the operation was successful.</returns>
-        public async Task<Response<IEnumerable<PricePoint>>> GetHistoricalDailyPrices(string symbol, DateTime from,
+        public async Task<Response<IEnumerable<PricePoint>>> GetHistoricalDailyPrices(Instrument instrument, DateTime from,
             DateTime to)
         {
             var request = new HistoricalDailyInstrumentPricesRequest
             {
-                Symbol = symbol,
+                Symbol = instrument.Symbol,
+                Type = instrument.Type,
+                CurrencyCode = instrument.CurrencyCode,
                 From = TimeZoneInfo.ConvertTimeToUtc(from),
                 To = TimeZoneInfo.ConvertTimeToUtc(to)
             };
@@ -84,17 +88,19 @@ namespace PortEval.FinancialDataFetcher
         /// <summary>
         /// Retrieves intraday prices of the supplied symbol in the supplied range.
         /// </summary>
-        /// <param name="symbol">Symbol to retrieve prices for</param>
+        /// <param name="instrument">Instrument to retrieve prices for.</param>
         /// <param name="from">Range start</param>
         /// <param name="to">Range end</param>
         /// <param name="interval">Interval between individual price points</param>
         /// <returns>A Response object containing operation status and intraday prices if the operation was successful.</returns>
-        public async Task<Response<IEnumerable<PricePoint>>> GetIntradayPrices(string symbol, DateTime from, DateTime to,
+        public async Task<Response<IEnumerable<PricePoint>>> GetIntradayPrices(Instrument instrument, DateTime from, DateTime to,
             IntradayInterval interval = IntradayInterval.OneHour)
         {
             var request = new IntradayPricesRequest
             {
-                Symbol = symbol,
+                Symbol = instrument.Symbol,
+                Type = instrument.Type,
+                CurrencyCode = instrument.CurrencyCode,
                 From = TimeZoneInfo.ConvertTimeToUtc(from),
                 To = TimeZoneInfo.ConvertTimeToUtc(to),
                 Interval = interval
@@ -106,13 +112,15 @@ namespace PortEval.FinancialDataFetcher
         /// <summary>
         /// Retrieves the latest price of the supplied symbol.
         /// </summary>
-        /// <param name="symbol">Symbol to fetch price for</param>
+        /// <param name="instrument">Instrument to retrieve prices for.</param>
         /// <returns>A Response object containing operation status and latest price point if the operation was successful.</returns>
-        public async Task<Response<PricePoint>> GetLatestInstrumentPrice(string symbol)
+        public async Task<Response<PricePoint>> GetLatestInstrumentPrice(Instrument instrument)
         {
             var request = new LatestInstrumentPriceRequest
             {
-                Symbol = symbol
+                Symbol = instrument.Symbol,
+                Type = instrument.Type,
+                CurrencyCode = instrument.CurrencyCode
             };
 
             return await ProcessRequest<ILatestPriceFinancialApi, LatestInstrumentPriceRequest, PricePoint>(request);

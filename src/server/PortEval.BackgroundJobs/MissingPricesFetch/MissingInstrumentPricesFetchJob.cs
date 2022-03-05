@@ -93,12 +93,12 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                 var intradayInterval = timeDifference <= TimeSpan.FromDays(1)
                     ? IntradayInterval.FiveMinutes
                     : IntradayInterval.OneHour;
-                fetchResult = await _fetcher.GetIntradayPrices(instrument.Symbol, range.From, range.To,
+                fetchResult = await _fetcher.GetIntradayPrices(instrument, range.From, range.To,
                     intradayInterval);
             }
             else
             {
-                fetchResult = await _fetcher.GetHistoricalDailyPrices(instrument.Symbol, range.From, range.To);
+                fetchResult = await _fetcher.GetHistoricalDailyPrices(instrument, range.From, range.To);
             }
 
             if (fetchResult.StatusCode != StatusCode.Ok) return;

@@ -15,7 +15,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo.Models
         public string BaseCurrency { get; set; }
 
         [JsonProperty("topOfBookData")]
-        public TiingoCryptoTopPriceDataResponseModel Data { get; set; }
+        public List<TiingoCryptoTopPriceDataResponseModel> Data { get; set; }
     }
 
     internal class TiingoCryptoTopPriceDataResponseModel
