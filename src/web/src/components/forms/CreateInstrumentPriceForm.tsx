@@ -36,7 +36,7 @@ export default function CreateInstrumentPriceForm({ instrumentId, onSuccess }: P
     return (
         <LoadingWrapper isLoaded={isLoaded}>
             <form onSubmit={handleSubmit}>
-                <NumberInput allowFloat allowNegativeValues label='Price'
+                <NumberInput allowFloat label='Price'
                     onChange={(newPrice) => setPrice(newPrice)} value={price}
                 />
                 <DateTimeSelector enableTime format='MMM dd, yyyy, HH:mm' label='Date'

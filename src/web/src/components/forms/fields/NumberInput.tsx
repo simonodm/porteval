@@ -16,28 +16,37 @@ export default function NumberInput(
     const [numberText, setNumberText] = useState(value?.toString() ?? '0');
     const [number, setNumber] = useState(value ?? 0);
 
-    const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let resultTextValue;
-        if(!allowNegativeValues) {
-            resultTextValue = e.target.value.replaceAll('-', '');
-        } else {
-            resultTextValue = e.target.value;
-        }
-        
-        setNumberText(resultTextValue);
-
-        let newNumber;
-        if(allowFloat) {
-            newNumber = parseFloat(resultTextValue);
-        } else {
-            newNumber = parseInt(resultTextValue);
-        }
+    const updateNumber = (value: string) => {
+        const newNumber = allowFloat ? parseFloat(value) : parseInt(value);
 
         if(!isNaN(newNumber)) {
             if(validator === undefined || validator(number)) {
                 setNumber(newNumber);
                 onChange && onChange(newNumber);
             }
+        }
+    }
+
+    const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
+        let inputRegexPattern = '\\d*';
+        let numberRegexPattern = '\\d*';
+        if(allowFloat) {
+            inputRegexPattern += '(\\.\\d*)?';
+            numberRegexPattern += '(\\.\\d+)?';
+        }
+        if(allowNegativeValues) {
+            inputRegexPattern = '-?' + inputRegexPattern;
+            numberRegexPattern = '-?' + numberRegexPattern;
+        }
+
+        const inputRegex = new RegExp(`^(${inputRegexPattern})?$`, 'g');
+        const numberRegex = new RegExp(`^${numberRegexPattern}$`, 'g');
+
+        if(inputRegex.test(e.target.value)) {
+            setNumberText(e.target.value);
+        }
+        if(numberRegex.test(e.target.value)) {
+            updateNumber(e.target.value);
         }
     }
 
@@ -56,7 +65,6 @@ export default function NumberInput(
                 disabled={disabled}
                 id={label?.toLowerCase().replaceAll(' ', '-')}
                 onChange={handleNumberChange}
-                type="number"
                 value={numberText}
             />
         </div>
