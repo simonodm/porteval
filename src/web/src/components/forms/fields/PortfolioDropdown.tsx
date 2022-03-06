@@ -4,12 +4,13 @@ import { Portfolio } from '../../../types';
 
 type Props = {
     portfolios: Array<Portfolio>;
+    className?: string;
     disabled?: boolean;
     value?: number;
     onChange?: (portfolioId: number) => void;
 }
 
-export default function PortfolioDropdown({ portfolios, disabled, value, onChange }: Props): JSX.Element {
+export default function PortfolioDropdown({ className, portfolios, disabled, value, onChange }: Props): JSX.Element {
     const [portfolioId, setPortfolioId] = useState(value);
 
     const handlePortfolioChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -34,7 +35,7 @@ export default function PortfolioDropdown({ portfolios, disabled, value, onChang
     }, [portfolios]);
 
     return (
-        <div className="form-group">
+        <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="portfolio">Portfolio:</label>
             <select className="form-control" disabled={disabled} id="portfolio"
                 onChange={handlePortfolioChange} value={portfolioId}

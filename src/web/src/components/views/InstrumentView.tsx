@@ -14,7 +14,7 @@ import { useDeleteInstrumentPriceMutation, useGetInstrumentByIdQuery, useGetInst
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
 
-import { getDateTimeLocaleString, getPerformanceString, getPriceString } from '../../utils/string';
+import { formatDateTimeString, getPerformanceString, getPriceString } from '../../utils/string';
 import * as constants from '../../constants';
 import PortEvalChart from '../charts/PortEvalChart';
 import ModalWrapper from '../modals/ModalWrapper';
@@ -25,6 +25,7 @@ import PageSelector from '../ui/PageSelector';
 import './InstrumentView.css';
 
 import CreateInstrumentPriceForm from '../forms/CreateInstrumentPriceForm';
+import useUserSettings from '../../hooks/useUserSettings';
 
 type Params = {
     instrumentId?: string;
@@ -47,6 +48,8 @@ export default function InstrumentView(): JSX.Element {
     );
     const currency = useGetCurrencyQuery(instrument.data?.currencyCode ?? skipToken)
     const [deletePrice, mutationStatus] = useDeleteInstrumentPriceMutation()
+
+    const [userSettings] = useUserSettings();
 
     const instrumentLoaded = checkIsLoaded(instrument, currentPrice);
     const instrumentError = checkIsError(instrument, currentPrice);
@@ -94,7 +97,15 @@ export default function InstrumentView(): JSX.Element {
                             </tr>
                             <tr>
                                 <td>Current price:</td>
-                                <td>{ getPriceString(currentPrice.data?.price, currency.data?.symbol) }</td>
+                                <td>
+                                    { 
+                                        getPriceString(
+                                            currentPrice.data?.price,
+                                            userSettings.decimalSeparator,
+                                            currency.data?.symbol
+                                        )
+                                    }
+                                </td>
                             </tr>
                             <tr>
                                 <td>Note:</td>
@@ -142,11 +153,29 @@ export default function InstrumentView(): JSX.Element {
                             <tbody>
                                 {prices.data?.data.map((price, index, array) => (
                                     <tr key={price.id}>
-                                        <td>{getDateTimeLocaleString(price.time)}</td>
-                                        <td>{getPriceString(price.price, currency.data?.symbol)}</td>
-                                        <td>{index < array.length - 1 ?
-                                                getPerformanceString(price.price / array[index + 1].price - 1) :
-                                                getPerformanceString(0)}
+                                        <td>
+                                            {
+                                                formatDateTimeString(
+                                                    price.time,
+                                                    userSettings.dateFormat + ' ' + userSettings.timeFormat
+                                                )
+                                            }
+                                        </td>
+                                        <td>
+                                            {
+                                                getPriceString(
+                                                    price.price,
+                                                    userSettings.decimalSeparator,
+                                                    currency.data?.symbol
+                                                )
+                                            }
+                                        </td>
+                                        <td>{index < array.length - 1
+                                                ? getPerformanceString(
+                                                    price.price / array[index + 1].price - 1,
+                                                    userSettings.decimalSeparator
+                                                )
+                                                : getPerformanceString(0, userSettings.decimalSeparator)}
                                         </td>
                                         <td>
                                             <button
@@ -178,7 +207,7 @@ export default function InstrumentView(): JSX.Element {
                     </div>
                 </div>
             </div>
-            <ModalWrapper closeModal={() => setModalIsOpen(false)} isOpen={modalIsOpen}>
+            <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Add new price" isOpen={modalIsOpen}>
                 { instrument.data &&
                     <CreateInstrumentPriceForm
                         instrumentId={instrument.data.id}

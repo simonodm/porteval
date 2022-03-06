@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 type Props = {
+    className?: string;
     label?: string;
     value?: number;
     disabled?: boolean;
@@ -11,17 +12,15 @@ type Props = {
 }
 
 export default function NumberInput(
-    { label, value, disabled, allowNegativeValues, allowFloat, validator, onChange }: Props
+    { className, label, value, disabled, allowNegativeValues, allowFloat, validator, onChange }: Props
 ): JSX.Element {
     const [numberText, setNumberText] = useState(value?.toString() ?? '0');
-    const [number, setNumber] = useState(value ?? 0);
 
     const updateNumber = (value: string) => {
         const newNumber = allowFloat ? parseFloat(value) : parseInt(value);
 
         if(!isNaN(newNumber)) {
-            if(validator === undefined || validator(number)) {
-                setNumber(newNumber);
+            if(validator === undefined || validator(newNumber)) {
                 onChange && onChange(newNumber);
             }
         }
@@ -29,7 +28,7 @@ export default function NumberInput(
 
     const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
         let inputRegexPattern = '\\d*';
-        let numberRegexPattern = '\\d*';
+        let numberRegexPattern = '\\d+';
         if(allowFloat) {
             inputRegexPattern += '(\\.\\d*)?';
             numberRegexPattern += '(\\.\\d+)?';
@@ -52,13 +51,18 @@ export default function NumberInput(
 
     useEffect(() => {
         if(value !== undefined) {
-            setNumberText(value.toString());
-            setNumber(value);
+            // Since JS differentiates between +0 and -0, this special check is enough
+            // to convert -0 to '-0' string (which naturally gets converted to '0' by .toString())
+            if(Object.is(value, -0)) {
+                setNumberText('-0');
+            } else {
+                setNumberText(value.toString());
+            }
         }
     }, [value]);
 
     return (
-        <div className="form-group">
+        <div className={`form-group ${className ?? ''}`}>
             <label htmlFor={label?.toLowerCase().replaceAll(' ', '-')}>{label}:</label>
             <input
                 className="form-control"

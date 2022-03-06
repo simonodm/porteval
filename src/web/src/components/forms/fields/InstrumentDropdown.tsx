@@ -4,6 +4,7 @@ import { Instrument } from '../../../types';
 
 type Props = {
     instruments: Array<Instrument>;
+    className?: string;
     value?: number;
     creatable?: boolean;
     disabled?: boolean;
@@ -13,7 +14,7 @@ type Props = {
 }
 
 export default function InstrumentDropdown(
-    { instruments, value, disabled, creatable, onCreate, onCancelCreate, onChange }: Props
+    { instruments, className, value, disabled, creatable, onCreate, onCancelCreate, onChange }: Props
 ): JSX.Element {
     const [instrumentId, setInstrumentId] = useState(value);
     const [creatingNew, setCreatingNew] = useState(false);
@@ -51,7 +52,7 @@ export default function InstrumentDropdown(
     }, [value]);
 
     return (
-        <div className="form-group">
+        <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="instrument">Instrument:</label>
             <select className="form-control" disabled={disabled || creatingNew} id="instrument"
                 onChange={handleInstrumentIdChange} value={instrumentId}

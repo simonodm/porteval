@@ -21,7 +21,7 @@ export default function InstrumentListView(): JSX.Element {
             <div className="col-xs-12 container-fluid">
                 <InstrumentsTable />
             </div>
-            <ModalWrapper closeModal={() => setModalIsOpen(false)} isOpen={modalIsOpen}>
+            <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Create new instrument" isOpen={modalIsOpen}>
                 <CreateInstrumentForm onSuccess={() => setModalIsOpen(false)} />
             </ModalWrapper>
         </Fragment>

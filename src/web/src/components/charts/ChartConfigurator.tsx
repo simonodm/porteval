@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 
-import DatePicker from 'react-datepicker';
-
 import { DateTime } from 'luxon';
 
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
@@ -14,6 +12,9 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './ChartConfigurator.css';
 import { camelToProperCase } from '../../utils/string';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
+import CurrencyDropdown from '../forms/fields/CurrencyDropdown';
+import DateTimeSelector from '../forms/fields/DateTimeSelector';
+import useUserSettings from '../../hooks/useUserSettings';
 
 type Props = {
     onChange?: (chart: ChartConfig) => void;
@@ -30,6 +31,8 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
         {unit: 'month', value: 6},
         {unit: 'year', value: 1}
     ];
+
+    const [userSettings] = useUserSettings();
 
     const context = useContext(ChartLineConfigurationContext);
 
@@ -67,9 +70,9 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
         }
     }
 
-    const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleCurrencyChange = (currencyCode: string) => {
         if(currentChart && isPriceDataChart(currentChart)) {
-            const newChart = {...currentChart, currencyCode: e.target.value};
+            const newChart = {...currentChart, currencyCode};
             setCurrentChart(newChart);
             onChange && onChange(newChart);
         }
@@ -83,12 +86,12 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
         }
     }
 
-    const handleStartDateChange = (date: Date) => {
+    const handleStartDateChange = (date: DateTime) => {
         if(currentChart) {
             const newChart: ChartConfig = {
                 ...currentChart,
                 isToDate: false,
-                dateRangeStart: date.toISOString(),
+                dateRangeStart: date.toISO(),
                 dateRangeEnd: currentChart.isToDate ? DateTime.now().toISO() : currentChart.dateRangeEnd
             }
             setCurrentChart(newChart);
@@ -96,15 +99,15 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
         }
     }
 
-    const handleEndDateChange = (date: Date) => {
+    const handleEndDateChange = (date: DateTime) => {
         if(currentChart) {
             const newChart: ChartConfig = {
                 ...currentChart,
                 isToDate: false,
                 dateRangeStart: currentChart.isToDate
-                    ? DateTime.fromJSDate(date).minus({ months: 1 }).toISO()
+                    ? date.minus({ months: 1 }).toISO()
                     : currentChart.dateRangeStart,
-                dateRangeEnd: date.toISOString()
+                dateRangeEnd: date.toISO()
             }
             setCurrentChart(newChart);
             onChange && onChange(newChart);
@@ -142,18 +145,12 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                     {
                         isPriceDataChart(currentChart) 
                             &&
-                            <span className="chart-configurator-setting">
-                                <label htmlFor="chart-currency">Currency:</label>
-                                <select className="form-select" id="chart-currency" onChange={handleCurrencyChange}>
-                                    {currencies.data?.map(currency =>
-                                        <option
-                                            key={currency.code}
-                                            selected={currentChart.currencyCode === currency.code}
-                                            value={currency.code}
-                                        >{currency.code}
-                                        </option>)}
-                                </select>
-                            </span>
+                            <CurrencyDropdown
+                                className='chart-configurator-setting'
+                                currencies={currencies.data ?? []}
+                                onChange={handleCurrencyChange}
+                                value={currentChart.currencyCode}
+                            />
                     }
                     {
                         currentChart && isAggregatedChart(currentChart)
@@ -173,34 +170,26 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                                 </select>
                             </span>
                     }
-                    <span className="chart-configurator-setting">
-                        <label htmlFor="chart-date-start">Range start:</label>
-                        <DatePicker 
-                            id="chart-date-start"
-                            onChange={handleStartDateChange}
-                            popperClassName="chart-datepicker-popper"
-                            selected={
-                                currentChart.isToDate
-                                    ? undefined
-                                    : DateTime.fromISO(currentChart.dateRangeStart).toJSDate()
-                            }
-                            wrapperClassName="chart-datepicker-wrapper"
-                        />
-                    </span>
-                    <span className="chart-configurator-setting">
-                        <label htmlFor="chart-date-end">Range end:</label>
-                        <DatePicker 
-                            id="chart-date-end"
-                            onChange={handleEndDateChange}
-                            popperClassName="chart-datepicker-popper"
-                            selected={
-                                currentChart.isToDate
-                                    ? undefined
-                                    : DateTime.fromISO(currentChart.dateRangeEnd).toJSDate()
-                            }
-                            wrapperClassName="chart-datepicker-wrapper"
-                        />
-                    </span>
+                    <DateTimeSelector
+                        className='chart-configurator-setting'
+                        dateFormat={userSettings.dateFormat}
+                        label='Range start'
+                        onChange={handleStartDateChange}
+                        timeFormat={userSettings.timeFormat}
+                        value={currentChart.isToDate
+                            ? undefined
+                            : DateTime.fromISO(currentChart.dateRangeStart)}
+                    />
+                    <DateTimeSelector
+                        className='chart-configurator-setting'
+                        dateFormat={userSettings.dateFormat}
+                        label='Range start'
+                        onChange={handleEndDateChange}
+                        timeFormat={userSettings.timeFormat}
+                        value={currentChart.isToDate
+                            ? undefined
+                            : DateTime.fromISO(currentChart.dateRangeEnd)}
+                    />
                     <span className="chart-configurator-setting">
                         <label htmlFor="to-date-range">To-date range</label>
                         <div id="to-date-range">

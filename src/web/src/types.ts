@@ -243,3 +243,9 @@ export type ChartLineConfigurationContextType = {
     configureLine: (line: ChartLine) => void;
     removeLine: (line: ChartLine) => void;
 }
+
+export type UserSettings = {
+    dateFormat: string;
+    timeFormat: string;
+    decimalSeparator: string;
+}

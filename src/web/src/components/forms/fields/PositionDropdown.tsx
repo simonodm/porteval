@@ -4,12 +4,13 @@ import { Position } from '../../../types';
 
 type Props = {
     positions: Array<Position>;
+    className?: string;
     disabled?: boolean;
     value?: number;
     onChange?: (positionId: number) => void;
 }
 
-export default function PositionDropdown({ positions, disabled, value, onChange }: Props): JSX.Element {
+export default function PositionDropdown({ positions, className, disabled, value, onChange }: Props): JSX.Element {
     const [positionId, setPositionId] = useState(value ?? (positions.length > 0 ? positions[0].id : undefined));
 
     const handlePositionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -34,7 +35,7 @@ export default function PositionDropdown({ positions, disabled, value, onChange 
     }, [positions]);
 
     return (
-        <div className="form-group">
+        <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="position">Instrument:</label>
             <select className="form-control" disabled={disabled} id="portfolio-position"
                 onChange={handlePositionChange} value={positionId}

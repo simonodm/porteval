@@ -4,7 +4,7 @@ import { DateTime, Duration } from 'luxon';
 import { DEFAULT_CHART_TODATE_RANGE, CHART_TRANSACTION_SIGN_CIRCLE_RADIUS,
     CHART_TRANSACTION_SIGN_SIZE } from '../constants';
 import { ChartConfig, AggregationFrequency, ChartLine, ChartLineDashType,
-    ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction } from '../types';
+    ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction, UserSettings } from '../types';
 import { Line, XAxisInterval } from '../components/charts/LineChart';
 
 import { RenderedDataPointInfo } from './lineChart';
@@ -174,7 +174,7 @@ export function generateDefaultPositionChart(position: Position): ChartConfig {
 }
 
 export function generateTooltipTransactionList(
-    lines: Array<LineWithTransactions>, from: string | undefined, to: string | undefined
+    settings: UserSettings, lines: Array<LineWithTransactions>, from: string | undefined, to: string | undefined
 ): HTMLElement | null {
     let transactions = lines.reduce<Array<Transaction>>((prev, curr) => {
         return prev.concat(findLineTransactionsInRange(curr.transactions, from, to));
@@ -197,7 +197,7 @@ export function generateTooltipTransactionList(
             const isPurchase = transaction.amount > 0;
             transactionRowElement.innerHTML = 
                 `${isPurchase ? 'BUY' : 'SELL'} ${Math.abs(transaction.amount)} ` +
-                `${transaction.instrument.symbol} @ ${getPriceString(transaction.price)}`;
+                `${transaction.instrument.symbol} @ ${getPriceString(transaction.price, settings.decimalSeparator)}`;
             transactionsList.append(transactionRowElement);
         });
 

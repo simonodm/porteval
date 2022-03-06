@@ -9,6 +9,8 @@ import useInstrumentPriceAutoFetchingState from '../../hooks/useInstrumentPriceA
 
 import { useAddTransactionMutation } from '../../redux/api/transactionApi';
 
+import useUserSettings from '../../hooks/useUserSettings';
+
 import NumberInput from './fields/NumberInput';
 import DateTimeSelector from './fields/DateTimeSelector';
 import TextInput from './fields/TextInput';
@@ -22,6 +24,8 @@ export default function CreateTransactionForm({ positionId, onSuccess }: Props):
     const [amount, setAmount] = useState<number>(1);
     const [time, setTime] = useState(DateTime.now());
     const [note, setNote] = useState('');
+
+    const [userSettings] = useUserSettings();
 
     const [
         price,
@@ -82,8 +86,8 @@ export default function CreateTransactionForm({ positionId, onSuccess }: Props):
                 <NumberInput allowFloat label='Price' onChange={handlePriceChange}
                     value={price}
                 />
-                <DateTimeSelector format='MMM dd, yyyy, HH:mm' label='Date' onChange={handleTimeChange}
-                    timeInterval={1} value={time}
+                <DateTimeSelector dateFormat={userSettings.dateFormat} label='Date' onChange={handleTimeChange}
+                    timeFormat={userSettings.timeFormat} timeInterval={1} value={time}
                 />
                 <TextInput label='Note' onChange={handleNoteChange} value={note} />
                 <button 

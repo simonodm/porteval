@@ -47,7 +47,9 @@ export default function PortfolioPicker(): JSX.Element {
                     )
                 })}
             </LoadingWrapper>
-            <ModalWrapper closeModal={() => setModalIsOpen(false)} isOpen={modalIsOpen}>
+            <ModalWrapper closeModal={() => setModalIsOpen(false)} heading={`Select ${modalPortfolio?.name} positions`}
+                isOpen={modalIsOpen}
+            >
                 {
                     modalPortfolio && <ChartPortfolioConfigurator portfolio={modalPortfolio} />
                 }

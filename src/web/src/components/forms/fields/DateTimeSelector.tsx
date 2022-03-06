@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { DateTime } from 'luxon';
 import DatePicker from 'react-datepicker';
 
-import { DEFAULT_DT_SELECTOR_FORMAT } from '../../../constants';
-
 type Props = {
     label: string;
+    className?: string;
+    dateFormat?: string;
+    timeFormat?: string;
     disabled?: boolean;
-    format?: string;
     enableTime?: boolean;
     timeInterval?: number;
     value?: DateTime;
@@ -16,7 +16,9 @@ type Props = {
 
 export default function DateTimeSelector({
     label,
-    format,
+    className,
+    dateFormat,
+    timeFormat,
     enableTime,
     disabled,
     timeInterval,
@@ -31,6 +33,8 @@ export default function DateTimeSelector({
         setTime(convertedDT);
         onChange && onChange(convertedDT);
     }
+
+    console.log(timeFormat);
     
     useEffect(() => {
         if(value !== undefined) {
@@ -39,15 +43,16 @@ export default function DateTimeSelector({
     }, [value]);
 
     return (
-        <div className="form-group">
+        <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="date">{label}:</label>
             <DatePicker
-                dateFormat={format ?? DEFAULT_DT_SELECTOR_FORMAT}
+                dateFormat={dateFormat && timeFormat ? dateFormat + ' ' + timeFormat : undefined}
                 disabled={disabled}
                 id="date"
                 onChange={handleTimeChange}
                 selected={time.toJSDate()}
                 showTimeSelect={!!enableTime}
+                timeFormat={timeFormat}
                 timeIntervals={timeInterval ?? 5}
             />
         </div>

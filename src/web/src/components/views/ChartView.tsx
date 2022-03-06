@@ -151,6 +151,7 @@ export default function ChartView(): JSX.Element {
         const onSuccess = () => {
             toast.success('Saved');
             setIsChanged(false);
+            setEditModalIsOpen(false);
         }
 
         if(!chartId) {
@@ -211,7 +212,11 @@ export default function ChartView(): JSX.Element {
                             <PortfolioPicker />
                             <InstrumentPicker />
                         </div>
-                        <ModalWrapper closeModal={() => setLineModalIsOpen(false)} isOpen={lineModalIsOpen}>
+                        <ModalWrapper
+                            closeModal={() => setLineModalIsOpen(false)}
+                            heading={`Configure line ${modalLine?.name ?? ''}`} 
+                            isOpen={lineModalIsOpen}
+                        >
                             {
                                 modalLine &&
                                     <ChartLineConfigurator
@@ -220,7 +225,11 @@ export default function ChartView(): JSX.Element {
                                     />
                             }
                         </ModalWrapper>
-                        <ModalWrapper closeModal={() => setEditModalIsOpen(false)} isOpen={editModalIsOpen}>
+                        <ModalWrapper
+                            closeModal={() => setEditModalIsOpen(false)}
+                            heading="Edit chart info"
+                            isOpen={editModalIsOpen}
+                        >
                             <EditChartMetaForm chart={chart} onSave={handleEditSave} />
                         </ModalWrapper>
                     </div>

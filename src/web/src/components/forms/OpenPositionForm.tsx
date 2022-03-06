@@ -14,6 +14,8 @@ import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 
 import { useAddPositionMutation } from '../../redux/api/positionApi';
 
+import useUserSettings from '../../hooks/useUserSettings';
+
 import InstrumentDropdown from './fields/InstrumentDropdown';
 
 import TextInput from './fields/TextInput';
@@ -54,6 +56,8 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
     ] = useInstrumentPriceAutoFetchingState(instrumentId, DateTime.now());
 
     const [positionNote, setPositionNote] = useState('');
+
+    const [userSettings] = useUserSettings();
 
     const isLoaded = checkIsLoaded(instruments, currencies, instrumentMutationStatus, positionMutationStatus);
     const isError = checkIsError(instruments, currencies);
@@ -176,8 +180,9 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
                 <NumberInput allowFloat label='Price' onChange={setPrice}
                     value={price}
                 />
-                <DateTimeSelector enableTime format='MMM dd, yyyy, HH:mm' label='Date'
-                    onChange={handleTimeChange} timeInterval={1} value={time}
+                <DateTimeSelector dateFormat={userSettings.dateFormat} enableTime label='Date'
+                    onChange={handleTimeChange} timeFormat={userSettings.timeFormat} timeInterval={1}
+                    value={time}
                 />
                 <TextInput label='Note' onChange={setPositionNote} value={positionNote} />
                 <button 

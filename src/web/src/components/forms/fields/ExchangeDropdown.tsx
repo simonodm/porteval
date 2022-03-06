@@ -4,6 +4,7 @@ import CreatableSelect from 'react-select/creatable';
 import { Exchange } from '../../../types';
 
 type Props = {
+    className?: string;
     value?: Exchange,
     disabled?: boolean;
     exchanges: Array<Exchange>
@@ -15,7 +16,7 @@ type Option = {
     value: string;
 }
 
-export default function ExchangeDropdown({ value, disabled, exchanges, onChange }: Props): JSX.Element {
+export default function ExchangeDropdown({ className, value, disabled, exchanges, onChange }: Props): JSX.Element {
     const [exchange, setExchange] = useState(value);
 
     const handleExchangeChange = (newValue: Option | null) => {
@@ -38,7 +39,7 @@ export default function ExchangeDropdown({ value, disabled, exchanges, onChange 
     }
 
     return (
-        <div className="form-group">
+        <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="exchange">Exchange:</label>
             <CreatableSelect
                 id="exchange"

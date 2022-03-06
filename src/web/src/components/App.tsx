@@ -15,7 +15,6 @@ import Dashboard from './views/Dashboard';
 import InstrumentView from './views/InstrumentView';
 import InstrumentListView from './views/InstrumentListView';
 import PortfolioListView from './views/PortfolioListView';
-import SettingsView from './views/SettingsView';
 import PortfolioView from './views/PortfolioView';
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -24,6 +23,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import ChartListView from './views/ChartListView';
 import ChartView from './views/ChartView';
+import CurrenciesView from './views/CurrenciesView';
+import SettingsView from './views/SettingsView';
 
 export default function App(): JSX.Element {
     return (
@@ -54,6 +55,9 @@ export default function App(): JSX.Element {
                             </Route>
                             <Route path="/charts">
                                 <ChartListView />
+                            </Route>
+                            <Route path="/currencies">
+                                <CurrenciesView />
                             </Route>
                             <Route path="/settings">
                                 <SettingsView />

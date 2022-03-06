@@ -7,6 +7,8 @@ import LoadingWrapper from '../ui/LoadingWrapper';
 
 import { Transaction } from '../../types';
 
+import useUserSettings from '../../hooks/useUserSettings';
+
 import DateTimeSelector from './fields/DateTimeSelector';
 import NumberInput from './fields/NumberInput';
 import TextInput from './fields/TextInput';
@@ -19,6 +21,8 @@ type Props = {
 export default function EditTransactionForm({ transaction, onSuccess }: Props): JSX.Element {
     const [note, setNote] = useState(transaction.note);
     const [updateTransaction, mutationStatus] = useUpdateTransactionMutation();
+
+    const [userSettings] = useUserSettings();
 
     const isLoaded = checkIsLoaded(mutationStatus);
     const isError= checkIsError(mutationStatus);
@@ -45,8 +49,8 @@ export default function EditTransactionForm({ transaction, onSuccess }: Props): 
                 <NumberInput allowFloat disabled label='Price'
                     value={transaction.price}
                 />
-                <DateTimeSelector disabled format='MMM dd, yyyy, HH:mm' label='Date'
-                    timeInterval={1} value={DateTime.fromISO(transaction.time)}
+                <DateTimeSelector dateFormat={userSettings.dateFormat} disabled label='Date'
+                    timeFormat={userSettings.timeFormat} timeInterval={1} value={DateTime.fromISO(transaction.time)}
                 />
                 <TextInput label='Note' onChange={handleNoteChange} value={note} />
                 <button 

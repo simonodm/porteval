@@ -18,6 +18,8 @@ import { generateDefaultPortfolioChart } from '../../utils/chart';
 import EditPortfolioForm from '../forms/EditPortfolioForm';
 import OpenPositionForm from '../forms/OpenPositionForm';
 
+import useUserSettings from '../../hooks/useUserSettings';
+
 import PositionRows from './PositionRows';
 
 type Props = {
@@ -38,6 +40,8 @@ export default function PortfolioRow({ portfolio }: Props): JSX.Element {
     const [portfolioExpanded, setPortfolioExpanded] = useState(false);
     const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
     const [updateModalIsOpen, setUpdateModalIsOpen] = useState(false);
+
+    const [userSettings] = useUserSettings();
 
     const isLoaded = checkIsLoaded(currency, profitData, performanceData);
     const isError = checkIsError(currency, profitData, performanceData);
@@ -60,42 +64,45 @@ export default function PortfolioRow({ portfolio }: Props): JSX.Element {
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPriceString(profitData.lastDay, currency.data?.symbol)}</>
+                        <>{getPriceString(profitData.lastDay, userSettings.decimalSeparator, currency.data?.symbol)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPriceString(profitData.lastWeek, currency.data?.symbol)}</>
+                        <>{getPriceString(profitData.lastWeek, userSettings.decimalSeparator, currency.data?.symbol)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPriceString(profitData.lastMonth, currency.data?.symbol)}</>
+                        <>
+                            {getPriceString(profitData.lastMonth, userSettings.decimalSeparator,
+                                currency.data?.symbol)}
+                        </>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPriceString(profitData.total, currency.data?.symbol)}</>
+                        <>{getPriceString(profitData.total, userSettings.decimalSeparator, currency.data?.symbol)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPerformanceString(performanceData.lastDay)}</>
+                        <>{getPerformanceString(performanceData.lastDay, userSettings.decimalSeparator)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPerformanceString(performanceData.lastWeek)}</>
+                        <>{getPerformanceString(performanceData.lastWeek, userSettings.decimalSeparator)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPerformanceString(performanceData.lastMonth)}</>
+                        <>{getPerformanceString(performanceData.lastMonth, userSettings.decimalSeparator)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPerformanceString(performanceData.total)}</>
+                        <>{getPerformanceString(performanceData.total, userSettings.decimalSeparator)}</>
                     </LoadingWrapper>
                 </td>
                 <td></td>
@@ -118,9 +125,11 @@ export default function PortfolioRow({ portfolio }: Props): JSX.Element {
                         to={{pathname: '/charts/view', state: {chart: generateDefaultPortfolioChart(portfolio)}}}
                     >Chart
                     </NavLink>
-                    <button className="btn btn-danger btn-extra-sm" onClick={() => {
- deletePortfolio(portfolio.id); setIsRemoved(true) 
-}} role="button"
+                    <button className="btn btn-danger btn-extra-sm"
+                        onClick={() => {
+                            deletePortfolio(portfolio.id); setIsRemoved(true) 
+                        }}
+                        role="button"
                     >Remove
                     </button>
                 </td>
@@ -128,10 +137,14 @@ export default function PortfolioRow({ portfolio }: Props): JSX.Element {
             { portfolioExpanded &&
                 <PositionRows portfolioId={portfolio.id} />
             }
-            <ModalWrapper closeModal={() => setCreateModalIsOpen(false)} isOpen={createModalIsOpen}>
+            <ModalWrapper closeModal={() => setCreateModalIsOpen(false)} heading="Open new position"
+                isOpen={createModalIsOpen}
+            >
                 <OpenPositionForm onSuccess={() => setCreateModalIsOpen(false)} portfolioId={portfolio.id} />
             </ModalWrapper>
-            <ModalWrapper closeModal={() => setUpdateModalIsOpen(false)} isOpen={updateModalIsOpen}>
+            <ModalWrapper closeModal={() => setUpdateModalIsOpen(false)} heading={`Edit ${portfolio.name}`}
+                isOpen={updateModalIsOpen}
+            >
                 <EditPortfolioForm onSuccess={() => setUpdateModalIsOpen(false)} portfolio={portfolio} />
             </ModalWrapper>
         </>

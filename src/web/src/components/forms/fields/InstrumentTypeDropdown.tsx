@@ -4,12 +4,13 @@ import { InstrumentType } from '../../../types';
 import * as constants from '../../../constants';
 
 type Props = {
+    className?: string;
     value?: InstrumentType;
     disabled?: boolean;
     onChange?: (type: InstrumentType) => void;
 }
 
-export default function InstrumentTypeDropdown({ value, disabled, onChange }: Props): JSX.Element {
+export default function InstrumentTypeDropdown({ className, value, disabled, onChange }: Props): JSX.Element {
     const types: Array<InstrumentType> =
         ['stock', 'bond', 'mutualFund', 'commodity', 'cryptoCurrency', 'etf', 'index', 'other']
     const [type, setType] = useState<InstrumentType>(value ?? 'stock');
@@ -34,7 +35,7 @@ export default function InstrumentTypeDropdown({ value, disabled, onChange }: Pr
     }, [])
 
     return (
-        <div className="form-group">
+        <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="instrument-type">Type:</label>
             <select
                 className="form-control"

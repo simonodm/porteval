@@ -17,6 +17,8 @@ import { generateDefaultPositionChart } from '../../utils/chart';
 import CreateTransactionForm from '../forms/CreateTransactionForm';
 import EditPositionForm from '../forms/EditPositionForm';
 
+import useUserSettings from '../../hooks/useUserSettings';
+
 import TransactionsTable from './TransactionsTable';
 
 type Props = {
@@ -37,6 +39,8 @@ export default function PositionRow({ position }: Props): JSX.Element {
     const [instrumentExpanded, setInstrumentExpanded] = useState(false);
     const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
     const [updateModalIsOpen, setUpdateModalIsOpen] = useState(false);
+
+    const [userSettings] = useUserSettings();
 
     const isLoaded = checkIsLoaded(currency, profitData, performanceData);
     const isError = checkIsError(currency, profitData, performanceData);
@@ -61,42 +65,45 @@ export default function PositionRow({ position }: Props): JSX.Element {
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPriceString(profitData.lastDay, currency.data?.symbol)}</>
+                        <>{getPriceString(profitData.lastDay, userSettings.decimalSeparator, currency.data?.symbol)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPriceString(profitData.lastWeek, currency.data?.symbol)}</>
+                        <>{getPriceString(profitData.lastWeek, userSettings.decimalSeparator, currency.data?.symbol)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPriceString(profitData.lastMonth, currency.data?.symbol)}</>
+                        <>
+                            {getPriceString(profitData.lastMonth, userSettings.decimalSeparator,
+                                currency.data?.symbol)}
+                        </>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPriceString(profitData.total, currency.data?.symbol)}</>
+                        <>{getPriceString(profitData.total, userSettings.decimalSeparator, currency.data?.symbol)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPerformanceString(performanceData.lastDay)}</>
+                        <>{getPerformanceString(performanceData.lastDay, userSettings.decimalSeparator)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPerformanceString(performanceData.lastWeek)}</>
+                        <>{getPerformanceString(performanceData.lastWeek, userSettings.decimalSeparator)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPerformanceString(performanceData.lastMonth)}</>
+                        <>{getPerformanceString(performanceData.lastMonth, userSettings.decimalSeparator)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPerformanceString(performanceData.total)}</>
+                        <>{getPerformanceString(performanceData.total, userSettings.decimalSeparator)}</>
                     </LoadingWrapper>
                 </td>
                 <td></td>
@@ -139,10 +146,16 @@ export default function PositionRow({ position }: Props): JSX.Element {
                     </td>
                 </tr>
             }
-            <ModalWrapper closeModal={() => setCreateModalIsOpen(false)} isOpen={createModalIsOpen}>
+            <ModalWrapper closeModal={() => setCreateModalIsOpen(false)} heading="Add new transaction"
+                isOpen={createModalIsOpen}
+            >
                 <CreateTransactionForm onSuccess={() => setCreateModalIsOpen(false)} positionId={position.id} />
             </ModalWrapper>
-            <ModalWrapper closeModal={() => setUpdateModalIsOpen(false)} isOpen={updateModalIsOpen}>
+            <ModalWrapper
+                closeModal={() => setUpdateModalIsOpen(false)}
+                heading={`Edit position ${position.instrument.symbol}.`}
+                isOpen={updateModalIsOpen}
+            >
                 <EditPositionForm onSuccess={() => setUpdateModalIsOpen(false)} position={position} />
             </ModalWrapper>
         </>

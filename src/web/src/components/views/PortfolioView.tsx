@@ -20,6 +20,7 @@ import * as constants from '../../constants';
 import PortEvalChart from '../charts/PortEvalChart';
 import { generateDefaultPortfolioChart } from '../../utils/chart';
 import PageHeading from '../ui/PageHeading';
+import useUserSettings from '../../hooks/useUserSettings';
 
 type Params = {
     portfolioId?: string;
@@ -34,6 +35,8 @@ export default function PortfolioView(): JSX.Element {
     const currency = useGetCurrencyQuery(portfolio.data?.currencyCode ?? skipToken);
     const profitData = useGetPortfolioToDateProfitsQueryWrapper(portfolioId);
     const performanceData = useGetPortfolioToDatePerformanceQueryWrapper(portfolioId);
+
+    const [userSettings] = useUserSettings();
 
     const isLoaded = checkIsLoaded(portfolio, value);
     const isError = checkIsError(portfolio, value);
@@ -55,30 +58,81 @@ export default function PortfolioView(): JSX.Element {
                                 </tr>
                                 <tr>
                                     <td>Current value:</td>
-                                    <td>{getPriceString(value.data?.value, currency.data?.symbol)}</td>
+                                    <td>
+                                        {
+                                            getPriceString(
+                                                value.data?.value,
+                                                userSettings.decimalSeparator,
+                                                currency.data?.symbol)
+                                        }
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Total profit:</td>
-                                    <td>{getPriceString(profitData.total, currency.data?.symbol)}</td>
+                                    <td>
+                                        {
+                                            getPriceString(
+                                                profitData.total,
+                                                userSettings.decimalSeparator,
+                                                currency.data?.symbol
+                                            )
+                                        }
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Total performance:</td>
-                                    <td>{getPerformanceString(performanceData.total)}</td>
+                                    <td>
+                                        {
+                                            getPerformanceString(performanceData.total, userSettings.decimalSeparator)
+                                        }
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Daily/weekly/monthly profit:</td>
                                     <td>
-                                        {getPriceString(profitData.lastDay, currency.data?.symbol) + ' / '}
-                                        {getPriceString(profitData.lastWeek, currency.data?.symbol) + ' / '}
-                                        {getPriceString(profitData.lastMonth, currency.data?.symbol)}
+                                        {
+                                            getPriceString(profitData.lastDay,
+                                                userSettings.decimalSeparator,
+                                                currency.data?.symbol
+                                            ) + ' / '
+                                        }
+                                        {
+                                            getPriceString(
+                                                profitData.lastWeek,
+                                                userSettings.decimalSeparator,
+                                                currency.data?.symbol
+                                            ) + ' / '
+                                        }
+                                        {
+                                            getPriceString(
+                                                profitData.lastMonth,
+                                                userSettings.decimalSeparator,
+                                                currency.data?.symbol
+                                            )
+                                        }
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Daily/weekly/monthly performance:</td>
                                     <td>
-                                        {getPerformanceString(performanceData.lastDay) + ' / '}
-                                        {getPerformanceString(performanceData.lastWeek) + ' / '}
-                                        {getPerformanceString(performanceData.lastMonth)}
+                                        {
+                                            getPerformanceString(
+                                                performanceData.lastDay,
+                                                userSettings.decimalSeparator
+                                            ) + ' / '
+                                        }
+                                        {
+                                            getPerformanceString(
+                                                performanceData.lastWeek,
+                                                userSettings.decimalSeparator
+                                            ) + ' / '
+                                        }
+                                        {
+                                            getPerformanceString(
+                                                performanceData.lastMonth,
+                                                userSettings.decimalSeparator
+                                            )
+                                        }
                                     </td>
                                 </tr>
                                 <tr>

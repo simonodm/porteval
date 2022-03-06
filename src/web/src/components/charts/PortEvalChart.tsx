@@ -13,6 +13,8 @@ import { convertDashToStrokeDashArray, calculateXAxisInterval, getChartDateRange
 import { useGetChartDataQuery, useGetChartTransactionsQuery } from '../../redux/api/chartApi';
 import { RenderedDataPointInfo } from '../../utils/lineChart';
 
+import useUserSettings from '../../hooks/useUserSettings';
+
 import LineChart from './LineChart';
 
 type Props = {
@@ -26,6 +28,8 @@ export default function PortEvalChart({ chart }: Props): JSX.Element {
     const chartData = useGetChartDataQuery({ chart, frequency, from: from.toISO(), to: to.toISO() });
     const transactionData = useGetChartTransactionsQuery({ chart, from: from.toISO(), to: to.toISO() });
     const currency = useGetCurrencyQuery(isPriceDataChart(chart) ? chart.currencyCode : skipToken);
+
+    const [userSettings] = useUserSettings();
 
     const lines = chart.lines.map((line, idx) => ({
         name: line.name,
@@ -43,12 +47,13 @@ export default function PortEvalChart({ chart }: Props): JSX.Element {
 
     const config = {
         yFormat: isPriceDataChart(chart)
-            ? (yValue: number) => getPriceString(yValue, currency.data?.symbol)
+            ? (yValue: number) => getPriceString(yValue, userSettings.decimalSeparator, currency.data?.symbol)
             : (yValue: number) => getPerformanceString(yValue),
         xFormat: getXAxisD3Format(from, to),
         xInterval: calculateXAxisInterval(from, to),
         tooltipCallback: transactionData?.data
-            ? (from: string | undefined, to: string | undefined) => generateTooltipTransactionList(lines, from, to)
+            ? (from: string | undefined, to: string | undefined) =>
+                generateTooltipTransactionList(userSettings, lines, from, to)
             : () => null,
         additionalRenderCallback: transactionSignRenderCallback
     };

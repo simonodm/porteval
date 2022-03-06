@@ -7,6 +7,8 @@ import { checkIsLoaded, onSuccessfulResponse } from '../../utils/queries';
 
 import LoadingWrapper from '../ui/LoadingWrapper';
 
+import useUserSettings from '../../hooks/useUserSettings';
+
 import DateTimeSelector from './fields/DateTimeSelector';
 import NumberInput from './fields/NumberInput';
 
@@ -20,6 +22,8 @@ export default function CreateInstrumentPriceForm({ instrumentId, onSuccess }: P
 
     const [price, setPrice] = useState(0);
     const [time, setTime] = useState(DateTime.now());
+
+    const [userSettings] = useUserSettings();
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         addPrice({
@@ -39,8 +43,14 @@ export default function CreateInstrumentPriceForm({ instrumentId, onSuccess }: P
                 <NumberInput allowFloat label='Price'
                     onChange={(newPrice) => setPrice(newPrice)} value={price}
                 />
-                <DateTimeSelector enableTime format='MMM dd, yyyy, HH:mm' label='Date'
-                    onChange={(newTime) => setTime(newTime)} timeInterval={1} value={time}
+                <DateTimeSelector
+                    dateFormat={userSettings.dateFormat}
+                    enableTime
+                    label='Date'
+                    onChange={(newTime) => setTime(newTime)}
+                    timeFormat={userSettings.timeFormat}
+                    timeInterval={1}
+                    value={time}
                 /> 
                 <button className="btn btn-primary" role="button">Save</button>
             </form>

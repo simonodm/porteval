@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 type Props = {
     label: string;
+    className?: string;
     placeholder?: string;
     disabled?: boolean;
     value?: string;
@@ -9,7 +10,9 @@ type Props = {
     onChange?: (value: string) => void;
 }
 
-export default function TextInput({ label, placeholder, disabled, value, validator, onChange }: Props): JSX.Element {
+export default function TextInput(
+    { label, className, placeholder, disabled, value, validator, onChange }: Props
+): JSX.Element {
     const [text, setText] = useState(value ?? '');
 
     const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,7 +29,7 @@ export default function TextInput({ label, placeholder, disabled, value, validat
     }, [value]);
 
     return (
-        <div className="form-group">
+        <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="transaction-note">{label}:</label>
             <input 
                 className="form-control"

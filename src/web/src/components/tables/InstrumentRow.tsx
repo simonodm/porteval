@@ -12,6 +12,7 @@ import { generateDefaultInstrumentChart } from '../../utils/chart';
 import * as constants from '../../constants';
 import ModalWrapper from '../modals/ModalWrapper';
 import EditInstrumentForm from '../forms/EditInstrumentForm';
+import useUserSettings from '../../hooks/useUserSettings';
 
 type Props = {
     instrument: Instrument;
@@ -22,6 +23,8 @@ export default function InstrumentRow({ instrument }: Props): JSX.Element {
     const currentPrice = useGetInstrumentCurrentPriceQuery(instrument.id);
     const [ deleteInstrument, { isLoading } ] = useDeleteInstrumentMutation();
     const [ isModalOpen, setIsModalOpen ] = useState(false);
+
+    const [userSettings] = useUserSettings();
 
     const isLoaded = checkIsLoaded(currency, currentPrice);
     const isError = checkIsError(currency, currentPrice);
@@ -36,7 +39,13 @@ export default function InstrumentRow({ instrument }: Props): JSX.Element {
                 <td>{constants.INSTRUMENT_TYPE_TO_STRING[instrument.type]}</td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPriceString(currentPrice.data?.price, currency.data?.symbol)}</>
+                        <>
+                            {getPriceString(
+                                currentPrice.data?.price,
+                                userSettings.decimalSeparator,
+                                currency.data?.symbol
+                            )}
+                        </>
                     </LoadingWrapper>
                 </td>
                 <td>{instrument.note}</td>
@@ -64,7 +73,9 @@ export default function InstrumentRow({ instrument }: Props): JSX.Element {
                     </LoadingWrapper>
                 </td>
             </tr>
-            <ModalWrapper closeModal={() => setIsModalOpen(false)} isOpen={isModalOpen}>
+            <ModalWrapper closeModal={() => setIsModalOpen(false)}
+                heading={`Edit ${instrument.symbol}`} isOpen={isModalOpen}
+            >
                 <EditInstrumentForm instrument={instrument} onSuccess={() => setIsModalOpen(false)} />
             </ModalWrapper>
         </>

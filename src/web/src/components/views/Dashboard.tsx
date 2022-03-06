@@ -123,7 +123,9 @@ export default function Dashboard(): JSX.Element {
                     }
                 })}
             </ResponsiveGridLayout>
-            <ModalWrapper closeModal={() => setModalIsOpen(false)} isOpen={modalIsOpen}>
+            <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Add charts to dashboard"
+                isOpen={modalIsOpen}
+            >
                 <DashboardChartPicker
                     charts={charts.data?.filter(c => !dashboardLayout?.items.find(item => item.chartId === c.id)) ?? []}
                     onDrag={handleDrag}

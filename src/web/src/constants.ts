@@ -1,5 +1,13 @@
 import { ChartConfig, ChartLineBase, InstrumentType, ChartToDateRange } from './types';
 
+export const DEFAULT_DATE_FORMAT = 'yyyy/MM/dd';
+export const DEFAULT_TIME_FORMAT = 'HH:mm';
+export const DEFAULT_DECIMAL_SEPARATOR = '.';
+
+export const DATE_FORMAT_STORAGE_KEY = 'dateFormat';
+export const TIME_FORMAT_STORAGE_KEY = 'timeFormat';
+export const DECIMAL_SEPARATOR_STORAGE_KEY = 'decimalSeparator';
+
 export const API_NAME_MAX_LENGTH = 64;
 export const API_NOTE_MAX_LENGTH = 255;
 export const API_MAX_CHART_LINE_WIDTH = 8;
@@ -9,7 +17,6 @@ export const REFRESH_INTERVAL = 300_000;
 export const ERROR_STRING = 'An error has occured. Please try again later.';
 export const CHART_TRANSACTION_SIGN_CIRCLE_RADIUS = 4;
 export const CHART_TRANSACTION_SIGN_SIZE = 5;
-export const DEFAULT_DT_SELECTOR_FORMAT = 'yyyy/MM/dd';
 export const LINE_PREVIEW_LENGTH = 30;
 export const DEFAULT_CHART_TODATE_RANGE: ChartToDateRange = {
     unit: 'day',

@@ -4,12 +4,13 @@ import { Currency } from '../../../types';
 
 type Props = {
     currencies: Array<Currency>;
+    className?: string;
     disabled?: boolean;
     value?: string;
     onChange?: (currencyCode: string) => void
 }
 
-export default function CurrencyDropdown({ currencies, disabled, value, onChange }: Props): JSX.Element {
+export default function CurrencyDropdown({ currencies, className, disabled, value, onChange }: Props): JSX.Element {
     const [currencyCode, setCurrencyCode] = useState(value);
 
     useEffect(() => {
@@ -27,7 +28,7 @@ export default function CurrencyDropdown({ currencies, disabled, value, onChange
     })
 
     return (
-        <div className="form-group">
+        <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="currency">Currency:</label>
             <select className="form-control" disabled={disabled} id="currency"
                 onChange={(e) => setCurrencyCode(e.target.value)} value={currencyCode}
