@@ -29,31 +29,31 @@ namespace PortEval.Application.Queries.DataQueries
         {
             return new QueryWrapper<IEnumerable<TransactionDetailsQueryModel>>
             {
-                Query = @"SELECT PortfolioId, pTransactions.PositionId, InstrumentId, pTransactions.Id AS TransactionId, Time, Amount,
+                Query = @"WITH rownum_prices_start AS (
+	                          SELECT InstrumentId, Price AS InstrumentPriceAtRangeStart, ROW_NUMBER() OVER(PARTITION BY InstrumentId ORDER BY Time DESC) as rownum_start FROM dbo.InstrumentPrices
+	                          WHERE Time <= @TimeFrom
+                          ), rownum_prices_end AS (
+	                          SELECT InstrumentId, Price AS InstrumentPriceAtRangeEnd, ROW_NUMBER() OVER(PARTITION BY InstrumentId ORDER BY Time DESC) as rownum_end FROM dbo.InstrumentPrices
+	                          WHERE Time <= @TimeTo
+                          )
+ 
+                          SELECT PortfolioId, Instruments.Id as InstrumentId, pTransactions.PositionId, pTransactions.Id AS TransactionId, Time, Amount,
 	                          Price, Instruments.CurrencyCode AS TransactionCurrency, Portfolios.CurrencyCode AS PortfolioCurrency,
-                              posPrices.InstrumentPriceAtRangeStart, posPrices.InstrumentPriceAtRangeEnd, dbo.Portfolios.Note FROM dbo.Portfolios
+                              InstrumentPriceAtRangeStart, InstrumentPriceAtRangeEnd, dbo.Portfolios.Note FROM dbo.Portfolios
                           INNER JOIN (
 	                          SELECT Transactions.Id, PortfolioId, Time, Amount, Price, PositionId, InstrumentId FROM dbo.Positions
 	                          INNER JOIN dbo.Transactions ON PositionId = Positions.Id
                           ) AS pTransactions ON Portfolios.Id = pTransactions.PortfolioId
                           INNER JOIN dbo.Instruments ON Instruments.Id = InstrumentId
                           INNER JOIN (
-	                          SELECT Positions.Id AS PositionId, ip2.Price AS InstrumentPriceAtRangeStart, ip1.Price AS InstrumentPriceAtRangeEnd FROM dbo.Positions
+	                          SELECT rownum_prices_start.InstrumentId, InstrumentPriceAtRangeStart, InstrumentPriceAtRangeEnd FROM rownum_prices_start
 	                          INNER JOIN (
-		                          SELECT InstrumentPrices.InstrumentId, MAX(Time) AS PriceTimeRangeEnd, PriceTimeRangeStart FROM dbo.InstrumentPrices
-		                          INNER JOIN (
-			                          SELECT InstrumentId, MAX(Time) AS PriceTimeRangeStart FROM dbo.InstrumentPrices 
-			                          WHERE Time <= @TimeFrom
-			                          GROUP BY InstrumentId
-		                          ) AS pricesFrom ON InstrumentPrices.InstrumentId = pricesFrom.InstrumentId
-		                          WHERE Time <= @TimeTo 
-		                          GROUP BY InstrumentPrices.InstrumentId, PriceTimeRangeStart
-	                          ) AS prices ON prices.InstrumentId = Positions.InstrumentId
- 	                          INNER JOIN dbo.InstrumentPrices AS ip1 ON ip1.InstrumentId = prices.InstrumentId AND ip1.Time = prices.PriceTimeRangeEnd
-  	                          INNER JOIN dbo.InstrumentPrices AS ip2 ON ip2.InstrumentId = prices.InstrumentId AND ip2.Time = prices.PriceTimeRangeStart
-                          ) AS posPrices ON posPrices.PositionId = pTransactions.PositionId
-                          WHERE PortfolioId = @PortfolioId
-                          AND Time <= @TimeTo",
+		                          SELECT InstrumentId, InstrumentPriceAtRangeEnd FROM rownum_prices_end
+		                          WHERE rownum_end = 1
+	                          ) AS prices_end ON prices_end.InstrumentId = rownum_prices_start.InstrumentId
+	                          WHERE rownum_start = 1
+                          ) AS Prices ON Prices.InstrumentId = Instruments.Id
+                          WHERE PortfolioId = @PortfolioId",
                 Params = new { PortfolioId = portfolioId, TimeFrom = from, TimeTo = to }
             };
         }

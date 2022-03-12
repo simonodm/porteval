@@ -47,6 +47,7 @@ namespace PortEval.Application.Services
 
             existingInstrument.SetName(options.Name);
             existingInstrument.SetNote(options.Note);
+            existingInstrument.IncreaseVersion();
             _instrumentRepository.Update(existingInstrument);
             await _instrumentRepository.UnitOfWork.CommitAsync();
             return existingInstrument;

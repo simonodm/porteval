@@ -35,6 +35,11 @@ namespace PortEval.Application.Services
                 throw new OperationNotAllowedException($"Cannot create a position for an instrument of type: index.");
             }
 
+            if (instrument.GetPriceAt(options.InitialTransaction.Time)?.Price != options.InitialTransaction.Price)
+            {
+                instrument.AddPricePoint(options.InitialTransaction.Time, options.InitialTransaction.Price);
+                _instrumentRepository.Update(instrument);
+            }
 
             var createdPosition = new Position(options.PortfolioId, options.InstrumentId, options.Note);
             createdPosition.AddTransaction(options.InitialTransaction.Amount, options.InitialTransaction.Price,

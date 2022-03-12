@@ -88,10 +88,10 @@ export default function CurrenciesView(): JSX.Element {
                                                 {
                                                     getPriceString(
                                                         exchangeRate.exchangeRate,
-                                                        userSettings.decimalSeparator,
                                                         currencies.data?.find(
                                                             c => c.code === exchangeRate.currencyToCode
-                                                        )?.symbol
+                                                        )?.symbol,
+                                                        userSettings
                                                     )
                                                 }
                                             </td>

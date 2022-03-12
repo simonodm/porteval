@@ -217,7 +217,7 @@ namespace PortEval.Application.Queries
             var process = new Func<DateTime, Task<EntityChartPointDto>>(async time =>
             {
                 var price = await GetInstrumentPrice(instrumentId, time);
-                if (price.Response == null) return null;
+                if (price?.Response == null || price.Status != QueryStatus.Ok) return new EntityChartPointDto(time, 0m);
 
                 price.Response.Time = time;
                 return await _exchangeRateQueries.ConvertChartPointCurrency(instrument.Response.CurrencyCode, currencyCode,

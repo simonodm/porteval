@@ -30,12 +30,10 @@ namespace PortEval.Application.Services
 
             if (options.IsDefault && !currencyEntity.IsDefault)
             {
-                var currencies = await _currencyRepository.ListAllAsync();
-                foreach (var currency in currencies.Where(c => c.IsDefault))
-                {
-                    currency.UnsetDefault();
-                    _currencyRepository.Update(currency);
-                }
+                var defaultCurrency = await _currencyRepository.GetDefaultCurrencyAsync();
+                defaultCurrency.UnsetDefault();
+                defaultCurrency.IncreaseVersion();
+                _currencyRepository.Update(defaultCurrency);
 
                 currencyEntity.SetAsDefault();
                 currencyEntity.IncreaseVersion();

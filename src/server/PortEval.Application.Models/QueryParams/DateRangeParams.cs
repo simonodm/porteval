@@ -1,4 +1,5 @@
 ﻿using System;
+using PortEval.Domain;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace PortEval.Application.Models.QueryParams
@@ -10,7 +11,7 @@ namespace PortEval.Application.Models.QueryParams
     public class DateRangeParams
     {
         [SwaggerSchema("Period start.")]
-        public DateTime From { get; set; } = DateTime.MinValue;
+        public DateTime From { get; set; } = PortEvalConstants.FinancialDataStartTime;
 
         [SwaggerSchema("Period end.")]
         public DateTime To { get; set; } = DateTime.Now;

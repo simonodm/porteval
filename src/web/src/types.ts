@@ -248,4 +248,5 @@ export type UserSettings = {
     dateFormat: string;
     timeFormat: string;
     decimalSeparator: string;
+    thousandsSeparator: string;
 }

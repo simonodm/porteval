@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Domain;
 
 namespace PortEval.Application.Queries
 {
@@ -99,8 +100,7 @@ namespace PortEval.Application.Queries
                 {
                     PositionId = positionId
                 },
-                new DateRangeParams { 
-                    From = DateTime.MinValue,
+                new DateRangeParams {
                     To = time
                 });
 
@@ -141,7 +141,7 @@ namespace PortEval.Application.Queries
                 await _transactionQueries.GetTransactions(new TransactionFilters
                 {
                     PositionId = positionId
-                }, dateRange.SetFrom(DateTime.MinValue));
+                }, dateRange.SetFrom(PortEvalConstants.FinancialDataStartTime));
 
             var instrumentPriceAtRangeStart =
                 (await _instrumentQueries.GetInstrumentPrice(position.Response.InstrumentId, dateRange.From)).Response?.Price ?? 0m;
@@ -215,7 +215,7 @@ namespace PortEval.Application.Queries
                     transactionDetailsQuery.Params);
             }
 
-            var performance = IrrPerformanceCalculator.CalculatePerformance(transactionData, dateRange.From, dateRange.To);
+            var performance = InternalRateOfReturnCalculator.CalculateIrr(transactionData, dateRange.From, dateRange.To);
             return new QueryResponse<EntityPerformanceDto>
             {
                 Status = QueryStatus.Ok,

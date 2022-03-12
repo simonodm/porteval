@@ -5,7 +5,6 @@ using PortEval.Application.Queries.DataQueries;
 using PortEval.Application.Queries.Helpers;
 using PortEval.Application.Queries.Interfaces;
 using PortEval.Application.Queries.Models;
-using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure;
 using System;
@@ -85,16 +84,9 @@ namespace PortEval.Application.Queries
                     continue;
                 }
 
-                var exchangeRate = await _exchangeRateQueries.GetExchangeRateAt(position.Instrument.CurrencyCode,
-                    portfolio.Response.CurrencyCode, time);
-                if (exchangeRate == null)
-                {
-                    throw new OperationNotAllowedException(
-                        $"Unable to calculate portfolio value: instrument {position.Instrument.Symbol} currency cannot be converted to portfolio currency."
-                    );
-                }
-
-                value += positionValue.Response.Value * exchangeRate.Response.ExchangeRate;
+                var convertedValue = await _exchangeRateQueries.Convert(position.Instrument.CurrencyCode,
+                    portfolio.Response.CurrencyCode, positionValue.Response.Value, time);
+                value += convertedValue;
             }
 
             var valueDto = new EntityValueDto
@@ -129,7 +121,7 @@ namespace PortEval.Application.Queries
             using (var connection = _connection.CreateConnection())
             {
                 transactions = (await GetTransactionsConvertedToPortfolioCurrency(connection, portfolioId,
-                    new DateRangeParams { From = DateTime.MinValue, To = dateRange.To })).ToList();
+                    new DateRangeParams { To = dateRange.To })).ToList();
             }
 
             var profit = valueAtEnd.Response.Value - transactions.Sum(t => t.Price * t.Amount) -
@@ -169,7 +161,7 @@ namespace PortEval.Application.Queries
                 transactions = (await GetTransactionsConvertedToPortfolioCurrency(connection, portfolioId, dateRange)).ToList();
             }
 
-            var performance = IrrPerformanceCalculator.CalculatePerformance(transactions, dateRange.From, dateRange.To);
+            var performance = InternalRateOfReturnCalculator.CalculateIrr(transactions, dateRange.From, dateRange.To);
 
             return new QueryResponse<EntityPerformanceDto>
             {
@@ -366,30 +358,24 @@ namespace PortEval.Application.Queries
             {
                 if (transaction.TransactionCurrency == transaction.PortfolioCurrency) continue;
 
-                var exchangeRateTransactionPrice = await _exchangeRateQueries.GetExchangeRateAt(transaction.TransactionCurrency,
-                    transaction.PortfolioCurrency, transaction.Time);
-                if (exchangeRateTransactionPrice == null)
-                {
-                    throw new ApplicationException($"No exchange rate found between {transaction.TransactionCurrency} and {transaction.PortfolioCurrency} at {transaction.Time}.");
-                }
+                var convertedTransactionPrice = await _exchangeRateQueries.Convert(transaction.TransactionCurrency,
+                    transaction.PortfolioCurrency, transaction.Price, transaction.Time);
 
                 if (!instrumentConvertedRangeStartPrices.ContainsKey(transaction.InstrumentId))
                 {
-                    var exchangeRate = await _exchangeRateQueries.GetExchangeRateAt(transaction.TransactionCurrency,
-                        transaction.PortfolioCurrency, timeFrom);
-                    instrumentConvertedRangeStartPrices[transaction.InstrumentId] =
-                        transaction.InstrumentPriceAtRangeStart * exchangeRate.Response.ExchangeRate;
+                    instrumentConvertedRangeStartPrices[transaction.InstrumentId] = await _exchangeRateQueries.Convert(
+                        transaction.TransactionCurrency, transaction.PortfolioCurrency,
+                        transaction.InstrumentPriceAtRangeStart, timeFrom);
                 }
 
                 if (!instrumentConvertedRangeEndPrices.ContainsKey(transaction.InstrumentId))
                 {
-                    var exchangeRate = await _exchangeRateQueries.GetExchangeRateAt(transaction.TransactionCurrency,
-                        transaction.PortfolioCurrency, dateRange.To);
-                    instrumentConvertedRangeEndPrices[transaction.InstrumentId] =
-                        transaction.InstrumentPriceAtRangeEnd * exchangeRate.Response.ExchangeRate;
+                    instrumentConvertedRangeEndPrices[transaction.InstrumentId] = await _exchangeRateQueries.Convert(
+                        transaction.TransactionCurrency, transaction.PortfolioCurrency,
+                        transaction.InstrumentPriceAtRangeEnd, dateRange.To);
                 }
 
-                transaction.Price *= exchangeRateTransactionPrice.Response.ExchangeRate;
+                transaction.Price = convertedTransactionPrice;
                 transaction.InstrumentPriceAtRangeStart = instrumentConvertedRangeStartPrices[transaction.InstrumentId];
                 transaction.InstrumentPriceAtRangeEnd = instrumentConvertedRangeEndPrices[transaction.InstrumentId];
             }

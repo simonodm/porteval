@@ -24,6 +24,15 @@ namespace PortEval.Application.Queries.DataQueries
             };
         }
 
+        public static QueryWrapper<CurrencyDto> GetDefaultCurrency()
+        {
+            return new QueryWrapper<CurrencyDto>
+            {
+                Query = @"SELECT Code, Name, Symbol, IsDefault FROM dbo.Currencies
+                          WHERE IsDefault = 1"
+            };
+        }
+
         public static QueryWrapper<CurrencyExchangeRateDto> GetCurrencyExchangeRate(string currencyCode, string currencyToCode, DateTime time)
         {
             return new QueryWrapper<CurrencyExchangeRateDto>

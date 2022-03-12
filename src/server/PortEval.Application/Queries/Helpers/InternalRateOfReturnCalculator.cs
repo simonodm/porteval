@@ -7,18 +7,18 @@ using System.Linq;
 namespace PortEval.Application.Queries.Helpers
 {
     /// <summary>
-    /// Calculates approximate financial performance of a tradeable entity based on transactions' internal rate of return.
+    /// Calculates approximate internal rate of return of a position.
     /// </summary>
-    internal static class IrrPerformanceCalculator
+    internal static class InternalRateOfReturnCalculator
     {
         /// <summary>
-        /// Calculates approximate performance in the given range using Newton's method.
+        /// Calculates approximate internal rate of return in the given range using modified Newton's method.
         /// </summary>
         /// <param name="transactions">All transactions.</param>
         /// <param name="from">Start range.</param>
         /// <param name="to">End range.</param>
         /// <returns>An <see cref="EntityPerformanceDto">EntityPerformanceDto</see> instance containing the calculation result.</returns>
-        public static EntityPerformanceDto CalculatePerformance(IEnumerable<TransactionDetailsQueryModel> transactions, DateTime from, DateTime to)
+        public static EntityPerformanceDto CalculateIrr(IEnumerable<TransactionDetailsQueryModel> transactions, DateTime from, DateTime to)
         {
             var transactionsList = transactions.ToList();
             if (transactionsList.Count == 0)
@@ -35,17 +35,36 @@ namespace PortEval.Application.Queries.Helpers
             var interval = GetSinglePointIntervalLength(firstTransactionTime, to);
             var totalIntervalCount = CalculateIntervalPointCount(firstTransactionTime, to, interval);
             var equation = new PolynomialEquation(0.01);
+            var initialGuessNumerator = 0m;
+            var initialGuessDenominator = 0m;
+            var currentAmount = 0m;
 
+            int? firstIntervalCount = null;
             foreach (var transaction in transactionsList)
             {
                 var transactionIntervalCount = CalculateIntervalPointCount(transaction.Time, to, interval);
                 var transactionValue =
                     transaction.Time < from ? transaction.InstrumentPriceAtRangeStart : transaction.Price;
-                equation.AddCoefficient(transactionIntervalCount, (double)(transaction.Amount * transactionValue) / 1000);
-                equation.AddCoefficient(0, -(double)(transaction.Amount * transaction.InstrumentPriceAtRangeEnd) / 1000);
+                equation.AddCoefficient(transactionIntervalCount, -(double)(transaction.Amount * transactionValue));
+                equation.AddCoefficient(0, (double)(transaction.Amount * transaction.InstrumentPriceAtRangeEnd));
+                currentAmount += transaction.Amount;
+
+                if (firstIntervalCount == null || firstIntervalCount == transactionIntervalCount)
+                {
+                    initialGuessDenominator = transaction.Amount * transactionValue;
+                    firstIntervalCount = transactionIntervalCount;
+                }
+                else
+                {
+                    initialGuessNumerator -= transaction.Amount * transactionValue;
+                }
+
+                initialGuessNumerator += transaction.Amount * transaction.InstrumentPriceAtRangeEnd;
             }
 
-            var singlePointPerformance = equation.CalculateRoot(1);
+            var initialGuess = Math.Pow((double)initialGuessNumerator / (double)initialGuessDenominator,
+                2.0 / (totalIntervalCount + 1));
+            var singlePointPerformance = equation.CalculateRoot(initialGuess);
             var totalPerformance = Math.Pow(singlePointPerformance, totalIntervalCount);
 
             if (singlePointPerformance < 0 && totalPerformance > 0) totalPerformance *= -1;
@@ -67,7 +86,7 @@ namespace PortEval.Application.Queries.Helpers
         /// <returns>Interval unit count between the supplied dates.</returns>
         private static int CalculateIntervalPointCount(DateTime rangeStart, DateTime rangeEnd, TimeSpan interval)
         {
-            return (int)((rangeEnd.Ticks - rangeStart.Ticks) / interval.Ticks);
+            return (int)Math.Ceiling((rangeEnd.Ticks - (double)rangeStart.Ticks) / interval.Ticks);
         }
 
         /// <summary>
@@ -83,9 +102,10 @@ namespace PortEval.Application.Queries.Helpers
             if (difference >= TimeSpan.FromDays(3650)) return TimeSpan.FromDays(365);
             if (difference >= TimeSpan.FromDays(365)) return TimeSpan.FromDays(30);
             if (difference >= TimeSpan.FromDays(30)) return TimeSpan.FromDays(7);
-            if (difference >= TimeSpan.FromDays(3)) return TimeSpan.FromDays(1);
+            if (difference >= TimeSpan.FromDays(2)) return TimeSpan.FromDays(1);
+            if (difference >= TimeSpan.FromHours(2)) return TimeSpan.FromHours(1);
 
-            return TimeSpan.FromHours(1);
+            return TimeSpan.FromMinutes(5);
         }
     }
 }

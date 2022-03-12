@@ -66,11 +66,6 @@ namespace PortEval.Domain.Models.Entities
         {
             var orderedPrices = _prices.OrderBy(p => p.Time).Reverse();
             var price = orderedPrices.FirstOrDefault(p => p.Time <= time);
-            if (price == null)
-            {
-                throw new ItemNotFoundException($"No price point found for instrument {Id} at time {time}");
-            }
-
             return price;
         }
 

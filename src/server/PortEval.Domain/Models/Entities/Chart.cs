@@ -38,42 +38,7 @@ namespace PortEval.Domain.Models.Entities
         public ChartLine FindChartLineById(int id)
         {
             var line = _lines.FirstOrDefault(chartLine => chartLine.Id == id);
-            if (line == null)
-            {
-                throw new ItemNotFoundException($"Chart {Id} does not contain line {id}.");
-            }
-
             return line;
-        }
-
-        public ChartLine AddChartLine(ChartLine line)
-        {
-            _lines.Add(line);
-            return line;
-        }
-
-        public ChartLine AddPortfolioChartLine(int portfolioId, Color color, int width = 1,
-            LineDashType dashType = LineDashType.Solid)
-        {
-            var chartLine = new ChartLinePortfolio(Id, width, dashType, color, portfolioId);
-            _lines.Add(chartLine);
-            return chartLine;
-        }
-
-        public ChartLine AddInstrumentChartLine(int instrumentId, Color color, int width = 1,
-            LineDashType dashType = LineDashType.Solid)
-        {
-            var chartLine = new ChartLineInstrument(Id, width, dashType, color, instrumentId);
-            _lines.Add(chartLine);
-            return chartLine;
-        }
-
-        public ChartLine AddPositionChartLine(int positionId, Color color, int width = 1,
-            LineDashType dashType = LineDashType.Solid)
-        {
-            var chartLine = new ChartLinePosition(Id, width, dashType, color, positionId);
-            _lines.Add(chartLine);
-            return chartLine;
         }
 
         public void ReplaceLines(IEnumerable<ChartLine> lines)
@@ -83,12 +48,6 @@ namespace PortEval.Domain.Models.Entities
             {
                 _lines.Add(line);
             }
-        }
-
-        public void RemoveLine(int lineId)
-        {
-            var line = FindChartLineById(lineId);
-            _lines.Remove(line);
         }
 
         public void Rename(string name)

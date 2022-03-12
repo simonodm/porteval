@@ -42,15 +42,17 @@ export default function PositionPicker({ portfolio }: Props): JSX.Element {
                         existingLine.type === 'position'
                         && existingLine.positionId === position.id);
 
-                    return <PositionPickerItem
-                        key={position.id}
-                        line={line}
-                        onLineAdd={() => context.addPositionLine(position)}
-                        onLineConfigure={() => line ? context.configureLine(line) : undefined}
-                        onLineRemove={() => line ? context.removeLine(line) : undefined}
-                        position={position}
-                           />
-})}
+                    return (
+                        <PositionPickerItem
+                            key={position.id}
+                            line={line}
+                            onLineAdd={() => context.addPositionLine(position)}
+                            onLineConfigure={() => line ? context.configureLine(line) : undefined}
+                            onLineRemove={() => line ? context.removeLine(line) : undefined}
+                            position={position}
+                        />
+                    )
+                })}
             </LoadingWrapper>
         </div>
     );

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
+using PortEval.Domain;
 
 namespace PortEval.BackgroundJobs.InitialPriceFetch
 {
@@ -54,7 +55,7 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
             var fiveDaysCutoffDate = fetchStart - PriceUtils.FiveDays;
             var oneDayCutoffDate = fetchStart - PriceUtils.FiveDays;
 
-            var dailyPricesResponse = await _fetcher.GetHistoricalDailyPrices(instrument, new DateTime(2000, 1, 1),
+            var dailyPricesResponse = await _fetcher.GetHistoricalDailyPrices(instrument, PortEvalConstants.FinancialDataStartTime,
                 fiveDaysCutoffDate);
             var hourlyPricesResponse = await _fetcher.GetIntradayPrices(instrument, fiveDaysCutoffDate, oneDayCutoffDate,
                 IntradayInterval.OneHour);

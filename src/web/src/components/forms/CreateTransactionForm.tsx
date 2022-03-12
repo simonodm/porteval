@@ -86,8 +86,9 @@ export default function CreateTransactionForm({ positionId, onSuccess }: Props):
                 <NumberInput allowFloat label='Price' onChange={handlePriceChange}
                     value={price}
                 />
-                <DateTimeSelector dateFormat={userSettings.dateFormat} label='Date' onChange={handleTimeChange}
-                    timeFormat={userSettings.timeFormat} timeInterval={1} value={time}
+                <DateTimeSelector dateFormat={userSettings.dateFormat} enableTime label='Date'
+                    onChange={handleTimeChange} timeFormat={userSettings.timeFormat} timeInterval={1}
+                    value={time}
                 />
                 <TextInput label='Note' onChange={handleNoteChange} value={note} />
                 <button 

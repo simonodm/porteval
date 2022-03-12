@@ -55,27 +55,10 @@ namespace PortEval.Domain.Models.Entities
 
         public CurrencyExchangeRate GetExchangeRate(string currencyToCode, DateTime time)
         {
-            var orderedExchangeRates = _exchangeRates.OrderByDescending(rate => rate.Time);
+            var orderedExchangeRates = _exchangeRates.Where(rate => rate.CurrencyToCode == currencyToCode).OrderByDescending(rate => rate.Time);
             var exchangeRate =
-                orderedExchangeRates.FirstOrDefault(rate => rate.CurrencyToCode == currencyToCode && rate.Time <= time);
-
-            if (exchangeRate == null)
-            {
-                throw new ItemNotFoundException($"No exchange rate found from currency {Code} to currency {currencyToCode} at {time}.");
-            }
-
+                orderedExchangeRates.FirstOrDefault(rate => rate.Time <= time);
             return exchangeRate;
-        }
-
-        public void RemoveExchangeRate(DateTime time, string currencyToCode)
-        {
-            var existingRate = _exchangeRates.FirstOrDefault(r => r.Time == time && r.CurrencyToCode == currencyToCode);
-            if (existingRate == null)
-            {
-                throw new ItemNotFoundException($"No conversion rate found from currency {Code} to currency {currencyToCode} at {time}.");
-            }
-
-            _exchangeRates.Remove(existingRate);
         }
 
         public void RemoveExchangeRate(int id)
@@ -87,19 +70,6 @@ namespace PortEval.Domain.Models.Entities
             }
 
             _exchangeRates.Remove(existingRate);
-        }
-
-        public decimal? Convert(decimal value, string targetCurrencyCode, DateTime time)
-        {
-            try
-            {
-                var exchangeRate = GetExchangeRate(targetCurrencyCode, time);
-                return value * exchangeRate.ExchangeRate;
-            }
-            catch
-            {
-                return null;
-            }
         }
     }
 }

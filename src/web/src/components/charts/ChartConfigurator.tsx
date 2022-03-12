@@ -173,6 +173,7 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                     <DateTimeSelector
                         className='chart-configurator-setting'
                         dateFormat={userSettings.dateFormat}
+                        enableTime
                         label='Range start'
                         onChange={handleStartDateChange}
                         timeFormat={userSettings.timeFormat}
@@ -183,6 +184,7 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                     <DateTimeSelector
                         className='chart-configurator-setting'
                         dateFormat={userSettings.dateFormat}
+                        enableTime
                         label='Range start'
                         onChange={handleEndDateChange}
                         timeFormat={userSettings.timeFormat}
@@ -198,7 +200,8 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                                     <button
                                         className={
                                             'btn btn-sm ' +
-                                            (currentChart.isToDate && currentChart.toDateRange === range
+                                            (currentChart.isToDate && currentChart.toDateRange.unit === range.unit
+                                                && currentChart.toDateRange.value === range.value
                                                 ? 'btn-dark'
                                                 : 'btn-light')
                                         }

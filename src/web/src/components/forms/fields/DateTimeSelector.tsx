@@ -25,7 +25,7 @@ export default function DateTimeSelector({
     value,
     onChange
 }: Props): JSX.Element {
-    const [time, setTime] = useState(value ?? DateTime.now());
+    const [time, setTime] = useState<DateTime | undefined>(value ?? DateTime.now());
 
     const handleTimeChange = (dt: Date) => {
         const convertedDT = DateTime.fromJSDate(dt);
@@ -37,9 +37,7 @@ export default function DateTimeSelector({
     console.log(timeFormat);
     
     useEffect(() => {
-        if(value !== undefined) {
-            setTime(value);
-        }
+        setTime(value);
     }, [value]);
 
     return (
@@ -50,7 +48,7 @@ export default function DateTimeSelector({
                 disabled={disabled}
                 id="date"
                 onChange={handleTimeChange}
-                selected={time.toJSDate()}
+                selected={time?.toJSDate()}
                 showTimeSelect={!!enableTime}
                 timeFormat={timeFormat}
                 timeIntervals={timeInterval ?? 5}

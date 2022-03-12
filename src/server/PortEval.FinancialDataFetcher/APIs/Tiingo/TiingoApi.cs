@@ -67,7 +67,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
             var startDate = from.ToString("yyyy-M-d");
             var endDate = to.ToString("yyyy-M-d");
 
-            var urlBuilder = new QueryUrlBuilder($"{TIINGO_DAILY_BASE_URL}/{symbol}");
+            var urlBuilder = new QueryUrlBuilder($"{TIINGO_DAILY_BASE_URL}/{symbol}/prices");
             urlBuilder.AddQueryParam("token", _apiKey);
             urlBuilder.AddQueryParam("startDate", startDate);
             urlBuilder.AddQueryParam("endDate", endDate);
@@ -165,7 +165,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                 Result = result.Result?.First()?.Data?.Any() != null
                     ? new PricePoint
                     {
-                        CurrencyCode = "USD",
+                        CurrencyCode = currency,
                         Price = result.Result.First().Data.First().LastPrice,
                         Symbol = ticker,
                         Time = DateTime.Now
@@ -262,7 +262,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                     .Where(price => price.Time >= from && price.Time <= to)
                     .Select(price => new PricePoint
                     {
-                        CurrencyCode = "USD",
+                        CurrencyCode = currency,
                         Price = price.Price,
                         Symbol = ticker,
                         Time = price.Time

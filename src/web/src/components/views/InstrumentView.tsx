@@ -101,8 +101,8 @@ export default function InstrumentView(): JSX.Element {
                                     { 
                                         getPriceString(
                                             currentPrice.data?.price,
-                                            userSettings.decimalSeparator,
-                                            currency.data?.symbol
+                                            currency.data?.symbol,
+                                            userSettings
                                         )
                                     }
                                 </td>
@@ -165,17 +165,17 @@ export default function InstrumentView(): JSX.Element {
                                             {
                                                 getPriceString(
                                                     price.price,
-                                                    userSettings.decimalSeparator,
-                                                    currency.data?.symbol
+                                                    currency.data?.symbol,
+                                                    userSettings
                                                 )
                                             }
                                         </td>
                                         <td>{index < array.length - 1
                                                 ? getPerformanceString(
                                                     price.price / array[index + 1].price - 1,
-                                                    userSettings.decimalSeparator
+                                                    userSettings
                                                 )
-                                                : getPerformanceString(0, userSettings.decimalSeparator)}
+                                                : getPerformanceString(0, userSettings)}
                                         </td>
                                         <td>
                                             <button

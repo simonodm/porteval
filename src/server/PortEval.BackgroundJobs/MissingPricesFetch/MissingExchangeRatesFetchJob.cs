@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
+using PortEval.Domain;
 
 namespace PortEval.BackgroundJobs.MissingPricesFetch
 {
@@ -52,7 +53,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                 .Select(er => er.Time)
                 .ToListAsync();
 
-            var initialTime = new DateTime(2000, 1, 1);
+            var initialTime = PortEvalConstants.FinancialDataStartTime;
 
             var missingExchangeRates = PriceUtils.GetMissingPriceRanges(
                 exchangeRateTimes,

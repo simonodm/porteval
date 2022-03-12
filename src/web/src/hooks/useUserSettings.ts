@@ -7,7 +7,9 @@ import { DATE_FORMAT_STORAGE_KEY,
     TIME_FORMAT_STORAGE_KEY,
     DEFAULT_TIME_FORMAT,
     DECIMAL_SEPARATOR_STORAGE_KEY,
-    DEFAULT_DECIMAL_SEPARATOR
+    DEFAULT_DECIMAL_SEPARATOR,
+    THOUSANDS_SEPARATOR_STORAGE_KEY,
+    DEFAULT_THOUSANDS_SEPARATOR
 } from '../constants';
 
 import useLocalStorage from './useLocalStorage';
@@ -21,18 +23,24 @@ export default function useUserSettings(): [UserSettings, SetUserSettingsCallbac
         DECIMAL_SEPARATOR_STORAGE_KEY,
         DEFAULT_DECIMAL_SEPARATOR
     );
+    const [thousandsSeparator, setThousandsSeparator] = useLocalStorage(
+        THOUSANDS_SEPARATOR_STORAGE_KEY,
+        DEFAULT_THOUSANDS_SEPARATOR
+    );
 
     const [settings, setSettings] = useState({
         dateFormat,
         timeFormat,
-        decimalSeparator
+        decimalSeparator,
+        thousandsSeparator
     });
 
     useEffect(() => {
         setSettings({
             dateFormat,
             timeFormat,
-            decimalSeparator
+            decimalSeparator,
+            thousandsSeparator
         });
     }, [dateFormat, timeFormat, decimalSeparator]);
 
@@ -40,6 +48,7 @@ export default function useUserSettings(): [UserSettings, SetUserSettingsCallbac
         setDateFormat(newSettings.dateFormat);
         setTimeFormat(newSettings.timeFormat);
         setDecimalSeparator(newSettings.decimalSeparator);
+        setThousandsSeparator(newSettings.thousandsSeparator);
     };
 
     return [settings, changeSettings];

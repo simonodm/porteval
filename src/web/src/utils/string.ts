@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon';
 
+import { UserSettings } from '../types';
+
 export function camelToProperCase(str: string): string {
     if(str.length === 0) {
         return str;
@@ -10,26 +12,30 @@ export function camelToProperCase(str: string): string {
     return result;
 }
 
-export function getPriceString(price?: number, decimalSeparator?: string, currencySymbol?: string): string {
+export function getPriceString(
+    price?: number, currencySymbol?: string, settings?: UserSettings
+): string {
     if(price === undefined) return '';
 
-    let resultStr = price.toFixed(2);
-    if(decimalSeparator !== undefined) {
-        resultStr = resultStr.replace('.', decimalSeparator);
+    let resultStr = Math.abs(price).toFixed(2);
+    if(settings !== undefined) {
+        resultStr = resultStr.replace('.', settings.decimalSeparator);
+        resultStr = splitThousands(resultStr, settings.thousandsSeparator);
     }
 
-    if(!currencySymbol) return resultStr;
-
-    return currencySymbol + resultStr;
+    return `${price < 0 ? '-' : ''}${currencySymbol ?? ''} ${resultStr}`;
 }
 
-export function getPerformanceString(performance?: number, decimalSeparator?: string): string {
+export function getPerformanceString(
+    performance?: number, settings?: UserSettings
+): string {
     if(performance === undefined) return '';
 
     const prefix = performance < 0 ? '-' : '+';
     let resultStr = Math.abs((performance * 100)).toFixed(2);
-    if(decimalSeparator !== undefined) {
-        resultStr = resultStr.replace('.', decimalSeparator);
+    if(settings !== undefined) {
+        resultStr = resultStr.replace('.', settings.decimalSeparator);
+        resultStr = splitThousands(resultStr, settings.thousandsSeparator);
     }
 
     return `${prefix}${resultStr}%`;
@@ -37,4 +43,8 @@ export function getPerformanceString(performance?: number, decimalSeparator?: st
 
 export function formatDateTimeString(isoDateTime: string, format: string): string {
     return DateTime.fromISO(isoDateTime).toFormat(format)
+}
+
+function splitThousands(number: string, separator: string): string {
+    return number.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 }

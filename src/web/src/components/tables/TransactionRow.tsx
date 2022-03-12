@@ -23,7 +23,7 @@ export default function TransactionRow({ transaction, currency }: Props): JSX.El
         <tr>
             <td>{formatDateTimeString(transaction.time, userSettings.dateFormat + ' ' + userSettings.timeFormat)}</td>
             <td>{transaction.amount}</td>
-            <td>{getPriceString(transaction.price, userSettings.decimalSeparator, currency?.symbol)}</td>
+            <td>{getPriceString(transaction.price, currency?.symbol, userSettings)}</td>
             <td>{transaction.note}</td>
             <td>
                 <button

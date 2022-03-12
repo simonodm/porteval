@@ -42,8 +42,8 @@ export default function InstrumentRow({ instrument }: Props): JSX.Element {
                         <>
                             {getPriceString(
                                 currentPrice.data?.price,
-                                userSettings.decimalSeparator,
-                                currency.data?.symbol
+                                currency.data?.symbol,
+                                userSettings
                             )}
                         </>
                     </LoadingWrapper>

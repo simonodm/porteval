@@ -62,8 +62,8 @@ export default function PortfolioView(): JSX.Element {
                                         {
                                             getPriceString(
                                                 value.data?.value,
-                                                userSettings.decimalSeparator,
-                                                currency.data?.symbol)
+                                                currency.data?.symbol,
+                                                userSettings)
                                         }
                                     </td>
                                 </tr>
@@ -73,8 +73,8 @@ export default function PortfolioView(): JSX.Element {
                                         {
                                             getPriceString(
                                                 profitData.total,
-                                                userSettings.decimalSeparator,
-                                                currency.data?.symbol
+                                                currency.data?.symbol,
+                                                userSettings
                                             )
                                         }
                                     </td>
@@ -83,7 +83,7 @@ export default function PortfolioView(): JSX.Element {
                                     <td>Total performance:</td>
                                     <td>
                                         {
-                                            getPerformanceString(performanceData.total, userSettings.decimalSeparator)
+                                            getPerformanceString(performanceData.total, userSettings)
                                         }
                                     </td>
                                 </tr>
@@ -92,22 +92,22 @@ export default function PortfolioView(): JSX.Element {
                                     <td>
                                         {
                                             getPriceString(profitData.lastDay,
-                                                userSettings.decimalSeparator,
-                                                currency.data?.symbol
+                                                currency.data?.symbol,
+                                                userSettings
                                             ) + ' / '
                                         }
                                         {
                                             getPriceString(
                                                 profitData.lastWeek,
-                                                userSettings.decimalSeparator,
-                                                currency.data?.symbol
+                                                currency.data?.symbol,
+                                                userSettings
                                             ) + ' / '
                                         }
                                         {
                                             getPriceString(
                                                 profitData.lastMonth,
-                                                userSettings.decimalSeparator,
-                                                currency.data?.symbol
+                                                currency.data?.symbol,
+                                                userSettings
                                             )
                                         }
                                     </td>
@@ -118,19 +118,19 @@ export default function PortfolioView(): JSX.Element {
                                         {
                                             getPerformanceString(
                                                 performanceData.lastDay,
-                                                userSettings.decimalSeparator
+                                                userSettings
                                             ) + ' / '
                                         }
                                         {
                                             getPerformanceString(
                                                 performanceData.lastWeek,
-                                                userSettings.decimalSeparator
+                                                userSettings
                                             ) + ' / '
                                         }
                                         {
                                             getPerformanceString(
                                                 performanceData.lastMonth,
-                                                userSettings.decimalSeparator
+                                                userSettings
                                             )
                                         }
                                     </td>

@@ -3,10 +3,12 @@ import { ChartConfig, ChartLineBase, InstrumentType, ChartToDateRange } from './
 export const DEFAULT_DATE_FORMAT = 'yyyy/MM/dd';
 export const DEFAULT_TIME_FORMAT = 'HH:mm';
 export const DEFAULT_DECIMAL_SEPARATOR = '.';
+export const DEFAULT_THOUSANDS_SEPARATOR = ' ';
 
 export const DATE_FORMAT_STORAGE_KEY = 'dateFormat';
 export const TIME_FORMAT_STORAGE_KEY = 'timeFormat';
 export const DECIMAL_SEPARATOR_STORAGE_KEY = 'decimalSeparator';
+export const THOUSANDS_SEPARATOR_STORAGE_KEY = 'thousandsSeparator';
 
 export const API_NAME_MAX_LENGTH = 64;
 export const API_NOTE_MAX_LENGTH = 255;

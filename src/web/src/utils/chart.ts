@@ -197,7 +197,7 @@ export function generateTooltipTransactionList(
             const isPurchase = transaction.amount > 0;
             transactionRowElement.innerHTML = 
                 `${isPurchase ? 'BUY' : 'SELL'} ${Math.abs(transaction.amount)} ` +
-                `${transaction.instrument.symbol} @ ${getPriceString(transaction.price, settings.decimalSeparator)}`;
+                `${transaction.instrument.symbol} @ ${getPriceString(transaction.price, undefined, settings)}`;
             transactionsList.append(transactionRowElement);
         });
 

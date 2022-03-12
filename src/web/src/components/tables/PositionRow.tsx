@@ -65,45 +65,44 @@ export default function PositionRow({ position }: Props): JSX.Element {
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPriceString(profitData.lastDay, userSettings.decimalSeparator, currency.data?.symbol)}</>
+                        <>{getPriceString(profitData.lastDay, currency.data?.symbol, userSettings)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPriceString(profitData.lastWeek, userSettings.decimalSeparator, currency.data?.symbol)}</>
+                        <>{getPriceString(profitData.lastWeek, currency.data?.symbol, userSettings)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
                         <>
-                            {getPriceString(profitData.lastMonth, userSettings.decimalSeparator,
-                                currency.data?.symbol)}
+                            {getPriceString(profitData.lastMonth, currency.data?.symbol, userSettings)}
                         </>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPriceString(profitData.total, userSettings.decimalSeparator, currency.data?.symbol)}</>
+                        <>{getPriceString(profitData.total, currency.data?.symbol, userSettings)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPerformanceString(performanceData.lastDay, userSettings.decimalSeparator)}</>
+                        <>{getPerformanceString(performanceData.lastDay, userSettings)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPerformanceString(performanceData.lastWeek, userSettings.decimalSeparator)}</>
+                        <>{getPerformanceString(performanceData.lastWeek, userSettings)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPerformanceString(performanceData.lastMonth, userSettings.decimalSeparator)}</>
+                        <>{getPerformanceString(performanceData.lastMonth, userSettings)}</>
                     </LoadingWrapper>
                 </td>
                 <td>
                     <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                        <>{getPerformanceString(performanceData.total, userSettings.decimalSeparator)}</>
+                        <>{getPerformanceString(performanceData.total, userSettings)}</>
                     </LoadingWrapper>
                 </td>
                 <td></td>

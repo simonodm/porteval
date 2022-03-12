@@ -39,5 +39,16 @@ namespace PortEval.Application.Queries.Interfaces
         /// <returns>Chart point converted to the target currency.</returns>
         public Task<EntityChartPointDto> ConvertChartPointCurrency(string baseCurrencyCode,
             string targetCurrencyCode, EntityChartPointDto chartPoint);
+
+        /// <summary>
+        /// Converts the provided value between the specified currencies. If no direct exchange rate between the provided currencies is available, this method
+        /// attempts to approximate the exchange rate by doing an indirect conversion to the application default currency.
+        /// </summary>
+        /// <param name="baseCurrencyCode">Currency to convert from.</param>
+        /// <param name="targetCurrencyCode">Currency to convert to.</param>
+        /// <param name="price">Value to convert.</param>
+        /// <param name="time">Date and time of exchange rate to use.</param>
+        /// <returns>A task representing the asynchronous database access operation. Task result contains a decimal representing the converted value.</returns>
+        public Task<decimal> Convert(string baseCurrencyCode, string targetCurrencyCode, decimal price, DateTime time);
     }
 }
