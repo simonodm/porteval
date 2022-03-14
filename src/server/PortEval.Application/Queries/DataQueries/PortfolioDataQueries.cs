@@ -54,7 +54,8 @@ namespace PortEval.Application.Queries.DataQueries
 	                          ) AS prices_end ON prices_end.InstrumentId = rownum_prices_start.InstrumentId
 	                          WHERE rownum_start = 1
                           ) AS Prices ON Prices.InstrumentId = Instruments.Id
-                          WHERE PortfolioId = @PortfolioId",
+                          WHERE PortfolioId = @PortfolioId
+                          ORDER BY Time DESC",
                 Params = new { PortfolioId = portfolioId, TimeFrom = from, TimeTo = to }
             };
         }

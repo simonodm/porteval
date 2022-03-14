@@ -20,7 +20,7 @@ namespace PortEval.Application.Queries.Helpers
         /// <returns>An <see cref="EntityPerformanceDto">EntityPerformanceDto</see> instance containing the calculation result.</returns>
         public static EntityPerformanceDto CalculateIrr(IEnumerable<TransactionDetailsQueryModel> transactions, DateTime from, DateTime to)
         {
-            var transactionsList = transactions.ToList();
+            var transactionsList = transactions.OrderBy(t => t.Time).ToList();
             if (transactionsList.Count == 0)
             {
                 return new EntityPerformanceDto

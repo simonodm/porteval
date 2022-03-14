@@ -91,7 +91,8 @@ namespace PortEval.Application.Queries.DataQueries
 	                          ) AS prices_end ON prices_end.InstrumentId = rownum_prices_start.InstrumentId
 	                          WHERE rownum_start = 1
                           ) AS Prices ON Positions.InstrumentId = Prices.InstrumentId
-                          WHERE Transactions.PositionId = @PositionId",
+                          WHERE Transactions.PositionId = @PositionId
+                          ORDER BY Time DESC",
                 Params = new { PositionId = positionId, TimeFrom = from, TimeTo = to }
             };
         }
