@@ -43,6 +43,7 @@ namespace PortEval.Application.Queries.DataQueries
                           INNER JOIN (
 	                          SELECT Transactions.Id, PortfolioId, Time, Amount, Price, PositionId, InstrumentId FROM dbo.Positions
 	                          INNER JOIN dbo.Transactions ON PositionId = Positions.Id
+                              WHERE Time <= @TimeTo
                           ) AS pTransactions ON Portfolios.Id = pTransactions.PortfolioId
                           INNER JOIN dbo.Instruments ON Instruments.Id = InstrumentId
                           INNER JOIN (

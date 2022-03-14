@@ -78,7 +78,10 @@ namespace PortEval.Application.Queries.DataQueries
                           )
  
                           SELECT Time, Amount, Price, InstrumentPriceAtRangeStart, InstrumentPriceAtRangeEnd FROM dbo.Positions
-                          INNER JOIN dbo.Transactions ON PositionId = Positions.Id
+                          INNER JOIN (
+	                          SELECT PositionId, Time, Amount, Price FROM dbo.Transactions
+	                          WHERE Time <= @TimeTo
+                          ) AS Transactions ON PositionId = Positions.Id
                           INNER JOIN dbo.Instruments ON Instruments.Id = InstrumentId
                           INNER JOIN (
 	                          SELECT rownum_prices_start.InstrumentId, InstrumentPriceAtRangeStart, InstrumentPriceAtRangeEnd FROM rownum_prices_start
