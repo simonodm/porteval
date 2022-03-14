@@ -9,23 +9,21 @@ import { DateTime } from 'luxon';
 import LoadingWrapper from '../ui/LoadingWrapper';
 
 import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
-import { useDeleteInstrumentPriceMutation, useGetInstrumentByIdQuery, useGetInstrumentCurrentPriceQuery,
-    useGetInstrumentPricePageQuery, usePrefetch } from '../../redux/api/instrumentApi';
+import { useGetInstrumentByIdQuery, useGetInstrumentCurrentPriceQuery } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
 
-import { formatDateTimeString, getPerformanceString, getPriceString } from '../../utils/string';
-import * as constants from '../../constants';
+import { getPriceString } from '../../utils/string';
 import PortEvalChart from '../charts/PortEvalChart';
 import ModalWrapper from '../modals/ModalWrapper';
 import { generateDefaultInstrumentChart } from '../../utils/chart';
 import PageHeading from '../ui/PageHeading';
-import PageSelector from '../ui/PageSelector';
 
 import './InstrumentView.css';
 
 import CreateInstrumentPriceForm from '../forms/CreateInstrumentPriceForm';
 import useUserSettings from '../../hooks/useUserSettings';
+import InstrumentPricesTable from '../tables/InstrumentPricesTable';
 
 type Params = {
     instrumentId?: string;
@@ -35,27 +33,14 @@ export default function InstrumentView(): JSX.Element {
     const params = useParams<Params>();
     const instrumentId = params.instrumentId ? parseInt(params.instrumentId) : 0;
 
-    const [page, setPage] = useState(1);
-    const [pageLimit] = useState(100);
-
-    const prefetchPrices = usePrefetch('getInstrumentPricePage');
-
     const instrument = useGetInstrumentByIdQuery(instrumentId);
     const currentPrice = useGetInstrumentCurrentPriceQuery(instrumentId);
-    const prices = useGetInstrumentPricePageQuery(
-        { instrumentId, page, limit: pageLimit, frequency: 'day' },
-        { pollingInterval: constants.REFRESH_INTERVAL }
-    );
     const currency = useGetCurrencyQuery(instrument.data?.currencyCode ?? skipToken)
-    const [deletePrice, mutationStatus] = useDeleteInstrumentPriceMutation()
 
     const [userSettings] = useUserSettings();
 
     const instrumentLoaded = checkIsLoaded(instrument, currentPrice);
     const instrumentError = checkIsError(instrument, currentPrice);
-
-    const pricesLoaded = checkIsLoaded(prices, mutationStatus);
-    const pricesError = checkIsError(prices, mutationStatus);
 
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
@@ -131,80 +116,11 @@ export default function InstrumentView(): JSX.Element {
                     <div className="content-heading">
                         <h5>Price history</h5>
                     </div>
-                    <div className="float-right">
-                        <PageSelector
-                            onPageChange={(p) => setPage(p)}
-                            page={page}
-                            prefetch={(p) => 
-                                prefetchPrices({ instrumentId, page: p, limit: pageLimit, frequency: 'day' })}
-                            totalPages={prices.data ? prices.data.totalCount / pageLimit : 1}
+                    {instrument.data && 
+                        <InstrumentPricesTable currencySymbol={currency.data?.symbol}
+                            instrumentId={instrument.data.id}
                         />
-                    </div>
-                    <table className="entity-list w-100">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Price</th>
-                                <th>Change</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <LoadingWrapper isError={pricesError} isLoaded={pricesLoaded}>
-                            <tbody>
-                                {prices.data?.data.map((price, index, array) => (
-                                    <tr key={price.id}>
-                                        <td>
-                                            {
-                                                formatDateTimeString(
-                                                    price.time,
-                                                    userSettings.dateFormat + ' ' + userSettings.timeFormat
-                                                )
-                                            }
-                                        </td>
-                                        <td>
-                                            {
-                                                getPriceString(
-                                                    price.price,
-                                                    currency.data?.symbol,
-                                                    userSettings
-                                                )
-                                            }
-                                        </td>
-                                        <td>{index < array.length - 1
-                                                ? getPerformanceString(
-                                                    price.price / array[index + 1].price - 1,
-                                                    userSettings
-                                                )
-                                                : getPerformanceString(0, userSettings)}
-                                        </td>
-                                        <td>
-                                            <button
-                                                className="btn btn-danger btn-extra-sm"
-                                                onClick={() => instrument.data
-                                                    ? deletePrice({
-                                                        instrumentId: instrument.data.id,
-                                                        priceId: price.id 
-                                                    })
-                                                    : undefined}
-                                                type="button"
-                                            >
-                                                Remove
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </LoadingWrapper>
-                    </table>
-                    <div className="float-right">
-                        <PageSelector
-                            onPageChange={(p) => setPage(p)}
-                            page={page}
-                            prefetch={(p) => 
-                                prefetchPrices({ instrumentId, page: p, limit: pageLimit, frequency: 'day' })}
-                            totalPages={prices.data ? prices.data.totalCount / pageLimit : 1}
-                        />
-                    </div>
+                    }
                 </div>
             </div>
             <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Add new price" isOpen={modalIsOpen}>

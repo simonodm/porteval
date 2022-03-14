@@ -16,7 +16,7 @@ export default function PageSelector({ page, totalPages, onPageChange, prefetch 
     }
 
     return (
-        <div className="page-selector">
+        <span className="page-selector d-inline">
             { page > 1 &&
                 <button
                     className="btn btn-primary btn-sm mr-1"
@@ -35,6 +35,6 @@ export default function PageSelector({ page, totalPages, onPageChange, prefetch 
                     Next page
                 </button>
             }
-        </div>
+        </span>
     )
 }
