@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using PortEval.Application.Models.DTOs;
+using PortEval.Domain;
 using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Application.Models.Validators
@@ -13,9 +14,12 @@ namespace PortEval.Application.Models.Validators
                 .MaximumLength(64);
             RuleFor(c => c.DateRangeStart)
                 .NotEmpty()
+                .GreaterThanOrEqualTo(PortEvalConstants.FinancialDataStartTime)
                 .When(c => c.IsToDate != true);
             RuleFor(c => c.DateRangeEnd)
                 .NotEmpty()
+                .GreaterThanOrEqualTo(PortEvalConstants.FinancialDataStartTime)
+                .GreaterThanOrEqualTo(c => c.DateRangeStart)
                 .When(c => c.IsToDate != true);
             RuleFor(c => c.ToDateRange)
                 .NotEmpty()

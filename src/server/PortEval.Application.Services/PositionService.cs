@@ -29,6 +29,12 @@ namespace PortEval.Application.Services
         {
             await ValidatePortfolioExists(options.PortfolioId);
 
+            if (options.InitialTransaction == default)
+            {
+                throw new OperationNotAllowedException(
+                    "An initial transaction is required when opening a new position.");
+            }
+
             var instrument = await FetchInstrument(options.InstrumentId);
             if (instrument.Type == InstrumentType.Index)
             {

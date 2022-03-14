@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using PortEval.Application.Models.DTOs;
+using PortEval.Domain;
 
 namespace PortEval.Application.Models.Validators
 {
@@ -18,7 +19,7 @@ namespace PortEval.Application.Models.Validators
             {
                 RuleFor(p => p.InitialTransaction.Amount).NotEmpty().GreaterThan(0);
                 RuleFor(p => p.InitialTransaction.Price).NotEmpty().GreaterThan(0);
-                RuleFor(p => p.InitialTransaction.Time).NotEmpty();
+                RuleFor(p => p.InitialTransaction.Time).NotEmpty().GreaterThanOrEqualTo(PortEvalConstants.FinancialDataStartTime);
             });
         }
     }

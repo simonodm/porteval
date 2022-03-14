@@ -13,7 +13,7 @@ namespace PortEval.Application.Models.Validators
         public DateRangeParamsValidator()
         {
             RuleFor(dr => dr.From)
-                .LessThanOrEqualTo(dr => dr.To);
+                .LessThan(dr => dr.To);
         }
     }
 }
