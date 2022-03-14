@@ -14,9 +14,9 @@ const instrumentApi = portEvalApi.injectEndpoints({
             providesTags: (result) =>
                 result
                     ? [
-                        ...result.map(({ id }) => ({ type: 'Instrument' as const, id })),
-                        'Instruments'
-                      ]
+                        'Instruments',
+                        ...result.map(instrument => ({ type: 'Instrument' as const, id: instrument.id }))
+                    ]
                     : []
         }),
         getInstrumentPage: build.query<PaginatedResponse<Instrument>, PaginationParameters>({
@@ -24,8 +24,8 @@ const instrumentApi = portEvalApi.injectEndpoints({
             providesTags: (result) =>
                 result
                     ? [
-                        ...result.data.map(({ id }) => ({ type: 'Instrument' as const, id })),
-                        'Instruments'
+                        'Instruments',
+                        ...result.data.map(instrument => ({ type: 'Instrument' as const, id: instrument.id }))
                     ]
                     : []
         }),
@@ -55,7 +55,7 @@ const instrumentApi = portEvalApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) =>
                 !error
-                    ? [{ type: 'Instrument', id: arg.id }, 'Instruments']
+                    ? [{ type: 'Instrument', id: arg.id }, 'Exchanges']
                     : []
         }),
         deleteInstrument: build.mutation<void, number>({
@@ -69,10 +69,12 @@ const instrumentApi = portEvalApi.injectEndpoints({
                         'Instruments',
                         'PortfolioCalculations',
                         'PositionCalculations',
-                        'Charts',
+                        'PortfolioTransactions',
+                        'PositionTransactions',
                         'Exchanges',
                         { type: 'Instrument', id: arg },
-                        { type: 'InstrumentCalculations', id: arg }
+                        { type: 'InstrumentCalculations', id: arg },
+                        { type: 'InstrumentTransactions', id: arg }
                     ]
                     : []
         }),
@@ -114,7 +116,7 @@ const instrumentApi = portEvalApi.injectEndpoints({
             }),
             providesTags: (result) =>
                 result
-                    ? [{ type: 'InstrumentPrices', id: result.id }]
+                    ? [{ type: 'InstrumentPrice', id: result.id }]
                     : []
         }),
         getInstrumentCurrentPrice: build.query<InstrumentPrice, number>({
@@ -123,7 +125,7 @@ const instrumentApi = portEvalApi.injectEndpoints({
             }),
             providesTags: (result) =>
                 result
-                    ? [{ type: 'InstrumentPrices', id: result.id }]
+                    ? [{ type: 'InstrumentPrice', id: result.id }]
                     : []
         }),
         addInstrumentPrice: build.mutation<InstrumentPrice, InstrumentPriceConfig>({
@@ -134,12 +136,12 @@ const instrumentApi = portEvalApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) =>
                 !error
-                    ? [{
-                        type: 'InstrumentPrices',
-                        id: arg.instrumentId
-                       },
-                       'PortfolioCalculations',
-                       'PositionCalculations']
+                    ? [
+                        'PortfolioCalculations',
+                        'PositionCalculations',
+                        { type: 'InstrumentPrices', id: arg.instrumentId },
+                        { type: 'InstrumentCalculations', id: arg.instrumentId },
+                    ]
                     : []
         }),
         deleteInstrumentPrice: build.mutation<void, { instrumentId: number, priceId: number }>({
@@ -150,9 +152,10 @@ const instrumentApi = portEvalApi.injectEndpoints({
             invalidatesTags: (result, error, arg) =>
                 !error
                     ? [
-                        'PortfolioCalculations', 'PositionCalculations',
-                        { type: 'InstrumentCalculations', id: arg.instrumentId },
-                        { type: 'InstrumentPrices', id: arg.instrumentId }
+                        'PortfolioCalculations',
+                        'PositionCalculations',
+                        { type: 'InstrumentPrices', id: arg.instrumentId },
+                        { type: 'InstrumentCalculations', id: arg.instrumentId }
                     ]
                     : []
         }),

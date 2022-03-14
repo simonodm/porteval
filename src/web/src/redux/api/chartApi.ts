@@ -6,7 +6,8 @@ import { Chart, ChartConfig, AggregationFrequency,
     EntityChartDataPoint, isPriceDataChart, Transaction } from '../../types';
 
 import { buildChartLineDataBaseUrl, buildChartLineTransactionsUrl,
-    generateChartLinesTags, truncateEntityName, generateChartTransactionTags } from './apiUtils';
+    generateChartLineCalcTags, truncateEntityName, generateChartTransactionTags, ChartLineEntityTag,
+    generateChartLineReferencedEntityTags } from './apiUtils';
 import { portEvalApi } from './portEvalApi';
 
 const chartApi = portEvalApi.injectEndpoints({
@@ -16,19 +17,22 @@ const chartApi = portEvalApi.injectEndpoints({
             providesTags: (result) => 
                 result
                     ? [
-                        ...result.map(({ id }) => ({ type: 'Chart' as const, id })),
-                        ...generateChartLinesTags(
-                            result.map(({ lines }) => lines).reduce((prevLines, lines) => [...prevLines, ...lines], [])
+                        ...result.reduce<Array<ChartLineEntityTag>>(
+                            (prev, curr) => [...prev, ...generateChartLineReferencedEntityTags(curr.lines)], []
                         ),
+                        ...result.map(chart => ({ type: 'Chart' as const, id: chart.id })),
                         'Charts'
-                      ]
+                    ]
                     : []
         }),
         getChart: build.query<Chart, number>({
             query: (id) => `charts/${id}`,
             providesTags: (result, error, arg) =>
                 result
-                    ? [{ type: 'Chart', id: arg }]
+                    ? [
+                        ...generateChartLineReferencedEntityTags(result.lines),
+                        { type: 'Chart', id: arg }
+                    ]
                     : []
         }),
         createChart: build.mutation<Chart, ChartConfig>({
@@ -60,7 +64,7 @@ const chartApi = portEvalApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) =>
                 !error
-                    ? ['Charts', { type: 'Chart', id: arg }]
+                    ? [{ type: 'Chart', id: arg }]
                     : []
         }),
         getChartData: build.query<
@@ -99,7 +103,7 @@ const chartApi = portEvalApi.injectEndpoints({
             },
             providesTags: (result, error, arg) =>
                 result
-                    ? generateChartLinesTags(arg.chart.lines)
+                    ? generateChartLineCalcTags(arg.chart.lines)
                     : []
         }),
         getChartTransactions: build.query<Array<Array<Transaction>>, { chart: ChartConfig, from: string, to: string }>({

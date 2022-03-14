@@ -125,25 +125,43 @@ export function buildChartLineTransactionsUrl(line: ChartLine, from: string, to:
     return `transactions?${entityIdQueryParam}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
 }
 
-type ChartLineDataTag = {
-    type: 'ChartLinePortfolio' | 'ChartLinePosition' | 'ChartLineInstrument';
+export type ChartLineEntityTag = {
+    type: 'Portfolio' | 'Position' | 'Instrument',
     id: string | number
 };
 
-type ChartLineTransactionTag = {
-    type: 'ChartLinePortfolioTransactions' | 'ChartLinePositionTransactions' | 'ChartLineInstrumentTransactions';
+export type ChartLineDataTag = {
+    type: 'PortfolioCalculations' | 'PositionCalculations' | 'InstrumentCalculations';
     id: string | number
 };
 
-export const generateChartLinesTags = (lines: Array<ChartLine>): Array<ChartLineDataTag> => {
+export type ChartLineTransactionTag = {
+    type: 'PortfolioTransactions' | 'PositionTransactions' | 'InstrumentTransactions';
+    id: string | number
+};
+
+export const generateChartLineReferencedEntityTags = (lines: Array<ChartLine>): Array<ChartLineEntityTag> => {
+    return lines.map(line => {
+        switch(line.type) {
+            case 'portfolio':
+                return { type: 'Portfolio', id: line.portfolioId };
+            case 'position':
+                return { type: 'Position', id: line.positionId };
+            case 'instrument':
+                return { type: 'Instrument', id: line.instrumentId };
+        }
+    })
+}
+
+export const generateChartLineCalcTags = (lines: Array<ChartLine>): Array<ChartLineDataTag> => {
     return lines.map(line => {
             switch(line.type) {
                 case 'portfolio':
-                    return { type: 'ChartLinePortfolio', id: line.portfolioId };
+                    return { type: 'PortfolioCalculations', id: line.portfolioId };
                 case 'position':
-                    return { type: 'ChartLinePosition', id: line.positionId };
+                    return { type: 'PositionCalculations', id: line.positionId };
                 case 'instrument':
-                    return { type: 'ChartLineInstrument', id: line.instrumentId };
+                    return { type: 'InstrumentCalculations', id: line.instrumentId };
             }
         });
 }
@@ -152,11 +170,11 @@ export const generateChartTransactionTags = (lines: Array<ChartLine>): Array<Cha
     return lines.map(line => {
         switch(line.type) {
             case 'portfolio':
-                return { type: 'ChartLinePortfolioTransactions', id: line.portfolioId };
+                return { type: 'PortfolioTransactions', id: line.portfolioId };
             case 'position':
-                return { type: 'ChartLinePositionTransactions', id: line.positionId };
+                return { type: 'PositionTransactions', id: line.positionId };
             case 'instrument':
-                return { type: 'ChartLineInstrumentTransactions', id: line.instrumentId };
+                return { type: 'InstrumentTransactions', id: line.instrumentId };
         }
     })
 }

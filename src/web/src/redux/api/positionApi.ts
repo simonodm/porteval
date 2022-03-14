@@ -33,7 +33,12 @@ const positionApi = portEvalApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) =>
                 result 
-                    ? [{ type: 'Positions', id: arg.portfolioId }]
+                    ? [
+                        'InstrumentTransactions',
+                        { type: 'Positions', id: arg.portfolioId },
+                        { type: 'PortfolioTransactions', id: result.portfolioId },
+                        { type: 'PortfolioCalculations', id: result.portfolioId },
+                    ]
                     : []
         }),
         updatePosition: build.mutation<Position, Position>({
@@ -55,12 +60,12 @@ const positionApi = portEvalApi.injectEndpoints({
             invalidatesTags: (result, error, arg) =>
                 !error
                     ? [
-                        { type: 'Positions', id: arg.portfolioId },
                         { type: 'Position', id: arg.id },
-                        { type: 'Transactions', id: arg.id },
+                        { type: 'PositionTransactions', id: arg.id },
+                        { type: 'InstrumentTransactions', id: arg.instrumentId },
+                        { type: 'PortfolioTransactions', id: arg.portfolioId },
                         { type: 'PortfolioCalculations', id: arg.portfolioId },
-                        { type: 'PositionCalculations', id: arg.id },
-                        'Charts'
+                        { type: 'PositionCalculations', id: arg.id }
                       ]
                     : []
         }),

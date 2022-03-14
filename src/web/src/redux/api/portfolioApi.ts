@@ -13,10 +13,10 @@ const portfolioApi = portEvalApi.injectEndpoints({
             providesTags: (result) => 
                 result
                     ? [
-                        ...result.map(({ id }) => ({ type: 'Portfolio' as const, id})),
-                         'Portfolios'
-                      ]
-                    : ['Portfolios']
+                        'Portfolios',
+                        ...result.map(portfolio => ({ type: 'Portfolio' as const, id: portfolio.id }))
+                    ]
+                    : []
         }),
         getPortfolioById: build.query<Portfolio, number>({
             query: (id) => `portfolios/${id}`,
@@ -31,7 +31,10 @@ const portfolioApi = portEvalApi.injectEndpoints({
                 method: 'POST',
                 body: truncateEntityName(truncateEntityNote(data))
             }),
-            invalidatesTags: () => ['Portfolios']
+            invalidatesTags: (result, error) => 
+                !error
+                    ? ['Portfolios']
+                    : []
         }),
         updatePortfolio: build.mutation<Portfolio, Portfolio>({
             query: (data) => ({
@@ -41,7 +44,10 @@ const portfolioApi = portEvalApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) => 
                 !error
-                    ? ['Portfolios', { type: 'Portfolio', id: arg.id }]
+                    ? [
+                        { type: 'Portfolio', id: arg.id },
+                        { type: 'PortfolioCalculations', id: arg.id }
+                    ]
                     : []
         }),
         deletePortfolio: build.mutation<void, number>({
@@ -52,10 +58,12 @@ const portfolioApi = portEvalApi.injectEndpoints({
             invalidatesTags: (result, error, arg) =>
                 !error
                     ? [
-                        'Portfolios',
-                        'Charts',
+                        'Position',
+                        'PositionCalculations',
+                        'InstrumentTransactions',
                         { type: 'Portfolio', id: arg },
                         { type: 'Positions', id: arg },
+                        { type: 'PortfolioTransactions', id: arg },
                         { type: 'PortfolioCalculations', id: arg },
                       ]
                     : []

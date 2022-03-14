@@ -5,10 +5,18 @@ import { portEvalApi } from './portEvalApi';
 const currencyApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
         getAllKnownCurrencies: build.query<Array<Currency>, void>({
-            query: () => 'currencies'
+            query: () => 'currencies',
+            providesTags: (result) =>
+                result
+                    ? ['Currencies']
+                    : []
         }),
         getCurrency: build.query<Currency, string>({
-            query: (code) => `currencies/${code}`
+            query: (code) => `currencies/${code}`,
+            providesTags: (result) =>
+                result
+                    ? ['Currencies']
+                    : []
         }),
         getExchangeRates: build.query<Array<CurrencyExchangeRate>, { codeFrom: string, time: string }>({
             query: ({ codeFrom, time}) =>
@@ -30,7 +38,11 @@ const currencyApi = portEvalApi.injectEndpoints({
                 url: `currencies/${data.code}`,
                 method: 'PUT',
                 body: data
-            })
+            }),
+            invalidatesTags: (result, error) =>
+                !error
+                    ? ['Currencies']
+                    : []
         })
     })
 });
