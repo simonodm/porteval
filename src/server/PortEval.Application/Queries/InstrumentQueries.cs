@@ -80,7 +80,7 @@ namespace PortEval.Application.Queries
 
         /// <inheritdoc cref="IInstrumentQueries.GetInstrumentPrices"/>
         public async Task<QueryResponse<PaginatedResponse<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId,
-            PaginationParams pagination, DateRangeParams dateRange, AggregationFrequency frequency = AggregationFrequency.FiveMin)
+            PaginationParams pagination, DateRangeParams dateRange, AggregationFrequency? frequency = null)
         {
             var instrument = await GetInstrument(instrumentId);
             if (instrument.Status == QueryStatus.NotFound)

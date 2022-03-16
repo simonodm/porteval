@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Select from 'react-select';
 
@@ -19,21 +19,21 @@ type Props = {
 
 type SelectOption = {
     label: string;
-    value: AggregationFrequency;
+    value?: AggregationFrequency;
 }
 
 export default function InstrumentPricesTable({ instrumentId, currencySymbol }: Props): JSX.Element {
     const [page, setPage] = useState(1);
     const [pageLimit] = useState(100);
-    const [frequency, setFrequency] = useState<AggregationFrequency>('5min');
+    const [frequency, setFrequency] = useState<AggregationFrequency | undefined>(undefined);
 
     const frequencyOptions: Array<SelectOption> = [
-        { label: '5 minutes', value: '5min' },
-        { label: 'Hour', value: 'hour' },
-        { label: 'Day', value: 'day' },
-        { label: 'Week', value: 'week' },
-        { label: 'Month', value: 'month' },
-        { label: 'Year', value: 'year' }
+        { label: 'All', value: undefined },
+        { label: 'Hourly', value: 'hour' },
+        { label: 'Daily', value: 'day' },
+        { label: 'Weekly', value: 'week' },
+        { label: 'Monthly', value: 'month' },
+        { label: 'Yearly', value: 'year' }
     ]
 
     const prices = useGetInstrumentPricePageQuery(
@@ -44,6 +44,10 @@ export default function InstrumentPricesTable({ instrumentId, currencySymbol }: 
     const [deletePrice, mutationStatus] = useDeleteInstrumentPriceMutation()
 
     const [userSettings] = useUserSettings();
+
+    useEffect(() => {
+        setPage(1);
+    }, [frequency]);
 
     const pricesLoaded = checkIsLoaded(prices, mutationStatus);
     const pricesError = checkIsError(prices, mutationStatus);

@@ -39,7 +39,7 @@ namespace PortEval.Application.Queries.DataQueries
             };
         }
 
-        public static QueryWrapper<int> GetInstrumentPriceCount(int instrumentId, DateTime from, DateTime to, AggregationFrequency frequency)
+        public static QueryWrapper<int> GetInstrumentPriceCount(int instrumentId, DateTime from, DateTime to, AggregationFrequency? frequency)
         {
             var partitionCalc = GetInstrumentPriceIntervalPartitionCalc(frequency);
             return new QueryWrapper<int>
@@ -68,7 +68,7 @@ namespace PortEval.Application.Queries.DataQueries
         }
 
         public static QueryWrapper<IEnumerable<InstrumentPriceDto>> GetInstrumentPrices(int instrumentId, DateTime from, DateTime to,
-            PaginationParams pagination, AggregationFrequency frequency)
+            PaginationParams pagination, AggregationFrequency? frequency)
         {
             var partitionCalc = GetInstrumentPriceIntervalPartitionCalc(frequency);
             return new QueryWrapper<IEnumerable<InstrumentPriceDto>>
@@ -120,10 +120,11 @@ namespace PortEval.Application.Queries.DataQueries
             };
         }
 
-        private static string GetInstrumentPriceIntervalPartitionCalc(AggregationFrequency frequency)
+        private static string GetInstrumentPriceIntervalPartitionCalc(AggregationFrequency? frequency)
         {
             return frequency switch
             {
+                null => "[Time]",
                 AggregationFrequency.FiveMin => "DATEADD(minute, 5 * (DATEDIFF(minute, '', [Time]) / 5), '')",
                 AggregationFrequency.Day => "DATEADD(day, DATEDIFF(day, '', [Time]), '')",
                 AggregationFrequency.Hour => "DATEADD(hour, DATEDIFF(hour, '', [Time]), '')",
