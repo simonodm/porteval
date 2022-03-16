@@ -13,8 +13,8 @@ namespace PortEval.Infrastructure.Configurations
             builder
                 .HasIndex(p => new { p.InstrumentId, p.Time });
             builder
-                .HasOne(p => p.Instrument)
-                .WithMany(i => i.Prices)
+                .HasOne<Instrument>()
+                .WithMany()
                 .HasForeignKey(p => p.InstrumentId);
             builder
                 .Property(p => p.Time)

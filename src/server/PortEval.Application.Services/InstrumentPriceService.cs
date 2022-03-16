@@ -13,46 +13,45 @@ namespace PortEval.Application.Services
     public class InstrumentPriceService : IInstrumentPriceService
     {
         private readonly IInstrumentRepository _instrumentRepository;
+        private readonly IInstrumentPriceRepository _instrumentPriceRepository;
 
-        public InstrumentPriceService(IInstrumentRepository instrumentRepository)
+        public InstrumentPriceService(IInstrumentRepository instrumentRepository, IInstrumentPriceRepository instrumentPriceRepository)
         {
             _instrumentRepository = instrumentRepository;
+            _instrumentPriceRepository = instrumentPriceRepository;
         }
 
         /// <inheritdoc cref="IInstrumentPriceService.AddPricePointAsync"/>
         public async Task<InstrumentPrice> AddPricePointAsync(InstrumentPriceDto options)
         {
-            var instrument = await FetchInstrument(options.InstrumentId);
-            var pricePoint = instrument.AddPricePoint(options.Time.RoundDown(TimeSpan.FromMinutes(1)), options.Price);
-            _instrumentRepository.Update(instrument);
-            await _instrumentRepository.UnitOfWork.CommitAsync();
+            await ValidateInstrumentExists(options.InstrumentId);
+
+            var pricePoint = new InstrumentPrice(options.Time.RoundDown(TimeSpan.FromMinutes(1)), options.Price,
+                options.InstrumentId);
+            _instrumentPriceRepository.AddInstrumentPrice(pricePoint);
+            await _instrumentPriceRepository.UnitOfWork.CommitAsync();
             return pricePoint;
         }
 
         /// <inheritdoc cref="IInstrumentPriceService.AddPricePointAsync"/>
         public async Task DeletePricePointByIdAsync(int instrumentId, int priceId)
         {
-            var instrument = await FetchInstrument(instrumentId);
-            instrument.RemovePricePointById(priceId);
-            _instrumentRepository.Update(instrument);
-            await _instrumentRepository.UnitOfWork.CommitAsync();
+            await _instrumentPriceRepository.DeleteInstrumentPriceAsync(instrumentId, priceId);
+            await _instrumentPriceRepository.UnitOfWork.CommitAsync();
         }
 
         /// <summary>
-        /// Retrieves an instrument by ID.
+        /// Checks whether an instrument with the specified ID exists, throws an exception otherwise.
         /// </summary>
-        /// <param name="instrumentId">ID of the instrument to retrieve.</param>
+        /// <param name="instrumentId">ID of the instrument to check.</param>
         /// <exception cref="ItemNotFoundException">If no instrument with the supplied ID exists.</exception>
-        /// <returns>A task representing the asynchronous search operation. Task result contains the found instrument entity.</returns>
-        private async Task<Instrument> FetchInstrument(int instrumentId)
+        /// <returns>A task representing the asynchronous search operation.</returns>
+        private async Task ValidateInstrumentExists(int instrumentId)
         {
-            var instrument = await _instrumentRepository.FindAsync(instrumentId);
-            if (instrument == null)
+            if (!await _instrumentRepository.Exists(instrumentId))
             {
                 throw new ItemNotFoundException($"Instrument {instrumentId} does not exist.");
             }
-
-            return instrument;
         }
     }
 }

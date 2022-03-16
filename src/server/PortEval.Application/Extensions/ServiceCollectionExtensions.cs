@@ -52,6 +52,7 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IUnitOfWork, PortEvalDbContext>();
 
             services.AddScoped<IInstrumentRepository, InstrumentRepository>();
+            services.AddScoped<IInstrumentPriceRepository, InstrumentPriceRepository>();
             services.AddScoped<IPortfolioRepository, PortfolioRepository>();
             services.AddScoped<IPositionRepository, PositionRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();

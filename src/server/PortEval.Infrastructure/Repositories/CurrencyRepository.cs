@@ -22,7 +22,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<IEnumerable<Currency>> ListAllAsync()
         {
             return await _context.Currencies
-                .Include(c => c.ExchangeRates)
                 .ToListAsync();
         }
 
@@ -30,7 +29,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<Currency> FindAsync(string currencyCode)
         {
             var currencyEntity = await _context.Currencies
-                .Include(c => c.ExchangeRates)
                 .FirstOrDefaultAsync(c => c.Code == currencyCode);
 
             return currencyEntity;
@@ -41,7 +39,6 @@ namespace PortEval.Infrastructure.Repositories
         {
             var defaultCurrency = await _context.Currencies
                 .Where(c => c.IsDefault)
-                .Include(c => c.ExchangeRates)
                 .FirstOrDefaultAsync();
 
             return defaultCurrency;

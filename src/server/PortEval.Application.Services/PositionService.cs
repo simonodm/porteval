@@ -15,11 +15,13 @@ namespace PortEval.Application.Services
         private readonly IPortfolioRepository _portfolioRepository;
         private readonly IPositionRepository _positionRepository;
         private readonly IInstrumentRepository _instrumentRepository;
+        private readonly IInstrumentPriceRepository _instrumentPriceRepository;
 
         public PositionService(IPortfolioRepository portfolioRepository,
-            IPositionRepository positionRepository, IInstrumentRepository instrumentRepository)
+            IPositionRepository positionRepository, IInstrumentRepository instrumentRepository, IInstrumentPriceRepository instrumentPriceRepository)
         {
             _instrumentRepository = instrumentRepository;
+            _instrumentPriceRepository = instrumentPriceRepository;
             _positionRepository = positionRepository;
             _portfolioRepository = portfolioRepository;
         }
@@ -38,13 +40,17 @@ namespace PortEval.Application.Services
             var instrument = await FetchInstrument(options.InstrumentId);
             if (instrument.Type == InstrumentType.Index)
             {
-                throw new OperationNotAllowedException($"Cannot create a position for an instrument of type: index.");
+                throw new OperationNotAllowedException("Cannot create a position for an instrument of type index.");
             }
 
-            if (instrument.GetPriceAt(options.InitialTransaction.Time)?.Price != options.InitialTransaction.Price)
+            // create a price point at transaction time if there is no price OR if transaction price is different
+            var existingPrice =
+                await _instrumentPriceRepository.FindPriceAt(options.InstrumentId, options.InitialTransaction.Time);
+            if (existingPrice == null || existingPrice.Price != options.InitialTransaction.Price)
             {
-                instrument.AddPricePoint(options.InitialTransaction.Time, options.InitialTransaction.Price);
-                _instrumentRepository.Update(instrument);
+                var newPrice = new InstrumentPrice(options.InitialTransaction.Time, options.InitialTransaction.Price,
+                    options.InstrumentId);
+                _instrumentPriceRepository.AddInstrumentPrice(newPrice);
             }
 
             var createdPosition = new Position(options.PortfolioId, options.InstrumentId, options.Note);

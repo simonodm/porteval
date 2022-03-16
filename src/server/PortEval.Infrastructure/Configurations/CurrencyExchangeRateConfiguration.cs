@@ -13,12 +13,14 @@ namespace PortEval.Infrastructure.Configurations
             builder
                 .HasIndex(e => new { e.CurrencyFromCode, e.Time });
             builder
-                .HasOne(e => e.CurrencyFrom)
-                .WithMany(c => c.ExchangeRates)
+                .HasOne<Currency>()
+                .WithMany()
+                .HasForeignKey(er => er.CurrencyFromCode)
                 .OnDelete(DeleteBehavior.Cascade);
             builder
-                .HasOne(e => e.CurrencyTo)
-                .WithMany();
+                .HasOne<Currency>()
+                .WithMany()
+                .HasForeignKey(er => er.CurrencyToCode);
             builder
                 .Property(e => e.Time)
                 .IsRequired();

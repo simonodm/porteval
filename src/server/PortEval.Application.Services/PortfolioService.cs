@@ -3,7 +3,6 @@ using PortEval.Application.Services.Interfaces;
 using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PortEval.Application.Services
@@ -13,13 +12,11 @@ namespace PortEval.Application.Services
     {
         private readonly IPortfolioRepository _portfolioRepository;
         private readonly ICurrencyRepository _currencyRepository;
-        private readonly IChartRepository _chartRepository;
 
-        public PortfolioService(IPortfolioRepository portfolioRepository, ICurrencyRepository currencyRepository, IChartRepository chartRepository)
+        public PortfolioService(IPortfolioRepository portfolioRepository, ICurrencyRepository currencyRepository)
         {
             _portfolioRepository = portfolioRepository;
             _currencyRepository = currencyRepository;
-            _chartRepository = chartRepository;
         }
 
         /// <inheritdoc cref="IPortfolioService.CreatePortfolioAsync"/>

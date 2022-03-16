@@ -45,7 +45,7 @@ namespace PortEval.Application.Services
                 throw new ItemNotFoundException($"Instrument {options.Id} does not exist.");
             }
 
-            existingInstrument.SetName(options.Name);
+            existingInstrument.Rename(options.Name);
             existingInstrument.SetNote(options.Note);
             existingInstrument.IncreaseVersion();
             _instrumentRepository.Update(existingInstrument);
