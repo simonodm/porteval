@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import { DateTime } from 'luxon';
 
+import { Popover } from 'react-tiny-popover';
+
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { ChartConfig, isPriceDataChart, isAggregatedChart,
     AggregationFrequency, ChartType, ChartToDateRange } from '../../types';
@@ -15,6 +17,7 @@ import ChartLineConfigurationContext from '../../context/ChartLineConfigurationC
 import CurrencyDropdown from '../forms/fields/CurrencyDropdown';
 import DateTimeSelector from '../forms/fields/DateTimeSelector';
 import useUserSettings from '../../hooks/useUserSettings';
+import NumberInput from '../forms/fields/NumberInput';
 
 type Props = {
     onChange?: (chart: ChartConfig) => void;
@@ -40,6 +43,9 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
     const defaultCurrency = currencies.data ? currencies.data.find(c => c.isDefault)?.code ?? 'USD' : 'USD';
 
     const [currentChart, setCurrentChart] = useState(context.chart);
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+    const [isCustomToDateRange, setIsCustomToDateRange] = useState(false);
+
     const isLoaded = checkIsLoaded(currencies);
     const isError = checkIsError(currencies);
 
@@ -123,6 +129,12 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
             }
             setCurrentChart(newChart);
             onChange && onChange(newChart);
+
+            if(!toDateRanges.reduce((prev, curr) => prev || range === curr, false)) {
+                setIsCustomToDateRange(true);
+            } else {
+                setIsCustomToDateRange(false);
+            }
         }
     }
 
@@ -200,7 +212,9 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                                     <button
                                         className={
                                             'btn btn-sm ' +
-                                            (currentChart.isToDate && currentChart.toDateRange.unit === range.unit
+                                            (!isCustomToDateRange
+                                                && currentChart.isToDate
+                                                && currentChart.toDateRange.unit === range.unit
                                                 && currentChart.toDateRange.value === range.value
                                                 ? 'btn-dark'
                                                 : 'btn-light')
@@ -209,8 +223,33 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                                         onClick={() => handleToDateRangeChange(range)}
                                         type="button"
                                     >{range.value + range.unit[0].toUpperCase()}
-                                    </button>)
+                                    </button>) 
                             }
+                            <Popover
+                                content={() =>
+                                    <div className="popover-content">
+                                        <NumberInput
+                                            label="Custom range (in days)"
+                                            onChange={(days) => handleToDateRangeChange({ unit: 'day', value: days })}
+                                        />
+                                    </div>
+                                }
+                                isOpen={isPopoverOpen}
+                                onClickOutside={() => setIsPopoverOpen(false)}
+                                positions={['bottom']}
+                            >
+                                <button
+                                    className={
+                                        'btn btn-sm ' +
+                                        (isCustomToDateRange ? 'btn-dark' : 'btn-light')
+                                    }
+                                    onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+                                    type="button"
+                                >
+                                    Custom
+                                </button>
+                            </Popover>
+                                
                         </div>
                     </span>
                 </form>

@@ -130,3 +130,9 @@ table.entity-data td:nth-child(2) {
 .tooltip-transactions > p {
     margin-bottom: 0;
 }
+
+.popover-content {
+    padding: 6px 12px;
+    background-color: white;
+    border: 1px solid lightgray;
+}
