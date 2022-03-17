@@ -4,13 +4,13 @@ using Microsoft.Extensions.Logging;
 using PortEval.Application.Models;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Queries.Interfaces;
+using PortEval.Application.Services.Queries.Interfaces;
 using PortEval.Application.Services.Interfaces;
 using PortEval.Domain.Models.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Queries;
+using PortEval.Application.Services.Queries;
 
 namespace PortEval.Application.Controllers
 {

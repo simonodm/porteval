@@ -1,10 +1,11 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
+using PortEval.Application.Services.Queries.Interfaces;
 
 namespace PortEval.Infrastructure
 {
-    public class PortEvalDbConnection
+    public class PortEvalDbConnection : IDbConnectionCreator
     {
         private readonly string _connectionString;
 

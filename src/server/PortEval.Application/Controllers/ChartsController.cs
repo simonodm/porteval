@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Queries.Interfaces;
 using PortEval.Application.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Queries;
+using PortEval.Application.Services.Queries;
+using PortEval.Application.Services.Queries.Interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

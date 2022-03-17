@@ -3,9 +3,6 @@ using Hangfire.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PortEval.Application.Queries;
-using PortEval.Application.Queries.Interfaces;
-using PortEval.Application.Queries.TypeHandlers;
 using PortEval.Application.Services;
 using PortEval.Application.Services.Interfaces;
 using PortEval.Application.Services.Interfaces.Repositories;
@@ -15,6 +12,9 @@ using PortEval.Infrastructure.Repositories;
 using System;
 using System.Data;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
+using PortEval.Application.Services.Queries;
+using PortEval.Application.Services.Queries.Interfaces;
+using PortEval.Application.Services.Queries.TypeHandlers;
 using PortEval.BackgroundJobs.DatabaseCleanup;
 using PortEval.BackgroundJobs.InitialPriceFetch;
 using PortEval.BackgroundJobs.LatestPricesFetch;
@@ -107,7 +107,7 @@ namespace PortEval.Application.Extensions
         /// <param name="services">ASP.NET service IoC container.</param>
         public static void ConfigureDapper(this IServiceCollection services)
         {
-            services.AddScoped<PortEvalDbConnection>();
+            services.AddScoped<IDbConnectionCreator, PortEvalDbConnection>();
             Dapper.SqlMapper.AddTypeHandler(new ColorHandler());
             Dapper.SqlMapper.AddTypeMap(typeof(DateTime), DbType.DateTime2);
         }

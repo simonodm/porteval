@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PortEval.Application.Queries.Interfaces;
+using PortEval.Application.Services.Queries.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
