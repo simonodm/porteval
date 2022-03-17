@@ -138,7 +138,7 @@ export default function PositionRow({ position }: Props): JSX.Element {
                     </button>
                 </td>
             </tr>
-            { instrumentExpanded &&
+            { instrumentExpanded && !isRemoved &&
                 <tr>
                     <td colSpan={14}>
                         <TransactionsTable currency={currency.data} positionId={position.id} />

@@ -133,7 +133,7 @@ export default function PortfolioRow({ portfolio }: Props): JSX.Element {
                     </button>
                 </td>
             </tr>
-            { portfolioExpanded &&
+            { portfolioExpanded && !isRemoved &&
                 <PositionRows portfolioId={portfolio.id} />
             }
             <ModalWrapper closeModal={() => setCreateModalIsOpen(false)} heading="Open new position"
