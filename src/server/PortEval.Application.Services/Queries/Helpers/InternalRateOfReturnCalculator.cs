@@ -35,11 +35,8 @@ namespace PortEval.Application.Services.Queries.Helpers
             var interval = GetSinglePointIntervalLength(firstTransactionTime, to);
             var totalIntervalCount = CalculateIntervalPointCount(firstTransactionTime, to, interval);
             var equation = new PolynomialEquation(0.01);
-            var initialGuessNumerator = 0m;
-            var initialGuessDenominator = 0m;
-            var currentAmount = 0m;
+            var initialGuess = 0m;
 
-            int? firstIntervalCount = null;
             foreach (var transaction in transactionsList)
             {
                 var transactionIntervalCount = CalculateIntervalPointCount(transaction.Time, to, interval);
@@ -47,24 +44,12 @@ namespace PortEval.Application.Services.Queries.Helpers
                     transaction.Time < from ? transaction.InstrumentPriceAtRangeStart : transaction.Price;
                 equation.AddCoefficient(transactionIntervalCount, -(double)(transaction.Amount * transactionValue));
                 equation.AddCoefficient(0, (double)(transaction.Amount * transaction.InstrumentPriceAtRangeEnd));
-                currentAmount += transaction.Amount;
-
-                if (firstIntervalCount == null || firstIntervalCount == transactionIntervalCount)
-                {
-                    initialGuessDenominator = transaction.Amount * transactionValue;
-                    firstIntervalCount = transactionIntervalCount;
-                }
-                else
-                {
-                    initialGuessNumerator -= transaction.Amount * transactionValue;
-                }
-
-                initialGuessNumerator += transaction.Amount * transaction.InstrumentPriceAtRangeEnd;
+                initialGuess += transaction.Amount *
+                    (transaction.InstrumentPriceAtRangeEnd - transaction.InstrumentPriceAtRangeStart)
+                    / Math.Max(0, transaction.InstrumentPriceAtRangeStart) + 1;
             }
 
-            var initialGuess = Math.Pow((double)initialGuessNumerator / (double)initialGuessDenominator,
-                2.0 / (totalIntervalCount + 1));
-            var singlePointPerformance = equation.CalculateRoot(initialGuess);
+            var singlePointPerformance = equation.CalculateRoot(Math.Pow((double)initialGuess, 1.0 / totalIntervalCount));
             var totalPerformance = Math.Pow(singlePointPerformance, totalIntervalCount);
 
             if (singlePointPerformance < 0 && totalPerformance > 0) totalPerformance *= -1;
