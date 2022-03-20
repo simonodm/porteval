@@ -13,6 +13,15 @@ namespace PortEval.Application.Services.Queries.Interfaces
     public interface IPositionQueries
     {
         /// <summary>
+        /// Retrieves all positions.
+        /// </summary>
+        /// <returns>
+        /// A task representing the asynchronous database query.
+        /// Task result contains an <c>IEnumerable</c> containing the retrieved position DTOs;
+        /// </returns>
+        Task<QueryResponse<IEnumerable<PositionDto>>> GetAllPositions();
+
+        /// <summary>
         /// Retrieves all positions of the given portfolio ordered by ID.
         /// </summary>
         /// <returns>

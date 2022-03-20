@@ -15,11 +15,11 @@ namespace PortEval.Application.Models.Validators
             RuleFor(p => p.Note)
                 .MaximumLength(255);
 
-            When(p => p.InitialTransaction != default, () =>
+            When(p => p.Id == default, () =>
             {
-                RuleFor(p => p.InitialTransaction.Amount).NotEmpty().GreaterThan(0);
-                RuleFor(p => p.InitialTransaction.Price).NotEmpty().GreaterThan(0);
-                RuleFor(p => p.InitialTransaction.Time).NotEmpty().GreaterThanOrEqualTo(PortEvalConstants.FinancialDataStartTime);
+                RuleFor(p => p.Amount).NotEmpty().GreaterThan(0);
+                RuleFor(p => p.Price).NotEmpty().GreaterThan(0);
+                RuleFor(p => p.Time).NotEmpty().GreaterThanOrEqualTo(PortEvalConstants.FinancialDataStartTime);
             });
         }
     }

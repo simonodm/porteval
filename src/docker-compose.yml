@@ -25,11 +25,14 @@ services:
       - porteval-db
     ports:
       - "4680:80"
+    volumes:
+      - porteval_api_files:/app/files
     env_file:
       - ./.env.dev
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
+      - FILE_STORAGE=/app/files
       
   porteval-web:
     image: ${DOCKER_REGISTRY-}porteval-web:dev
@@ -47,3 +50,4 @@ services:
 
 volumes:
     porteval_db_dev:
+    porteval_api_files:

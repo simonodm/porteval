@@ -37,7 +37,7 @@ namespace PortEval.Application.Controllers
         {
             _logger.LogInformation($"Instruments requested (page {pagination.Page}, limit {pagination.Limit}.");
 
-            var instruments = await _instrumentQueries.GetInstruments(pagination);
+            var instruments = await _instrumentQueries.GetInstrumentsPage(pagination);
             return instruments.Response;
         }
 

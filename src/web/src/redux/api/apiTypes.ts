@@ -5,9 +5,9 @@ import { Instrument, Portfolio, Position, Transaction } from '../../types'
 
 export type CreateInstrumentParameters = Omit<Instrument, 'id'>;
 export type CreatePortfolioParameters = Omit<Portfolio, 'id'>;
-export type CreatePositionParameters = Omit<Position, 'id' | 'instrument'> & {
-    initialTransaction: Omit<CreateTransactionParameters, 'positionId'>;
-}
+export type CreatePositionParameters = Omit<Position, 'id' | 'instrument'> 
+    & Omit<CreateTransactionParameters, 'positionId' | 'note'>
+
 export type CreateTransactionParameters = Omit<Transaction, 'id' | 'instrument' | 'portfolioId'>;
 
 export type PaginationParameters = {

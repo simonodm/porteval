@@ -23,7 +23,7 @@ export function getPriceString(
         resultStr = splitThousands(resultStr, settings.thousandsSeparator);
     }
 
-    return `${price < 0 ? '-' : ''}${currencySymbol ?? ''} ${resultStr}`;
+    return `${price < 0 ? '-' : ''}${currencySymbol ?? ''}${resultStr}`;
 }
 
 export function getPerformanceString(

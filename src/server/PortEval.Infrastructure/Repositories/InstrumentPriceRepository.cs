@@ -17,6 +17,13 @@ namespace PortEval.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<InstrumentPrice> FindPriceAsync(int instrumentId, int priceId)
+        {
+            return await _context.InstrumentPrices
+                .Where(price => price.InstrumentId == instrumentId && price.Id == priceId)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<InstrumentPrice> FindPriceAt(int instrumentId, DateTime time)
         {
             return await _context.InstrumentPrices
@@ -38,6 +45,18 @@ namespace PortEval.Infrastructure.Repositories
             {
                 _context.InstrumentPrices.Remove(foundPrice);
             }
+        }
+
+        public async Task<bool> Exists(int instrumentId, int priceId)
+        {
+            return await _context.InstrumentPrices
+                .AnyAsync(price => price.Id == priceId && price.InstrumentId == instrumentId);
+        }
+
+        public async Task<bool> Exists(int instrumentId, DateTime time)
+        {
+            return await _context.InstrumentPrices
+                .AnyAsync(price => price.InstrumentId == instrumentId && price.Time == time);
         }
     }
 }

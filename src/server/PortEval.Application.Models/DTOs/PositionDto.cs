@@ -1,4 +1,5 @@
-﻿using Swashbuckle.AspNetCore.Annotations;
+﻿using System;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace PortEval.Application.Models.DTOs
 {
@@ -20,7 +21,13 @@ namespace PortEval.Application.Models.DTOs
         [SwaggerSchema("Instrument which this position represents.")]
         public InstrumentDto Instrument { get; set; }
 
-        [SwaggerSchema("Initial transaction for initial position open.")]
-        public TransactionDto InitialTransaction { get; set; }
+        [SwaggerSchema("Initial transaction time.")]
+        public DateTime? Time { get; set; }
+
+        [SwaggerSchema("Initial transaction amount.")]
+        public decimal? Amount { get; set; }
+
+        [SwaggerSchema("Initial transaction price.")]
+        public decimal? Price { get; set; }
     }
 }

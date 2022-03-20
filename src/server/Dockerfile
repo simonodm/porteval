@@ -17,6 +17,7 @@ COPY . .
 RUN chmod +x ./wait-for-it.sh
 WORKDIR "/app/PortEval.Application"
 RUN dotnet build "PortEval.Application.csproj" -c Debug -o /app/build
+RUN mkdir /app/files
 
 FROM build AS publish
 RUN dotnet publish "PortEval.Application.csproj" -c Debug -o /app/publish

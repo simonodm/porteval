@@ -12,6 +12,10 @@ namespace PortEval.Domain.Models.Entities
 
         public CurrencyExchangeRate(DateTime time, decimal exchangeRate, string currencyFromCode, string currencyToCode)
         {
+            if (time < PortEvalConstants.FinancialDataStartTime)
+                throw new InvalidOperationException(
+                    $"Exchange rate time must be later than {PortEvalConstants.FinancialDataStartTime}");
+
             Time = time;
             ExchangeRate = exchangeRate;
             CurrencyFromCode = currencyFromCode;

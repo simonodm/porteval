@@ -1,14 +1,24 @@
 ﻿using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Application.Services.Queries.Models;
+using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
-using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Application.Services.Queries.DataQueries
 {
     internal static class InstrumentDataQueries
     {
+        public static QueryWrapper<IEnumerable<InstrumentDto>> GetAllInstrumentsQuery()
+        {
+            return new QueryWrapper<IEnumerable<InstrumentDto>>
+            {
+                Query =
+                    @"SELECT Id, Name, Symbol, Exchange, Type, CurrencyCode, Note, IsTracked, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Instruments
+                          ORDER BY Symbol"
+            };
+        }
+
         public static QueryWrapper<int> GetInstrumentCountQuery()
         {
             return new QueryWrapper<int>
@@ -36,6 +46,19 @@ namespace PortEval.Application.Services.Queries.DataQueries
                 Query = @"SELECT Id, Name, Symbol, Exchange, Type, CurrencyCode, Note, IsTracked, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Instruments
                           WHERE Id = @InstrumentId",
                 Params = new { InstrumentId = instrumentId }
+            };
+        }
+
+        public static QueryWrapper<IEnumerable<InstrumentDto>> GetInstrumentPrices(int instrumentId, DateTime from, DateTime to)
+        {
+            return new QueryWrapper<IEnumerable<InstrumentDto>>
+            {
+                Query = @"SELECT * FROM dbo.InstrumentPrices
+                          WHERE InstrumentId = @InstrumentId
+                          AND Time >= @TimeFrom
+                          AND Time <= @TimeTo
+                          ORDER BY Time DESC",
+                Params = new { InstrumentId = instrumentId, TimeFrom = from, TimeTo = to }
             };
         }
 
@@ -67,7 +90,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
             };
         }
 
-        public static QueryWrapper<IEnumerable<InstrumentPriceDto>> GetInstrumentPrices(int instrumentId, DateTime from, DateTime to,
+        public static QueryWrapper<IEnumerable<InstrumentPriceDto>> GetInstrumentPricesPage(int instrumentId, DateTime from, DateTime to,
             PaginationParams pagination, AggregationFrequency? frequency)
         {
             var partitionCalc = GetInstrumentPriceIntervalPartitionCalc(frequency);

@@ -106,12 +106,9 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
                     portfolioId,
                     instrumentId: positionInstrumentId,
                     note: positionNote,
-                    initialTransaction: {
-                        amount,
-                        price,
-                        time: time.toISO(),
-                        note: ''
-                    }
+                    amount,
+                    price,
+                    time: time.toISO()
                 }).then(res => onSuccessfulResponse(res, onSuccess));
             }
         }

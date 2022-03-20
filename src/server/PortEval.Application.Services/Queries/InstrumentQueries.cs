@@ -27,8 +27,22 @@ namespace PortEval.Application.Services.Queries
             _exchangeRateQueries = exchangeRateQueries;
         }
 
-        /// <inheritdoc cref="IInstrumentQueries.GetInstruments"/>
-        public async Task<QueryResponse<PaginatedResponse<InstrumentDto>>> GetInstruments(PaginationParams pagination)
+        /// <inheritdoc cref="IInstrumentQueries.GetAllInstruments"/>
+        public async Task<QueryResponse<IEnumerable<InstrumentDto>>> GetAllInstruments()
+        {
+            var query = InstrumentDataQueries.GetAllInstrumentsQuery();
+            using var connection = _connectionCreator.CreateConnection();
+            var instruments = await connection.QueryAsync<InstrumentDto>(query.Query, query.Params);
+
+            return new QueryResponse<IEnumerable<InstrumentDto>>
+            {
+                Status = QueryStatus.Ok,
+                Response = instruments
+            };
+        }
+
+        /// <inheritdoc cref="IInstrumentQueries.GetInstrumentsPage"/>
+        public async Task<QueryResponse<PaginatedResponse<InstrumentDto>>> GetInstrumentsPage(PaginationParams pagination)
         {
             var pageQuery = InstrumentDataQueries.GetInstrumentPageQuery(pagination);
             var totalCountQuery = InstrumentDataQueries.GetInstrumentCountQuery();
@@ -78,7 +92,32 @@ namespace PortEval.Application.Services.Queries
         }
 
         /// <inheritdoc cref="IInstrumentQueries.GetInstrumentPrices"/>
-        public async Task<QueryResponse<PaginatedResponse<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId,
+        public async Task<QueryResponse<IEnumerable<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId,
+            DateRangeParams dateRange)
+        {
+            var instrument = await GetInstrument(instrumentId);
+            if (instrument.Status == QueryStatus.NotFound)
+            {
+                return new QueryResponse<IEnumerable<InstrumentPriceDto>>
+                {
+                    Status = QueryStatus.NotFound
+                };
+            }
+
+            var query = InstrumentDataQueries.GetInstrumentPrices(instrumentId, dateRange.From, dateRange.To);
+
+            using var connection = _connectionCreator.CreateConnection();
+            var prices = await connection.QueryAsync<InstrumentPriceDto>(query.Query, query.Params);
+
+            return new QueryResponse<IEnumerable<InstrumentPriceDto>>
+            {
+                Status = QueryStatus.Ok,
+                Response = prices
+            };
+        }
+
+        /// <inheritdoc cref="IInstrumentQueries.GetInstrumentPricesPage"/>
+        public async Task<QueryResponse<PaginatedResponse<InstrumentPriceDto>>> GetInstrumentPricesPage(int instrumentId,
             PaginationParams pagination, DateRangeParams dateRange, AggregationFrequency? frequency = null)
         {
             var instrument = await GetInstrument(instrumentId);
@@ -91,7 +130,7 @@ namespace PortEval.Application.Services.Queries
             }
 
             var pricePageQuery =
-                InstrumentDataQueries.GetInstrumentPrices(instrumentId, dateRange.From, dateRange.To, pagination, frequency);
+                InstrumentDataQueries.GetInstrumentPricesPage(instrumentId, dateRange.From, dateRange.To, pagination, frequency);
             var totalCountQuery =
                 InstrumentDataQueries.GetInstrumentPriceCount(instrumentId, dateRange.From, dateRange.To, frequency);
 

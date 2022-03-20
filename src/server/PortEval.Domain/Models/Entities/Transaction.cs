@@ -14,6 +14,16 @@ namespace PortEval.Domain.Models.Entities
 
         public Transaction(int positionId, DateTime time, decimal amount, decimal price, string note = "")
         {
+            if (time < PortEvalConstants.FinancialDataStartTime)
+                throw new InvalidOperationException(
+                    $"Transaction time must be later than {PortEvalConstants.FinancialDataStartTime}");
+
+            if (amount == 0)
+                throw new InvalidOperationException("Transaction amount cannot be zero.");
+
+            if (price <= 0)
+                throw new InvalidOperationException("Transaction price must be above zero.");
+
             PositionId = positionId;
             Time = time;
             Amount = amount;

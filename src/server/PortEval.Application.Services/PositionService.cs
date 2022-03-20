@@ -31,11 +31,15 @@ namespace PortEval.Application.Services
         {
             await ValidatePortfolioExists(options.PortfolioId);
 
-            if (options.InitialTransaction == default)
+            if (options.Amount == null || options.Price == null || options.Time == null)
             {
                 throw new OperationNotAllowedException(
                     "An initial transaction is required when opening a new position.");
             }
+
+            var initialTransactionTime = (DateTime)options.Time;
+            var initialTransactionPrice = (decimal)options.Price;
+            var initialTransactionAmount = (decimal)options.Amount;
 
             var instrument = await FetchInstrument(options.InstrumentId);
             if (instrument.Type == InstrumentType.Index)
@@ -45,17 +49,17 @@ namespace PortEval.Application.Services
 
             // create a price point at transaction time if there is no price OR if transaction price is different
             var existingPrice =
-                await _instrumentPriceRepository.FindPriceAt(options.InstrumentId, options.InitialTransaction.Time);
-            if (existingPrice == null || existingPrice.Price != options.InitialTransaction.Price)
+                await _instrumentPriceRepository.FindPriceAt(options.InstrumentId, initialTransactionTime);
+            if (existingPrice == null || existingPrice.Price != options.Price)
             {
-                var newPrice = new InstrumentPrice(options.InitialTransaction.Time, options.InitialTransaction.Price,
+                var newPrice = new InstrumentPrice(initialTransactionTime, initialTransactionPrice,
                     options.InstrumentId);
                 _instrumentPriceRepository.AddInstrumentPrice(newPrice);
             }
 
             var createdPosition = new Position(options.PortfolioId, options.InstrumentId, options.Note);
-            createdPosition.AddTransaction(options.InitialTransaction.Amount, options.InitialTransaction.Price,
-                options.InitialTransaction.Time);
+            createdPosition.AddTransaction(initialTransactionAmount, initialTransactionPrice,
+                initialTransactionTime);
             _positionRepository.Add(createdPosition);
             await _positionRepository.UnitOfWork.CommitAsync();
             return createdPosition;

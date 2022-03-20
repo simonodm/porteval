@@ -31,12 +31,27 @@ namespace PortEval.Application.Services.Queries
             _transactionQueries = transactionQueries;
         }
 
+        /// <inheritdoc cref="IPositionQueries.GetAllPositions"/>
+        public async Task<QueryResponse<IEnumerable<PositionDto>>> GetAllPositions()
+        {
+            var query = PositionDataQueries.GetPositions();
+
+            using var connection = _connectionCreator.CreateConnection();
+            var positions = await connection.QueryAsync<PositionDto>(query.Query, query.Params);
+
+            return new QueryResponse<IEnumerable<PositionDto>>
+            {
+                Status = QueryStatus.Ok,
+                Response = positions
+            };
+        }
+
         /// <inheritdoc cref="IPositionQueries.GetPortfolioPositions"/>
         public async Task<QueryResponse<IEnumerable<PositionDto>>> GetPortfolioPositions(int portfolioId)
         {
             // The portfolio query has to be done manually (and not through IPortfolioQueries) to prevent DI circular dependency.
             var portfolioQuery = PortfolioDataQueries.GetPortfolio(portfolioId);
-            var positionsQuery = PositionDataQueries.GetPortfolioPositionsWithInstruments(portfolioId);
+            var positionsQuery = PositionDataQueries.GetPortfolioPositions(portfolioId);
 
             using var connection = _connectionCreator.CreateConnection();
             var portfolio =

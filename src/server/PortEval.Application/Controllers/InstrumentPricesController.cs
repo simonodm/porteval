@@ -37,7 +37,7 @@ namespace PortEval.Application.Controllers
         {
             _logger.LogInformation($"Prices requested for instrument {instrumentId} (page {pagination.Page}, limit {pagination.Limit}).");
 
-            var prices = await _instrumentQueries.GetInstrumentPrices(instrumentId, pagination, dateRange, frequency);
+            var prices = await _instrumentQueries.GetInstrumentPricesPage(instrumentId, pagination, dateRange, frequency);
             if (prices.Status == QueryStatus.NotFound)
             {
                 return NotFound($"Instrument {instrumentId} not found.");

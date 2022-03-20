@@ -7,7 +7,17 @@ namespace PortEval.Application.Services.Queries.DataQueries
 {
     internal static class PositionDataQueries
     {
-        public static QueryWrapper<IEnumerable<PositionDto>> GetPortfolioPositionsWithInstruments(int portfolioId)
+        public static QueryWrapper<IEnumerable<PositionDto>> GetPositions()
+        {
+            return new QueryWrapper<IEnumerable<PositionDto>>
+            {
+                Query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions 
+                          INNER JOIN dbo.Instruments
+                          ON Positions.InstrumentId = Instruments.Id"
+            };
+        }
+
+        public static QueryWrapper<IEnumerable<PositionDto>> GetPortfolioPositions(int portfolioId)
         {
             return new QueryWrapper<IEnumerable<PositionDto>>
             {

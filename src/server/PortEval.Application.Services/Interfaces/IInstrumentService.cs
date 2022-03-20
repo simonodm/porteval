@@ -1,7 +1,6 @@
 ﻿using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Models.Entities;
 using System.Threading.Tasks;
-using PortEval.Domain.Exceptions;
 
 namespace PortEval.Application.Services.Interfaces
 {

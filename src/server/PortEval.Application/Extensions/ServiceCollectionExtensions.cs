@@ -11,6 +11,7 @@ using PortEval.Infrastructure;
 using PortEval.Infrastructure.Repositories;
 using System;
 using System.Data;
+using PortEval.Application.Services.BulkImportExport;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Application.Services.Queries;
 using PortEval.Application.Services.Queries.Interfaces;
@@ -41,6 +42,14 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IChartService, ChartService>();
             services.AddScoped<IInstrumentPriceService, InstrumentPriceService>();
             services.AddScoped<IDashboardService, DashboardService>();
+
+            services.AddScoped<ICsvImportService, CsvImportService>();
+            services.AddScoped<ICsvExportService, CsvExportService>();
+            services.AddScoped<PortfolioImportProcessor>();
+            services.AddScoped<PositionImportProcessor>();
+            services.AddScoped<InstrumentImportProcessor>();
+            services.AddScoped<TransactionImportProcessor>();
+            services.AddScoped<PriceImportProcessor>();
         }
 
         /// <summary>

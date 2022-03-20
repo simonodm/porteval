@@ -14,14 +14,23 @@ namespace PortEval.Application.Services.Queries.Interfaces
     public interface IInstrumentQueries
     {
         /// <summary>
-        /// Retrieves all instruments ordered by ID. The result is paginated.
+        /// Retrieves all instruments ordered by symbol alphabetically.
+        /// </summary>
+        /// <returns>
+        /// A task representing the asynchronous database query.
+        /// Task result contains an <c>IEnumerable</c> containing the retrieved instrument DTOs.
+        /// </returns>
+        Task<QueryResponse<IEnumerable<InstrumentDto>>> GetAllInstruments();
+
+        /// <summary>
+        /// Retrieves all instruments ordered by symbol alphabetically. The result is paginated.
         /// </summary>
         /// <param name="pagination">Pagination parameters.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
         /// Task result contains a <see cref="PaginatedResponse{TPayload}">PaginatedResponse</see> containing the retrieved instrument DTOs.
         /// </returns>
-        Task<QueryResponse<PaginatedResponse<InstrumentDto>>> GetInstruments(PaginationParams pagination);
+        Task<QueryResponse<PaginatedResponse<InstrumentDto>>> GetInstrumentsPage(PaginationParams pagination);
 
         /// <summary>
         /// Retrieves an instrument by ID.
@@ -37,6 +46,15 @@ namespace PortEval.Application.Services.Queries.Interfaces
         Task<QueryResponse<IEnumerable<ExchangeDto>>> GetKnownExchanges();
 
         /// <summary>
+        /// Retrieves all instrument prices in the specified date range ordered by price time descending.
+        /// </summary>
+        /// <param name="instrumentId">ID of the instrument to retrieve prices of.</param>
+        /// <param name="dateRange">Date range to retrieve prices for.</param>
+        /// <returns>A task representing the asynchronous database query. Task result contains an <c>IEnumerable</c> of price DTOs.</returns>
+        Task<QueryResponse<IEnumerable<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId,
+            DateRangeParams dateRange);
+
+        /// <summary>
         /// Retrieves instrument prices in the specified date range ordered by price time, descending. The result is paginated.
         /// </summary>
         /// <param name="instrumentId">ID of the instrument to retrieve prices of.</param>
@@ -44,7 +62,7 @@ namespace PortEval.Application.Services.Queries.Interfaces
         /// <param name="dateRange">Date range to retrieve prices for.</param>
         /// <param name="frequency">Desired interval between prices.</param>
         /// <returns>A task representing the asynchronous database query. Task result contains an <c>IEnumerable</c> of price DTOs.</returns>
-        Task<QueryResponse<PaginatedResponse<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId, PaginationParams pagination,
+        Task<QueryResponse<PaginatedResponse<InstrumentPriceDto>>> GetInstrumentPricesPage(int instrumentId, PaginationParams pagination,
             DateRangeParams dateRange, AggregationFrequency? frequency = null);
 
         /// <summary>
