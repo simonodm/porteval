@@ -16,9 +16,9 @@ export default function InstrumentTypeDropdown({ className, value, disabled, onC
     const [type, setType] = useState<InstrumentType>(value ?? 'stock');
 
     const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const type = e.target.value as InstrumentType;
-        setType(type)
-        onChange && onChange(type);
+        const newType = e.target.value as InstrumentType;
+        setType(newType)
+        onChange && onChange(newType);
     }
 
     useEffect(() => {

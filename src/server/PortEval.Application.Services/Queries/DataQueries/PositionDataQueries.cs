@@ -41,37 +41,6 @@ namespace PortEval.Application.Services.Queries.DataQueries
             };
         }
 
-        public static QueryWrapper<IEnumerable<TransactionDto>> GetPositionTransactions(int positionId, DateTime from, DateTime to)
-        {
-            return new QueryWrapper<IEnumerable<TransactionDto>>
-            {
-                Query = @"SELECT Transactions.Id, PositionId, Positions.PortfolioId, Time, Amount, Price, Transactions.Note FROM dbo.Transactions
-                          INNER JOIN dbo.Positions ON Transactions.PositionId = Positions.Id
-                          WHERE PositionId = @PositionId
-                          AND Time >= @TimeFrom
-                          AND Time <= @TimeTo",
-                Params = new
-                {
-                    PositionId = positionId,
-                    TimeFrom = from,
-                    TimeTo = to
-                }
-            };
-        }
-
-        public static QueryWrapper<TransactionDto> GetTransaction(int positionId, int transactionId)
-        {
-            return new QueryWrapper<TransactionDto>
-            {
-                Query =
-                    @"SELECT Transactions.Id, PositionId, Positions.PortfolioId, Time, Amount, Price, Note FROM dbo.Transactions
-                          INNER JOIN dbo.Positions ON Transactions.PositionId = Positions.Id
-                          WHERE PositionId = @PositionId
-                          AND Transactions.Id = @TransactionId",
-                Params = new { PositionId = positionId, TransactionId = transactionId }
-            };
-        }
-
         public static QueryWrapper<IEnumerable<TransactionDetailsQueryModel>> GetDetailedTransactionsQuery(
             int positionId, DateTime from, DateTime to)
         {

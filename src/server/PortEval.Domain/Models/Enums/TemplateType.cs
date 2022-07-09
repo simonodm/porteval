@@ -1,6 +1,6 @@
-﻿namespace PortEval.Application.Models.DTOs.Enums
+﻿namespace PortEval.Domain.Models.Enums
 {
-    public enum CsvTemplateType
+    public enum TemplateType
     {
         Portfolios,
         Positions,

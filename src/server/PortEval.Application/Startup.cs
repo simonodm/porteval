@@ -45,6 +45,8 @@ namespace PortEval.Application
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.Converters.Add(new AggregationFrequencyJsonConverter());
+                    options.SerializerSettings.Converters.Add(new TemplateTypeJsonConverter());
+                    options.SerializerSettings.Converters.Add(new ImportStatusJsonConverter());
                     options.SerializerSettings.Converters.Add(new ColorJsonConverter());
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
@@ -129,10 +131,12 @@ namespace PortEval.Application
             RecurringJob.AddOrUpdate<IMissingExchangeRatesFetchJob>("fetch_missing_exchange_rates",
                 job => job.Run(), Cron.Daily);
             RecurringJob.AddOrUpdate<IInstrumentPriceCleanupJob>("db_cleanup", job => job.Run(), Cron.Daily);
+            RecurringJob.AddOrUpdate<IImportCleanupJob>("import_cleanup", job => job.Run(), Cron.Daily);
 
             RecurringJob.Trigger("db_cleanup");
             RecurringJob.Trigger("fetch_missing_prices");
             RecurringJob.Trigger("fetch_missing_exchange_rates");
+            RecurringJob.Trigger("import_cleanup");
         }
     }
 }

@@ -1,13 +1,14 @@
 import { DateTime } from 'luxon';
 import { skipToken } from '@reduxjs/toolkit/dist/query';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useGetInstrumentPriceAtQuery } from '../redux/api/instrumentApi';
 
 type SetInstrumentCallback = (instrumentId: number) => void;
 type SetTimeCallback = (dt: DateTime) => void;
+type SetPriceCallback = (price: number) => void;
 type AutoUpdateReturnType =
-    [number, SetInstrumentCallback, SetTimeCallback, React.Dispatch<React.SetStateAction<number>>]
+    [number, SetInstrumentCallback, SetTimeCallback, SetPriceCallback]
 
 export default function useInstrumentPriceAutoFetchingState(
     initialInstrumentId: number | undefined, initialTime: DateTime
@@ -15,9 +16,15 @@ export default function useInstrumentPriceAutoFetchingState(
     const [instrumentId, setInstrumentId] = useState(initialInstrumentId);
     const [time, setTime] = useState(initialTime);
     const [price, setPrice] = useState(0);
+    const [isCustomPrice, setIsCustomPrice] = useState(false);
 
     const instrumentPrice =
-        useGetInstrumentPriceAtQuery(instrumentId ? { instrumentId, time: time.toISO() } : skipToken);
+        useGetInstrumentPriceAtQuery(instrumentId && !isCustomPrice ? { instrumentId, time: time.toISO() } : skipToken);
+
+    const setCustomPrice = (price: number) => {
+        setIsCustomPrice(true);
+        setPrice(price);
+    }
 
     useEffect(() => {
         if(instrumentPrice.data) {
@@ -25,5 +32,5 @@ export default function useInstrumentPriceAutoFetchingState(
         }
     }, [instrumentPrice.data]);
 
-    return [price, setInstrumentId, setTime, setPrice];
+    return [price, setInstrumentId, setTime, setCustomPrice];
 }

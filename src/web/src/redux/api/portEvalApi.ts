@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const portEvalApi = createApi({
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4680/api' }),
+    baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
     endpoints: () => ({}),
     tagTypes: [
         'Portfolios',
@@ -24,6 +24,8 @@ export const portEvalApi = createApi({
         'Chart',
         'DashboardLayout',
         'Exchanges',
-        'Currencies'
+        'Currencies',
+        'Imports',
+        'Import'
     ]
 });

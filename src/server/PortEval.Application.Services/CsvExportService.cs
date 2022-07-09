@@ -15,7 +15,7 @@ namespace PortEval.Application.Services
             using var sw = new StreamWriter(ms);
             using var csv = new CsvWriter(sw, CultureInfo.InvariantCulture);
             csv.Context.RegisterClassMap<PortfolioClassMap>();
-            csv.Context.RegisterClassMap<PositionClassMap>();
+            csv.Context.RegisterClassMap<PositionExportClassMap>();
             csv.Context.RegisterClassMap<TransactionClassMap>();
             csv.Context.RegisterClassMap<InstrumentClassMap>();
             csv.Context.RegisterClassMap<InstrumentPriceClassMap>();

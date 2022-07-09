@@ -36,7 +36,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
             }
 
 
-            baseQuery += " ORDER BY Time DESC";
+            baseQuery += " ORDER BY Time";
             return new QueryWrapper<IEnumerable<TransactionDto>>
             {
                 Query = baseQuery,

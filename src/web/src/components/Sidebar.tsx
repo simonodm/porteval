@@ -23,6 +23,9 @@ export default function Sidebar(): JSX.Element {
                     <NavLink activeClassName="active" to="/currencies">Currencies</NavLink>
                 </li>
                 <li>
+                    <NavLink activeClassName="active" to="/import">Import and export</NavLink>
+                </li>
+                <li>
                     <NavLink activeClassName="active" to="/settings">Settings</NavLink>
                 </li>
             </ul>

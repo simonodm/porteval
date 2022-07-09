@@ -108,7 +108,7 @@ export default function Dashboard(): JSX.Element {
                                 isBounded: true
                             }} key={chart.id}
                             >
-                                <DashboardChart chart={chart} />
+                                <DashboardChart chart={chart} disabled={isEditable} />
                                 { isEditable && 
                                     <button
                                         className="btn btn-danger grid-remove-button"

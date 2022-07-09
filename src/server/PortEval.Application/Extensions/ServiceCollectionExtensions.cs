@@ -17,6 +17,7 @@ using PortEval.Application.Services.Queries;
 using PortEval.Application.Services.Queries.Interfaces;
 using PortEval.Application.Services.Queries.TypeHandlers;
 using PortEval.BackgroundJobs.DatabaseCleanup;
+using PortEval.BackgroundJobs.DataImport;
 using PortEval.BackgroundJobs.InitialPriceFetch;
 using PortEval.BackgroundJobs.LatestPricesFetch;
 using PortEval.BackgroundJobs.MissingPricesFetch;
@@ -67,6 +68,7 @@ namespace PortEval.Application.Extensions
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
             services.AddScoped<IChartRepository, ChartRepository>();
             services.AddScoped<IDashboardItemRepository, DashboardItemRepository>();
+            services.AddScoped<IDataImportRepository, DataImportRepository>();
         }
 
         /// <summary>
@@ -81,6 +83,8 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IMissingExchangeRatesFetchJob, MissingExchangeRatesFetchJob>();
             services.AddScoped<IMissingInstrumentPricesFetchJob, MissingInstrumentPricesFetchJob>();
             services.AddScoped<IInstrumentPriceCleanupJob, InstrumentPriceCleanupJob>();
+            services.AddScoped<IDataImportJob, DataImportJob>();
+            services.AddScoped<IImportCleanupJob, ImportCleanupJob>();
         }
 
         /// <summary>
@@ -97,6 +101,7 @@ namespace PortEval.Application.Extensions
             services.AddScoped<ICurrencyExchangeRateQueries, CurrencyExchangeRateQueries>();
             services.AddScoped<IChartQueries, ChartQueries>();
             services.AddScoped<IDashboardLayoutQueries, DashboardLayoutQueries>();
+            services.AddScoped<IDataImportQueries, DataImportQueries>();
         }
 
         /// <summary>

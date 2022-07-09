@@ -21,7 +21,7 @@ type Props = {
 }
 
 export default function CreateTransactionForm({ positionId, onSuccess }: Props): JSX.Element {
-    const [amount, setAmount] = useState<number>(1);
+    const [amount, setAmount] = useState<number | undefined>(undefined);
     const [time, setTime] = useState(DateTime.now());
     const [note, setNote] = useState('');
 
@@ -64,7 +64,7 @@ export default function CreateTransactionForm({ positionId, onSuccess }: Props):
     }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        if(positionId !== undefined) {
+        if(positionId !== undefined && amount !== undefined) {
             createTransaction({
                 positionId: positionId,
                 time: time.toISO(),

@@ -45,9 +45,11 @@ namespace PortEval.Application.Services.Queries.Helpers
                 equation.AddCoefficient(transactionIntervalCount, -(double)(transaction.Amount * transactionValue));
                 equation.AddCoefficient(0, (double)(transaction.Amount * transaction.InstrumentPriceAtRangeEnd));
                 initialGuess += transaction.Amount *
-                    (transaction.InstrumentPriceAtRangeEnd - transaction.InstrumentPriceAtRangeStart)
-                    / Math.Max(0, transaction.InstrumentPriceAtRangeStart) + 1;
+                    ((transaction.InstrumentPriceAtRangeEnd - transaction.InstrumentPriceAtRangeStart)
+                    / Math.Max(1, transaction.InstrumentPriceAtRangeStart) + 1);
             }
+
+            initialGuess = Math.Max(0, initialGuess); // fail-safe
 
             var singlePointPerformance = equation.CalculateRoot(Math.Pow((double)initialGuess, 1.0 / totalIntervalCount));
             var totalPerformance = Math.Pow(singlePointPerformance, totalIntervalCount);

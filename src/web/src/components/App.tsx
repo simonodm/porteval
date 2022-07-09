@@ -25,6 +25,7 @@ import ChartListView from './views/ChartListView';
 import ChartView from './views/ChartView';
 import CurrenciesView from './views/CurrenciesView';
 import SettingsView from './views/SettingsView';
+import ImportExportView from './views/ImportExportView';
 
 export default function App(): JSX.Element {
     return (
@@ -58,6 +59,9 @@ export default function App(): JSX.Element {
                             </Route>
                             <Route path="/currencies">
                                 <CurrenciesView />
+                            </Route>
+                            <Route path="/import">
+                                <ImportExportView />
                             </Route>
                             <Route path="/settings">
                                 <SettingsView />

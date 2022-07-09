@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PortEval.Infrastructure;
 
 namespace PortEval.Infrastructure.Migrations
 {
     [DbContext(typeof(PortEvalDbContext))]
-    partial class PortEvalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220330101403_ImportsTableAdded")]
+    partial class ImportsTableAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1405,18 +1407,7 @@ namespace PortEval.Infrastructure.Migrations
                     b.Property<bool>("ErrorLogAvailable")
                         .HasColumnType("bit");
 
-                    b.Property<string>("ErrorLogPath")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
                     b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("StatusDetails")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<int>("TemplateType")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Time")

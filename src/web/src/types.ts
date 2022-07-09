@@ -189,6 +189,23 @@ export type Exchange = {
     name: string;
 }
 
+export type ImportStartedResponse = {
+    importId: string;
+}
+
+export type TemplateType = 'portfolios' | 'positions' | 'transactions' | 'prices' | 'instruments';
+export type ImportStatus = 'finished' | 'error' | 'inProgress' | 'pending';
+
+export type ImportEntry = {
+    importId: string;
+    templateType: TemplateType;
+    status: ImportStatus;
+    statusDetails: string;
+    errorLogAvailable: boolean;
+    errorLogUrl: string;
+    time: string;
+}
+
 export type EntityValue = {
     value: number;
     time: string;

@@ -29,6 +29,7 @@ namespace PortEval.Infrastructure
             new ChartLineInstrumentConfiguration().Configure(modelBuilder.Entity<ChartLineInstrument>());
             new DashboardItemConfiguration().Configure(modelBuilder.Entity<DashboardItem>());
             new DashboardChartItemConfiguration().Configure(modelBuilder.Entity<DashboardChartItem>());
+            new DataImportConfiguration().Configure(modelBuilder.Entity<DataImport>());
         }
 
         public void Commit()
@@ -51,6 +52,7 @@ namespace PortEval.Infrastructure
         public DbSet<Chart> Charts { get; set; }
         public DbSet<ChartLine> ChartLines { get; set; }
         public DbSet<DashboardItem> DashboardItems { get; set; }
+        public DbSet<DataImport> Imports { get; set; }
 
         private async Task HandleConcurrencyException(DbUpdateConcurrencyException exception)
         {

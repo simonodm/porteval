@@ -14,7 +14,7 @@ type Props = {
 export default function NumberInput(
     { className, label, value, disabled, allowNegativeValues, allowFloat, validator, onChange }: Props
 ): JSX.Element {
-    const [numberText, setNumberText] = useState(value?.toString() ?? '0');
+    const [numberText, setNumberText] = useState(value?.toString() ?? '');
 
     const updateNumber = (value: string) => {
         const newNumber = allowFloat ? parseFloat(value) : parseInt(value);

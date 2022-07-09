@@ -46,7 +46,7 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
     const [instrumentType, setInstrumentType] = useState<InstrumentType>('stock');
     const [instrumentCurrency, setInstrumentCurrency] = useState('');
 
-    const [amount, setAmount] = useState(1);
+    const [amount, setAmount] = useState<number | undefined>(undefined);
     const [time, setTime] = useState(DateTime.now());
     const [
         price,
@@ -101,7 +101,7 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
         }
 
         const handleCreatePosition = () => {
-            if(portfolioId && positionInstrumentId) {
+            if(portfolioId && positionInstrumentId && amount) {
                 createPosition({
                     portfolioId,
                     instrumentId: positionInstrumentId,

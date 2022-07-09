@@ -37,7 +37,11 @@ namespace PortEval.Application.Services.Queries
             var query = PositionDataQueries.GetPositions();
 
             using var connection = _connectionCreator.CreateConnection();
-            var positions = await connection.QueryAsync<PositionDto>(query.Query, query.Params);
+            var positions = await connection.QueryAsync<PositionDto, InstrumentDto, PositionDto>(query.Query, (p, i) =>
+            {
+                p.Instrument = i;
+                return p;
+            }, query.Params);
 
             return new QueryResponse<IEnumerable<PositionDto>>
             {
@@ -387,7 +391,6 @@ namespace PortEval.Application.Services.Queries
         /// <summary>
         /// Retrieves the time of the first available transaction of the given position.
         /// </summary>
-        /// <param name="portfolioId">Parent portfolio ID.</param>
         /// <param name="positionId">Position ID.</param>
         /// <returns>A task representing the asynchronous database query operation. Task result contains the time of the first transaction if such exists, null otherwise.</returns>
         private async Task<DateTime?> GetFirstTransactionTime(int positionId)
