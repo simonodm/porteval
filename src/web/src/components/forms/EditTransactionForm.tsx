@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import React, { useState } from 'react';
 
-import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
+import { checkIsLoaded, onSuccessfulResponse } from '../../utils/queries';
 import { useUpdateTransactionMutation } from '../../redux/api/transactionApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
 
@@ -19,21 +19,22 @@ type Props = {
 }
 
 export default function EditTransactionForm({ transaction, onSuccess }: Props): JSX.Element {
+    const [amount, setAmount] = useState(transaction.amount);
+    const [price, setPrice] = useState(transaction.price);
+    const [time, setTime] = useState(DateTime.fromISO(transaction.time));
     const [note, setNote] = useState(transaction.note);
     const [updateTransaction, mutationStatus] = useUpdateTransactionMutation();
 
     const [userSettings] = useUserSettings();
 
     const isLoaded = checkIsLoaded(mutationStatus);
-    const isError= checkIsError(mutationStatus);
-
-    const handleNoteChange = (newNote: string) => {
-        setNote(newNote);
-    }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         updateTransaction({
             ...transaction,
+            amount,
+            price,
+            time: time.toISO(),
             note
         }).then(res => onSuccessfulResponse(res, onSuccess));
 
@@ -41,18 +42,19 @@ export default function EditTransactionForm({ transaction, onSuccess }: Props): 
     }
 
     return (
-        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
+        <LoadingWrapper isLoaded={isLoaded}>
             <form onSubmit={handleSubmit}>
-                <NumberInput allowFloat allowNegativeValues disabled
-                    label='Amount' value={transaction.amount}
+                <NumberInput allowFloat allowNegativeValues
+                    label='Amount' onChange={setAmount} value={amount}
                 />
-                <NumberInput allowFloat disabled label='Price'
-                    value={transaction.price}
+                <NumberInput allowFloat label='Price'
+                    onChange={setPrice} value={price}
                 />
-                <DateTimeSelector dateFormat={userSettings.dateFormat} disabled label='Date'
-                    timeFormat={userSettings.timeFormat} timeInterval={1} value={DateTime.fromISO(transaction.time)}
+                <DateTimeSelector dateFormat={userSettings.dateFormat} label='Date'
+                    onChange={setTime} timeFormat={userSettings.timeFormat}
+                    timeInterval={1} value={time}
                 />
-                <TextInput label='Note' onChange={handleNoteChange} value={note} />
+                <TextInput label='Note' onChange={setNote} value={note} />
                 <button 
                     className="btn btn-primary"
                     role="button"

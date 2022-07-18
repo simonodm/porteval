@@ -64,7 +64,7 @@ export default function CreateTransactionForm({ positionId, onSuccess }: Props):
     }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        if(positionId !== undefined && amount !== undefined) {
+        if(positionId !== undefined && amount !== undefined && price !== undefined) {
             createTransaction({
                 positionId: positionId,
                 time: time.toISO(),

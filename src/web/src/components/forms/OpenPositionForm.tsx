@@ -52,7 +52,8 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
         price,
         setPriceFetchInstrument,
         setPriceFetchTime,
-        setPrice
+        setPrice,
+        setAutoUpdateEnabled
     ] = useInstrumentPriceAutoFetchingState(instrumentId, DateTime.now());
 
     const [positionNote, setPositionNote] = useState('');
@@ -83,11 +84,18 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
 
     const handleInstrumentCreationStart = () => {
         setIsNewInstrument(true);
-        setInstrumentId(undefined);
+        setPrice(undefined);
+        setAutoUpdateEnabled(false);
     }
 
     const handleInstrumentCreationCancel = () => {
         setIsNewInstrument(false);
+        setAutoUpdateEnabled(true);
+    }
+
+    const handlePriceChange = (price: number) => {
+        setPrice(price);
+        setAutoUpdateEnabled(false);
     }
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -96,12 +104,11 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
         const handleNewInstrumentCreated = (newInstrument: Instrument) => {
             setInstrumentId(newInstrument.id);
             setIsNewInstrument(false);
-            console.log(newInstrument);
             positionInstrumentId = newInstrument.id;
         }
 
         const handleCreatePosition = () => {
-            if(portfolioId && positionInstrumentId && amount) {
+            if(portfolioId && positionInstrumentId && amount && price) {
                 createPosition({
                     portfolioId,
                     instrumentId: positionInstrumentId,
@@ -174,7 +181,7 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
                 <NumberInput allowFloat label='Amount' onChange={setAmount}
                     value={amount}
                 />
-                <NumberInput allowFloat label='Price' onChange={setPrice}
+                <NumberInput allowFloat label='Price' onChange={handlePriceChange}
                     value={price}
                 />
                 <DateTimeSelector dateFormat={userSettings.dateFormat} enableTime label='Date'

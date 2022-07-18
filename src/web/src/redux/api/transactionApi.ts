@@ -74,6 +74,8 @@ const transactionApi = portEvalApi.injectEndpoints({
                 !error && result
                     ? [
                         { type: 'Transaction', id: arg.id },
+                        { type: 'PortfolioCalculations', id: result.portfolioId },
+                        { type: 'PositionCalculations', id: arg.positionId }
                     ]
                     : []
         }),

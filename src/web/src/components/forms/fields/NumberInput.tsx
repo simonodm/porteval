@@ -58,6 +58,8 @@ export default function NumberInput(
             } else {
                 setNumberText(value.toString());
             }
+        } else {
+            setNumberText('');
         }
     }, [value]);
 

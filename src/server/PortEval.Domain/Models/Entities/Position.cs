@@ -40,6 +40,28 @@ namespace PortEval.Domain.Models.Entities
             return transaction;
         }
 
+        public Transaction UpdateTransaction(int id, decimal amount, decimal price, DateTime time, string note)
+        {
+            var transaction = FindTransaction(id);
+            if (transaction == null)
+            {
+                throw new ItemNotFoundException($"Transaction {id} not found in position {Id}.");
+            }
+
+            if ((transaction.Time > time && GetAmountAt(time) + amount < 0)
+                || (transaction.Time <= time && GetAmountAt(time) - transaction.Amount + amount < 0))
+            {
+                throw new OperationNotAllowedException($"Position amount cannot fall below zero.");
+            }
+
+            transaction.SetTime(time);
+            transaction.SetAmount(amount);
+            transaction.SetPrice(price);
+            transaction.SetNote(note);
+
+            return transaction;
+        }
+
         public void RemoveTransaction(int transactionId)
         {
             var transaction = FindTransaction(transactionId);

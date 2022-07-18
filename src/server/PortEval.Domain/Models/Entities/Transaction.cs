@@ -31,6 +31,21 @@ namespace PortEval.Domain.Models.Entities
             Note = note;
         }
 
+        public void SetTime(DateTime time)
+        {
+            Time = time;
+        }
+
+        public void SetAmount(decimal amount)
+        {
+            Amount = amount;
+        }
+
+        public void SetPrice(decimal price)
+        {
+            Price = price;
+        }
+
         public void SetNote(string note)
         {
             Note = note;

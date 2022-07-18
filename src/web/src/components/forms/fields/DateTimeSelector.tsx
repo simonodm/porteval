@@ -33,8 +33,6 @@ export default function DateTimeSelector({
         setTime(convertedDT);
         onChange && onChange(convertedDT);
     }
-
-    console.log(timeFormat);
     
     useEffect(() => {
         setTime(value);
@@ -44,7 +42,7 @@ export default function DateTimeSelector({
         <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="date">{label}:</label>
             <DatePicker
-                dateFormat={dateFormat && timeFormat ? dateFormat + ' ' + timeFormat : undefined}
+                dateFormat={dateFormat && timeFormat ? dateFormat + ' ' + timeFormat : dateFormat}
                 disabled={disabled}
                 id="date"
                 onChange={handleTimeChange}

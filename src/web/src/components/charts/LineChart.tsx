@@ -18,8 +18,9 @@ export type Line = {
 
 type ChartConfig = {
     xInterval?: XAxisInterval;
-    yFormat?: (yValue: number) => string;
     xFormat?: (xValue: Date) => string;
+    xTooltipFormat?: (xValue: Date) => string;
+    yFormat?: (yValue: number) => string;
     tooltipCallback?: TooltipCallback;
     additionalRenderCallback?: RenderCallback;
 }
@@ -41,6 +42,7 @@ export default function LineChart({ config, lines }: Props): JSX.Element {
             const chart = createChart()
                 .withLines(lines)
                 .withXFormat(config?.xFormat ?? d3.timeFormat('%b %d'))
+                .withXTooltipFormat(config?.xTooltipFormat ?? d3.timeFormat('%b %d'))
                 .withYFormat(config?.yFormat ?? ((y: number) => y.toString()))
                 .withInterval(interval)
 

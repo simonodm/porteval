@@ -185,10 +185,8 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                     <DateTimeSelector
                         className='chart-configurator-setting'
                         dateFormat={userSettings.dateFormat}
-                        enableTime
                         label='Range start'
                         onChange={handleStartDateChange}
-                        timeFormat={userSettings.timeFormat}
                         value={currentChart.isToDate
                             ? undefined
                             : DateTime.fromISO(currentChart.dateRangeStart)}
@@ -196,10 +194,8 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                     <DateTimeSelector
                         className='chart-configurator-setting'
                         dateFormat={userSettings.dateFormat}
-                        enableTime
                         label='Range start'
                         onChange={handleEndDateChange}
-                        timeFormat={userSettings.timeFormat}
                         value={currentChart.isToDate
                             ? undefined
                             : DateTime.fromISO(currentChart.dateRangeEnd)}

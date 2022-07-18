@@ -69,6 +69,19 @@ export function getXAxisD3Format(from: DateTime, to: DateTime): (date: Date) => 
     return d3.timeFormat('%H:%M');
 }
 
+export function getXTooltipD3Format(from: DateTime, to: DateTime): (date: Date) => string {
+    const diff = to.diff(from);
+
+    if(diff >= Duration.fromObject({ years: 1 })) {
+        return d3.timeFormat('%b %d, %Y');
+    }
+    if(diff >= Duration.fromObject({ days: 1 })) {
+        return d3.timeFormat('%b %d');
+    }
+
+    return d3.timeFormat('%H:%M');
+}
+
 export function calculateAppropriateChartFrequency(from: DateTime, to: DateTime): AggregationFrequency {
     const diff = to.diff(from);
 
@@ -119,7 +132,7 @@ export function generateDefaultInstrumentChart(instrument: Instrument): ChartCon
 
     const instrumentPriceChart: ChartConfig = {
         type: 'price',
-        name: 'New chart',
+        name: instrument.symbol,
         currencyCode: `${instrument.currencyCode}`,
         isToDate: true,
         toDateRange: DEFAULT_CHART_TODATE_RANGE,
@@ -141,7 +154,7 @@ export function generateDefaultPortfolioChart(portfolio: Portfolio): ChartConfig
 
     const portfolioPriceChart: ChartConfig = {
         type: 'price',
-        name: 'New chart',
+        name: portfolio.name,
         currencyCode: `${portfolio.currencyCode}`,
         isToDate: true,
         toDateRange: DEFAULT_CHART_TODATE_RANGE,
@@ -155,7 +168,7 @@ export function generateDefaultPositionChart(position: Position): ChartConfig {
     const positionPriceLine: ChartLine = {
         positionId: position.id,
         width: 1,
-        name: position.instrument.symbol,
+        name: position.instrument.name,
         dash: 'solid',
         color: '#0000FF',
         type: 'position'
@@ -163,7 +176,7 @@ export function generateDefaultPositionChart(position: Position): ChartConfig {
 
     const positionPriceChart: ChartConfig = {
         type: 'price',
-        name: 'New chart',
+        name: `${position.instrument.name} position`,
         currencyCode: position.instrument.currencyCode,
         isToDate: true,
         toDateRange: DEFAULT_CHART_TODATE_RANGE,

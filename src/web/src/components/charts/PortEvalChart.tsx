@@ -9,7 +9,7 @@ import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { getPriceString, getPerformanceString } from '../../utils/string';
 import { convertDashToStrokeDashArray, calculateXAxisInterval, getChartDateRange,
     getChartFrequency, getXAxisD3Format, generateTooltipTransactionList,
-    generateChartLineTransactionIcons } from '../../utils/chart';
+    generateChartLineTransactionIcons, getXTooltipD3Format } from '../../utils/chart';
 import { useGetChartDataQuery, useGetChartTransactionsQuery } from '../../redux/api/chartApi';
 import { RenderedDataPointInfo } from '../../utils/lineChart';
 
@@ -50,6 +50,7 @@ export default function PortEvalChart({ chart }: Props): JSX.Element {
             ? (yValue: number) => getPriceString(yValue, currency.data?.symbol, userSettings)
             : (yValue: number) => getPerformanceString(yValue, userSettings),
         xFormat: getXAxisD3Format(from, to),
+        xTooltipFormat: getXTooltipD3Format(from, to),
         xInterval: calculateXAxisInterval(from, to),
         tooltipCallback: transactionData?.data
             ? (from: string | undefined, to: string | undefined) =>

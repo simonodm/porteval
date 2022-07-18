@@ -30,8 +30,9 @@ export default function InstrumentPicker(): JSX.Element {
                             onLineAdd={() => context.addInstrumentLine(instrument)}
                             onLineConfigure={line ? () => context.configureLine(line) : undefined}
                             onLineRemove={() => line ? context.removeLine(line) : undefined}
-                        />)
-                    })}
+                        />
+                    )
+                })}
             </LoadingWrapper>
         </div>
     )

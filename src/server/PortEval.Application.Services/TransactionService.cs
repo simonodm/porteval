@@ -33,11 +33,11 @@ namespace PortEval.Application.Services
         /// <inheritdoc cref="ITransactionService.UpdateTransactionAsync"/>
         public async Task<Transaction> UpdateTransactionAsync(TransactionDto options)
         {
-            var transaction = await FindTransaction(options.PositionId, options.Id);
+            var position = await FindPosition(options.PositionId);
 
-            transaction.SetNote(options.Note);
-            transaction.Position.IncreaseVersion();
-            _positionRepository.Update(transaction.Position);
+            var transaction = position.UpdateTransaction(options.Id, options.Amount, options.Price, options.Time, options.Note);
+            position.IncreaseVersion();
+            _positionRepository.Update(position);
             await _positionRepository.UnitOfWork.CommitAsync();
 
             return transaction;

@@ -36,6 +36,7 @@ class D3LineChart {
 
     _xScale: d3.ScaleTime<number, number> | null = null;
     _xFormat: (x: Date) => string = d3.isoFormat;
+    _xTooltipFormat: (x: Date) => string = d3.isoFormat;
 
     _yScale: d3.ScaleLinear<number, number> | null = null;
     _yFormat: (y: number) => string = (num) => `${num}`;
@@ -64,6 +65,11 @@ class D3LineChart {
 
     withXFormat(xFormat: typeof this._xFormat) {
         this._xFormat = xFormat;
+        return this;
+    }
+
+    withXTooltipFormat(xTooltipFormat: typeof this._xTooltipFormat) {
+        this._xTooltipFormat = xTooltipFormat;
         return this;
     }
 
@@ -335,7 +341,7 @@ class D3LineChart {
                     .attr('x2', this._xScale(x))
                     .attr('y1', 0)
                     .attr('y2', this._height);
-                this._tooltip.html(this._xFormat(new Date(currDataPoint.time)))
+                this._tooltip.html(this._xTooltipFormat(new Date(currDataPoint.time)))
                     .style('display', 'block')
                     .selectAll()
                     .data(this._lines).enter()

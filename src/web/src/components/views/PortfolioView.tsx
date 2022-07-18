@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 
 import { useParams } from 'react-router-dom';
 
@@ -21,6 +21,8 @@ import PortEvalChart from '../charts/PortEvalChart';
 import { generateDefaultPortfolioChart } from '../../utils/chart';
 import PageHeading from '../ui/PageHeading';
 import useUserSettings from '../../hooks/useUserSettings';
+import ModalWrapper from '../modals/ModalWrapper';
+import OpenPositionForm from '../forms/OpenPositionForm';
 
 type Params = {
     portfolioId?: string;
@@ -30,6 +32,8 @@ export default function PortfolioView(): JSX.Element {
     const params = useParams<Params>();
     const portfolioId = params.portfolioId ? parseInt(params.portfolioId) : 0;
     const portfolio = useGetPortfolioByIdQuery(portfolioId);
+
+    const [modalIsOpen, setModalIsOpen] = useState(false);
     
     const value = useGetPortfolioCurrentValueQuery(portfolioId, { pollingInterval: constants.REFRESH_INTERVAL })
     const currency = useGetCurrencyQuery(portfolio.data?.currencyCode ?? skipToken);
@@ -147,6 +151,14 @@ export default function PortfolioView(): JSX.Element {
                     { chart && <PortEvalChart chart={chart} /> }
                 </div>
             </div>
+            <div className="action-buttons">
+                <button
+                    className="btn btn-success btn-sm float-right"
+                    onClick={() => setModalIsOpen(true)} role="button"
+                >
+                    Open position
+                </button>
+            </div>
             <div className="row">
                 <div className="col-xs-12 container-fluid">
                     <h5>Positions</h5>
@@ -161,6 +173,9 @@ export default function PortfolioView(): JSX.Element {
                     </table>
                 </div>
             </div>
+            <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Open position" isOpen={modalIsOpen}>
+                <OpenPositionForm onSuccess={() => setModalIsOpen(false)} portfolioId={portfolioId} />
+            </ModalWrapper>
         </Fragment>
         
     )
