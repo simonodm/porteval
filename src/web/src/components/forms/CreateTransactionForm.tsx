@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon';
 import React, { useEffect, useState } from 'react';
 
 import { useGetPositionQuery } from '../../redux/api/positionApi';
@@ -22,7 +21,7 @@ type Props = {
 
 export default function CreateTransactionForm({ positionId, onSuccess }: Props): JSX.Element {
     const [amount, setAmount] = useState<number | undefined>(undefined);
-    const [time, setTime] = useState(DateTime.now());
+    const [time, setTime] = useState(new Date());
     const [note, setNote] = useState('');
 
     const [userSettings] = useUserSettings();
@@ -54,7 +53,7 @@ export default function CreateTransactionForm({ positionId, onSuccess }: Props):
         setPrice(newPrice);
     }
 
-    const handleTimeChange = (dt: DateTime) => {
+    const handleTimeChange = (dt: Date) => {
         setTime(dt);
         setPriceFetchTime(dt);
     }
@@ -67,7 +66,7 @@ export default function CreateTransactionForm({ positionId, onSuccess }: Props):
         if(positionId !== undefined && amount !== undefined && price !== undefined) {
             createTransaction({
                 positionId: positionId,
-                time: time.toISO(),
+                time: time.toISOString(),
                 amount,
                 price,
                 note

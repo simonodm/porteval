@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 
 import useUserSettings from '../../hooks/useUserSettings';
+import { formatDateTimeString, isValidDateTimeFormat } from '../../utils/string';
 
 import TextInput from './fields/TextInput';
 
 type Props = {
     onSuccess?: () => void;
+    onFailure?: (error: string) => void;
 }
 
-export default function SettingsForm({ onSuccess }: Props): JSX.Element {
+export default function SettingsForm({ onSuccess, onFailure }: Props): JSX.Element {
     const [settings, setSettings] = useUserSettings();
 
     const [dateFormatValue, setDateFormatValue] = useState(settings.dateFormat);
@@ -17,13 +19,19 @@ export default function SettingsForm({ onSuccess }: Props): JSX.Element {
     const [thousandsSeparatorValue, setThousandsSeparatorValue] = useState(settings.thousandsSeparator);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if(!isValidDateTimeFormat(dateFormatValue) || !isValidDateTimeFormat(timeFormatValue)) {
+            onFailure && onFailure(`Invalid date or time format.`);
+            return;
+        }
+
         setSettings({
             dateFormat: dateFormatValue,
             timeFormat: timeFormatValue,
             decimalSeparator: decimalSeparatorValue,
             thousandsSeparator: thousandsSeparatorValue
         });
-        e.preventDefault();
 
         onSuccess && onSuccess();
     }

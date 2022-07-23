@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 
-import { DateTime } from 'luxon';
-
 import { Popover } from 'react-tiny-popover';
 
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
@@ -18,6 +16,7 @@ import CurrencyDropdown from '../forms/fields/CurrencyDropdown';
 import DateTimeSelector from '../forms/fields/DateTimeSelector';
 import useUserSettings from '../../hooks/useUserSettings';
 import NumberInput from '../forms/fields/NumberInput';
+import { subMonths } from 'date-fns';
 
 type Props = {
     onChange?: (chart: ChartConfig) => void;
@@ -92,28 +91,28 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
         }
     }
 
-    const handleStartDateChange = (date: DateTime) => {
+    const handleStartDateChange = (date: Date) => {
         if(currentChart) {
             const newChart: ChartConfig = {
                 ...currentChart,
                 isToDate: false,
-                dateRangeStart: date.toISO(),
-                dateRangeEnd: currentChart.isToDate ? DateTime.now().toISO() : currentChart.dateRangeEnd
+                dateRangeStart: date.toISOString(),
+                dateRangeEnd: currentChart.isToDate ? new Date().toISOString() : currentChart.dateRangeEnd
             }
             setCurrentChart(newChart);
             onChange && onChange(newChart);
         }
     }
 
-    const handleEndDateChange = (date: DateTime) => {
+    const handleEndDateChange = (date: Date) => {
         if(currentChart) {
             const newChart: ChartConfig = {
                 ...currentChart,
                 isToDate: false,
                 dateRangeStart: currentChart.isToDate
-                    ? date.minus({ months: 1 }).toISO()
+                    ? subMonths(date, 1).toISOString()
                     : currentChart.dateRangeStart,
-                dateRangeEnd: date.toISO()
+                dateRangeEnd: date.toISOString()
             }
             setCurrentChart(newChart);
             onChange && onChange(newChart);
@@ -189,7 +188,7 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                         onChange={handleStartDateChange}
                         value={currentChart.isToDate
                             ? undefined
-                            : DateTime.fromISO(currentChart.dateRangeStart)}
+                            : new Date(currentChart.dateRangeStart)}
                     />
                     <DateTimeSelector
                         className='chart-configurator-setting'
@@ -198,7 +197,7 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                         onChange={handleEndDateChange}
                         value={currentChart.isToDate
                             ? undefined
-                            : DateTime.fromISO(currentChart.dateRangeEnd)}
+                            : new Date(currentChart.dateRangeEnd)}
                     />
                     <span className="chart-configurator-setting">
                         <label htmlFor="to-date-range">To-date range</label>

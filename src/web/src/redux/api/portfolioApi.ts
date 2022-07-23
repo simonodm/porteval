@@ -1,5 +1,4 @@
-import { DateTime } from 'luxon';
-
+import { subDays, subMonths, subWeeks } from 'date-fns';
 import { EntityPerformance, EntityProfit, EntityValue, Portfolio } from '../../types';
 
 import { CreatePortfolioParameters, DateRangeParameters } from './apiTypes';
@@ -78,7 +77,7 @@ const portfolioApi = portEvalApi.injectEndpoints({
         }),
         getPortfolioCurrentValue: build.query<EntityValue, number>({
             query: (id) =>
-                `portfolios/${id}/value?at=${encodeURIComponent(DateTime.now().toISO())}`,
+                `portfolios/${id}/value?at=${encodeURIComponent(new Date().toISOString())}`,
             providesTags: (result, error, arg) =>
                 result
                     ? [{ type: 'PortfolioCalculations', id: arg }]
@@ -97,10 +96,10 @@ const portfolioApi = portEvalApi.injectEndpoints({
         }),
         getPortfolioLastDayProfit: build.query<EntityProfit, number>({
             query: (id) => {
-                const to = DateTime.now();
-                const from = to.minus({ days: 1 });
+                const to = new Date();
+                const from = subDays(to, 1);
                 return `portfolios/${id}/profit` +
-                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                    `?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -109,10 +108,10 @@ const portfolioApi = portEvalApi.injectEndpoints({
         }),
         getPortfolioLastWeekProfit: build.query<EntityProfit, number>({
             query: (id) => {
-                const to = DateTime.now();
-                const from = to.minus({ weeks: 1 });
+                const to = new Date();
+                const from = subWeeks(to, 1);
                 return `portfolios/${id}/profit` + 
-                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                    `?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -121,10 +120,10 @@ const portfolioApi = portEvalApi.injectEndpoints({
         }),
         getPortfolioLastMonthProfit: build.query<EntityProfit, number>({
             query: (id) => {
-                const to = DateTime.now();
-                const from = to.minus({ months: 1 });
+                const to = new Date();
+                const from = subMonths(to, 1);
                 return `portfolios/${id}/profit` + 
-                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                    `?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -132,7 +131,7 @@ const portfolioApi = portEvalApi.injectEndpoints({
                     : []
         }),
         getPortfolioTotalProfit: build.query<EntityProfit, number>({
-            query: (id) => `portfolios/${id}/profit?to=${encodeURIComponent(DateTime.now().toISO())}`,
+            query: (id) => `portfolios/${id}/profit?to=${encodeURIComponent(new Date().toISOString())}`,
             providesTags: (result, error, arg) =>
                 result
                     ? [{ type: 'PortfolioCalculations', id: arg }]
@@ -150,10 +149,10 @@ const portfolioApi = portEvalApi.injectEndpoints({
         }),
         getPortfolioLastDayPerformance: build.query<EntityPerformance, number>({
             query: (id) => {
-                const to = DateTime.now();
-                const from = to.minus({ days: 1 });
+                const to = new Date();
+                const from = subDays(to, 1);
                 return `portfolios/${id}/performance` + 
-                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                    `?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -162,10 +161,10 @@ const portfolioApi = portEvalApi.injectEndpoints({
         }),
         getPortfolioLastWeekPerformance: build.query<EntityPerformance, number>({
             query: (id) => {
-                const to = DateTime.now();
-                const from = to.minus({ weeks: 1 });
+                const to = new Date();
+                const from = subWeeks(to, 1);
                 return `portfolios/${id}/performance` + 
-                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                    `?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -174,10 +173,10 @@ const portfolioApi = portEvalApi.injectEndpoints({
         }),
         getPortfolioLastMonthPerformance: build.query<EntityPerformance, number>({
             query: (id) => {
-                const to = DateTime.now();
-                const from = to.minus({ months: 1 });
+                const to = new Date();
+                const from = subMonths(to, 1);
                 return `portfolios/${id}/performance` + 
-                    `?from=${encodeURIComponent(from.toISO())}&to=${encodeURIComponent(to.toISO())}`
+                    `?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`
             },
             providesTags: (result, error, arg) =>
                 result
@@ -185,7 +184,7 @@ const portfolioApi = portEvalApi.injectEndpoints({
                     : []
         }),
         getPortfolioTotalPerformance: build.query<EntityPerformance, number>({
-            query: (id) => `portfolios/${id}/performance?to=${encodeURIComponent(DateTime.now().toISO())}`,
+            query: (id) => `portfolios/${id}/performance?to=${encodeURIComponent(new Date().toISOString())}`,
             providesTags: (result, error, arg) =>
                 result
                     ? [{ type: 'PortfolioCalculations', id: arg }]

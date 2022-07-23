@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon';
 import React, { useState } from 'react';
 
 import { useAddInstrumentPriceMutation } from '../../redux/api/instrumentApi';
@@ -21,7 +20,7 @@ export default function CreateInstrumentPriceForm({ instrumentId, onSuccess }: P
     const [addPrice, mutationStatus] = useAddInstrumentPriceMutation();
 
     const [price, setPrice] = useState(0);
-    const [time, setTime] = useState(DateTime.now());
+    const [time, setTime] = useState(new Date());
 
     const [userSettings] = useUserSettings();
 
@@ -29,7 +28,7 @@ export default function CreateInstrumentPriceForm({ instrumentId, onSuccess }: P
         addPrice({
             instrumentId,
             price,
-            time: time.toISO()
+            time: time.toISOString()
         }).then(res => onSuccessfulResponse(res, onSuccess));
 
         e.preventDefault();

@@ -4,8 +4,6 @@ import { useParams } from 'react-router-dom';
 
 import { skipToken } from '@reduxjs/toolkit/dist/query';
 
-import { DateTime } from 'luxon';
-
 import LoadingWrapper from '../ui/LoadingWrapper';
 
 import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
@@ -52,9 +50,7 @@ export default function InstrumentView(): JSX.Element {
                 { instrument.data?.isTracked  && instrument.data.lastPriceUpdate &&
                     <span className="float-right last-updated">
                         Prices updated: {
-                            DateTime
-                                .fromISO(instrument.data?.lastPriceUpdate)
-                                .toLocaleString(DateTime.DATETIME_MED)
+                            new Date(instrument.data.lastPriceUpdate).toLocaleString()
                         }
                     </span>
                 }

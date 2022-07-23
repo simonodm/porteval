@@ -1,5 +1,4 @@
-import { DateTime } from 'luxon';
-
+import { format } from 'date-fns';
 import { UserSettings } from '../types';
 
 export function camelToProperCase(str: string): string {
@@ -41,8 +40,18 @@ export function getPerformanceString(
     return `${prefix}${resultStr}%`;
 }
 
-export function formatDateTimeString(isoDateTime: string, format: string): string {
-    return DateTime.fromISO(isoDateTime).toFormat(format)
+export function isValidDateTimeFormat(dtFormat: string): boolean {
+    try {
+        format(Date.parse("1999-01-01T00:00:00Z"), dtFormat);
+        return true;
+    }
+    catch (ex) {
+        return false;
+    }
+}
+
+export function formatDateTimeString(isoDateTime: string, dtFormat: string): string {
+    return format(Date.parse(isoDateTime), dtFormat);
 }
 
 function splitThousands(number: string, separator: string): string {

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { DateTime } from 'luxon';
 import DatePicker from 'react-datepicker';
 
 type Props = {
@@ -10,8 +9,8 @@ type Props = {
     disabled?: boolean;
     enableTime?: boolean;
     timeInterval?: number;
-    value?: DateTime;
-    onChange?: (dt: DateTime) => void;
+    value?: Date;
+    onChange?: (dt: Date) => void;
 }
 
 export default function DateTimeSelector({
@@ -25,13 +24,11 @@ export default function DateTimeSelector({
     value,
     onChange
 }: Props): JSX.Element {
-    const [time, setTime] = useState<DateTime | undefined>(value ?? DateTime.now());
+    const [time, setTime] = useState<Date | undefined>(value ?? new Date());
 
-    const handleTimeChange = (dt: Date) => {
-        const convertedDT = DateTime.fromJSDate(dt);
-        
-        setTime(convertedDT);
-        onChange && onChange(convertedDT);
+    const handleTimeChange = (dt: Date) => {        
+        setTime(dt);
+        onChange && onChange(dt);
     }
     
     useEffect(() => {
@@ -46,7 +43,7 @@ export default function DateTimeSelector({
                 disabled={disabled}
                 id="date"
                 onChange={handleTimeChange}
-                selected={time?.toJSDate()}
+                selected={time}
                 showTimeSelect={!!enableTime}
                 timeFormat={timeFormat}
                 timeIntervals={timeInterval ?? 5}

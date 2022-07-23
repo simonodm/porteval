@@ -25,8 +25,8 @@ export default function PortEvalChart({ chart }: Props): JSX.Element {
     const [from, to] = getChartDateRange(chart);
     const frequency = getChartFrequency(chart);
 
-    const chartData = useGetChartDataQuery({ chart, frequency, from: from.toISO(), to: to.toISO() });
-    const transactionData = useGetChartTransactionsQuery({ chart, from: from.toISO(), to: to.toISO() });
+    const chartData = useGetChartDataQuery({ chart, frequency, from: from.toISOString(), to: to.toISOString() });
+    const transactionData = useGetChartTransactionsQuery({ chart, from: from.toISOString(), to: to.toISOString() });
     const currency = useGetCurrencyQuery(isPriceDataChart(chart) ? chart.currencyCode : skipToken);
 
     const [userSettings] = useUserSettings();

@@ -1,5 +1,4 @@
 import * as d3 from 'd3';
-import { DateTime, Duration } from 'luxon';
 
 import { DEFAULT_CHART_TODATE_RANGE, CHART_TRANSACTION_SIGN_CIRCLE_RADIUS,
     CHART_TRANSACTION_SIGN_SIZE } from '../constants';
@@ -10,6 +9,7 @@ import { Line, XAxisInterval } from '../components/charts/LineChart';
 import { RenderedDataPointInfo } from './lineChart';
 import { getPriceString } from './string';
 import removeDuplicates from './array';
+import { Duration, intervalToDuration, sub } from 'date-fns';
 
 type LineWithTransactions = Line & {
     transactions: Array<Transaction>
@@ -26,13 +26,16 @@ export function convertDashToStrokeDashArray(dash: ChartLineDashType): string {
     }
 }
 
-export function calculateXAxisInterval(from: DateTime, to: DateTime): XAxisInterval {
-    const diff = to.diff(from);
+export function calculateXAxisInterval(from: Date, to: Date): XAxisInterval {
+    const diff = intervalToDuration({
+        start: from,
+        end: to
+    });
 
-    if(diff >= Duration.fromObject({ years: 2 })) return 'year';
-    if(diff >= Duration.fromObject({ months: 6 })) return 'month';
-    if(diff >= Duration.fromObject({ months: 1 })) return 'week';
-    if(diff >= Duration.fromObject({ days: 2 })) return 'day';
+    if(diff >= { years: 2 }) return 'year';
+    if(diff >= { months: 6 }) return 'month';
+    if(diff >= { months: 1 }) return 'week';
+    if(diff >= { days: 2 }) return 'day';
 
     return 'hour';
 }
@@ -53,43 +56,52 @@ export function getXAxisD3Interval(interval: XAxisInterval | undefined): d3.Coun
     }
 }
 
-export function getXAxisD3Format(from: DateTime, to: DateTime): (date: Date) => string {
-    const diff = to.diff(from);
+export function getXAxisD3Format(from: Date, to: Date): (date: Date) => string {
+    const diff = intervalToDuration({
+        start: from,
+        end: to
+    });
 
-    if(diff >= Duration.fromObject({ years: 2 })) {
+    if(diff >= { years: 2 }) {
         return d3.timeFormat('%Y');
     }
-    if(diff >= Duration.fromObject({ months: 6 })) {
+    if(diff >= { months: 6 }) {
         return d3.timeFormat('%b %Y');
     }
-    if(diff >= Duration.fromObject({ days: 2 })) {
+    if(diff >= { days: 2 }) {
         return d3.timeFormat('%b %d');
     }
 
     return d3.timeFormat('%H:%M');
 }
 
-export function getXTooltipD3Format(from: DateTime, to: DateTime): (date: Date) => string {
-    const diff = to.diff(from);
+export function getXTooltipD3Format(from: Date, to: Date): (date: Date) => string {
+    const diff = intervalToDuration({
+        start: from,
+        end: to
+    });
 
-    if(diff >= Duration.fromObject({ years: 1 })) {
+    if(diff >= { years: 1 }) {
         return d3.timeFormat('%b %d, %Y');
     }
-    if(diff >= Duration.fromObject({ days: 1 })) {
+    if(diff >= { days: 1 }) {
         return d3.timeFormat('%b %d');
     }
 
     return d3.timeFormat('%H:%M');
 }
 
-export function calculateAppropriateChartFrequency(from: DateTime, to: DateTime): AggregationFrequency {
-    const diff = to.diff(from);
+export function calculateAppropriateChartFrequency(from: Date, to: Date): AggregationFrequency {
+    const diff = intervalToDuration({
+        start: from,
+        end: to
+    });
 
-    if(diff > Duration.fromObject({ years: 10 })) return 'year';
-    if(diff > Duration.fromObject({ years: 2 })) return 'month';
-    if(diff > Duration.fromObject({ years: 1})) return 'week';
-    if(diff > Duration.fromObject({ days: 7 })) return 'day';
-    if(diff > Duration.fromObject({ days: 1 })) return 'hour';
+    if(diff > { years: 10 }) return 'year';
+    if(diff > { years: 2 }) return 'month';
+    if(diff > { years: 1}) return 'week';
+    if(diff > { days: 7 }) return 'day';
+    if(diff > { days: 1 }) return 'hour';
 
     return '5min';
 }
@@ -103,18 +115,18 @@ export function getChartFrequency(chart: ChartConfig): AggregationFrequency {
     return calculateAppropriateChartFrequency(from, to);
 }
 
-export function getChartDateRange(chart: ChartConfig): [DateTime, DateTime] {
-    const currentTime = DateTime.now();
+export function getChartDateRange(chart: ChartConfig): [Date, Date] {
+    const currentTime = Date.now();
 
-    let from, to;
+    let from: Date, to: Date;
     if(chart.isToDate) {
         // round down to 5 minutes
-        const roundedTime = DateTime.fromMillis(currentTime.toMillis() - (currentTime.toMillis() % (300 * 1000)));
-        from = roundedTime.minus(getDurationFromToDateRange(chart.toDateRange));
+        const roundedTime = new Date(currentTime - currentTime % (300 * 1000));
+        from = new Date(sub(roundedTime, getDurationFromToDateRange(chart.toDateRange)));
         to = roundedTime;
     } else {
-        from = DateTime.fromISO(chart.dateRangeStart)
-        to = DateTime.fromISO(chart.dateRangeEnd);
+        from = new Date(chart.dateRangeStart)
+        to = new Date(chart.dateRangeEnd);
     }
 
     return [from, to];
@@ -257,11 +269,11 @@ function getTransactionTotalAmount(
 function findLineTransactionsInRange(
     transactions: Array<Transaction>, from: string | undefined, to: string | undefined
 ): Array<Transaction> {
-    const convertedFrom = from && DateTime.fromISO(from);
-    const convertedTo = to && DateTime.fromISO(to);
+    const convertedFrom = from && new Date(from);
+    const convertedTo = to && new Date(to);
 
     return transactions.filter(t => {
-        const time = DateTime.fromISO(t.time)
+        const time = new Date(t.time)
         return (convertedFrom === undefined || time >= convertedFrom) &&
                (convertedTo === undefined || time <= convertedTo);
     });
@@ -281,15 +293,15 @@ function generateMinusSignSVG(x: number, y: number, size: number, color: string)
     return sign;
 }
 
-function getDurationFromToDateRange(toDateRange: ChartToDateRange) {
+function getDurationFromToDateRange(toDateRange: ChartToDateRange): Duration {
     switch(toDateRange.unit) {
         case 'day':
-            return Duration.fromObject({ days: toDateRange.value });
+            return { days: toDateRange.value };
         case 'week':
-            return Duration.fromObject({ weeks: toDateRange.value})
+            return { weeks: toDateRange.value}
         case 'month':
-            return Duration.fromObject({ months: toDateRange.value });
+            return { months: toDateRange.value };
         case 'year':
-            return Duration.fromObject({ years: toDateRange.value });
+            return { years: toDateRange.value };
     }
 }

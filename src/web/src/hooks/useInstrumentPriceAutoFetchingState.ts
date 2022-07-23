@@ -1,18 +1,17 @@
-import { DateTime } from 'luxon';
 import { skipToken } from '@reduxjs/toolkit/dist/query';
 import { useEffect, useState } from 'react';
 
 import { useGetInstrumentPriceAtQuery } from '../redux/api/instrumentApi';
 
 type SetInstrumentCallback = (instrumentId: number | undefined) => void;
-type SetTimeCallback = (dt: DateTime) => void;
+type SetTimeCallback = (dt: Date) => void;
 type SetPriceCallback = (price: number | undefined) => void;
 type SetAutoUpdateEnabledCallback = (enabled: boolean) => void;
 type AutoUpdateReturnType =
     [number | undefined, SetInstrumentCallback, SetTimeCallback, SetPriceCallback, SetAutoUpdateEnabledCallback]
 
 export default function useInstrumentPriceAutoFetchingState(
-    initialInstrumentId: number | undefined, initialTime: DateTime
+    initialInstrumentId: number | undefined, initialTime: Date
 ): AutoUpdateReturnType {
     const [instrumentId, setInstrumentId] = useState(initialInstrumentId);
     const [time, setTime] = useState(initialTime);
@@ -21,7 +20,7 @@ export default function useInstrumentPriceAutoFetchingState(
 
     const instrumentPrice =
         useGetInstrumentPriceAtQuery(
-            instrumentId && autoUpdateEnabled ? { instrumentId, time: time.toISO() } : skipToken
+            instrumentId && autoUpdateEnabled ? { instrumentId, time: time.toISOString() } : skipToken
         );
 
     useEffect(() => {

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import { DateTime } from 'luxon';
-
 import { useCreateInstrumentMutation, useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
@@ -47,14 +45,14 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
     const [instrumentCurrency, setInstrumentCurrency] = useState('');
 
     const [amount, setAmount] = useState<number | undefined>(undefined);
-    const [time, setTime] = useState(DateTime.now());
+    const [time, setTime] = useState(new Date());
     const [
         price,
         setPriceFetchInstrument,
         setPriceFetchTime,
         setPrice,
         setAutoUpdateEnabled
-    ] = useInstrumentPriceAutoFetchingState(instrumentId, DateTime.now());
+    ] = useInstrumentPriceAutoFetchingState(instrumentId, time);
 
     const [positionNote, setPositionNote] = useState('');
 
@@ -77,7 +75,7 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
         setPriceFetchInstrument(id);
     }
 
-    const handleTimeChange = (time: DateTime) => {
+    const handleTimeChange = (time: Date) => {
         setTime(time);
         setPriceFetchTime(time);
     }
@@ -115,7 +113,7 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
                     note: positionNote,
                     amount,
                     price,
-                    time: time.toISO()
+                    time: time.toISOString()
                 }).then(res => onSuccessfulResponse(res, onSuccess));
             }
         }

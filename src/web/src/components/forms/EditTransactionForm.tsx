@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon';
 import React, { useState } from 'react';
 
 import { checkIsLoaded, onSuccessfulResponse } from '../../utils/queries';
@@ -21,7 +20,7 @@ type Props = {
 export default function EditTransactionForm({ transaction, onSuccess }: Props): JSX.Element {
     const [amount, setAmount] = useState(transaction.amount);
     const [price, setPrice] = useState(transaction.price);
-    const [time, setTime] = useState(DateTime.fromISO(transaction.time));
+    const [time, setTime] = useState(new Date(transaction.time));
     const [note, setNote] = useState(transaction.note);
     const [updateTransaction, mutationStatus] = useUpdateTransactionMutation();
 
@@ -34,7 +33,7 @@ export default function EditTransactionForm({ transaction, onSuccess }: Props): 
             ...transaction,
             amount,
             price,
-            time: time.toISO(),
+            time: time.toISOString(),
             note
         }).then(res => onSuccessfulResponse(res, onSuccess));
 
