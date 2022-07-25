@@ -15,15 +15,16 @@ namespace PortEval.Application.Services
         private readonly IPortfolioRepository _portfolioRepository;
         private readonly IPositionRepository _positionRepository;
         private readonly IInstrumentRepository _instrumentRepository;
-        private readonly IInstrumentPriceRepository _instrumentPriceRepository;
+
+        private readonly IInstrumentPriceService _instrumentPriceService;
 
         public PositionService(IPortfolioRepository portfolioRepository,
-            IPositionRepository positionRepository, IInstrumentRepository instrumentRepository, IInstrumentPriceRepository instrumentPriceRepository)
+            IPositionRepository positionRepository, IInstrumentRepository instrumentRepository, IInstrumentPriceService instrumentPriceService)
         {
             _instrumentRepository = instrumentRepository;
-            _instrumentPriceRepository = instrumentPriceRepository;
             _positionRepository = positionRepository;
             _portfolioRepository = portfolioRepository;
+            _instrumentPriceService = instrumentPriceService;
         }
 
         /// <inheritdoc cref="IPositionService.OpenPositionAsync"/>
@@ -44,17 +45,7 @@ namespace PortEval.Application.Services
             var instrument = await FetchInstrument(options.InstrumentId);
             if (instrument.Type == InstrumentType.Index)
             {
-                throw new OperationNotAllowedException("Cannot create a position for an instrument of type index.");
-            }
-
-            // create a price point at transaction time if there is no price OR if transaction price is different
-            var existingPrice =
-                await _instrumentPriceRepository.FindPriceAt(options.InstrumentId, initialTransactionTime);
-            if (existingPrice == null || existingPrice.Price != options.Price)
-            {
-                var newPrice = new InstrumentPrice(initialTransactionTime, initialTransactionPrice,
-                    options.InstrumentId);
-                _instrumentPriceRepository.AddInstrumentPrice(newPrice);
+                throw new OperationNotAllowedException("Cannot create a position for an index.");
             }
 
             var createdPosition = new Position(options.PortfolioId, options.InstrumentId, options.Note);
@@ -62,6 +53,9 @@ namespace PortEval.Application.Services
                 initialTransactionTime);
             _positionRepository.Add(createdPosition);
             await _positionRepository.UnitOfWork.CommitAsync();
+
+            await _instrumentPriceService.AddPriceIfNotExistsAsync(options.InstrumentId, initialTransactionTime, initialTransactionPrice);
+
             return createdPosition;
         }
 

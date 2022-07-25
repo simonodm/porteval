@@ -33,7 +33,24 @@ namespace PortEval.Application.Services
             return pricePoint;
         }
 
-        /// <inheritdoc cref="IInstrumentPriceService.AddPricePointAsync"/>
+        /// <inheritdoc cref="IInstrumentPriceService.AddPriceIfNotExistsAsync"/>
+        public async Task<InstrumentPrice> AddPriceIfNotExistsAsync(int instrumentId, DateTime time, decimal price)
+        {
+            await ValidateInstrumentExists(instrumentId);
+
+            var existingPrice = await _instrumentPriceRepository.FindPriceAt(instrumentId, time);
+            if(existingPrice != null && existingPrice.Price == price)
+            {
+                return existingPrice;
+            }
+
+            var pricePoint = new InstrumentPrice(time.RoundDown(TimeSpan.FromMinutes(1)), price, instrumentId);
+            _instrumentPriceRepository.AddInstrumentPrice(pricePoint);
+            await _instrumentPriceRepository.UnitOfWork.CommitAsync();
+            return pricePoint;
+        }
+
+        /// <inheritdoc cref="IInstrumentPriceService.DeletePricePointByIdAsync"/>
         public async Task DeletePricePointByIdAsync(int instrumentId, int priceId)
         {
             await _instrumentPriceRepository.DeleteInstrumentPriceAsync(instrumentId, priceId);

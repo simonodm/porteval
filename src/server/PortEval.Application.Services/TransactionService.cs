@@ -12,9 +12,12 @@ namespace PortEval.Application.Services
     {
         private readonly IPositionRepository _positionRepository;
 
-        public TransactionService(IPositionRepository positionRepository)
+        private readonly IInstrumentPriceService _instrumentPriceService;
+
+        public TransactionService(IPositionRepository positionRepository, IInstrumentPriceService instrumentPriceService)
         {
             _positionRepository = positionRepository;
+            _instrumentPriceService = instrumentPriceService;
         }
 
         /// <inheritdoc cref="ITransactionService.AddTransactionAsync"/>
@@ -26,6 +29,8 @@ namespace PortEval.Application.Services
 
             _positionRepository.Update(position);
             await _positionRepository.UnitOfWork.CommitAsync();
+
+            await _instrumentPriceService.AddPriceIfNotExistsAsync(position.InstrumentId, options.Time, options.Price);
 
             return createdTransaction;
         }
@@ -62,7 +67,7 @@ namespace PortEval.Application.Services
         /// Retrieves a position by its ID.
         /// </summary>
         /// <param name="positionId">Position ID</param>
-        /// <exception cref="ItemNotFoundException">Thrown if or position was found with the supplied ID.</exception>
+        /// <exception cref="ItemNotFoundException">Thrown if no position was found with the supplied ID.</exception>
         /// <returns>A task representing the asynchronous search operation. The task result contains the found position entity.</returns>
         private async Task<Position> FindPosition(int positionId)
         {
