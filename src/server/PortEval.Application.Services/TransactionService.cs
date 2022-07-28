@@ -45,6 +45,8 @@ namespace PortEval.Application.Services
             _positionRepository.Update(position);
             await _positionRepository.UnitOfWork.CommitAsync();
 
+            await _instrumentPriceService.AddPriceIfNotExistsAsync(position.InstrumentId, options.Time, options.Price);
+
             return transaction;
         }
 
