@@ -74,6 +74,16 @@ namespace PortEval.Application.Controllers
             return positions.Response.ToList();
         }
 
+        // GET api/portfolios/5/positions/stats
+        [HttpGet("{id}/positions/stats")]
+        public async Task<ActionResult<IEnumerable<PositionStatisticsDto>>> GetPositionsStatistics(int id)
+        {
+            _logger.LogInformation($"Requesting portfolio {id} positions' statistics");
+
+            var result = await _positionQueries.GetPortfolioPositionsStatistics(id);
+            return result.Response.ToList();
+        }
+
         // GET api/portfolios/5/value?at=2021-01-01T02:00:00Z
         [HttpGet("{id}/value")]
         public async Task<ActionResult<EntityValueDto>> GetPortfolioValue(int id, [FromQuery] DateTime? at)
@@ -193,6 +203,31 @@ namespace PortEval.Application.Controllers
             }
 
             return result.Response.ToList();
+        }
+
+        // GET api/portfolios/stats
+        [HttpGet("stats")]
+        public async Task<ActionResult<IEnumerable<EntityStatisticsDto>>> GetAllPortfoliosStatistics()
+        {
+            _logger.LogInformation("Portfolios' statistics requested.");
+            var result = await _portfolioQueries.GetAllPortfoliosStatistics();
+
+            return result.Response.ToList();
+        }
+
+        // GET api/portfolios/5/stats
+        [HttpGet("{id}/stats")]
+        public async Task<ActionResult<EntityStatisticsDto>> GetPortfolioStatistics(int id)
+        {
+            _logger.LogInformation($"Portfolio {id} statistics requested.");
+            var result = await _portfolioQueries.GetPortfolioStatistics(id);
+
+            if(result.Status == QueryStatus.NotFound)
+            {
+                return NotFound($"Portfolio {id} not found.");
+            }
+
+            return result.Response;
         }
 
         // POST api/portfolios

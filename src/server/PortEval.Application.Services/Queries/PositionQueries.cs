@@ -388,6 +388,59 @@ namespace PortEval.Application.Services.Queries
             };
         }
 
+        /// <inheritdoc cref="IPositionQueries.GetPortfolioPositionsStatistics"/>
+        public async Task<QueryResponse<IEnumerable<PositionStatisticsDto>>> GetPortfolioPositionsStatistics(int portfolioId)
+        {
+            var now = DateTime.Now;
+
+            var positions = await GetPortfolioPositions(portfolioId);
+
+            var data = await Task.WhenAll(positions.Response.Select(position => GetPositionStatistics(position.Id)));
+            return new QueryResponse<IEnumerable<PositionStatisticsDto>>
+            {
+                Status = QueryStatus.Ok,
+                Response = data.Select(stats => stats.Response)
+            };
+        }
+
+        /// <inheritdoc cref="IPositionQueries.GetPositionStatistics"/>
+        public async Task<QueryResponse<PositionStatisticsDto>> GetPositionStatistics(int id)
+        {
+            var performanceTotal = await GetPositionPerformance(id, new DateRangeParams());
+            var performanceLastDay = await GetPositionPerformance(id, new DateRangeParams { From = DateTime.Now.AddDays(-1) });
+            var performanceLastWeek = await GetPositionPerformance(id, new DateRangeParams { From = DateTime.Now.AddDays(-7) });
+            var performanceLastMonth = await GetPositionPerformance(id, new DateRangeParams { From = DateTime.Now.AddMonths(-1) });
+
+            var profitTotal = await GetPositionProfit(id, new DateRangeParams());
+            var profitLastDay = await GetPositionProfit(id, new DateRangeParams { From = DateTime.Now.AddDays(-1) });
+            var profitLastWeek = await GetPositionProfit(id, new DateRangeParams { From = DateTime.Now.AddDays(-7) });
+            var profitLastMonth = await GetPositionProfit(id, new DateRangeParams { From = DateTime.Now.AddMonths(-1) });
+
+            if (profitLastMonth.Status != QueryStatus.Ok)
+            {
+                return new QueryResponse<PositionStatisticsDto>
+                {
+                    Status = profitLastMonth.Status
+                };
+            }
+
+            return new QueryResponse<PositionStatisticsDto>
+            {
+                Status = QueryStatus.Ok,
+                Response = new PositionStatisticsDto
+                {
+                    TotalPerformance = performanceTotal.Response.Performance,
+                    LastDayPerformance = performanceLastDay.Response.Performance,
+                    LastWeekPerformance = performanceLastWeek.Response.Performance,
+                    LastMonthPerformance = performanceLastMonth.Response.Performance,
+                    TotalProfit = profitTotal.Response.Profit,
+                    LastDayProfit = profitLastDay.Response.Profit,
+                    LastWeekProfit = profitLastWeek.Response.Profit,
+                    LastMonthProfit = profitLastWeek.Response.Profit
+                }
+            };
+        }
+
         /// <summary>
         /// Retrieves the time of the first available transaction of the given position.
         /// </summary>

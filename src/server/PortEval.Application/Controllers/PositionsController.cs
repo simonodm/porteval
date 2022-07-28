@@ -173,6 +173,20 @@ namespace PortEval.Application.Controllers
             return result.Response.ToList();
         }
 
+        [HttpGet("{positionId}/stats")]
+        public async Task<ActionResult<PositionStatisticsDto>> GetPositionStatistics(int positionId)
+        {
+            _logger.LogInformation($"Position {positionId} statistics requested.");
+
+            var result = await _positionQueries.GetPositionStatistics(positionId);
+            if(result.Status == QueryStatus.NotFound)
+            {
+                return NotFound($"Position {positionId} not found");
+            }
+
+            return result.Response;
+        }
+
         // POST api/positions
         [HttpPost]
         public async Task<ActionResult<PositionDto>> PostPosition([FromBody] PositionDto createRequest)

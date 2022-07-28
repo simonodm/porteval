@@ -140,5 +140,25 @@ namespace PortEval.Application.Services.Queries.Interfaces
         /// </returns>
         Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartPositionPerformanceAggregated(int positionId,
             DateRangeParams dateRange, AggregationFrequency frequency);
+
+        /// <summary>
+        /// Retrieves performance and profit statistics of positions of a given portfolio for the past day, week, month, and total.
+        /// </summary>
+        /// <param name="portfolioId">Parent portfolio ID</param>
+        /// <returns>
+        /// A task representing the asynchronous database query.
+        /// Task result contains an <c>IEnumerable</c> of <see cref="PositionStatisticsDto"/> containing the positions' statistics.
+        /// </returns>
+        Task<QueryResponse<IEnumerable<PositionStatisticsDto>>> GetPortfolioPositionsStatistics(int portfolioId);
+
+        /// <summary>
+        /// Retrieves performance and profit statistics of a given position for the past day, week, month, and total.
+        /// </summary>
+        /// <param name="id">Position ID</param>
+        /// <returns>
+        /// A task representing the asynchronous database query.
+        /// Task result contains a <see cref="PositionStatisticsDto"/> containing the position's statistics.
+        /// </returns>
+        Task<QueryResponse<PositionStatisticsDto>> GetPositionStatistics(int id);
     }
 }

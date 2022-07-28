@@ -311,6 +311,59 @@ namespace PortEval.Application.Services.Queries
             };
         }
 
+        /// <inheritdoc cref="IPortfolioQueries.GetAllPortfoliosStatistics"/>
+        public async Task<QueryResponse<IEnumerable<EntityStatisticsDto>>> GetAllPortfoliosStatistics()
+        {
+            var now = DateTime.Now;
+
+            var portfolios = await GetPortfolios();
+
+            var data = await Task.WhenAll(portfolios.Response.Select(portfolio => GetPortfolioStatistics(portfolio.Id)));
+            return new QueryResponse<IEnumerable<EntityStatisticsDto>>
+            {
+                Status = QueryStatus.Ok,
+                Response = data.Select(stats => stats.Response)
+            };
+        }
+
+        /// <inheritdoc cref="IPortfolioQueries.GetPortfolioStatistics"/>
+        public async Task<QueryResponse<EntityStatisticsDto>> GetPortfolioStatistics(int id)
+        {
+            var performanceTotal = await GetPortfolioPerformance(id, new DateRangeParams());
+            var performanceLastDay = await GetPortfolioPerformance(id, new DateRangeParams { From = DateTime.Now.AddDays(-1) });
+            var performanceLastWeek = await GetPortfolioPerformance(id, new DateRangeParams { From = DateTime.Now.AddDays(-7) });
+            var performanceLastMonth = await GetPortfolioPerformance(id, new DateRangeParams { From = DateTime.Now.AddMonths(-1) });
+
+            var profitTotal = await GetPortfolioProfit(id, new DateRangeParams());
+            var profitLastDay = await GetPortfolioProfit(id, new DateRangeParams { From = DateTime.Now.AddDays(-1) });
+            var profitLastWeek = await GetPortfolioProfit(id, new DateRangeParams { From = DateTime.Now.AddDays(-7) });
+            var profitLastMonth = await GetPortfolioProfit(id, new DateRangeParams { From = DateTime.Now.AddMonths(-1) });
+
+            if(profitLastMonth.Status != QueryStatus.Ok)
+            {
+                return new QueryResponse<EntityStatisticsDto>
+                {
+                    Status = profitLastMonth.Status
+                };
+            }
+
+            return new QueryResponse<EntityStatisticsDto>
+            {
+                Status = QueryStatus.Ok,
+                Response = new EntityStatisticsDto
+                {
+                    TotalPerformance = performanceTotal.Response.Performance,
+                    LastDayPerformance = performanceLastDay.Response.Performance,
+                    LastWeekPerformance = performanceLastWeek.Response.Performance,
+                    LastMonthPerformance = performanceLastMonth.Response.Performance,
+                    TotalProfit = profitTotal.Response.Profit,
+                    LastDayProfit = profitLastDay.Response.Profit,
+                    LastWeekProfit = profitLastWeek.Response.Profit,
+                    LastMonthProfit = profitLastWeek.Response.Profit
+                }
+            };
+        }
+
         /// <summary>
         /// Retrieves the time of the first available transaction of the given portfolio.
         /// </summary>
