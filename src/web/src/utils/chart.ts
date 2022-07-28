@@ -10,6 +10,7 @@ import { RenderedDataPointInfo } from './lineChart';
 import { getPriceString } from './string';
 import removeDuplicates from './array';
 import { Duration, intervalToDuration, sub } from 'date-fns';
+import { durationGreaterThan, durationGreaterThanOrEqualTo } from './date';
 
 type LineWithTransactions = Line & {
     transactions: Array<Transaction>
@@ -32,10 +33,10 @@ export function calculateXAxisInterval(from: Date, to: Date): XAxisInterval {
         end: to
     });
 
-    if(diff >= { years: 2 }) return 'year';
-    if(diff >= { months: 6 }) return 'month';
-    if(diff >= { months: 1 }) return 'week';
-    if(diff >= { days: 2 }) return 'day';
+    if(durationGreaterThanOrEqualTo(diff, { years: 2 })) return 'year';
+    if(durationGreaterThanOrEqualTo(diff, { months: 6 })) return 'month';
+    if(durationGreaterThanOrEqualTo(diff, { months: 1 })) return 'week';
+    if(durationGreaterThanOrEqualTo(diff, { days: 2 })) return 'day';
 
     return 'hour';
 }
@@ -62,13 +63,13 @@ export function getXAxisD3Format(from: Date, to: Date): (date: Date) => string {
         end: to
     });
 
-    if(diff >= { years: 2 }) {
+    if(durationGreaterThanOrEqualTo(diff, { years: 2 })) {
         return d3.timeFormat('%Y');
     }
-    if(diff >= { months: 6 }) {
+    if(durationGreaterThanOrEqualTo(diff, { months: 6 })) {
         return d3.timeFormat('%b %Y');
     }
-    if(diff >= { days: 2 }) {
+    if(durationGreaterThanOrEqualTo(diff, { days: 2 })) {
         return d3.timeFormat('%b %d');
     }
 
@@ -81,10 +82,10 @@ export function getXTooltipD3Format(from: Date, to: Date): (date: Date) => strin
         end: to
     });
 
-    if(diff >= { years: 1 }) {
+    if(durationGreaterThanOrEqualTo(diff, { years: 1 })) {
         return d3.timeFormat('%b %d, %Y');
     }
-    if(diff >= { days: 1 }) {
+    if(durationGreaterThanOrEqualTo(diff, { days: 1 })) {
         return d3.timeFormat('%b %d');
     }
 
@@ -97,11 +98,11 @@ export function calculateAppropriateChartFrequency(from: Date, to: Date): Aggreg
         end: to
     });
 
-    if(diff > { years: 10 }) return 'year';
-    if(diff > { years: 2 }) return 'month';
-    if(diff > { years: 1}) return 'week';
-    if(diff > { days: 7 }) return 'day';
-    if(diff > { days: 1 }) return 'hour';
+    if(durationGreaterThan(diff, { years: 10 })) return 'year';
+    if(durationGreaterThan(diff, { years: 2 })) return 'month';
+    if(durationGreaterThan(diff, { years: 1 })) return 'week';
+    if(durationGreaterThan(diff, { days: 7 })) return 'day';
+    if(durationGreaterThan(diff, { days: 1 })) return 'hour';
 
     return '5min';
 }
