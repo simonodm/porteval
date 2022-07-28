@@ -30,7 +30,8 @@ export default function CreateTransactionForm({ positionId, onSuccess }: Props):
         price,
         setPriceFetchInstrument,
         setPriceFetchTime,
-        setPrice
+        setPrice,
+        setAutoUpdateEnabled
     ] = useInstrumentPriceAutoFetchingState(undefined, time);
 
     const [createTransaction, mutationStatus] = useAddTransactionMutation();
@@ -51,6 +52,7 @@ export default function CreateTransactionForm({ positionId, onSuccess }: Props):
 
     const handlePriceChange = (newPrice: number) => {
         setPrice(newPrice);
+        setAutoUpdateEnabled(false);
     }
 
     const handleTimeChange = (dt: Date) => {
