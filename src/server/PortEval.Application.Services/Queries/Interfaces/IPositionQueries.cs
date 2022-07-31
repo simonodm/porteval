@@ -71,6 +71,17 @@ namespace PortEval.Application.Services.Queries.Interfaces
         Task<QueryResponse<EntityPerformanceDto>> GetPositionPerformance(int positionId, DateRangeParams dateRange);
 
         /// <summary>
+        /// Calculates the position's break-even point at the specified time.
+        /// </summary>
+        /// <param name="positionId">ID of the position to calculate BEP of.</param>
+        /// <param name="time">Time at which the BEP should be calculated.</param>
+        /// <returns>
+        /// A task representing the asynchronous database query.
+        /// Task result contains a <see cref="PositionBreakEvenPointDto"/> containing the position's BEP.
+        /// </returns>
+        Task<QueryResponse<PositionBreakEvenPointDto>> GetPositionBreakEvenPoint(int positionId, DateTime time);
+
+        /// <summary>
         /// Charts the position's value in the specified date range with the specified frequency.
         /// </summary>
         /// <param name="positionId">ID of the position to calculate charted value of.</param>

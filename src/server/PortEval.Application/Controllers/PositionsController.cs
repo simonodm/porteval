@@ -93,6 +93,22 @@ namespace PortEval.Application.Controllers
             return performance.Response;
         }
 
+        // GET api/positions/5/bep?at=2022-01-01T00:00:00Z
+        [HttpGet("{positionId}/bep")]
+        public async Task<ActionResult<PositionBreakEvenPointDto>> GetPositionBreakEvenPoint(int positionId, [FromQuery] DateTime? at)
+        {
+            var time = at ?? DateTime.Now;
+            _logger.LogInformation($"Position {positionId} break-even point at {time} requested.");
+
+            var breakEvenPoint = await _positionQueries.GetPositionBreakEvenPoint(positionId, time);
+            if(breakEvenPoint.Status == QueryStatus.NotFound)
+            {
+                return NotFound($"Position {positionId} not found.");
+            }
+
+            return breakEvenPoint.Response;
+        }
+
         // GET api/positions/5/value/chart?from=2021-01-01T00:00:00Z&to=2021-02-01T00:00:00Z&frequency=day
         [HttpGet("{positionId}/value/chart")]
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetPositionChartedValue(int positionId,

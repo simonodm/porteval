@@ -329,15 +329,17 @@ namespace PortEval.Application.Services.Queries
         /// <inheritdoc cref="IPortfolioQueries.GetPortfolioStatistics"/>
         public async Task<QueryResponse<EntityStatisticsDto>> GetPortfolioStatistics(int id)
         {
-            var performanceTotal = await GetPortfolioPerformance(id, new DateRangeParams());
-            var performanceLastDay = await GetPortfolioPerformance(id, new DateRangeParams { From = DateTime.Now.AddDays(-1) });
-            var performanceLastWeek = await GetPortfolioPerformance(id, new DateRangeParams { From = DateTime.Now.AddDays(-7) });
-            var performanceLastMonth = await GetPortfolioPerformance(id, new DateRangeParams { From = DateTime.Now.AddMonths(-1) });
+            var now = DateTime.Now;
 
-            var profitTotal = await GetPortfolioProfit(id, new DateRangeParams());
-            var profitLastDay = await GetPortfolioProfit(id, new DateRangeParams { From = DateTime.Now.AddDays(-1) });
-            var profitLastWeek = await GetPortfolioProfit(id, new DateRangeParams { From = DateTime.Now.AddDays(-7) });
-            var profitLastMonth = await GetPortfolioProfit(id, new DateRangeParams { From = DateTime.Now.AddMonths(-1) });
+            var performanceTotal = await GetPortfolioPerformance(id, new DateRangeParams { To = now });
+            var performanceLastDay = await GetPortfolioPerformance(id, new DateRangeParams { From = now.AddDays(-1), To = now });
+            var performanceLastWeek = await GetPortfolioPerformance(id, new DateRangeParams { From = now.AddDays(-7), To = now });
+            var performanceLastMonth = await GetPortfolioPerformance(id, new DateRangeParams { From = now.AddMonths(-1), To = now });
+
+            var profitTotal = await GetPortfolioProfit(id, new DateRangeParams { To = now });
+            var profitLastDay = await GetPortfolioProfit(id, new DateRangeParams { From = now.AddDays(-1), To = now });
+            var profitLastWeek = await GetPortfolioProfit(id, new DateRangeParams { From = now.AddDays(-7), To = now });
+            var profitLastMonth = await GetPortfolioProfit(id, new DateRangeParams { From = now.AddMonths(-1), To = now });
 
             if(profitLastMonth.Status != QueryStatus.Ok)
             {
@@ -352,14 +354,15 @@ namespace PortEval.Application.Services.Queries
                 Status = QueryStatus.Ok,
                 Response = new EntityStatisticsDto
                 {
-                    TotalPerformance = performanceTotal.Response.Performance,
-                    LastDayPerformance = performanceLastDay.Response.Performance,
-                    LastWeekPerformance = performanceLastWeek.Response.Performance,
-                    LastMonthPerformance = performanceLastMonth.Response.Performance,
-                    TotalProfit = profitTotal.Response.Profit,
-                    LastDayProfit = profitLastDay.Response.Profit,
-                    LastWeekProfit = profitLastWeek.Response.Profit,
-                    LastMonthProfit = profitLastWeek.Response.Profit
+                    Id = id,
+                    TotalPerformance = performanceTotal.Response?.Performance ?? 0m,
+                    LastDayPerformance = performanceLastDay.Response?.Performance ?? 0m,
+                    LastWeekPerformance = performanceLastWeek.Response?.Performance ?? 0m,
+                    LastMonthPerformance = performanceLastMonth.Response?.Performance ?? 0m,
+                    TotalProfit = profitTotal.Response?.Profit ?? 0m,
+                    LastDayProfit = profitLastDay.Response?.Profit ?? 0m,
+                    LastWeekProfit = profitLastWeek.Response?.Profit ?? 0m,
+                    LastMonthProfit = profitLastWeek.Response?.Profit ?? 0m
                 }
             };
         }

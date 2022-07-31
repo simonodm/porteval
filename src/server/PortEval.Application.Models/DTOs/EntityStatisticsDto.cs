@@ -2,6 +2,7 @@
 {
     public class EntityStatisticsDto
     {
+        public int Id { get; set; }
         public decimal TotalPerformance { get; set; }
         public decimal LastMonthPerformance { get; set; }
         public decimal LastWeekPerformance { get; set; }

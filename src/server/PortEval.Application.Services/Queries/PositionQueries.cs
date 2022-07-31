@@ -241,6 +241,34 @@ namespace PortEval.Application.Services.Queries
             };
         }
 
+        /// <inheritdoc cref="IPositionQueries.GetPositionBreakEvenPoint"/>
+        public async Task<QueryResponse<PositionBreakEvenPointDto>> GetPositionBreakEvenPoint(int positionId, DateTime time)
+        {
+            var position = await GetPosition(positionId);
+            if(position.Status != QueryStatus.Ok)
+            {
+                return new QueryResponse<PositionBreakEvenPointDto>
+                {
+                    Status = position.Status
+                };
+            }
+
+            var transactions = await _transactionQueries.GetTransactions(new TransactionFilters { PositionId = positionId }, new DateRangeParams { To = time });
+            var totalPositionBuyingPrice = transactions.Response.Sum(t => t.Amount * t.Price);
+            var positionAmount = transactions.Response.Sum(t => t.Amount);
+            var bep = totalPositionBuyingPrice / positionAmount;
+
+            return new QueryResponse<PositionBreakEvenPointDto>
+            {
+                Status = QueryStatus.Ok,
+                Response = new PositionBreakEvenPointDto
+                {
+                    BreakEvenPoint = bep,
+                    Time = time
+                }
+            };
+        }
+
         /// <inheritdoc cref="IPositionQueries.ChartPositionValue"/>
         public async Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartPositionValue(int positionId,
             DateRangeParams dateRange, AggregationFrequency frequency, string targetCurrencyCode = null)
@@ -406,15 +434,18 @@ namespace PortEval.Application.Services.Queries
         /// <inheritdoc cref="IPositionQueries.GetPositionStatistics"/>
         public async Task<QueryResponse<PositionStatisticsDto>> GetPositionStatistics(int id)
         {
-            var performanceTotal = await GetPositionPerformance(id, new DateRangeParams());
-            var performanceLastDay = await GetPositionPerformance(id, new DateRangeParams { From = DateTime.Now.AddDays(-1) });
-            var performanceLastWeek = await GetPositionPerformance(id, new DateRangeParams { From = DateTime.Now.AddDays(-7) });
-            var performanceLastMonth = await GetPositionPerformance(id, new DateRangeParams { From = DateTime.Now.AddMonths(-1) });
+            var now = DateTime.Now;
+            var performanceTotal = await GetPositionPerformance(id, new DateRangeParams { To = now });
+            var performanceLastDay = await GetPositionPerformance(id, new DateRangeParams { From = now.AddDays(-1), To = now });
+            var performanceLastWeek = await GetPositionPerformance(id, new DateRangeParams { From = now.AddDays(-7), To = now });
+            var performanceLastMonth = await GetPositionPerformance(id, new DateRangeParams { From = now.AddMonths(-1), To = now });
 
-            var profitTotal = await GetPositionProfit(id, new DateRangeParams());
-            var profitLastDay = await GetPositionProfit(id, new DateRangeParams { From = DateTime.Now.AddDays(-1) });
-            var profitLastWeek = await GetPositionProfit(id, new DateRangeParams { From = DateTime.Now.AddDays(-7) });
-            var profitLastMonth = await GetPositionProfit(id, new DateRangeParams { From = DateTime.Now.AddMonths(-1) });
+            var profitTotal = await GetPositionProfit(id, new DateRangeParams { To = now });
+            var profitLastDay = await GetPositionProfit(id, new DateRangeParams { From = now.AddDays(-1), To = now });
+            var profitLastWeek = await GetPositionProfit(id, new DateRangeParams { From = now.AddDays(-7), To = now });
+            var profitLastMonth = await GetPositionProfit(id, new DateRangeParams { From = now.AddMonths(-1), To = now });
+
+            var bep = await GetPositionBreakEvenPoint(id, now);
 
             if (profitLastMonth.Status != QueryStatus.Ok)
             {
@@ -429,14 +460,16 @@ namespace PortEval.Application.Services.Queries
                 Status = QueryStatus.Ok,
                 Response = new PositionStatisticsDto
                 {
-                    TotalPerformance = performanceTotal.Response.Performance,
-                    LastDayPerformance = performanceLastDay.Response.Performance,
-                    LastWeekPerformance = performanceLastWeek.Response.Performance,
-                    LastMonthPerformance = performanceLastMonth.Response.Performance,
-                    TotalProfit = profitTotal.Response.Profit,
-                    LastDayProfit = profitLastDay.Response.Profit,
-                    LastWeekProfit = profitLastWeek.Response.Profit,
-                    LastMonthProfit = profitLastWeek.Response.Profit
+                    Id = id,
+                    TotalPerformance = performanceTotal.Response?.Performance ?? 0m,
+                    LastDayPerformance = performanceLastDay.Response?.Performance ?? 0m,
+                    LastWeekPerformance = performanceLastWeek.Response?.Performance ?? 0m,
+                    LastMonthPerformance = performanceLastMonth.Response?.Performance ?? 0m,
+                    TotalProfit = profitTotal.Response?.Profit ?? 0m,
+                    LastDayProfit = profitLastDay.Response?.Profit ?? 0m,
+                    LastWeekProfit = profitLastWeek.Response?.Profit ?? 0m,
+                    LastMonthProfit = profitLastWeek.Response?.Profit ?? 0m,
+                    BreakEvenPoint = bep.Response?.BreakEvenPoint ?? 0m
                 }
             };
         }
