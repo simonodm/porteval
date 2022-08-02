@@ -1,4 +1,4 @@
-import { EntityPerformance, EntityProfit, EntityValue, Position } from '../../types';
+import { EntityPerformance, EntityProfit, EntityValue, Position, PositionStatistics } from '../../types';
 
 import { CreatePositionParameters, DateRangeParameters } from './apiTypes';
 import { portEvalApi } from './portEvalApi';
@@ -192,6 +192,20 @@ const positionApi = portEvalApi.injectEndpoints({
                 result
                     ? [{ type: 'PositionCalculations', id: arg.positionId }]
                     : []
+        }),
+        getPortfolioPositionsStatistics: build.query<Array<PositionStatistics>, number>({
+            query: (portfolioId) => `portfolios/${portfolioId}/positions/stats`,
+            providesTags: (result) =>
+                result
+                    ? result.map(({ id }) => ({ type: 'PositionCalculations' as const, id }))
+                    : []
+        }),
+        getPositionStatistics: build.query<PositionStatistics, number>({
+            query: (positionId) => `positions/${positionId}/stats`,
+            providesTags: (result, error, arg) =>
+                result
+                    ? [{ type: 'PositionCalculations', id: arg }]
+                    : []
         })
     })
 });
@@ -213,5 +227,7 @@ export const {
     useGetPositionLastDayPerformanceQuery,
     useGetPositionLastWeekPerformanceQuery,
     useGetPositionLastMonthPerformanceQuery,
-    useGetPositionTotalPerformanceQuery
+    useGetPositionTotalPerformanceQuery,
+    useGetPortfolioPositionsStatisticsQuery,
+    useGetPositionStatisticsQuery
 } = positionApi

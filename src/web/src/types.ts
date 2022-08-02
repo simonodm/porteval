@@ -223,6 +223,22 @@ export type EntityPerformance = {
     to: string;
 }
 
+export type EntityStatistics = {
+    id: number;
+    totalPerformance: number;
+    lastDayPerformance: number;
+    lastWeekPerformance: number;
+    lastMonthPerformance: number;
+    totalProfit: number;
+    lastDayProfit: number;
+    lastWeekProfit: number;
+    lastMonthProfit: number;
+}
+
+export type PositionStatistics = EntityStatistics & {
+    breakEvenPoint: number
+};
+
 export type EntityChartDataPoint = {
     time: string;
     value: number;

@@ -1,5 +1,5 @@
 import { subDays, subMonths, subWeeks } from 'date-fns';
-import { EntityPerformance, EntityProfit, EntityValue, Portfolio } from '../../types';
+import { EntityPerformance, EntityProfit, EntityStatistics, EntityValue, Portfolio } from '../../types';
 
 import { CreatePortfolioParameters, DateRangeParameters } from './apiTypes';
 import { truncateEntityName, truncateEntityNote } from './apiUtils';
@@ -93,6 +93,20 @@ const portfolioApi = portEvalApi.injectEndpoints({
                     ? [{ type: 'PortfolioCalculations', id: arg.id }]
                     : []
             
+        }),
+        getAllPortfoliosStatistics: build.query<Array<EntityStatistics>, void>({
+            query: () => 'portfolios/stats',
+            providesTags: (result) =>
+                result
+                    ? ['PortfolioCalculations']
+                    : []
+        }),
+        getPortfolioStatistics: build.query<EntityStatistics, number>({
+            query: (id) => `portfolios/${id}/stats`,
+            providesTags: (result, error, arg) =>
+                result 
+                    ? [{ type: 'PortfolioCalculations', id: arg }]
+                    : []
         }),
         getPortfolioLastDayProfit: build.query<EntityProfit, number>({
             query: (id) => {
@@ -210,5 +224,7 @@ export const {
     useGetPortfolioLastDayPerformanceQuery,
     useGetPortfolioLastWeekPerformanceQuery,
     useGetPortfolioLastMonthPerformanceQuery,
-    useGetPortfolioTotalPerformanceQuery
+    useGetPortfolioTotalPerformanceQuery,
+    useGetAllPortfoliosStatisticsQuery,
+    useGetPortfolioStatisticsQuery
 } = portfolioApi;
