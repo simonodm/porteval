@@ -22,6 +22,9 @@ namespace PortEval.Application.Models.DTOs
         [SwaggerSchema("Instrument type.")]
         public InstrumentType Type { get; set; }
 
+        [SwaggerSchema("Current price of the instrument.")]
+        public decimal CurrentPrice { get; set; }
+
         [SwaggerSchema("Instrument currency code.")]
         public string CurrencyCode { get; set; }
 
