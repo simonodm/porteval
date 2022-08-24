@@ -47,7 +47,7 @@ export default function PortEvalChart({ chart }: Props): JSX.Element {
 
     const config = {
         yFormat: isPriceDataChart(chart)
-            ? (yValue: number) => getPriceString(yValue, currency.data?.symbol, userSettings)
+            ? (yValue: number) => getPriceString(yValue, currency.data?.code, userSettings)
             : (yValue: number) => getPerformanceString(yValue, userSettings),
         xFormat: getXAxisD3Format(from, to),
         xTooltipFormat: getXTooltipD3Format(from, to),

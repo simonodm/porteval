@@ -36,6 +36,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-select": "^5.2.2",
+    "react-table": "^7.8.0",
     "react-tiny-popover": "^7.0.1",
     "react-toastify": "^8.0.3",
     "recharts": "^2.0.9",
@@ -66,5 +67,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react-table": "^7.7.12"
   }
 }

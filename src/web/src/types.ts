@@ -42,6 +42,7 @@ export type Instrument = {
     type: InstrumentType;
     exchange: string;
     currencyCode: string;
+    currentPrice?: number;
     note: string;
     isTracked?: boolean;
     lastPriceUpdate?: string;

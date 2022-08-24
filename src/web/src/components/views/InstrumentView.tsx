@@ -32,13 +32,11 @@ export default function InstrumentView(): JSX.Element {
     const instrumentId = params.instrumentId ? parseInt(params.instrumentId) : 0;
 
     const instrument = useGetInstrumentByIdQuery(instrumentId);
-    const currentPrice = useGetInstrumentCurrentPriceQuery(instrumentId);
-    const currency = useGetCurrencyQuery(instrument.data?.currencyCode ?? skipToken)
 
     const [userSettings] = useUserSettings();
 
-    const instrumentLoaded = checkIsLoaded(instrument, currentPrice);
-    const instrumentError = checkIsError(instrument, currentPrice);
+    const instrumentLoaded = checkIsLoaded(instrument);
+    const instrumentError = checkIsError(instrument);
 
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
@@ -81,8 +79,8 @@ export default function InstrumentView(): JSX.Element {
                                 <td>
                                     { 
                                         getPriceString(
-                                            currentPrice.data?.price,
-                                            currency.data?.symbol,
+                                            instrument.data?.currentPrice,
+                                            instrument.data?.currencyCode,
                                             userSettings
                                         )
                                     }
@@ -113,7 +111,7 @@ export default function InstrumentView(): JSX.Element {
                         <h5>Price history</h5>
                     </div>
                     {instrument.data && 
-                        <InstrumentPricesTable currencySymbol={currency.data?.symbol}
+                        <InstrumentPricesTable currencyCode={instrument.data.currencyCode}
                             instrumentId={instrument.data.id}
                         />
                     }

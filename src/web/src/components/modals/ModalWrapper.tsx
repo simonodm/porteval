@@ -7,7 +7,7 @@ import PageHeading from '../ui/PageHeading';
 
 type Props = {
     heading?: string;
-    children?: Array<JSX.Element> | JSX.Element;
+    children?: Array<JSX.Element> | JSX.Element | null;
     isOpen: boolean;
 } & ModalCallbacks
 

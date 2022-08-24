@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import Select from 'react-select';
 
@@ -10,11 +10,12 @@ import { formatDateTimeString, getPriceString, getPerformanceString } from '../.
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PageSelector from '../ui/PageSelector';
 import useUserSettings from '../../hooks/useUserSettings';
-import { AggregationFrequency } from '../../types';
+import { AggregationFrequency, InstrumentPrice } from '../../types';
+import DataTable, { ColumnDefinition } from './DataTable';
 
 type Props = {
     instrumentId: number;
-    currencySymbol?: string;
+    currencyCode?: string;
 }
 
 type SelectOption = {
@@ -22,7 +23,7 @@ type SelectOption = {
     value?: AggregationFrequency;
 }
 
-export default function InstrumentPricesTable({ instrumentId, currencySymbol }: Props): JSX.Element {
+export default function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Element {
     const [page, setPage] = useState(1);
     const [pageLimit] = useState(100);
     const [frequency, setFrequency] = useState<AggregationFrequency | undefined>(undefined);
@@ -49,8 +50,39 @@ export default function InstrumentPricesTable({ instrumentId, currencySymbol }: 
         setPage(1);
     }, [frequency]);
 
-    const pricesLoaded = checkIsLoaded(prices, mutationStatus);
-    const pricesError = checkIsError(prices, mutationStatus);
+    const columns: Array<ColumnDefinition<InstrumentPrice>> = useMemo(() => [
+        {
+            id: 'date',
+            header: 'Date',
+            accessor: p => p.time,
+            render: p => formatDateTimeString(p.time, userSettings.dateFormat + ' ' + userSettings.timeFormat)
+        },
+        {
+            id: 'price',
+            header: 'Price',
+            accessor: p => p.price,
+            render: p => getPriceString(p.price, currencyCode, userSettings)
+        },
+        {
+            id: 'actions',
+            header: 'Actions',
+            render: p => (
+                <button
+                    className="btn btn-danger btn-extra-sm"
+                    onClick={() => deletePrice({
+                        instrumentId: instrumentId,
+                        priceId: p.id 
+                    })}
+                    type="button"
+                >
+                    Remove
+                </button>
+            )
+        }
+    ], [])
+
+    const isLoaded = checkIsLoaded(prices, mutationStatus);
+    const isError = checkIsError(prices, mutationStatus);
 
     return (
         <div className="prices-table">
@@ -59,8 +91,6 @@ export default function InstrumentPricesTable({ instrumentId, currencySymbol }: 
                     <PageSelector
                         onPageChange={(p) => setPage(p)}
                         page={page}
-                        prefetch={(p) => 
-                            prefetchPrices({ instrumentId, page: p, limit: pageLimit, frequency })}
                         totalPages={prices.data ? prices.data.totalCount / pageLimit : 1}
                     />
                 </div>
@@ -72,66 +102,22 @@ export default function InstrumentPricesTable({ instrumentId, currencySymbol }: 
                 />
             </div>
             
-            <table className="entity-list w-100">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Price</th>
-                        <th>Change</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <LoadingWrapper isError={pricesError} isLoaded={pricesLoaded}>
-                    <tbody>
-                        {prices.data?.data.map((price, index, array) => (
-                            <tr key={price.id}>
-                                <td>
-                                    {
-                                        formatDateTimeString(
-                                            price.time,
-                                            userSettings.dateFormat + ' ' + userSettings.timeFormat
-                                        )
-                                    }
-                                </td>
-                                <td>
-                                    {
-                                        getPriceString(
-                                            price.price,
-                                            currencySymbol,
-                                            userSettings
-                                        )
-                                    }
-                                </td>
-                                <td>{index < array.length - 1
-                                        ? getPerformanceString(
-                                            price.price / array[index + 1].price - 1,
-                                            userSettings
-                                        )
-                                        : getPerformanceString(0, userSettings)}
-                                </td>
-                                <td>
-                                    <button
-                                        className="btn btn-danger btn-extra-sm"
-                                        onClick={() => deletePrice({
-                                            instrumentId: instrumentId,
-                                            priceId: price.id 
-                                        })}
-                                        type="button"
-                                    >
-                                        Remove
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </LoadingWrapper>
-            </table>
+            <DataTable 
+                className="w-100 entity-list"
+                columns={columns} 
+                data={{
+                    data: prices.data?.data ?? [],
+                    isLoading: !isLoaded,
+                    isError: isError
+                }}
+            />
+
             <div className="float-right">
                 <PageSelector
                     onPageChange={(p) => setPage(p)}
                     page={page}
                     prefetch={(p) => 
-                        prefetchPrices({ instrumentId, page: p, limit: pageLimit, frequency: 'day' })}
+                        prefetchPrices({ instrumentId, page: p, limit: pageLimit, frequency })}
                     totalPages={prices.data ? prices.data.totalCount / pageLimit : 1}
                 />
             </div>

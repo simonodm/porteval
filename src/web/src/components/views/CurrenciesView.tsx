@@ -11,6 +11,8 @@ import LoadingWrapper from '../ui/LoadingWrapper';
 import PageHeading from '../ui/PageHeading';
 import './CurrenciesView.css';
 import useUserSettings from '../../hooks/useUserSettings';
+import DataTable from '../tables/DataTable';
+import ExchangeRatesTable from '../tables/ExchangeRatesTable';
 
 export default function CurrenciesView(): JSX.Element {
     const currencies = useGetAllKnownCurrenciesQuery();
@@ -71,34 +73,13 @@ export default function CurrenciesView(): JSX.Element {
                         <button className="btn btn-primary btn-sm" onClick={onSave} role="button">Save</button>
                     </div>
                     <div className="row mt-5">
-                        <h5>Exchange rates</h5>
-                        <table className="entity-list w-100">
-                            <thead>
-                                <tr>
-                                    <th>Currency</th>
-                                    <th>Exchange rate</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    exchangeRates.data?.map(exchangeRate => 
-                                        <tr key={exchangeRate.id}>
-                                            <td>{exchangeRate.currencyToCode}</td>
-                                            <td>
-                                                {
-                                                    getPriceString(
-                                                        exchangeRate.exchangeRate,
-                                                        currencies.data?.find(
-                                                            c => c.code === exchangeRate.currencyToCode
-                                                        )?.symbol,
-                                                        userSettings
-                                                    )
-                                                }
-                                            </td>
-                                        </tr>)
-                                }
-                            </tbody>
-                        </table>
+                        {
+                            selectedCurrency !== undefined &&
+                                <>
+                                    <h5>Exchange rates</h5>
+                                    <ExchangeRatesTable sourceCurrencyCode={selectedCurrency.code} />
+                                </>
+                        }
                     </div>
                 </LoadingWrapper>
             </div>

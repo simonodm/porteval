@@ -3,7 +3,7 @@ type Dictionary = {
     [key: string]: boolean;
 }
 
-export default function removeDuplicates<T>(arr: Array<T>, predicate: (el: T) => PrimitiveValue): Array<T> {
+export function removeDuplicates<T>(arr: Array<T>, predicate: (el: T) => PrimitiveValue): Array<T> {
     const seenValues: Dictionary = {};
 
     return arr.filter(element => {

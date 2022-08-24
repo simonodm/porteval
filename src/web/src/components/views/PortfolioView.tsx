@@ -5,13 +5,13 @@ import { useParams } from 'react-router-dom';
 import { skipToken } from '@reduxjs/toolkit/dist/query';
 
 import PortfoliosTableHeaders from '../tables/PortfoliosTableHeaders';
-import PositionRows from '../tables/PositionRows';
+import PositionsTable from '../tables/PositionsTable';
 import LoadingWrapper from '../ui/LoadingWrapper';
 
 import useGetPortfolioToDatePerformanceQueryWrapper from '../../hooks/useGetPortfolioToDatePerformanceQueryWrapper';
 import useGetPortfolioToDateProfitsQueryWrapper from '../../hooks/useGetPortfolioToDateProfitsQueryWrapper';
 import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
-import { useGetPortfolioByIdQuery, useGetPortfolioCurrentValueQuery } from '../../redux/api/portfolioApi';
+import { useGetPortfolioByIdQuery, useGetPortfolioCurrentValueQuery, useGetPortfolioStatisticsQuery } from '../../redux/api/portfolioApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
 
@@ -23,6 +23,7 @@ import PageHeading from '../ui/PageHeading';
 import useUserSettings from '../../hooks/useUserSettings';
 import ModalWrapper from '../modals/ModalWrapper';
 import OpenPositionForm from '../forms/OpenPositionForm';
+import ExpandAllButtons from '../tables/ExpandAllButtons';
 
 type Params = {
     portfolioId?: string;
@@ -35,25 +36,23 @@ export default function PortfolioView(): JSX.Element {
 
     const [modalIsOpen, setModalIsOpen] = useState(false);
     
-    const value = useGetPortfolioCurrentValueQuery(portfolioId, { pollingInterval: constants.REFRESH_INTERVAL })
+    const value = useGetPortfolioCurrentValueQuery(portfolioId, { pollingInterval: constants.REFRESH_INTERVAL });
+    const stats = useGetPortfolioStatisticsQuery(portfolioId);
     const currency = useGetCurrencyQuery(portfolio.data?.currencyCode ?? skipToken);
-    const profitData = useGetPortfolioToDateProfitsQueryWrapper(portfolioId);
-    const performanceData = useGetPortfolioToDatePerformanceQueryWrapper(portfolioId);
 
     const [userSettings] = useUserSettings();
 
-    const isLoaded = checkIsLoaded(portfolio, value);
-    const isError = checkIsError(portfolio, value);
+    const isLoaded = checkIsLoaded(portfolio, stats, value);
+    const isError = checkIsError(portfolio, stats, value);
 
     const chart = portfolio.data ? generateDefaultPortfolioChart(portfolio.data) : undefined;
 
     return (
-        <Fragment>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
             <PageHeading heading={portfolio.data?.name ?? 'Portfolio'} />
             <div className="row mb-5">
                 <div className="col-xs-12 col-sm-6">
                     <h5>Data</h5>
-                    <LoadingWrapper isError={isError} isLoaded={isLoaded}>
                         <table className="entity-data w-100">
                             <tbody>
                                 <tr>
@@ -66,7 +65,7 @@ export default function PortfolioView(): JSX.Element {
                                         {
                                             getPriceString(
                                                 value.data?.value,
-                                                currency.data?.symbol,
+                                                portfolio.data?.currencyCode,
                                                 userSettings)
                                         }
                                     </td>
@@ -76,8 +75,8 @@ export default function PortfolioView(): JSX.Element {
                                     <td>
                                         {
                                             getPriceString(
-                                                profitData.total,
-                                                currency.data?.symbol,
+                                                stats.data?.totalProfit,
+                                                portfolio.data?.currencyCode,
                                                 userSettings
                                             )
                                         }
@@ -87,7 +86,7 @@ export default function PortfolioView(): JSX.Element {
                                     <td>Total performance:</td>
                                     <td>
                                         {
-                                            getPerformanceString(performanceData.total, userSettings)
+                                            getPerformanceString(stats.data?.totalPerformance, userSettings)
                                         }
                                     </td>
                                 </tr>
@@ -95,22 +94,23 @@ export default function PortfolioView(): JSX.Element {
                                     <td>Daily/weekly/monthly profit:</td>
                                     <td>
                                         {
-                                            getPriceString(profitData.lastDay,
-                                                currency.data?.symbol,
+                                            getPriceString(
+                                                stats.data?.lastDayProfit,
+                                                portfolio.data?.currencyCode,
                                                 userSettings
                                             ) + ' / '
                                         }
                                         {
                                             getPriceString(
-                                                profitData.lastWeek,
-                                                currency.data?.symbol,
+                                                stats.data?.lastWeekProfit,
+                                                portfolio.data?.currencyCode,
                                                 userSettings
                                             ) + ' / '
                                         }
                                         {
                                             getPriceString(
-                                                profitData.lastMonth,
-                                                currency.data?.symbol,
+                                                stats.data?.lastMonthProfit,
+                                                portfolio.data?.currencyCode,
                                                 userSettings
                                             )
                                         }
@@ -121,19 +121,19 @@ export default function PortfolioView(): JSX.Element {
                                     <td>
                                         {
                                             getPerformanceString(
-                                                performanceData.lastDay,
+                                                stats.data?.lastDayPerformance,
                                                 userSettings
                                             ) + ' / '
                                         }
                                         {
                                             getPerformanceString(
-                                                performanceData.lastWeek,
+                                                stats.data?.lastWeekPerformance,
                                                 userSettings
                                             ) + ' / '
                                         }
                                         {
                                             getPerformanceString(
-                                                performanceData.lastMonth,
+                                                stats.data?.lastMonthPerformance,
                                                 userSettings
                                             )
                                         }
@@ -145,7 +145,6 @@ export default function PortfolioView(): JSX.Element {
                                 </tr>
                             </tbody>
                         </table>
-                    </LoadingWrapper>
                 </div>
                 <div className="col-xs-12 col-sm-6">
                     { chart && <PortEvalChart chart={chart} /> }
@@ -162,21 +161,13 @@ export default function PortfolioView(): JSX.Element {
             <div className="row">
                 <div className="col-xs-12 container-fluid">
                     <h5>Positions</h5>
-                    <table className="entity-list w-100">
-                        <PortfoliosTableHeaders />
-                        <tbody>
-                            { portfolio.data
-                                ? <PositionRows portfolioId={portfolio.data?.id} />
-                                : null
-                            }
-                        </tbody>
-                    </table>
+                    <ExpandAllButtons />
+                    <PositionsTable className="w-100 entity-list" portfolioId={portfolioId} />
                 </div>
             </div>
             <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Open position" isOpen={modalIsOpen}>
                 <OpenPositionForm onSuccess={() => setModalIsOpen(false)} portfolioId={portfolioId} />
             </ModalWrapper>
-        </Fragment>
-        
+        </LoadingWrapper>
     )
 }

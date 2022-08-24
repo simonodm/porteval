@@ -98,7 +98,7 @@ const portfolioApi = portEvalApi.injectEndpoints({
             query: () => 'portfolios/stats',
             providesTags: (result) =>
                 result
-                    ? ['PortfolioCalculations']
+                    ? [...result.map(stats => ({ type: 'PortfolioCalculations' as const, id: stats.id })), 'Portfolios']
                     : []
         }),
         getPortfolioStatistics: build.query<EntityStatistics, number>({

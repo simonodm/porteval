@@ -20,6 +20,10 @@ export const ERROR_STRING = 'An error has occured. Please try again later.';
 export const CHART_TRANSACTION_SIGN_CIRCLE_RADIUS = 4;
 export const CHART_TRANSACTION_SIGN_SIZE = 5;
 export const LINE_PREVIEW_LENGTH = 30;
+export const EXPAND_ALL_ROWS_EVENT_NAME = 'dataTableExpandAll';
+export const COLLAPSE_ALL_ROWS_EVENT_NAME = 'dataTableCollapseAll';
+
+
 export const DEFAULT_CHART_TODATE_RANGE: ChartToDateRange = {
     unit: 'day',
     value: 5

@@ -1,52 +1,133 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import LoadingWrapper from '../ui/LoadingWrapper';
 
 
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
-import { useGetInstrumentPageQuery, usePrefetch } from '../../redux/api/instrumentApi';
+import { useDeleteInstrumentMutation, useGetInstrumentPageQuery, usePrefetch } from '../../redux/api/instrumentApi';
 import PageSelector from '../ui/PageSelector';
 
-import InstrumentRow from './InstrumentRow';
+import DataTable, { ColumnDefinition } from './DataTable';
+import { Instrument } from '../../types';
+import { INSTRUMENT_TYPE_TO_STRING } from '../../constants';
+import { getPriceString } from '../../utils/string';
+import useUserSettings from '../../hooks/useUserSettings';
+import { Link, NavLink } from 'react-router-dom';
+import { generateDefaultInstrumentChart } from '../../utils/chart';
+import EditInstrumentForm from '../forms/EditInstrumentForm';
+import ModalWrapper from '../modals/ModalWrapper';
 
 export default function InstrumentsTable(): JSX.Element {
     const [page, setPage] = useState(1);
     const [pageLimit] = useState(30);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [instrumentBeingEdited, setInstrumentBeingEdited] = useState<Instrument | undefined>(undefined);
+
+    const [userSettings] = useUserSettings();
 
     const prefetchInstruments = usePrefetch('getInstrumentPage');
     const instruments = useGetInstrumentPageQuery({ page: page, limit: pageLimit});
-    const isLoaded = checkIsLoaded(instruments);
-    const isError = checkIsError(instruments);
+    const [deleteInstrument, mutationStatus] = useDeleteInstrumentMutation();
+
+    const columns: Array<ColumnDefinition<Instrument>> = useMemo(() => [
+        {
+            id: 'name',
+            header: 'Name',
+            accessor: i => i.name,
+            render: i => <Link to={`/instruments/${i.id}`}>{i.name}</Link>
+        },
+        {
+            id: 'symbol',
+            header: 'Symbol',
+            accessor: i => i.symbol
+        },
+        {
+            id: 'currency',
+            header: 'Currency',
+            accessor: i => i.currencyCode
+        },
+        {
+            id: 'type',
+            header: 'Type',
+            accessor: i => i.type,
+            render: i => INSTRUMENT_TYPE_TO_STRING[i.type]
+        },
+        {
+            id: 'currentPrice',
+            header: 'Current price',
+            accessor: i => getPriceString(i.currentPrice, i.currencyCode, userSettings)
+        },
+        {
+            id: 'note',
+            header: 'Note',
+            accessor: i => i.note
+        },
+        {
+            id: 'actions',
+            header: 'Actions',
+            render: i => (
+                <>
+                    <NavLink
+                        className="btn btn-primary btn-extra-sm mr-1"
+                        to={{
+                            pathname: '/charts/view', state: { chart: generateDefaultInstrumentChart(i) 
+                        }}}
+                    >Chart
+                    </NavLink>
+                    <button
+                        className="btn btn-primary btn-extra-sm mr-1"
+                        onClick={() => {
+                            setInstrumentBeingEdited(i);
+                            setIsModalOpen(true);
+                        }}
+                        role="button"
+                    >Edit
+                    </button>
+                    <button
+                        className="btn btn-danger btn-extra-sm"
+                        onClick={() => deleteInstrument(i.id)}
+                        role="button"
+                    >Remove
+                    </button>
+                </>
+            )
+        },
+    ], []);
+
+    const isLoaded = checkIsLoaded(instruments, mutationStatus);
+    const isError = checkIsError(instruments, mutationStatus);
 
     return (
-        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <div className="col-xs-12 container-fluid">
-                <table className="entity-list w-100">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Symbol</th>
-                            <th>Currency</th>
-                            <th>Type</th>
-                            <th>Current price</th>
-                            <th>Note</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {instruments.data?.data.map(instrument =>
-                            <InstrumentRow instrument={instrument} key={instrument.id} />)}
-                    </tbody>
-                </table>
-                <div className="float-right">
-                    <PageSelector
-                        onPageChange={(p) => setPage(p)}
-                        page={page}
-                        prefetch={(p) => prefetchInstruments({ page: p, limit: pageLimit })}
-                        totalPages={instruments.data ? instruments.data.totalCount / pageLimit : 1}
-                    />
-                </div>
+        <>
+            <DataTable
+                className="w-100 entity-list"
+                sortable
+                columns={columns}
+                idSelector={i => i.id}
+                data={{
+                    data: instruments.data?.data ?? [],
+                    isLoading: !isLoaded,
+                    isError: isError
+                }} 
+            />
+            <div className="float-right">
+                <PageSelector
+                    onPageChange={(p) => setPage(p)}
+                    page={page}
+                    prefetch={(p) => prefetchInstruments({ page: p, limit: pageLimit })}
+                    totalPages={instruments.data ? instruments.data.totalCount / pageLimit : 1}
+                />
             </div>
-        </LoadingWrapper>
+            <ModalWrapper closeModal={() => setIsModalOpen(false)}
+                heading={`Edit ${instrumentBeingEdited?.symbol ?? ''}`} isOpen={isModalOpen}
+            >
+                {
+                    instrumentBeingEdited !== undefined
+                        ? <EditInstrumentForm instrument={instrumentBeingEdited} onSuccess={() => setIsModalOpen(false)} />
+                        : null
+                }
+            </ModalWrapper>
+        </>
+        
     );
 }

@@ -1,26 +1,32 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 type Props = {
     page: number,
     totalPages: number,
-    onPageChange: (page: number) => void;
-    prefetch: (page: number) => void;
+    onPageChange?: (page: number) => void;
+    prefetch?: (page: number) => void;
 }
 
 export default function PageSelector({ page, totalPages, onPageChange, prefetch }: Props): JSX.Element {
-    if(page > 1) {
-        prefetch(page - 1);
+    const handlePageChange = (newPage: number): void => {
+        onPageChange && onPageChange(newPage);
     }
-    if(page < totalPages) {
-        prefetch(page + 1);
-    }
+
+    useEffect(() => {
+        if(page > 1) {
+            prefetch && prefetch(page - 1);
+        }
+        if(page < totalPages) {
+            prefetch && prefetch(page + 1);
+        }
+    }, [page, totalPages]);
 
     return (
         <span className="page-selector d-inline">
             { page > 1 &&
                 <button
                     className="btn btn-primary btn-sm mr-1"
-                    onClick={() => onPageChange(page - 1)}
+                    onClick={() => handlePageChange(page - 1)}
                     role="button"
                 >
                     Previous page
@@ -29,7 +35,7 @@ export default function PageSelector({ page, totalPages, onPageChange, prefetch 
             { page < totalPages &&
                 <button
                     className="btn btn-primary btn-sm"
-                    onClick={() => onPageChange(page + 1)}
+                    onClick={() => handlePageChange(page + 1)}
                     role="button"
                 >
                     Next page

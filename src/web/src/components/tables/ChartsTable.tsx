@@ -1,31 +1,52 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import LoadingWrapper from '../ui/LoadingWrapper';
 
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
-import { useGetAllChartsQuery } from '../../redux/api/chartApi';
+import { useDeleteChartMutation, useGetAllChartsQuery } from '../../redux/api/chartApi';
 
-import ChartRow from './ChartRow';
+import DataTable, { ColumnDefinition } from './DataTable';
+import { Chart } from '../../types';
+import { Link } from 'react-router-dom';
 
 export default function ChartsTable(): JSX.Element {
     const charts = useGetAllChartsQuery();
+    const [deleteChart, deletionStatus] = useDeleteChartMutation();
 
-    const isLoaded = checkIsLoaded(charts);
-    const isError = checkIsError(charts);
+    const isLoaded = checkIsLoaded(charts, deletionStatus);
+    const isError = checkIsError(charts, deletionStatus);
+
+    const columns: Array<ColumnDefinition<Chart>> = useMemo(() => [
+        {
+            id: 'name',
+            header: 'Name',
+            accessor: c => c.name,
+            render: c => <Link to={`/charts/view/${c.id}`}>{c.name}</Link>
+        },
+        {
+            id: 'actions',
+            header: 'Actions',
+            render: c => (
+                <button className="btn btn-danger btn-extra-sm" onClick={() => deleteChart(c.id)} role="button">
+                    Remove
+                </button>
+            )
+        }
+    ], []);
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <table className="w-100 entity-list">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {charts.data?.map(chart => <ChartRow chart={chart} key={chart.id} />)}
-                </tbody>
-            </table>
+            <DataTable
+                className="w-100 entity-list"
+                sortable
+                columns={columns}
+                idSelector={c => c.id}
+                data={{
+                    data: charts.data ?? [],
+                    isLoading: !isLoaded,
+                    isError: isError
+                }}
+            />
         </LoadingWrapper>
     )
 }

@@ -8,7 +8,7 @@ import { Line, XAxisInterval } from '../components/charts/LineChart';
 
 import { RenderedDataPointInfo } from './lineChart';
 import { getPriceString } from './string';
-import removeDuplicates from './array';
+import { removeDuplicates } from './array';
 import { Duration, intervalToDuration, sub } from 'date-fns';
 import { durationGreaterThan, durationGreaterThanOrEqualTo } from './date';
 
@@ -223,7 +223,7 @@ export function generateTooltipTransactionList(
             const isPurchase = transaction.amount > 0;
             transactionRowElement.innerHTML = 
                 `${isPurchase ? 'BUY' : 'SELL'} ${Math.abs(transaction.amount)} ` +
-                `${transaction.instrument.symbol} @ ${getPriceString(transaction.price, undefined, settings)}`;
+                `${transaction.instrument.symbol} @ ${getPriceString(transaction.price, transaction.instrument.currencyCode, settings)}`;
             transactionsList.append(transactionRowElement);
         });
 

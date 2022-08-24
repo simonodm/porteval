@@ -11,8 +11,31 @@ export function camelToProperCase(str: string): string {
     return result;
 }
 
+function getBrowserLocales(): Array<string> | undefined {
+    const browserLocales = navigator.languages === undefined ? [navigator.language] : navigator.languages;
+    if(!browserLocales) {
+        return undefined;
+    }
+
+    return browserLocales.map(locale => locale.trim());
+}
+
+function getCurrencySymbol (currencyCode: string) {
+    const browserLocales = getBrowserLocales();
+    
+    return (0).toLocaleString(
+      browserLocales?.length ? browserLocales[0] : 'en-US',
+      {
+        style: 'currency',
+        currency: currencyCode,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }
+    ).replace(/\d/g, '').trim()
+  }
+
 export function getPriceString(
-    price?: number, currencySymbol?: string, settings?: UserSettings
+    price?: number, currencyCode?: string, settings?: UserSettings
 ): string {
     if(price === undefined) return '';
 
@@ -22,7 +45,9 @@ export function getPriceString(
         resultStr = splitThousands(resultStr, settings.thousandsSeparator);
     }
 
-    return `${price < 0 ? '-' : ''}${currencySymbol ?? ''}${resultStr}`;
+    const currencySymbol = currencyCode ? getCurrencySymbol(currencyCode) : '';
+
+    return `${price < 0 ? '-' : ''}${currencySymbol}${resultStr}`;
 }
 
 export function getPerformanceString(
