@@ -468,7 +468,7 @@ namespace PortEval.Application.Services.Queries
                     TotalProfit = profitTotal.Response?.Profit ?? 0m,
                     LastDayProfit = profitLastDay.Response?.Profit ?? 0m,
                     LastWeekProfit = profitLastWeek.Response?.Profit ?? 0m,
-                    LastMonthProfit = profitLastWeek.Response?.Profit ?? 0m,
+                    LastMonthProfit = profitLastMonth.Response?.Profit ?? 0m,
                     BreakEvenPoint = bep.Response?.BreakEvenPoint ?? 0m
                 }
             };
