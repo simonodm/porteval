@@ -13,6 +13,7 @@ const positionApi = portEvalApi.injectEndpoints({
                 result
                     ? [
                         ...result.map(({ id }) => ({ type: 'Position' as const, id})),
+                        ...result.map(({ id }) => ({ type: 'PositionCalculations' as const, id})),
                         { type: 'Positions', id: arg }
                       ]
                     : [{ type: 'Positions', id: arg }]
@@ -21,7 +22,7 @@ const positionApi = portEvalApi.injectEndpoints({
             query: ({ positionId }) => `positions/${positionId}`,
             providesTags: (result, error, arg) => 
                 result
-                    ? [{ type: 'Position', id: arg.positionId }]
+                    ? [{ type: 'Position', id: arg.positionId }, { type: 'PositionCalculations', id: arg.positionId }]
                     : []
         }),
         addPosition: build.mutation<Position, CreatePositionParameters>({

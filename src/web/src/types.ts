@@ -17,6 +17,7 @@ export type Position = {
     id: number;
     portfolioId: number;
     instrumentId: number;
+    positionSize: number;
     note: string;
     instrument: Instrument;
 }

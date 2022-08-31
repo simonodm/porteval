@@ -66,6 +66,11 @@ export default function PositionsTable({ className, portfolioId }: Props): JSX.E
             accessor: p => p.instrument.currencyCode
         },
         {
+            id: 'positionSize',
+            header: 'Size',
+            accessor: p => p.positionSize
+        },
+        {
             id: 'profit',
             header: 'Profit',
             columns: [
