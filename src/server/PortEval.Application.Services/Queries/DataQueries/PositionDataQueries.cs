@@ -11,7 +11,11 @@ namespace PortEval.Application.Services.Queries.DataQueries
         {
             return new QueryWrapper<IEnumerable<PositionDto>>
             {
-                Query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions 
+                Query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions
+                          LEFT JOIN (
+	                          SELECT [PositionId], SUM([Amount]) AS PositionSize FROM [dbo].[Transactions]
+	                          GROUP BY [PositionId]
+                          ) AS T on T.[PositionId] = dbo.Positions.Id
                           INNER JOIN dbo.Instruments
                           ON Positions.InstrumentId = Instruments.Id"
             };
@@ -22,6 +26,10 @@ namespace PortEval.Application.Services.Queries.DataQueries
             return new QueryWrapper<IEnumerable<PositionDto>>
             {
                 Query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions 
+                          LEFT JOIN (
+	                          SELECT [PositionId], SUM([Amount]) AS PositionSize FROM [dbo].[Transactions]
+	                          GROUP BY [PositionId]
+                          ) AS T on T.[PositionId] = dbo.Positions.Id
                           INNER JOIN dbo.Instruments
                           ON Positions.InstrumentId = Instruments.Id
                           WHERE Positions.PortfolioId = @PortfolioId",
@@ -34,6 +42,10 @@ namespace PortEval.Application.Services.Queries.DataQueries
             return new QueryWrapper<PositionDto>
             {
                 Query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions
+                          LEFT JOIN (
+	                          SELECT [PositionId], SUM([Amount]) AS PositionSize FROM [dbo].[Transactions]
+	                          GROUP BY [PositionId]
+                          ) AS T on T.[PositionId] = dbo.Positions.Id
                           INNER JOIN dbo.Instruments
                           ON Positions.InstrumentId = Instruments.Id
                           WHERE Positions.Id = @PositionId",

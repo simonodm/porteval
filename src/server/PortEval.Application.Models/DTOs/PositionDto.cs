@@ -15,6 +15,9 @@ namespace PortEval.Application.Models.DTOs
         [SwaggerSchema("Identifier of the instrument which this position represents.")]
         public int InstrumentId { get; set; }
 
+        [SwaggerSchema("Current position size.")]
+        public decimal PositionSize { get; set; }
+
         [SwaggerSchema("Position note.")]
         public string Note { get; set; }
 
