@@ -153,7 +153,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
         private async Task<Response<PricePoint>> GetTiingoCryptoTopOfBook(string ticker, string currency)
         {
             var urlBuilder = new QueryUrlBuilder($"{TIINGO_CRYPTO_BASE_URL}/top");
-            urlBuilder.AddQueryParam("tickers", ticker + currency);
+            urlBuilder.AddQueryParam("tickers", GetCryptoTicker(ticker, currency));
             urlBuilder.AddQueryParam("token", _apiKey);
 
             var result = await _httpClient.FetchJson<IEnumerable<TiingoCryptoTopPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
@@ -184,16 +184,17 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
             // attempting to download such ranges until one of the following happens:
             //  a) all the data until the end of the requested time range has been downloaded
             //  b) last 2 downloaded price ranges ended on the same date and time (in case price data ends before the requested time range end)
-            //  c) a download fails
             //
             // After which it returns all the successfully retrieved prices.
             //
-            // Specifically, if an attempted download is successful but returns empty data, there is a possibility d) that its range start + Tiingo date range limit
-            // is still earlier than the first available price data. In that case the algorithm below adds 5000 days to the current start date and attempts again until
+            // Specifically, if a download fails (returns an error code or empty data), there is a possibility c) that its range start + Tiingo date range limit
+            // is still earlier than the first available price data. In that case the algorithm below adds 1000 days to the current start date and attempts again until
             // the end of the requested time range is reached (or a download succeeds).
 
+            const int daysToAddOnFailure = 1000;
+
             var endDate = to.Date.AddDays(1).ToString("yyyy-M-d");
-            string resampleFreq = "1day";
+            var resampleFreq = "1day";
             if (interval != null)
             {
                 resampleFreq = interval == IntradayInterval.FiveMinutes ? "5min" : "60min";
@@ -207,7 +208,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
             while (true)
             {
                 var urlBuilder = new QueryUrlBuilder($"{TIINGO_CRYPTO_BASE_URL}/prices");
-                urlBuilder.AddQueryParam("tickers", ticker + currency);
+                urlBuilder.AddQueryParam("tickers", GetCryptoTicker(ticker, currency));
                 urlBuilder.AddQueryParam("startDate", lastPriceTime.ToString("yyyy-M-d"));
                 urlBuilder.AddQueryParam("endDate", endDate);
                 urlBuilder.AddQueryParam("resampleFreq", resampleFreq);
@@ -232,19 +233,25 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                             break;
                         }
                     }
-                    else if (prices.Count == 0 && lastPriceTime < to - TimeSpan.FromDays(5000)) // d)
+                    else if (prices.Count == 0 && lastPriceTime < to - TimeSpan.FromDays(365)) // d)
                     {
-                        lastPriceTime += TimeSpan.FromDays(5000);
+                        lastPriceTime += TimeSpan.FromDays(daysToAddOnFailure);
                     }
-                    else // c)
+                    else
                     {
                         break;
                     }
                 }
                 else // c)
                 {
-                    if (result.StatusCode == StatusCode.OtherError) anyUnexpectedError = true;
-                    break;
+                    if (lastPriceTime < to - TimeSpan.FromDays(daysToAddOnFailure))
+                    {
+                        lastPriceTime += TimeSpan.FromDays(daysToAddOnFailure);
+                    }
+                    if (result.StatusCode == StatusCode.OtherError)
+                    {
+                        anyUnexpectedError = true;
+                    }
                 }
             }
 
@@ -283,6 +290,16 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                 default:
                     throw new Exception($"Unrecognized resample frequency provided: {resampleFreq}.");
             }
+        }
+
+        private string GetCryptoTicker(string symbol, string currencyCode)
+        {
+            if (symbol.Substring(symbol.Length - 3, 3) == currencyCode)
+            {
+                return symbol;
+            }
+
+            return symbol + currencyCode;
         }
     }
 }
