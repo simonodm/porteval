@@ -105,34 +105,30 @@ namespace PortEval.Application.Services.Queries
             }
 
             var defaultCurrencyQuery = CurrencyDataQueries.GetDefaultCurrency();
+            var exchangeRateQuery = CurrencyDataQueries.GetCurrencyExchangeRate(baseCurrencyCode, targetCurrencyCode, time);
+
             using var connection = _connectionCreator.CreateConnection();
             var defaultCurrency =
                 await connection.QueryFirstOrDefaultAsync<CurrencyDto>(defaultCurrencyQuery.Query,
                     defaultCurrencyQuery.Params);
+
+            var exchangeRate = await connection.QueryFirstOrDefaultAsync<CurrencyExchangeRateDto>(exchangeRateQuery.Query, exchangeRateQuery.Params);
             
+            if(exchangeRate != null)
+            {
+                return price * exchangeRate.ExchangeRate;
+            }
             if (targetCurrencyCode == defaultCurrency.Code)
             {
                 return price * price / await Convert(defaultCurrency.Code, baseCurrencyCode, price, time);
             }
-            else if (baseCurrencyCode != defaultCurrency.Code)
+            if (baseCurrencyCode != defaultCurrency.Code)
             {
                 var convertedToDefault = await Convert(baseCurrencyCode, defaultCurrency.Code, price, time);
                 return await Convert(defaultCurrency.Code, targetCurrencyCode, convertedToDefault, time);
             }
-            else
-            {
-                var query = CurrencyDataQueries.GetCurrencyExchangeRate(baseCurrencyCode, targetCurrencyCode, time);
 
-                var exchangeRate =
-                    await connection.QueryFirstOrDefaultAsync<CurrencyExchangeRateDto>(query.Query, query.Params);
-
-                if (exchangeRate == null)
-                {
-                    throw new Exception($"No exchange rate available from {baseCurrencyCode} to {targetCurrencyCode} at {time}.");
-                }
-
-                return price * exchangeRate.ExchangeRate;
-            }
+            throw new Exception($"No exchange rate available from {baseCurrencyCode} to {targetCurrencyCode} at {time}.");
         }
     }
 }
