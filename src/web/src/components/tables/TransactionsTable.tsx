@@ -1,12 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
-import { useGetPositionTransactionsQuery } from '../../redux/api/transactionApi';
+import { useDeleteTransactionMutation, useGetPositionTransactionsQuery } from '../../redux/api/transactionApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
-import { Currency, Transaction } from '../../types';
+import { Transaction } from '../../types';
 
 import DataTable, { ColumnDefinition } from './DataTable';
 import useUserSettings from '../../hooks/useUserSettings';
 import { formatDateTimeString, getPriceString } from '../../utils/string';
+import ModalWrapper from '../modals/ModalWrapper';
+import EditTransactionForm from '../forms/EditTransactionForm';
 
 type Props = {
     className?: string;
@@ -16,6 +18,9 @@ type Props = {
 
 export default function TransactionsTable({ className, positionId, currencyCode }: Props): JSX.Element {
     const transactions = useGetPositionTransactionsQuery({ positionId });
+    const [deleteTransaction, mutationStatus] = useDeleteTransactionMutation();
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [transactionBeingEdited, setTransactionBeingEdited] = useState<Transaction | undefined>(undefined);
     
     const [userSettings] = useUserSettings();
 
@@ -44,6 +49,30 @@ export default function TransactionsTable({ className, positionId, currencyCode 
             id: 'note',
             header: 'Note',
             accessor: t => t.note
+        },
+        {
+            id: 'actions',
+            header: 'Actions',
+            render: t =>
+                <>
+                    <button
+                        className="btn btn-primary btn-extra-sm mr-1"
+                        onClick={() => {
+                            setTransactionBeingEdited(t);
+                            setModalIsOpen(true);
+                        }}
+                        role="button"
+                    >
+                        Edit
+                    </button>
+                    <button 
+                        className="btn btn-danger btn-extra-sm"
+                        onClick={() => deleteTransaction(t)}
+                        role="button"
+                    >
+                        Remove
+                    </button>
+                </>
         }
     ], []);
 
@@ -58,6 +87,13 @@ export default function TransactionsTable({ className, positionId, currencyCode 
                 }}
                 idSelector={t => t.id}
             />
+            <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Edit transaction" isOpen={modalIsOpen}>
+                {
+                    transactionBeingEdited !== undefined
+                        ? <EditTransactionForm onSuccess={() => setModalIsOpen(false)} transaction={transactionBeingEdited} />
+                        : null
+                }
+            </ModalWrapper>
         </>
     )
 }
