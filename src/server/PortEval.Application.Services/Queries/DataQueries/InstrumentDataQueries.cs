@@ -18,6 +18,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
                       LEFT JOIN (SELECT ROW_NUMBER() OVER (PARTITION BY InstrumentId ORDER BY Time DESC) row_num, * FROM dbo.InstrumentPrices) AS p
                       ON p.InstrumentId = dbo.Instruments.Id
                       WHERE p.row_num = 1
+                      OR p.row_num IS NULL
                       ORDER BY Symbol;"
             };
         }
@@ -38,6 +39,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
                           LEFT JOIN (SELECT ROW_NUMBER() OVER (PARTITION BY InstrumentId ORDER BY Time DESC) row_num, * FROM dbo.InstrumentPrices) AS p
                           ON p.InstrumentId = dbo.Instruments.Id
                           WHERE p.row_num = 1
+                          OR p.row_num IS NULL
                           ORDER BY Symbol
                           OFFSET @Offset ROWS
                           FETCH NEXT @Rows ROWS ONLY",
@@ -53,6 +55,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
                           LEFT JOIN (SELECT ROW_NUMBER() OVER (PARTITION BY InstrumentId ORDER BY Time DESC) row_num, * FROM dbo.InstrumentPrices) AS p
                           ON p.InstrumentId = dbo.Instruments.Id
                           WHERE p.row_num = 1
+                          OR p.row_num IS NULL
                           AND dbo.Instruments.Id = @InstrumentId",
                 Params = new { InstrumentId = instrumentId }
             };
