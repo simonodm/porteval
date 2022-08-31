@@ -256,7 +256,7 @@ namespace PortEval.Application.Services.Queries
             var transactions = await _transactionQueries.GetTransactions(new TransactionFilters { PositionId = positionId }, new DateRangeParams { To = time });
             var totalPositionBuyingPrice = transactions.Response.Sum(t => t.Amount * t.Price);
             var positionAmount = transactions.Response.Sum(t => t.Amount);
-            var bep = totalPositionBuyingPrice / positionAmount;
+            var bep = positionAmount != 0 ? totalPositionBuyingPrice / positionAmount : 0;
 
             return new QueryResponse<PositionBreakEvenPointDto>
             {
