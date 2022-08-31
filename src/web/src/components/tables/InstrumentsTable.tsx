@@ -37,6 +37,11 @@ export default function InstrumentsTable(): JSX.Element {
             render: i => <Link to={`/instruments/${i.id}`}>{i.name}</Link>
         },
         {
+            id: 'exchange',
+            header: 'Exchange',
+            accessor: i => i.exchange
+        },
+        {
             id: 'symbol',
             header: 'Symbol',
             accessor: i => i.symbol
