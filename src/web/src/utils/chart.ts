@@ -276,7 +276,7 @@ function findLineTransactionsInRange(
     return transactions.filter(t => {
         const time = new Date(t.time)
         return (convertedFrom === undefined || time >= convertedFrom) &&
-               (convertedTo === undefined || time <= convertedTo);
+               (convertedTo === undefined || time < convertedTo);
     });
 }
 
