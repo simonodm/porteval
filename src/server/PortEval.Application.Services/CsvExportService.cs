@@ -4,6 +4,7 @@ using PortEval.Application.Services.Interfaces;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using PortEval.Application.Services.Extensions;
 
 namespace PortEval.Application.Services
 {
@@ -14,11 +15,7 @@ namespace PortEval.Application.Services
             using var ms = new MemoryStream();
             using var sw = new StreamWriter(ms);
             using var csv = new CsvWriter(sw, CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<PortfolioClassMap>();
-            csv.Context.RegisterClassMap<PositionExportClassMap>();
-            csv.Context.RegisterClassMap<TransactionClassMap>();
-            csv.Context.RegisterClassMap<InstrumentClassMap>();
-            csv.Context.RegisterClassMap<InstrumentPriceClassMap>();
+            csv.RegisterExportClassMaps();
 
             csv.WriteRecords(rows);
             sw.Flush();

@@ -7,7 +7,7 @@ using PortEval.Application.Services.Interfaces.Repositories;
 
 namespace PortEval.Application.Services.BulkImportExport
 {
-    public abstract class ImportProcessor<TRow, TValidator>
+    public abstract class ImportProcessor<TRow, TValidator> : IImportProcessor<TRow>
         where TValidator : AbstractValidator<TRow>, new()
     {
         protected readonly IUnitOfWork UnitOfWork;

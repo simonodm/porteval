@@ -1,9 +1,10 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Services.BulkImportExport;
-using PortEval.Application.Services.BulkImportExport.ClassMaps;
+using PortEval.Application.Services.Extensions;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Models.Enums;
@@ -11,7 +12,6 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace PortEval.BackgroundJobs.DataImport
 {
@@ -33,53 +33,15 @@ namespace PortEval.BackgroundJobs.DataImport
             };
         }
 
-        public async Task Run(Guid importId, string inputFileName, TemplateType templateType, string logPath)
+        public async Task Run(Domain.Models.Entities.DataImport importEntry, string inputFileName, string logPath)
         {
-            var importEntry = new Domain.Models.Entities.DataImport(importId, templateType, ImportStatus.InProgress);
-            _importRepository.Add(importEntry);
-            await _importRepository.UnitOfWork.CommitAsync();
-
             try
             {
                 using var reader = new StreamReader(inputFileName);
                 using var csv = new CsvReader(reader, _csvConfig);
-                csv.Context.RegisterClassMap<PortfolioClassMap>();
-                csv.Context.RegisterClassMap<PositionImportClassMap>();
-                csv.Context.RegisterClassMap<TransactionClassMap>();
-                csv.Context.RegisterClassMap<InstrumentClassMap>();
-                csv.Context.RegisterClassMap<InstrumentPriceClassMap>();
+                csv.RegisterImportClassMaps();
 
-                switch (templateType)
-                {
-                    case TemplateType.Portfolios:
-                        var portfolioProcessor = _serviceProvider.GetRequiredService<PortfolioImportProcessor>();
-                        var portfolioResult = await portfolioProcessor.ProcessImport(csv.GetRecords<PortfolioDto>());
-                        SaveErrorLog(portfolioResult, logPath);
-                        break;
-                    case TemplateType.Positions:
-                        var positionProcessor = _serviceProvider.GetRequiredService<PositionImportProcessor>();
-                        var positionResult = await positionProcessor.ProcessImport(csv.GetRecords<PositionDto>());
-                        SaveErrorLog(positionResult, logPath);
-                        break;
-                    case TemplateType.Instruments:
-                        var instrumentProcessor = _serviceProvider.GetRequiredService<InstrumentImportProcessor>();
-                        var instrumentResult = await instrumentProcessor.ProcessImport(csv.GetRecords<InstrumentDto>());
-                        SaveErrorLog(instrumentResult, logPath);
-                        break;
-                    case TemplateType.Prices:
-                        var priceProcessor = _serviceProvider.GetRequiredService<PriceImportProcessor>();
-                        var pricesResult = await priceProcessor.ProcessImport(csv.GetRecords<InstrumentPriceDto>());
-                        SaveErrorLog(pricesResult, logPath);
-                        break;
-                    case TemplateType.Transactions:
-                        var transactionProcessor = _serviceProvider.GetRequiredService<TransactionImportProcessor>();
-                        var transactionsResult =
-                            await transactionProcessor.ProcessImport(csv.GetRecords<TransactionDto>());
-                        SaveErrorLog(transactionsResult, logPath);
-                        break;
-                    default:
-                        break;
-                }
+                await ProcessImportFromType(importEntry.TemplateType, csv, logPath);
 
                 importEntry.ChangeStatus(ImportStatus.Finished);
                 importEntry.AddErrorLog(logPath);
@@ -89,7 +51,7 @@ namespace PortEval.BackgroundJobs.DataImport
             catch (CsvHelperException ex)
             {
                 _logger.LogError(ex.Message);
-                importEntry.ChangeStatus(ImportStatus.Error, $"Error: failed to process received data as {templateType}.");
+                importEntry.ChangeStatus(ImportStatus.Error, $"Error: failed to process received data as {importEntry.TemplateType}.");
             }
             catch (Exception ex)
             {
@@ -104,15 +66,43 @@ namespace PortEval.BackgroundJobs.DataImport
             }
         }
 
+        private async Task ProcessImportFromType(TemplateType templateType, CsvReader reader, string logPath)
+        {
+            switch(templateType)
+            {
+                case TemplateType.Portfolios:
+                    await ProcessImport<PortfolioDto, PortfolioImportProcessor>(reader, logPath);
+                    break;
+                case TemplateType.Positions:
+                    await ProcessImport<PositionDto, PositionImportProcessor>(reader, logPath);
+                    break;
+                case TemplateType.Instruments:
+                    await ProcessImport<InstrumentDto, InstrumentImportProcessor>(reader, logPath);
+                    break;
+                case TemplateType.Prices:
+                    await ProcessImport<InstrumentPriceDto, PriceImportProcessor>(reader, logPath);
+                    break;
+                case TemplateType.Transactions:
+                    await ProcessImport<TransactionDto, TransactionImportProcessor>(reader, logPath);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private async Task ProcessImport<TRow, TProcessor>(CsvReader reader, string logPath)
+            where TProcessor : IImportProcessor<TRow>            
+        {
+            var processor = _serviceProvider.GetRequiredService<TProcessor>();
+            var result = await processor.ProcessImport(reader.GetRecords<TRow>());
+            SaveErrorLog(result, logPath);
+        }
+
         private void SaveErrorLog<T>(ImportResult<T> importResult, string filename)
         {
             using var sw = new StreamWriter(filename);
             using var csv = new CsvWriter(sw, _csvConfig);
-            csv.Context.RegisterClassMap<PortfolioClassMap>();
-            csv.Context.RegisterClassMap<PositionImportClassMap>();
-            csv.Context.RegisterClassMap<TransactionClassMap>();
-            csv.Context.RegisterClassMap<InstrumentClassMap>();
-            csv.Context.RegisterClassMap<InstrumentPriceClassMap>();
+            csv.RegisterImportClassMaps();
 
             csv.WriteErrorHeaders<T>();
             foreach (var entry in importResult.ErrorLog)

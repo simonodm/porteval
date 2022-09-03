@@ -74,15 +74,22 @@ namespace PortEval.Application.Controllers
             return File(fileStream, "text/csv", "error-log.csv");
         }
 
+        [HttpGet("template")]
+        public IActionResult GetImportTemplate(TemplateType templateType)
+        {
+            var stream = _importService.GetCsvTemplate(templateType);
+            return File(stream, "text/csv");
+        }
+
         [HttpPost]
         public async Task<ActionResult<CsvTemplateImportResultDto>> UploadFile([FromForm] IFormFile file, [FromForm] TemplateType type)
         {
             await using var stream = file.OpenReadStream();
-            var guid = _importService.StartImport(stream, type);
+            var importEntry = await _importService.StartImport(stream, type);
 
             return Ok(new CsvTemplateImportResultDto
             {
-                ImportId = guid
+                ImportId = importEntry.Id
             });
         }
     }
