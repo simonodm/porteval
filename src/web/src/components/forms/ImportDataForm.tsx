@@ -23,7 +23,20 @@ export default function ImportDataForm({ onSuccess }: Props): JSX.Element {
         setFile(file);
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleTemplateExport = (e: React.FormEvent) => {
+        const templateUrl = `/api/imports/template?templateType=${templateType}`;
+
+        fetch(templateUrl)
+            .then(res => res.blob())
+            .then(blob => {
+                const file = URL.createObjectURL(blob);
+                location.assign(file);
+            });
+
+        e.preventDefault();
+    }
+
+    const handleUpload = (e: React.FormEvent) => {
         if(file) {
             const formData = new FormData();
             formData.append('file', file);
@@ -37,12 +50,19 @@ export default function ImportDataForm({ onSuccess }: Props): JSX.Element {
     }
     
     return (
-        <form onSubmit={handleSubmit}>
+        <form>
             <TemplateTypeDropdown onChange={setTemplateType} />
+            <button
+                className="btn btn-primary btn-sm"
+                role="button"
+                onClick={handleTemplateExport}
+            >Download template
+            </button>
             <FileUpload label="Choose import file" onUpload={handleFileUpload} />
             <button 
                 className="btn btn-primary"
                 role="button"
+                onClick={handleUpload}
             >Upload
             </button>
         </form>
