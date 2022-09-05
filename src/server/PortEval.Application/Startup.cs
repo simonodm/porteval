@@ -125,8 +125,6 @@ namespace PortEval.Application
         private void ScheduleBackgroundJobs()
         {
             RecurringJob.AddOrUpdate<ILatestPricesFetchJob>("latest_prices", job => job.Run(), "*/5 * * * *");
-            RecurringJob.AddOrUpdate<ILatestExchangeRatesFetchJob>("latest_exchange_rates", job => job.Run(),
-                Cron.Daily);
             RecurringJob.AddOrUpdate<IMissingInstrumentPricesFetchJob>("fetch_missing_prices", job => job.Run(), Cron.Daily);
             RecurringJob.AddOrUpdate<IMissingExchangeRatesFetchJob>("fetch_missing_exchange_rates",
                 job => job.Run(), Cron.Daily);
