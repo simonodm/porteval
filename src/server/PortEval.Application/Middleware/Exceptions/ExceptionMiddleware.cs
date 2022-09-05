@@ -31,7 +31,7 @@ namespace PortEval.Application.Middleware.Exceptions
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{ex.StackTrace}");
+                _logger.LogError(ex.ToString());
                 await HandleExceptionAsync(context, ex);
             }
         }
