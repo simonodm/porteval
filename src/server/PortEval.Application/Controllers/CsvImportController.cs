@@ -78,7 +78,7 @@ namespace PortEval.Application.Controllers
         public IActionResult GetImportTemplate(TemplateType templateType)
         {
             var stream = _importService.GetCsvTemplate(templateType);
-            return File(stream, "text/csv");
+            return File(stream, "text/csv", $"import_{templateType.ToString().ToLower()}");
         }
 
         [HttpPost]
