@@ -1,22 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using PortEval.Application.Services.BulkImportExport.Interfaces;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PortEval.Application.Services.BulkImportExport
 {
-    public class ErrorLogEntry<T>
+    public class ProcessedRowErrorLogEntry<T> : IErrorLogEntry
     {
-        public T Row { get; set; }
+        public T Data { get; set; }
         public bool IsError { get; set; }
         public List<string> ErrorMessages { get; set; }
 
-        public ErrorLogEntry(T row)
+        public ProcessedRowErrorLogEntry(T data)
         {
-            Row = row;
+            Data = data;
             IsError = false;
             ErrorMessages = new List<string>();
         }
 
-        public ErrorLogEntry(T row, IEnumerable<string> errorMessages) : this(row)
+        public ProcessedRowErrorLogEntry(T data, string errorMessage) : this(data)
+        {
+            ErrorMessages.Add(errorMessage);
+            IsError = true;
+        }
+
+        public ProcessedRowErrorLogEntry(T data, IEnumerable<string> errorMessages) : this(data)
         {
             if (errorMessages.Any())
             {

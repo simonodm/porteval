@@ -1,44 +1,47 @@
-﻿using System;
+﻿using FluentValidation;
+using PortEval.Application.Services.BulkImportExport.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentValidation;
-using PortEval.Application.Services.Interfaces.Repositories;
 
 namespace PortEval.Application.Services.BulkImportExport
 {
-    public abstract class ImportProcessor<TRow, TValidator> : IImportProcessor<TRow>
-        where TValidator : AbstractValidator<TRow>, new()
+    public abstract class ImportProcessor<TRecord, TValidator> : IImportProcessor<TRecord>
+        where TValidator : AbstractValidator<TRecord>, new()
     {
-        protected readonly IUnitOfWork UnitOfWork;
         protected readonly TValidator Validator;
         protected Action OnImportFinish;
         protected Func<Task> OnImportFinishAsync;
 
-        protected ImportProcessor(IUnitOfWork unitOfWork)
+        protected ImportProcessor()
         {
-            UnitOfWork = unitOfWork;
             Validator = new TValidator();
         }
 
-        public async Task<ImportResult<TRow>> ProcessImport(IEnumerable<TRow> rows)
+        public async Task<ImportResult<TRecord>> ImportRecords(IEnumerable<TRecord> records)
         {
-            var errorLog = new List<ErrorLogEntry<TRow>>();
-            foreach (var row in rows)
+            var errorLog = new List<ProcessedRowErrorLogEntry<TRecord>>();
+            foreach (var record in records)
             {
-                var validationResult = Validator.Validate(row);
+                var validationResult = Validator.Validate(record);
                 if (!validationResult.IsValid)
                 {
-                    errorLog.Add(new ErrorLogEntry<TRow>(row, validationResult.Errors.Select(error => error.ErrorMessage)));
+                    errorLog.Add(new ProcessedRowErrorLogEntry<TRecord>(record, validationResult.Errors.Select(error => error.ErrorMessage)));
                 }
                 else
                 {
-                    var processResult = await ProcessItem(row);
-                    errorLog.Add(processResult);
+                    try
+                    {
+                        var processResult = await ProcessItem(record);
+                        errorLog.Add(processResult);
+                    }
+                    catch (Exception ex)
+                    {
+                        errorLog.Add(new ProcessedRowErrorLogEntry<TRecord>(record, ex.Message));
+                    }
                 }
             }
-
-            await UnitOfWork.CommitAsync();
 
             OnImportFinish?.Invoke();
             if (OnImportFinishAsync != null)
@@ -46,12 +49,12 @@ namespace PortEval.Application.Services.BulkImportExport
                 await OnImportFinishAsync();
             }
 
-            return new ImportResult<TRow>
+            return new ImportResult<TRecord>
             {
                 ErrorLog = errorLog
             };
         }
 
-        public abstract Task<ErrorLogEntry<TRow>> ProcessItem(TRow row);
+        public abstract Task<ProcessedRowErrorLogEntry<TRecord>> ProcessItem(TRecord row);
     }
 }

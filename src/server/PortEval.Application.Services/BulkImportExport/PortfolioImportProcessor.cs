@@ -1,46 +1,31 @@
-﻿using System.Threading.Tasks;
-using PortEval.Application.Models.DTOs;
+﻿using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.Validators;
-using PortEval.Application.Services.Interfaces.Repositories;
-using PortEval.Domain.Models.Entities;
+using PortEval.Application.Services.Interfaces;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Services.BulkImportExport
 {
     public class PortfolioImportProcessor : ImportProcessor<PortfolioDto, PortfolioDtoValidator>
     {
-        private readonly IPortfolioRepository _portfolioRepository;
-        private readonly ICurrencyRepository _currencyRepository;
+        private readonly IPortfolioService _portfolioService;
 
-        public PortfolioImportProcessor(IPortfolioRepository portfolioRepository, ICurrencyRepository currencyRepository) : base(portfolioRepository.UnitOfWork)
+        public PortfolioImportProcessor(IPortfolioService portfolioService) : base()
         {
-            _portfolioRepository = portfolioRepository;
-            _currencyRepository = currencyRepository;
+            _portfolioService = portfolioService;
         }
 
-        public override async Task<ErrorLogEntry<PortfolioDto>> ProcessItem(PortfolioDto row)
+        public override async Task<ProcessedRowErrorLogEntry<PortfolioDto>> ProcessItem(PortfolioDto row)
         {
-            var logEntry = new ErrorLogEntry<PortfolioDto>(row);
-            if (!await _currencyRepository.Exists(row.CurrencyCode))
-            {
-                logEntry.AddError($"Unknown currency: {row.CurrencyCode}.");
-                return logEntry;
-            }
+            var logEntry = new ProcessedRowErrorLogEntry<PortfolioDto>(row);
 
-            var existingPortfolio = row.Id != default
-                ? await _portfolioRepository.FindAsync(row.Id)
-                : null;
-
-            if (existingPortfolio == null)
+            if (row.Id == default)
             {
-                _portfolioRepository.Add(new Portfolio(row.Name, row.Note,
-                    row.CurrencyCode));
+                await _portfolioService.CreatePortfolioAsync(row);
             }
             else
             {
-                existingPortfolio.Rename(row.Name);
-                existingPortfolio.SetNote(row.Note);
-                existingPortfolio.ChangeCurrency(row.CurrencyCode);
-                _portfolioRepository.Update(existingPortfolio);
+                var portfolio = await _portfolioService.UpdatePortfolioAsync(row);
+                logEntry.Data.Id = portfolio.Id;
             }
 
             return logEntry;

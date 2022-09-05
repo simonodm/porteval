@@ -1,14 +1,18 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using CsvHelper.TypeConversion;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Services.BulkImportExport;
+using PortEval.Application.Services.BulkImportExport.Interfaces;
 using PortEval.Application.Services.Extensions;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Enums;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -17,19 +21,29 @@ namespace PortEval.BackgroundJobs.DataImport
 {
     public class DataImportJob : IDataImportJob
     {
+        private const string CSV_DELIMITER = ",";
+
         private readonly IServiceProvider _serviceProvider;
         private readonly IDataImportRepository _importRepository;
         private readonly ILogger _logger;
         private readonly CsvConfiguration _csvConfig;
+        private readonly List<RawRowErrorLogEntry> _parsingErrors;
 
         public DataImportJob(IServiceProvider serviceProvider, IDataImportRepository importRepository, ILoggerFactory loggerFactory)
         {
             _serviceProvider = serviceProvider;
             _importRepository = importRepository;
             _logger = loggerFactory.CreateLogger(typeof(DataImportJob));
+            _parsingErrors = new List<RawRowErrorLogEntry>();
             _csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                Delimiter = ",",
+                Delimiter = CSV_DELIMITER,
+                ReadingExceptionOccurred = (args) =>
+                {
+                    var context = args.Exception.Context;
+                    _parsingErrors.Add(new RawRowErrorLogEntry(context.Parser.Record, $"Failed to parse value \"{context.Parser[context.Reader.CurrentIndex]}\""));
+                    return false;
+                }
             };
         }
 
@@ -50,12 +64,17 @@ namespace PortEval.BackgroundJobs.DataImport
             }
             catch (CsvHelperException ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex.ToString());
                 importEntry.ChangeStatus(ImportStatus.Error, $"Error: failed to process received data as {importEntry.TemplateType}.");
+            }
+            catch (PortEvalException ex)
+            {
+                _logger.LogError(ex.ToString());
+                importEntry.ChangeStatus(ImportStatus.Error, $"Error: {ex.Message}.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex.ToString());
                 importEntry.ChangeStatus(ImportStatus.Error, "Internal error.");
             }
             finally
@@ -94,18 +113,22 @@ namespace PortEval.BackgroundJobs.DataImport
             where TProcessor : IImportProcessor<TRow>            
         {
             var processor = _serviceProvider.GetRequiredService<TProcessor>();
-            var result = await processor.ProcessImport(reader.GetRecords<TRow>());
-            SaveErrorLog(result, logPath);
+            var result = await processor.ImportRecords(reader.GetRecords<TRow>());
+            SaveErrorLog(result.ErrorLog, _parsingErrors, logPath);
         }
 
-        private void SaveErrorLog<T>(ImportResult<T> importResult, string filename)
+        private void SaveErrorLog<T>(IEnumerable<ProcessedRowErrorLogEntry<T>> processedErrorLog, IEnumerable<RawRowErrorLogEntry> parsingErrorLog, string filename)
         {
             using var sw = new StreamWriter(filename);
             using var csv = new CsvWriter(sw, _csvConfig);
             csv.RegisterImportClassMaps();
 
             csv.WriteErrorHeaders<T>();
-            foreach (var entry in importResult.ErrorLog)
+            foreach (var entry in parsingErrorLog)
+            {
+                csv.WriteErrorEntry(entry);
+            }
+            foreach (var entry in processedErrorLog)
             {
                 csv.WriteErrorEntry(entry);
             }

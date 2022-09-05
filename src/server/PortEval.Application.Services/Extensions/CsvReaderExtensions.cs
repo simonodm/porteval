@@ -8,7 +8,7 @@ namespace PortEval.Application.Services.Extensions
         public static void RegisterImportClassMaps(this CsvReader csv)
         {
             csv.Context.RegisterClassMap<PortfolioClassMap>();
-            csv.Context.RegisterClassMap<PositionClassMap>();
+            csv.Context.RegisterClassMap<PositionImportClassMap>();
             csv.Context.RegisterClassMap<TransactionClassMap>();
             csv.Context.RegisterClassMap<InstrumentClassMap>();
             csv.Context.RegisterClassMap<InstrumentPriceClassMap>();

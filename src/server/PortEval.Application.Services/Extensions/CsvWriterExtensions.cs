@@ -1,6 +1,7 @@
 ﻿using CsvHelper;
 using PortEval.Application.Services.BulkImportExport;
 using PortEval.Application.Services.BulkImportExport.ClassMaps;
+using PortEval.Application.Services.BulkImportExport.Interfaces;
 
 namespace PortEval.Application.Services.Extensions
 {
@@ -9,7 +10,7 @@ namespace PortEval.Application.Services.Extensions
         public static void RegisterImportClassMaps(this CsvWriter csv)
         {
             csv.Context.RegisterClassMap<PortfolioClassMap>();
-            csv.Context.RegisterClassMap<PositionClassMap>();
+            csv.Context.RegisterClassMap<PositionImportClassMap>();
             csv.Context.RegisterClassMap<TransactionClassMap>();
             csv.Context.RegisterClassMap<InstrumentClassMap>();
             csv.Context.RegisterClassMap<InstrumentPriceClassMap>();
@@ -31,11 +32,26 @@ namespace PortEval.Application.Services.Extensions
             csv.NextRecord();
         }
 
-        public static void WriteErrorEntry<T>(this CsvWriter csv, ErrorLogEntry<T> entry)
+        public static void WriteErrorEntry<T>(this CsvWriter csv, ProcessedRowErrorLogEntry<T> entry)
         {
-            csv.WriteRecord(entry.Row);
-            csv.WriteField(entry.IsError ? string.Join(' ', entry.ErrorMessages) : "OK");
+            csv.WriteRecord(entry.Data);
+            csv.WriteErrorField(entry);
             csv.NextRecord();
+        }
+
+        public static void WriteErrorEntry(this CsvWriter csv, RawRowErrorLogEntry entry)
+        {
+            foreach(var field in entry.RawRowFields)
+            {
+                csv.WriteField(field);
+            }
+            csv.WriteErrorField(entry);
+            csv.NextRecord();
+        }
+
+        private static void WriteErrorField(this CsvWriter csv, IErrorLogEntry entry)
+        {
+            csv.WriteField(entry.IsError ? string.Join(' ', entry.ErrorMessages) : "OK");
         }
     }
 }

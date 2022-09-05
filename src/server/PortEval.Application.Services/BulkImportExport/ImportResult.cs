@@ -4,6 +4,6 @@ namespace PortEval.Application.Services.BulkImportExport
 {
     public class ImportResult<T>
     {
-        public IEnumerable<ErrorLogEntry<T>> ErrorLog { get; set; }
+        public IEnumerable<ProcessedRowErrorLogEntry<T>> ErrorLog { get; set; }
     }
 }
