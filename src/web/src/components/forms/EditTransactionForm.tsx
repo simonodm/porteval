@@ -51,7 +51,7 @@ export default function EditTransactionForm({ transaction, onSuccess }: Props): 
                 />
                 <DateTimeSelector dateFormat={userSettings.dateFormat} label='Date'
                     onChange={setTime} timeFormat={userSettings.timeFormat}
-                    timeInterval={1} value={time}
+                    timeInterval={1} value={time} enableTime
                 />
                 <TextInput label='Note' onChange={setNote} value={note} />
                 <button 
