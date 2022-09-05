@@ -9,9 +9,7 @@ import DataTable, { ColumnDefinition } from './DataTable';
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { getPerformanceString, getPriceString } from '../../utils/string';
 import useUserSettings from '../../hooks/useUserSettings';
-import useCurrencyCodeMap from '../../hooks/useCurrencyCodeMap';
 import PositionsTable from './PositionsTable';
-import DataTableExpandableComponent from './DataTableExpandableComponent';
 import { Link, NavLink } from 'react-router-dom';
 import { generateDefaultPortfolioChart } from '../../utils/chart';
 import EditPortfolioForm from '../forms/EditPortfolioForm';
@@ -31,6 +29,7 @@ export default function PortfoliosTable(): JSX.Element {
     const [openPositionPortfolio, setOpenPositionPortfolio] = useState<Portfolio | undefined>(undefined);
     const [openPositionModalIsOpen, setOpenPositionModalIsOpen] = useState(false);
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
+    const [removedPortfolioId, setRemovedPortfolioId] = useState<number | undefined>(undefined);
 
     const [userSettings] = useUserSettings();
 
@@ -151,6 +150,7 @@ export default function PortfoliosTable(): JSX.Element {
                 </NavLink>
                 <button className="btn btn-danger btn-extra-sm"
                     onClick={() => {
+                        setRemovedPortfolioId(data.id);
                         deletePortfolio(data.id);
                     }}
                     role="button"
@@ -174,7 +174,9 @@ export default function PortfoliosTable(): JSX.Element {
                 }} 
                 idSelector={p => p.id}
                 expandElement={portfolio =>
-                    <PositionsTable className="w-100 entity-list entity-list-nested" portfolioId={portfolio.id} />
+                    removedPortfolioId !== portfolio.id
+                        ? <PositionsTable className="w-100 entity-list entity-list-nested" portfolioId={portfolio.id} />
+                        : null                 
                 }
             />
             <ModalWrapper closeModal={() => setOpenPositionModalIsOpen(false)} heading="Open new position"

@@ -3,7 +3,7 @@ import React from 'react';
 type Props = {
     originalRowColumnCount: number;
     hidden?: boolean;
-    render: () => JSX.Element;
+    render: () => JSX.Element | null;
 }
 
 export default function DataTableExpandableComponent({ originalRowColumnCount, hidden, render }: Props): JSX.Element {

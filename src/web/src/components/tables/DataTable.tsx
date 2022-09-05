@@ -27,7 +27,7 @@ type Props<T extends Record<string, unknown>> = {
     idSelector?: (entry: T) => string | number;
     sortable?: boolean;
     expandable?: boolean;
-    expandElement?: (data: T) => JSX.Element;
+    expandElement?: (data: T) => JSX.Element | null;
 };
 
 function convertColumnDefinition<T extends Record<string, unknown>>(colDef: ColumnDefinition<T>): Column<T> {
