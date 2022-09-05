@@ -159,7 +159,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
         {
             return frequency switch
             {
-                null => "[Time]",
+                null => "[Id]",
                 AggregationFrequency.FiveMin => "DATEADD(minute, 5 * (DATEDIFF(minute, '', [Time]) / 5), '')",
                 AggregationFrequency.Day => "DATEADD(day, DATEDIFF(day, '', [Time]), '')",
                 AggregationFrequency.Hour => "DATEADD(hour, DATEDIFF(hour, '', [Time]), '')",
