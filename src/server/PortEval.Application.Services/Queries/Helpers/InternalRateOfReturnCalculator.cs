@@ -32,21 +32,23 @@ namespace PortEval.Application.Services.Queries.Helpers
             }
 
             var firstTransactionTime = transactionsList[0].Time;
-            var interval = GetSinglePointIntervalLength(firstTransactionTime, to);
-            var totalIntervalCount = CalculateIntervalPointCount(firstTransactionTime, to, interval);
+            var intervalCountBase = firstTransactionTime < from ? from : firstTransactionTime;
+            var interval = GetSinglePointIntervalLength(intervalCountBase, to);
+            var totalIntervalCount = CalculateIntervalPointCount(intervalCountBase, to, interval);
             var equation = new PolynomialEquation(0.01);
             var initialGuess = 0m;
 
             foreach (var transaction in transactionsList)
             {
-                var transactionIntervalCount = CalculateIntervalPointCount(transaction.Time, to, interval);
+                var transactionTime = transaction.Time < from ? from : transaction.Time;
+                var transactionIntervalCount = CalculateIntervalPointCount(transactionTime, to, interval);
                 var transactionValue =
                     transaction.Time < from ? transaction.InstrumentPriceAtRangeStart : transaction.Price;
                 equation.AddCoefficient(transactionIntervalCount, -(double)(transaction.Amount * transactionValue));
                 equation.AddCoefficient(0, (double)(transaction.Amount * transaction.InstrumentPriceAtRangeEnd));
                 initialGuess += transaction.Amount *
-                    ((transaction.InstrumentPriceAtRangeEnd - transaction.InstrumentPriceAtRangeStart)
-                    / Math.Max(1, transaction.InstrumentPriceAtRangeStart) + 1);
+                    ((transaction.InstrumentPriceAtRangeEnd - transactionValue)
+                    / Math.Max(1, transactionValue) + 1);
             }
 
             initialGuess = Math.Max(0, initialGuess); // fail-safe
