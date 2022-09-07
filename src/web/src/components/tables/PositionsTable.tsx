@@ -136,6 +136,11 @@ export default function PositionsTable({ className, portfolioId }: Props): JSX.E
             accessor: p => getPriceString(p.breakEvenPoint, p.instrument.currencyCode, userSettings)
         },
         {
+            id: 'currentPrice',
+            header: 'Current price',
+            accessor: p => getPriceString(p.instrument.currentPrice, p.instrument.currencyCode, userSettings)
+        },
+        {
             id: 'note',
             header: 'Note',
             accessor: p => p.note
