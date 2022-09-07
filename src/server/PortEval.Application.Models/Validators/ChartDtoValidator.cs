@@ -2,6 +2,8 @@
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain;
 using PortEval.Domain.Models.Enums;
+using PortEval.Application.Models.Validators.Extensions;
+using System;
 
 namespace PortEval.Application.Models.Validators
 {
@@ -18,7 +20,7 @@ namespace PortEval.Application.Models.Validators
                 .When(c => c.IsToDate != true);
             RuleFor(c => c.DateRangeEnd)
                 .NotEmpty()
-                .GreaterThanOrEqualTo(PortEvalConstants.FinancialDataStartTime)
+                .ApplyTimeRangeRule()
                 .GreaterThanOrEqualTo(c => c.DateRangeStart)
                 .When(c => c.IsToDate != true);
             RuleFor(c => c.ToDateRange)

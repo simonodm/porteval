@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using PortEval.Application.Models.DTOs;
-using PortEval.Domain;
+using PortEval.Application.Models.Validators.Extensions;
 
 namespace PortEval.Application.Models.Validators
 {
@@ -15,9 +15,11 @@ namespace PortEval.Application.Models.Validators
                 .NotEmpty()
                 .Length(3);
             RuleFor(r => r.ExchangeRate)
-                .GreaterThan(0);
+                .NotEmpty()
+                .ApplyPriceRangeRule();
             RuleFor(r => r.Time)
-                .GreaterThanOrEqualTo(PortEvalConstants.FinancialDataStartTime);
+                .NotEmpty()
+                .ApplyTimeRangeRule();
         }
     }
 }

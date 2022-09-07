@@ -17,7 +17,11 @@ namespace PortEval.Application.Services.Queries.DataQueries
 	                          GROUP BY [PositionId]
                           ) AS T on T.[PositionId] = dbo.Positions.Id
                           INNER JOIN dbo.Instruments
-                          ON Positions.InstrumentId = Instruments.Id"
+                          ON Positions.InstrumentId = Instruments.Id
+                          LEFT JOIN (SELECT ROW_NUMBER() OVER (PARTITION BY InstrumentId ORDER BY Time DESC) row_num, InstrumentId AS PriceInstrumentId, Price as CurrentPrice FROM dbo.InstrumentPrices) AS p
+                          ON p.PriceInstrumentId = dbo.Instruments.Id
+                          WHERE (p.row_num = 1
+                          OR p.row_num IS NULL)"
             };
         }
 
@@ -32,7 +36,11 @@ namespace PortEval.Application.Services.Queries.DataQueries
                           ) AS T on T.[PositionId] = dbo.Positions.Id
                           INNER JOIN dbo.Instruments
                           ON Positions.InstrumentId = Instruments.Id
-                          WHERE Positions.PortfolioId = @PortfolioId",
+                          LEFT JOIN (SELECT ROW_NUMBER() OVER (PARTITION BY InstrumentId ORDER BY Time DESC) row_num, InstrumentId AS PriceInstrumentId, Price AS CurrentPrice FROM dbo.InstrumentPrices) AS p
+                          ON p.PriceInstrumentId = dbo.Instruments.Id
+                          WHERE (p.row_num = 1
+                          OR p.row_num IS NULL)
+                          AND Positions.PortfolioId = @PortfolioId",
                 Params = new { PortfolioId = portfolioId }
             };
         }
@@ -48,7 +56,11 @@ namespace PortEval.Application.Services.Queries.DataQueries
                           ) AS T on T.[PositionId] = dbo.Positions.Id
                           INNER JOIN dbo.Instruments
                           ON Positions.InstrumentId = Instruments.Id
-                          WHERE Positions.Id = @PositionId",
+                          LEFT JOIN (SELECT ROW_NUMBER() OVER (PARTITION BY InstrumentId ORDER BY Time DESC) row_num, InstrumentId AS PriceInstrumentId, Price as CurrentPrice FROM dbo.InstrumentPrices) AS p
+                          ON p.PriceInstrumentId = dbo.Instruments.Id
+                          WHERE (p.row_num = 1
+                          OR p.row_num IS NULL)
+                          AND Positions.Id = @PositionId",
                 Params = new { PositionId = positionId }
             };
         }
