@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+	<?define HostingBundleDownloadUrl=https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe ?>
+	
+	<Fragment>
+		<util:RegistrySearch
+			  Id="InstallationFound"
+			  Root="HKLM"
+			  Key="SOFTWARE\WOW6432Node\Microsoft\Updates\.NET\Microsoft .NET 6.0.8 - Windows Server Hosting (x86)"
+			  Result="exists"
+			  Variable="InstallationFound"
+			  Win64="yes" />
+		<PackageGroup Id="DotNetHostingBundle">
+			<ExePackage
+			  Id="DOTNETHB"
+			  DownloadUrl="$(var.HostingBundleDownloadUrl)"
+			  DetectCondition="InstallationFound"
+			  Name="dotnet-hosting-6.0.8-win.exe"
+			  Compressed="no"
+			  InstallCommand="/quiet"
+			  Permanent="yes"
+			>
+				<RemotePayload
+					Description=".NET Hosting Bundle"
+					ProductName=".NET Hosting Bundle"
+					Version="6.0.8.0"
+					Size="72549200"
+					Hash="96B9B9ECD4E4B028265FA57314BB41FD584ECABC" />
+			</ExePackage>
+		</PackageGroup>
+	</Fragment>
+</Wix>

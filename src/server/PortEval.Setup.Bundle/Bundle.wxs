@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Bundle Name="PortEval" Version="1.0.0.0" Manufacturer="Dmitry Simonov" UpgradeCode="cb6989b6-8fd3-4200-8b83-bd21de9c1c3f">
+		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense" />
+
+		<Chain>
+			<PackageGroupRef Id="InstallIIS" />
+			<PackageGroupRef Id="Sql2019ExprWeb" />
+			<PackageGroupRef Id="DotNetHostingBundle" />
+			<MsiPackage SourceFile="$(var.PortEval.Setup.TargetPath)" />
+		</Chain>
+	</Bundle>
+</Wix>

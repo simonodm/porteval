@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+	 xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension">
+	<Product Id="5e893641-543e-482f-bfa0-0231194a8dfa" Name="PortEvalApi" Language="1033" Version="1.0.0.0" Manufacturer="Dmitry Simonov" UpgradeCode="aaeb5c98-d082-4934-bbb3-49553e5a5b48">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+		
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="PortEval" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentGroupRef Id="APIPublishedFiles" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="IISMain" Name="inetpub">
+				<Directory Id="WWWMain" Name="wwwroot">
+					<Directory Id="APIINSTALLFOLDER" ComponentGuidGenerationSeed="f1aefe2e-dbe2-49d9-84a5-64369951a90e" Name="PortEval.API" />
+					<Directory Id="WEBINSTALLFOLDER" Name="PortEval.Web" />
+				</Directory>
+			</Directory>
+		</Directory>
+	</Fragment>
+	
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="APIINSTALLFOLDER">
+			<Component Id="InstallAppPool" Guid="8360b1f2-1170-403a-8ac3-85f80297f29c" Win64="yes">
+				<iis:WebAppPool Id="PortEvalAppPool"
+                            Name="PortEval App Pool"
+                            Identity="localSystem"
+                            ManagedPipelineMode="Integrated"
+                            ManagedRuntimeVersion="v4.0"
+                            RecycleMinutes="200"/>
+				<CreateFolder/>
+			</Component>
+
+			<Component Id="PortEval.API.IISWebSite" Guid="5153fc8a-2cc4-4645-89b5-f222bf6604c9">
+				<iis:WebSite Id="PortEval.API" Description="PortEval API" Directory="APIINSTALLFOLDER">
+					<iis:WebAddress Id="AllUnassigned" Port="6543" />
+					<iis:WebApplication Id="PortEvalAPIWebApp" Name="PortEval.API" WebAppPool="PortEvalAppPool" />
+				</iis:WebSite>
+				<CreateFolder/>
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<!-- Enable IIS services, inspired by: https://stackoverflow.com/questions/24439602/wix-burn-install-iis-if-not-yet-installed -->
+	<Fragment>
+		<PackageGroup Id="InstallIIS">
+			<ExePackage
+						Id="IIS_part0"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-WebServerRole"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-WebServerRole /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part1"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-WebServer"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-WebServer /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part2"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-CommonHttpFeatures"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-CommonHttpFeatures /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part3"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-StaticContent"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-StaticContent /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part4"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-DefaultDocument"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-DefaultDocument /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part5"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-DirectoryBrowsing"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-DirectoryBrowsing /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part6"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-HttpErrors"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpErrors /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part7"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-HttpRedirect"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpRedirect /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part8"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-ApplicationDevelopment"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ApplicationDevelopment /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part10"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-NetFxExtensibility"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-NetFxExtensibility /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part12"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-ISAPIExtensions"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ISAPIExtensions /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part11"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-ASP"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ASP /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part13"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-ISAPIFilter"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ISAPIFilter /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part9"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-ASPNET"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ASPNET /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part14"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-HealthAndDiagnostics"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HealthAndDiagnostics /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part15"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-HttpLogging"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpLogging /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part16"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-LoggingLibraries"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-LoggingLibraries /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part17"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-RequestMonitor"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-RequestMonitor /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part18"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-HttpTracing"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpTracing /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part19"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-CustomLogging"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-CustomLogging /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part20"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-Security"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-Security /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part21"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-WindowsAuthentication"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-WindowsAuthentication /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part22"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-RequestFiltering"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-RequestFiltering /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part23"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-IPSecurity"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-IPSecurity /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part24"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-Performance"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-Performance /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part25"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-HttpCompressionStatic"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpCompressionStatic /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part26"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-WebServerManagementTools"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-WebServerManagementTools /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part27"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-ManagementConsole"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ManagementConsole /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part28"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-ManagementScriptingTools"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ManagementScriptingTools /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part29"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-ManagementService"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ManagementService /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part30"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: WAS-WindowsActivationService"
+						InstallCommand="/Online /Enable-Feature /FeatureName:WAS-WindowsActivationService /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part31"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: WAS-ProcessModel"
+						InstallCommand="/Online /Enable-Feature /FeatureName:WAS-ProcessModel /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part32"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: WAS-NetFxEnvironment"
+						InstallCommand="/Online /Enable-Feature /FeatureName:WAS-NetFxEnvironment /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part33"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: WAS-ConfigurationAPI"
+						InstallCommand="/Online /Enable-Feature /FeatureName:WAS-ConfigurationAPI /NoRestart"
+                  >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part34"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: NetFx3"
+						InstallCommand="/Online /Enable-Feature /FeatureName:NetFx3 /NoRestart"
+                  >
+			</ExePackage>
+		</PackageGroup>
+	</Fragment>
+</Wix>

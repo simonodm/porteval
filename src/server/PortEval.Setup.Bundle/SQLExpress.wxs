@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+	<!--
+        SQL Server 2019 Express installation state properties
+        Official documentation can be found at the following location:
+           SQL Server 2019 -
+https://www.microsoft.com/en-us/sql-server/sql-server-2019
+    -->
+
+	<?define SqlServerInstance=PORTEVALSQL ?>
+	<?define Sql2019ExprDownloadUrl=https://download.microsoft.com/download/8/4/c/84c6c430-e0f5-476d-bf43-eaaa222a72e0/SQLEXPR_x64_ENU.exe ?>
+	<?define Sql2019ExprInstallCommand=/ACTION=Install /QS /IACCEPTSQLSERVERLICENSETERMS /ENU /FEATURES=SQLENGINE /INSTANCENAME=$(var.SqlServerInstance) /SQLSYSADMINACCOUNTS=BUILTIN\Administrators ?>
+	<?define Sql2019ExprUninstallCommand=/ACTION=Uninstall /QS /ENU /FEATURES=SQLENGINE /INSTANCENAME=$(var.SqlServerInstance) ?>
+	<?define Sql2019ExprRepairCommand=/ACTION=Repair /QS /ENU /FEATURES=SQLENGINE /INSTANCENAME=$(var.SqlServerInstance) ?>
+
+	<Fragment>
+		<util:RegistrySearch
+		  Id="SqlInstanceFound"
+		  Root="HKLM"
+		  Key="SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL"
+		  Value="$(var.SqlServerInstance)"
+		  Result="exists"
+		  Variable="SqlInstanceFound"
+		  Win64="yes" />
+
+		<PackageGroup Id="Sql2019ExprWeb">
+			<ExePackage
+			  Id="SQLSERVER"
+			  DownloadUrl="$(var.Sql2019ExprDownloadUrl)"
+			  Name="SQLEXPR_x64_ENU.exe"
+			  Compressed="no"
+			  DetectCondition="SqlInstanceFound"
+			  Permanent="yes"
+			  InstallCommand="$(var.Sql2019ExprInstallCommand)"
+			  UninstallCommand="$(var.Sql2019ExprUninstallCommand)"
+			  RepairCommand="$(var.Sql2019ExprRepairCommand)">
+				<!--If you want to uninstall Server 2019 Express when uninstalling
+your bundle, then set Permanent="no" in the ExePackage node above-->
+				<RemotePayload
+					Description="Microsoft SQL Server 2019 Express"
+					ProductName="Microsoft SQL Server 2019 Express"
+					Version="15.0.2000.5"
+					Size="268090448"
+					Hash="004a55528a3d38224b71c2de0d1a3291daef5e0f" />
+			</ExePackage>
+		</PackageGroup>
+	</Fragment>
+</Wix>

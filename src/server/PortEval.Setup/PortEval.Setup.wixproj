@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>3.10</ProductVersion>
+    <ProjectGuid>33431e63-ef02-4778-8c39-e9923c2586a0</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>PortEval.Setup</OutputName>
+    <OutputType>Package</OutputType>
+    <RunWixToolsOutOfProc Condition=" '$(PROCESSOR_ARCHITECTURE)'!='x86' ">true</RunWixToolsOutOfProc>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Product.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PortEval.Application\PortEval.Application.csproj">
+      <Name>PortEval.Application</Name>
+      <Project>{86031f04-d45c-4b32-99f3-f8afac878e16}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>
+      </DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>APIINSTALLFOLDER</RefTargetDir>
+      <IsDotnetSDKProject>True</IsDotnetSDKProject>
+      <TargetFrameworkIdentifier>net5.0</TargetFrameworkIdentifier>
+      <Runtime>win-x64</Runtime>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="WixIIsExtension.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixIIsExtension">
+      <HintPath>WixIIsExtension.dll</HintPath>
+      <Name>WixIIsExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
+  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
+    <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
+  </Target>
+  <Target Name="BeforeBuild">
+    <Exec WorkingDirectory="%(ProjectReference.RootDir)%(ProjectReference.Directory)" Command="dotnet publish -c $(Configuration) -f %(ProjectReference.TargetFrameworkIdentifier) -r %(ProjectReference.Runtime) /p:EnvironmentName=IIS" Condition="'%(ProjectReference.IsDotnetSDKProject)' == 'True'" />
+    <ItemGroup>
+      <LinkerBindInputPaths Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)bin\$(Configuration)\%(ProjectReference.TargetFrameworkIdentifier)\%(ProjectReference.Runtime)\publish" />
+    </ItemGroup>
+    <HeatDirectory OutputFile="obj\$(Configuration)\ProductInstallFiles.wxs" Directory="%(ProjectReference.RootDir)%(ProjectReference.Directory)bin\$(Configuration)\%(ProjectReference.TargetFrameworkIdentifier)\%(ProjectReference.Runtime)\publish" DirectoryRefId="APIINSTALLFOLDER" ComponentGroupName="APIPublishedFiles" ToolPath="$(WixToolPath)" AutogenerateGuids="true" SuppressCom="true" SuppressRegistry="true" SuppressFragments="true" SuppressRootDirectory="true" Condition="'%(ProjectReference.IsDotnetSDKProject)' == 'True'" RunAsSeparateProcess="$(RunWixToolsOutOfProc)" />
+    <ItemGroup>
+      <Compile Include="obj\$(Configuration)\ProductInstallFiles.wxs" Condition="'%(ProjectReference.IsDotnetSDKProject)' == 'True'" />
+    </ItemGroup>
+  </Target>
+</Project>
