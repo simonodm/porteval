@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("api/export")]
+    [Route("export")]
     [ApiController]
     public class CsvExportController : ControllerBase
     {

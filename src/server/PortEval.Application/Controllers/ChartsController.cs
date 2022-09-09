@@ -13,7 +13,7 @@ using PortEval.Application.Services.Queries.Interfaces;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ChartsController : ControllerBase
     {

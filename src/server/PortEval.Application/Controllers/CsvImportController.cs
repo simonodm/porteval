@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("api/imports")]
+    [Route("imports")]
     [ApiController]
     public class CsvImportController : ControllerBase
     {

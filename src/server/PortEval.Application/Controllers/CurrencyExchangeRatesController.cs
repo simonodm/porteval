@@ -10,7 +10,7 @@ using PortEval.Application.Services.Queries;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("api/currencies/{codeFrom}/exchange_rates")]
+    [Route("currencies/{codeFrom}/exchange_rates")]
     [ApiController]
     public class CurrencyExchangeRatesController : ControllerBase
     {

@@ -8,7 +8,7 @@ using PortEval.Application.Models.DTOs;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ExchangesController : ControllerBase
     {

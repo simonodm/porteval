@@ -13,7 +13,7 @@ using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("api/instruments/{instrumentId}/prices")]
+    [Route("instruments/{instrumentId}/prices")]
     [ApiController]
     public class InstrumentPricesController : ControllerBase
     {

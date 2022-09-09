@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class DashboardController : ControllerBase
     {

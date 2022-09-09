@@ -14,7 +14,7 @@ using PortEval.Application.Services.Queries;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class PortfoliosController : ControllerBase
     {
