@@ -1,51 +1,125 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-	 xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension">
-	<Product Id="5e893641-543e-482f-bfa0-0231194a8dfa" Name="PortEvalApi" Language="1033" Version="1.0.0.0" Manufacturer="Dmitry Simonov" UpgradeCode="aaeb5c98-d082-4934-bbb3-49553e5a5b48">
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
-		
-		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension">
+    <Product Id="5e893641-543e-482f-bfa0-0231194a8dfa" Name="PortEvalApi" Language="1033" Version="1.0.0.0" Manufacturer="Dmitry Simonov" UpgradeCode="aaeb5c98-d082-4934-bbb3-49553e5a5b48">
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+        <Feature Id="ProductFeature" Title="PortEval" Level="1">
+            <ComponentRef Id="WebAppPool" />
+			<ComponentRef Id="DataSourceRegistryKeys" />
+            <ComponentGroupRef Id="WebsiteComponents" />
+            <ComponentGroupRef Id="APIPublishedFiles" />
+            <ComponentGroupRef Id="WebCompiledFiles" />
+        </Feature>
+        <UI>
+            <Dialog Id="DataSourcesDlg" Width="370" Height="270">
+                <Control Type="Edit" Id="TiingoKeyEdit" Width="328" Height="15" X="22" Y="218" Property="TIINGO_KEY">
+                    <Condition Action="show">DataSourceListBox_Prop = "Tiingo"</Condition>
+                </Control>
+                <Control Type="ListBox" Property="DataSourcesListBox_Prop" Id="DataSourcesListBox" Width="322" Height="169" X="22" Y="15">
+                    <ListBox Property="DataSourcesListBox_Prop">
+                        <ListItem Text="Tiingo" Value="Tiingo" />
+                    </ListBox>
+                </Control>
+                <Control Type="Text" Id="EnterKeyText" Width="316" Height="14" X="22" Y="199">
+                    <Text>Enter API key:</Text>
+                </Control>
+                <Control Type="PushButton" Id="Back" Width="56" Height="17" X="169" Y="244">
+                    <Text>Back</Text>
+                    <Publish Event="NewDialog" Value="WelcomeDlgCustom">1</Publish>
+                </Control>
+                <Control Type="PushButton" Id="Next" Width="56" Height="17" X="225" Y="244">
+                    <Text>Next</Text>
+					<Publish Event="EndDialog" Value="Return">1</Publish>
+                </Control>
+                <Control Type="PushButton" Id="Cancel" Width="56" Height="17" X="292" Y="244">
+                    <Text>Cancel</Text>
+					<Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                </Control>
+            </Dialog>
+			<Dialog Id="WelcomeDlgCustom" Width="370" Height="270" Title="!(loc.WelcomeDlg_Title)">
+				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" >
+					<Publish Property="WixUI_InstallMode" Value="Update">Installed AND PATCH</Publish>
+				</Control>
+				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+					<Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+				</Control>
+				<Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" TabSkip="no" Text="!(loc.WelcomeDlgBitmap)" />
+				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Disabled="yes" Text="!(loc.WixUIBack)" />
+				<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+				<Control Id="Description" Type="Text" X="135" Y="80" Width="220" Height="60" Transparent="yes" NoPrefix="yes" Text="!(loc.WelcomeDlgDescription)" >
+					<Condition Action="show">NOT Installed OR NOT PATCH</Condition>
+					<Condition Action="hide">Installed AND PATCH</Condition>
+				</Control>
+				<Control Id="PatchDescription" Type="Text" X="135" Y="80" Width="220" Height="60" Transparent="yes" NoPrefix="yes" Text="!(loc.WelcomeUpdateDlgDescriptionUpdate)" >
+					<Condition Action="show">Installed AND PATCH</Condition>
+					<Condition Action="hide">NOT Installed OR NOT PATCH</Condition>
+				</Control>
+				<Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Transparent="yes" NoPrefix="yes" Text="!(loc.WelcomeDlgTitle)" />
+			</Dialog>
+            <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+            <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+            <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+            <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+            <Property Id="WixUI_Mode" Value="Minimal" />
+            <DialogRef Id="ErrorDlg" />
+            <DialogRef Id="FatalError" />
+            <DialogRef Id="FilesInUse" />
+            <DialogRef Id="MsiRMFilesInUse" />
+            <DialogRef Id="PrepareDlg" />
+            <DialogRef Id="ProgressDlg" />
+            <DialogRef Id="ResumeDlg" />
+            <DialogRef Id="UserExit" />
+            <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+            <Publish Dialog="WelcomeDlgCustom" Control="Next" Event="NewDialog" Value="DataSourcesDlg">1</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DataSourcesDlg" Order="2">Installed AND PATCH</Publish>
 
-		<Feature Id="ProductFeature" Title="PortEval" Level="1">
-			<ComponentRef Id="WebAppPool" />
-			<ComponentGroupRef Id="WebsiteComponents" />
-			<ComponentGroupRef Id="APIPublishedFiles" />
-			<ComponentGroupRef Id="WebCompiledFiles" />
-		</Feature>
-	</Product>
-
-	<Fragment>
-		<Directory Id="TARGETDIR" Name="SourceDir">
-			<Directory Id="IISMain" Name="inetpub">
-				<Directory Id="WWWMain" Name="wwwroot">
-					<Directory Id="APIINSTALLFOLDER" ComponentGuidGenerationSeed="f1aefe2e-dbe2-49d9-84a5-64369951a90e" Name="PortEval.API" />
-					<Directory Id="WEBINSTALLFOLDER" ComponentGuidGenerationSeed="a7447e43-04a5-43bf-b24c-d515a42ef0df" Name="PortEval.Web" />
-				</Directory>
-			</Directory>
-		</Directory>
-	</Fragment>
-	
-	<Fragment>
-		<Component Id="WebAppPool" Guid="8360b1f2-1170-403a-8ac3-85f80297f29c" Win64="yes" Directory="APIINSTALLFOLDER">
-			<iis:WebAppPool Id="PortEvalAppPool"
-						Name="PortEval App Pool"
-						Identity="localSystem"
-						ManagedPipelineMode="Integrated"
-						ManagedRuntimeVersion="v4.0"
-						RecycleMinutes="200"/>
-			<CreateFolder/>
+			<InstallUISequence>
+				<Show Dialog="WelcomeDlgCustom" Before="MaintenanceWelcomeDlg">NOT Installed OR PATCH</Show>
+				<Show Dialog="MaintenanceWelcomeDlg" Before="ProgressDlg">Installed AND NOT RESUMED AND NOT Preselected AND NOT PATCH</Show>
+			</InstallUISequence>
+			
+            <Property Id="ARPNOMODIFY" Value="1" />
+        </UI>
+        <UIRef Id="WixUI_Common" />
+        <Property Id="DataSourcesListBox_Prop" Value="Tiingo" />
+        <Property Id="TIINGO_KEY" Secure="yes" />
+    </Product>
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="IISMain" Name="inetpub">
+                <Directory Id="WWWMain" Name="wwwroot">
+                    <Directory Id="APIINSTALLFOLDER" ComponentGuidGenerationSeed="f1aefe2e-dbe2-49d9-84a5-64369951a90e" Name="PortEval.API" />
+                    <Directory Id="WEBINSTALLFOLDER" ComponentGuidGenerationSeed="a7447e43-04a5-43bf-b24c-d515a42ef0df" Name="PortEval.Web" />
+                </Directory>
+            </Directory>
+        </Directory>
+    </Fragment>
+    <Fragment>
+        <Component Id="WebAppPool" Guid="8360b1f2-1170-403a-8ac3-85f80297f29c" Win64="yes" Directory="APIINSTALLFOLDER">
+            <iis:WebAppPool Id="PortEvalAppPool" Name="PortEval App Pool" Identity="localSystem" ManagedPipelineMode="Integrated" ManagedRuntimeVersion="v4.0" RecycleMinutes="200" />
+            <CreateFolder />
+        </Component>
+		<Component Id="DataSourceRegistryKeys" Guid="c551bf99-b1fb-45f2-9eef-1c00216788e7" Directory="APIINSTALLFOLDER" Win64="yes">
+			<RegistryKey Root="HKLM" Key="Software\PortEval\Configuration" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
+				<RegistryValue Type="string" Name="PORTEVAL_Tiingo_Key" Value="[TIINGO_KEY]" KeyPath="yes" />
+			</RegistryKey>
 		</Component>
 		<ComponentGroup Id="WebsiteComponents" Directory="WEBINSTALLFOLDER">
 			<Component Id="PortEval.Web.IISWebSite" Guid="b4fb0353-fb39-4375-8e46-ff95c328b165">
 				<iis:WebSite Id="PortEval.Web" Description="PortEval Web" Directory="WEBINSTALLFOLDER">
-					<iis:WebAddress Id="PortEval.Web.WebAddress" Port="5432" />
-					<iis:WebVirtualDir Id="PortEval.API.VDir" Alias="api" Directory="APIINSTALLFOLDER">
-						<iis:WebApplication Id="PortEvalAPIWebApp" Name="PortEval.API" WebAppPool="PortEvalAppPool" />
-					</iis:WebVirtualDir>
-				</iis:WebSite>
-				<CreateFolder/>
-			</Component>
-		</ComponentGroup>
-	</Fragment>
+                    <iis:WebAddress Id="PortEval.Web.WebAddress" Port="5432" />
+                    <iis:WebVirtualDir Id="PortEval.API.VDir" Alias="api" Directory="APIINSTALLFOLDER">
+                        <iis:WebApplication Id="PortEvalAPIWebApp" Name="PortEval.API" WebAppPool="PortEvalAppPool" />
+                    </iis:WebVirtualDir>
+                </iis:WebSite>
+                <CreateFolder />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
 </Wix>

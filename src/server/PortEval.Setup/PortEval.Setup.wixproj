@@ -40,6 +40,10 @@
     <Content Include="WixIIsExtension.dll" />
   </ItemGroup>
   <ItemGroup>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
     <WixExtension Include="WixIIsExtension">
       <HintPath>WixIIsExtension.dll</HintPath>
       <Name>WixIIsExtension</Name>
@@ -59,13 +63,13 @@
     <ItemGroup>
       <Compile Include="obj\$(Configuration)\ProductInstallFiles.wxs" Condition="'%(ProjectReference.IsDotnetSDKProject)' == 'True'" />
     </ItemGroup>
-	<Exec WorkingDirectory="$(SolutionDir)../web" Command="npm run build" />
-	<ItemGroup>
-	  <LinkerBindInputPaths Include="$(SolutionDir)../web/build" />
-	</ItemGroup>
-	<HeatDirectory OutputFile="obj\$(Configuration)\WebInstallFiles.wxs" Directory="$(SolutionDir)../web/build" ToolPath="$(WixToolPath)" DirectoryRefId="WEBINSTALLFOLDER" ComponentGroupName="WebCompiledFiles"  AutogenerateGuids="true" SuppressCom="true" SuppressRegistry="true" SuppressFragments="true" SuppressRootDirectory="true" RunAsSeparateProcess="$(RunWixToolsOutOfProc)" />
-	<ItemGroup>
-	  <Compile Include="obj\$(Configuration)\WebInstallFiles.wxs" /> 
-	</ItemGroup>
+    <Exec WorkingDirectory="$(SolutionDir)../web" Command="npm run build" />
+    <ItemGroup>
+      <LinkerBindInputPaths Include="$(SolutionDir)../web/build" />
+    </ItemGroup>
+    <HeatDirectory OutputFile="obj\$(Configuration)\WebInstallFiles.wxs" Directory="$(SolutionDir)../web/build" ToolPath="$(WixToolPath)" DirectoryRefId="WEBINSTALLFOLDER" ComponentGroupName="WebCompiledFiles" AutogenerateGuids="true" SuppressCom="true" SuppressRegistry="true" SuppressFragments="true" SuppressRootDirectory="true" RunAsSeparateProcess="$(RunWixToolsOutOfProc)" />
+    <ItemGroup>
+      <Compile Include="obj\$(Configuration)\WebInstallFiles.wxs" />
+    </ItemGroup>
   </Target>
 </Project>
