@@ -67,7 +67,7 @@ namespace PortEval.Application
 
             services.AddBackgroundJobs();
 
-            services.AddServices();
+            services.AddServices(Configuration);
 
             services.AddQueries();
 

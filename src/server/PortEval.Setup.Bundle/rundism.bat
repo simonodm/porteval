@@ -1,1 +1,1 @@
-%WINDIR%\SysNative\dism.exe
+%WINDIR%\SysNative\dism.exe %*

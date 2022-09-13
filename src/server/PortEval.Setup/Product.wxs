@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension">
-    <Product Id="5e893641-543e-482f-bfa0-0231194a8dfa" Name="PortEvalApi" Language="1033" Version="1.0.0.0" Manufacturer="Dmitry Simonov" UpgradeCode="aaeb5c98-d082-4934-bbb3-49553e5a5b48">
+    <Product Id="1e7dd9ae-873a-4359-a4c6-2a47f5b7b994" Name="PortEval" Language="1033" Version="1.0.0.0" Manufacturer="Dmitry Simonov" UpgradeCode="aaeb5c98-d082-4934-bbb3-49553e5a5b48">
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
         <Feature Id="ProductFeature" Title="PortEval" Level="1">
-            <ComponentRef Id="WebAppPool" />
-			<ComponentRef Id="DataSourceRegistryKeys" />
+            <ComponentRef Id="APIAppPool" />
+			<ComponentRef Id="WEBAppPool" />
+			<ComponentRef Id="RegistryKeys" />
             <ComponentGroupRef Id="WebsiteComponents" />
             <ComponentGroupRef Id="APIPublishedFiles" />
             <ComponentGroupRef Id="WebCompiledFiles" />
+			<ComponentRef Id="URLRewriteWebConfigFile" />
         </Feature>
         <UI>
-            <Dialog Id="DataSourcesDlg" Width="370" Height="270">
+            <Dialog Id="DataSourcesDlg" Width="370" Height="270" Title="Configure data sources">
                 <Control Type="Edit" Id="TiingoKeyEdit" Width="328" Height="15" X="22" Y="218" Property="TIINGO_KEY">
-                    <Condition Action="show">DataSourceListBox_Prop = "Tiingo"</Condition>
+                    <Condition Action="show">DataSourcesListBox_Prop = "Tiingo"</Condition>
+					<Condition Action="hide">DataSourcesListBox_Prop &lt;&gt; "Tiingo"</Condition>
                 </Control>
+				<Control Type="Edit" Id="OpenExchangeRatesKeyEdit" Width="328" Height="15" X="22" Y="218" Property="OPENEXCHANGERATES_KEY">
+					<Condition Action="show">DataSourcesListBox_Prop = "OpenExchangeRates"</Condition>
+					<Condition Action="hide">DataSourcesListBox_Prop &lt;&gt; "OpenExchangeRates"</Condition>
+				</Control>
                 <Control Type="ListBox" Property="DataSourcesListBox_Prop" Id="DataSourcesListBox" Width="322" Height="169" X="22" Y="15">
                     <ListBox Property="DataSourcesListBox_Prop">
                         <ListItem Text="Tiingo" Value="Tiingo" />
+						<ListItem Text="Open Exchange Rates" Value="OpenExchangeRates" />
                     </ListBox>
                 </Control>
                 <Control Type="Text" Id="EnterKeyText" Width="316" Height="14" X="22" Y="199">
@@ -89,31 +97,45 @@
         <UIRef Id="WixUI_Common" />
         <Property Id="DataSourcesListBox_Prop" Value="Tiingo" />
         <Property Id="TIINGO_KEY" Secure="yes" />
+		<Property Id="OPENEXCHANGERATES_KEY" Secure="yes" />
     </Product>
     <Fragment>
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="IISMain" Name="inetpub">
                 <Directory Id="WWWMain" Name="wwwroot">
-                    <Directory Id="APIINSTALLFOLDER" ComponentGuidGenerationSeed="f1aefe2e-dbe2-49d9-84a5-64369951a90e" Name="PortEval.API" />
+					<Directory Id="APIINSTALLFOLDER" ComponentGuidGenerationSeed="f1aefe2e-dbe2-49d9-84a5-64369951a90e" Name="PortEval.API">
+						<Directory Id="APIFILESFOLDER" Name="APIFiles" />
+					</Directory>
                     <Directory Id="WEBINSTALLFOLDER" ComponentGuidGenerationSeed="a7447e43-04a5-43bf-b24c-d515a42ef0df" Name="PortEval.Web" />
                 </Directory>
             </Directory>
         </Directory>
     </Fragment>
     <Fragment>
-        <Component Id="WebAppPool" Guid="8360b1f2-1170-403a-8ac3-85f80297f29c" Win64="yes" Directory="APIINSTALLFOLDER">
+		<Component Id="URLRewriteWebConfigFile" Guid="35af0d06-6883-40f7-9ce4-bfa1fe86e3ac" Directory="WEBINSTALLFOLDER">
+			<File Id="PortEval.Web.WebConfig" KeyPath="yes" Source="AdditionalContent\web.config" />
+		</Component>
+        <Component Id="APIAppPool" Guid="8360b1f2-1170-403a-8ac3-85f80297f29c" Win64="yes" Directory="APIINSTALLFOLDER">
             <iis:WebAppPool Id="PortEvalAppPool" Name="PortEval App Pool" Identity="localSystem" ManagedPipelineMode="Integrated" ManagedRuntimeVersion="v4.0" RecycleMinutes="200" />
             <CreateFolder />
+			<CreateFolder Directory="APIFILESFOLDER" />
         </Component>
-		<Component Id="DataSourceRegistryKeys" Guid="c551bf99-b1fb-45f2-9eef-1c00216788e7" Directory="APIINSTALLFOLDER" Win64="yes">
+		<Component Id="WEBAppPool" Guid="" Win64="yes" Directory="WEBINSTALLFOLDER">
+			<iis:WebAppPool Id="PortEvalWebAppPool" Name="PortEval Web App Pool" Identity="applicationPoolIdentity" ManagedPipelineMode="Integrated" ManagedRuntimeVersion="v4.0" RecycleMinutes="200" />
+			<CreateFolder />
+ 		</Component>
+		<Component Id="RegistryKeys" Guid="c551bf99-b1fb-45f2-9eef-1c00216788e7" Directory="APIINSTALLFOLDER" Win64="yes">
 			<RegistryKey Root="HKLM" Key="Software\PortEval\Configuration" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
 				<RegistryValue Type="string" Name="PORTEVAL_Tiingo_Key" Value="[TIINGO_KEY]" KeyPath="yes" />
+				<RegistryValue Type="string" Name="PORTEVAL_OpenExchangeRates_Key" Value="[OPENEXCHANGERATES_KEY]" />
+				<RegistryValue Type="string" Name="PORTEVAL_File_Storage" Value="[APIINSTALLFOLDER]\Files" />
 			</RegistryKey>
 		</Component>
 		<ComponentGroup Id="WebsiteComponents" Directory="WEBINSTALLFOLDER">
 			<Component Id="PortEval.Web.IISWebSite" Guid="b4fb0353-fb39-4375-8e46-ff95c328b165">
 				<iis:WebSite Id="PortEval.Web" Description="PortEval Web" Directory="WEBINSTALLFOLDER">
                     <iis:WebAddress Id="PortEval.Web.WebAddress" Port="5432" />
+					<iis:WebApplication Id="PortEvalWebApp" Name="PortEval.Web" WebAppPool="PortEvalWebAppPool" />
                     <iis:WebVirtualDir Id="PortEval.API.VDir" Alias="api" Directory="APIINSTALLFOLDER">
                         <iis:WebApplication Id="PortEvalAPIWebApp" Name="PortEval.API" WebAppPool="PortEvalAppPool" />
                     </iis:WebVirtualDir>

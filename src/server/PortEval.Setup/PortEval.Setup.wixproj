@@ -37,6 +37,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="AdditionalContent\web.config" />
     <Content Include="WixIIsExtension.dll" />
   </ItemGroup>
   <ItemGroup>
@@ -48,6 +49,9 @@
       <HintPath>WixIIsExtension.dll</HintPath>
       <Name>WixIIsExtension</Name>
     </WixExtension>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AdditionalContent" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />

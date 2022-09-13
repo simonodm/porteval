@@ -34,6 +34,7 @@
     <Compile Include="DotNetPrerequisites.wxs" />
     <Compile Include="Bundle.wxs" />
     <Compile Include="EnableIIS.wxs" />
+    <Compile Include="IISUrlRewrite.wxs" />
     <Compile Include="SQLExpress.wxs" />
   </ItemGroup>
   <ItemGroup>
@@ -57,8 +58,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="packages\rewrite_amd64_en-US.msi" />
     <Content Include="rundism.bat" />
     <Content Include="WixUtilExtension.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="packages" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />

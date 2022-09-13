@@ -21,6 +21,8 @@ using PortEval.BackgroundJobs.DataImport;
 using PortEval.BackgroundJobs.InitialPriceFetch;
 using PortEval.BackgroundJobs.LatestPricesFetch;
 using PortEval.BackgroundJobs.MissingPricesFetch;
+using System.Runtime.InteropServices;
+using Microsoft.Win32;
 
 namespace PortEval.Application.Extensions
 {
@@ -33,7 +35,7 @@ namespace PortEval.Application.Extensions
         /// Configures PortEval's application services.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
-        public static void AddServices(this IServiceCollection services)
+        public static void AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IInstrumentService, InstrumentService>();
             services.AddScoped<IPortfolioService, PortfolioService>();
@@ -44,7 +46,11 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IInstrumentPriceService, InstrumentPriceService>();
             services.AddScoped<IDashboardService, DashboardService>();
 
-            services.AddScoped<ICsvImportService, CsvImportService>();
+            var fileStoragePath = configuration.GetConfigurationValue("PORTEVAL_File_Storage");
+            services.AddScoped<ICsvImportService, CsvImportService>(
+                provider =>
+                    new CsvImportService(provider.GetRequiredService<IDataImportRepository>(), fileStoragePath)
+            );
             services.AddScoped<ICsvExportService, CsvExportService>();
             services.AddScoped<PortfolioImportProcessor>();
             services.AddScoped<PositionImportProcessor>();
@@ -153,8 +159,8 @@ namespace PortEval.Application.Extensions
         public static void ConfigurePriceFetcher(this IServiceCollection services, IConfiguration configuration)
         {
             var fetcher = new PriceFetcher();
-            var tiingoKey = Environment.GetEnvironmentVariable("PORTEVAL_Tiingo_Key");
-            var openExchangeRatesKey = Environment.GetEnvironmentVariable("PORTEVAL_OpenExchangeRates_Key");
+            var tiingoKey = configuration.GetConfigurationValue("PORTEVAL_Tiingo_Key");
+            var openExchangeRatesKey = configuration.GetConfigurationValue("PORTEVAL_OpenExchangeRates_Key");
             if (tiingoKey != null)
             {
                 fetcher.AddTiingo(tiingoKey, new RateLimiter(TimeSpan.FromHours(1), 500));
@@ -169,5 +175,6 @@ namespace PortEval.Application.Extensions
 
             services.AddSingleton(fetcher);
         }
+        
     }
 }

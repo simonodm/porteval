@@ -11,14 +11,32 @@
 			  Variable="InstallationFound"
 			  Win64="yes" />
 		<PackageGroup Id="DotNetHostingBundle">
+			<!-- Repair if hosting bundle installation is found and IIS features were modified -->
+			<!-- Needed to prevent possible issues with IIS configuration file not including the hosting bundle -->
 			<ExePackage
 			  Id="DOTNETHB"
+			  DownloadUrl="$(var.HostingBundleDownloadUrl)"
+			  DetectCondition="NOT InstallationFound AND WebServerInstalled AND StaticContentInstalled AND DefaultDocumentInstalled AND DirectoryBrowsingInstalled AND HttpErrorsInstalled AND HttpRedirectInstalled AND ASPInstalled AND ASPNETInstalled AND ASPNET45Installed AND NetFxExtensibilityInstalled AND NetFxExtensibility45Installed AND ISAPIExtensionsInstalled AND ISAPIFilterInstalled AND HttpLoggingInstalled AND LoggingLibrariesInstalled AND RequestMonitorInstalled AND HttpTracingInstalled AND CustomLoggingInstalled AND RequestFilteringInstalled AND IPSecurityInstalled AND HttpCompressionStaticInstalled AND ManagementConsoleInstalled AND ManagementScriptingToolsInstalled AND AdminServiceInstalled AND NetFxEnvironmentInstalled AND WASConfigurationAPIInstalled"
+			  Name="dotnet-hosting-6.0.8-win.exe"
+			  Compressed="no"
+			  InstallCommand="/quiet /repair"
+			>
+				<RemotePayload
+					Description=".NET Hosting Bundle"
+					ProductName=".NET Hosting Bundle"
+					Version="6.0.8.0"
+					Size="72549200"
+					Hash="96B9B9ECD4E4B028265FA57314BB41FD584ECABC" />
+			</ExePackage>
+			<ExePackage
+			  Id="DOTNETHBREPAIR"
 			  DownloadUrl="$(var.HostingBundleDownloadUrl)"
 			  DetectCondition="InstallationFound"
 			  Name="dotnet-hosting-6.0.8-win.exe"
 			  Compressed="no"
 			  InstallCommand="/quiet"
-			  Permanent="yes"
+			  RepairCommand="/quiet /repair"
+			  UninstallCommand="/quiet /uninstall"
 			>
 				<RemotePayload
 					Description=".NET Hosting Bundle"

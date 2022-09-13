@@ -18,10 +18,10 @@ namespace PortEval.Application.Services
         private IDataImportRepository _importRepository;
         private readonly string _storagePath;
 
-        public CsvImportService(IDataImportRepository importRepository)
+        public CsvImportService(IDataImportRepository importRepository, string storagePath)
         {
             _importRepository = importRepository;
-            _storagePath = Environment.GetEnvironmentVariable("FILE_STORAGE");
+            _storagePath = storagePath;
         }
 
         public async Task<DataImport> StartImport(Stream inputFileStream, TemplateType templateType)

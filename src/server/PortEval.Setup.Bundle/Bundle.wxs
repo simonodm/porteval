@@ -4,10 +4,11 @@
 		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense" />
 
 		<Chain>
-			<PackageGroupRef Id="InstallIIS" />
 			<PackageGroupRef Id="Sql2019ExprWeb" />
+			<PackageGroupRef Id="InstallIIS" />
+			<PackageGroupRef Id="IISUrlRewrite" />
 			<PackageGroupRef Id="DotNetHostingBundle" />
-			<MsiPackage SourceFile="$(var.PortEval.Setup.TargetPath)" />
+			<MsiPackage SourceFile="$(var.PortEval.Setup.TargetPath)" DisplayInternalUI="yes" />
 		</Chain>
 	</Bundle>
 </Wix>

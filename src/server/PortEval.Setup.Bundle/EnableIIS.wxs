@@ -1,252 +1,364 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
 	<!-- Enable IIS services, inspired by: https://stackoverflow.com/questions/24439602/wix-burn-install-iis-if-not-yet-installed -->
 	<Fragment>
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="W3SVC" Variable="WebServerInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="StaticContent" Variable="StaticContentInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="DefaultDocument" Variable="DefaultDocumentInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="DirectoryBrowse" Variable="DirectoryBrowsingInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="HttpErrors" Variable="HttpErrorsInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="HttpRedirect" Variable="HttpRedirectInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="ASP" Variable="ASPInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="ASPNET" Variable="ASPNETInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="ASPNET45" Variable="ASPNET45Installed" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="NetFxExtensibility" Variable="NetFxExtensibilityInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="NetFxExtensibility45" Variable="NetFxExtensibility45Installed" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="ISAPIExtensions" Variable="ISAPIExtensionsInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="ISAPIFilter" Variable="ISAPIFilterInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="HttpLogging" Variable="HttpLoggingInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="LoggingLibraries" Variable="LoggingLibrariesInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="RequestMonitor" Variable="RequestMonitorInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="HttpTracing" Variable="HttpTracingInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="CustomLogging" Variable="CustomLoggingInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="RequestFiltering" Variable="RequestFilteringInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="IPSecurity" Variable="IPSecurityInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="HttpCompressionStatic" Variable="HttpCompressionStaticInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="ManagementConsole" Variable="ManagementConsoleInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="ManagementScriptingTools" Variable="ManagementScriptingToolsInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="AdminService" Variable="AdminServiceInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="NetFxEnvironment" Variable="NetFxEnvironmentInstalled" Win64="yes" />
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\InetStp\Components" Value="WASConfigurationAPI" Variable="WASConfigurationAPIInstalled" Win64="yes" />
+		
 		<PackageGroup Id="InstallIIS">
 			<ExePackage
 						Id="IIS_part0"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-WebServerRole"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-WebServerRole /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-WebServerRole /NoRestart /all"
+						InstallCondition="NOT WebServerInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part1"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-WebServer"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-WebServer /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-WebServer /NoRestart /all"
+						InstallCondition="NOT WebServerInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part2"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-CommonHttpFeatures"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-CommonHttpFeatures /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-CommonHttpFeatures /NoRestart /all"
+						InstallCondition="NOT StaticContentInstalled OR NOT DefaultDocumentInstalled OR NOT DirectoryBrowsingInstalled OR NOT HttpErrorsInstalled OR NOT HttpRedirectInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part3"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-StaticContent"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-StaticContent /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-StaticContent /NoRestart /all"
+						InstallCondition="NOT StaticContentInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part4"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-DefaultDocument"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-DefaultDocument /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-DefaultDocument /NoRestart /all"
+						InstallCondition="NOT DefaultDocumentInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part5"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-DirectoryBrowsing"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-DirectoryBrowsing /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-DirectoryBrowsing /NoRestart /all"
+						InstallCondition="NOT DirectoryBrowsingInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part6"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-HttpErrors"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpErrors /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpErrors /NoRestart /all"
+						InstallCondition="NOT HttpErrorsInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part7"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-HttpRedirect"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpRedirect /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpRedirect /NoRestart /all"
+						InstallCondition="NOT HttpRedirectInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part8"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-ApplicationDevelopment"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ApplicationDevelopment /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ApplicationDevelopment /NoRestart /all"
+						InstallCondition="NOT NetFxExtensibilityInstalled OR NOT NetFxExtensibility45Installed OR NOT ASPInstalled OR NOT ASPNET45Installed OR NOT ASPNETInstalled OR NOT ISAPIExtensionsInstalled OR NOT ISAPIFilterInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part10"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-NetFxExtensibility"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-NetFxExtensibility /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-NetFxExtensibility /NoRestart /all"
+						InstallCondition="NOT NetFxExtensibilityInstalled"
+						PerMachine="yes"
                   >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_part21"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: IIS-NetFxExtensibility45"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-NetFxExtensibility45 /NoRestart /all"
+						InstallCondition="NOT NetFxExtensibility45Installed"
+						PerMachine="yes"
+				  >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part12"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-ISAPIExtensions"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ISAPIExtensions /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ISAPIExtensions /NoRestart /all"
+						InstallCondition="NOT ISAPIExtensionsInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part11"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-ASP"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ASP /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ASP /NoRestart /all"
+						InstallCondition="NOT ASPInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part13"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-ISAPIFilter"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ISAPIFilter /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ISAPIFilter /NoRestart /all"
+						InstallCondition="NOT ISAPIFilterInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part9"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-ASPNET"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ASPNET /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ASPNET /NoRestart /all"
+						InstallCondition="NOT ASPNETInstalled"
+						PerMachine="yes"
                   >
+			</ExePackage>
+			<ExePackage Id='IIS_part35'
+                        DisplayName='Installing IIS: IIS-ASPNET45'
+                        SourceFile='rundism.bat'
+                        InstallCommand='/Online /Enable-Feature /FeatureName:IIS-ASPNET45 /NoRestart /all'
+						InstallCondition="NOT ASPNET45Installed"
+						PerMachine="yes"
+				  >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part14"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-HealthAndDiagnostics"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HealthAndDiagnostics /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HealthAndDiagnostics /NoRestart /all"
+						InstallCondition="NOT HttpLoggingInstalled OR NOT LoggingLibrariesInstalled OR NOT RequestMonitorInstalled OR NOT HttpTracingInstalled OR NOT CustomLoggingInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part15"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-HttpLogging"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpLogging /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpLogging /NoRestart /all"
+						InstallCondition="NOT HttpLoggingInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part16"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-LoggingLibraries"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-LoggingLibraries /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-LoggingLibraries /NoRestart /all"
+						InstallCondition="NOT LoggingLibrariesInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part17"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-RequestMonitor"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-RequestMonitor /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-RequestMonitor /NoRestart /all"
+						InstallCondition="NOT RequestMonitorInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part18"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-HttpTracing"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpTracing /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpTracing /NoRestart /all"
+						InstallCondition="NOT HttpTracingInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part19"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-CustomLogging"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-CustomLogging /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-CustomLogging /NoRestart /all"
+						InstallCondition="NOT CustomLoggingInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part20"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-Security"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-Security /NoRestart"
-                  >
-			</ExePackage>
-			<ExePackage
-						Id="IIS_part21"
-						SourceFile="rundism.bat"
-						DisplayName="Installing IIS: IIS-WindowsAuthentication"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-WindowsAuthentication /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-Security /NoRestart /all"
+						InstallCondition="NOT RequestFilteringInstalled OR NOT IPSecurityInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part22"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-RequestFiltering"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-RequestFiltering /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-RequestFiltering /NoRestart /all"
+						InstallCondition="NOT RequestFilteringInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part23"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-IPSecurity"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-IPSecurity /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-IPSecurity /NoRestart /all"
+						InstallCondition="NOT IPSecurityInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part24"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-Performance"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-Performance /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-Performance /NoRestart /all"
+						InstallCondition="NOT HttpCompressionStaticInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part25"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-HttpCompressionStatic"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpCompressionStatic /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-HttpCompressionStatic /NoRestart /all"
+						InstallCondition="NOT HttpCompressionStaticInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part26"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-WebServerManagementTools"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-WebServerManagementTools /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-WebServerManagementTools /NoRestart /all"
+						InstallCondition="NOT ManagementConsoleInstalled OR NOT ManagementScriptingToolsInstalled OR NOT AdminServiceInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part27"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-ManagementConsole"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ManagementConsole /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ManagementConsole /NoRestart /all"
+						InstallCondition="NOT ManagementConsoleInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part28"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-ManagementScriptingTools"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ManagementScriptingTools /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ManagementScriptingTools /NoRestart /all"
+						InstallCondition="NOT ManagementScriptingToolsInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part29"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: IIS-ManagementService"
-						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ManagementService /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:IIS-ManagementService /NoRestart /all"
+						InstallCondition="NOT AdminServiceInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part30"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: WAS-WindowsActivationService"
-						InstallCommand="/Online /Enable-Feature /FeatureName:WAS-WindowsActivationService /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:WAS-WindowsActivationService /NoRestart /all"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part31"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: WAS-ProcessModel"
-						InstallCommand="/Online /Enable-Feature /FeatureName:WAS-ProcessModel /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:WAS-ProcessModel /NoRestart /all"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part32"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: WAS-NetFxEnvironment"
-						InstallCommand="/Online /Enable-Feature /FeatureName:WAS-NetFxEnvironment /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:WAS-NetFxEnvironment /NoRestart /all"
+						InstallCondition="NOT NetFxEnvironmentInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part33"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: WAS-ConfigurationAPI"
-						InstallCommand="/Online /Enable-Feature /FeatureName:WAS-ConfigurationAPI /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:WAS-ConfigurationAPI /NoRestart /all"
+						InstallCondition="NOT WASConfigurationAPIInstalled"
+						PerMachine="yes"
                   >
 			</ExePackage>
 			<ExePackage
 						Id="IIS_part34"
 						SourceFile="rundism.bat"
 						DisplayName="Installing IIS: NetFx3"
-						InstallCommand="/Online /Enable-Feature /FeatureName:NetFx3 /NoRestart"
+						InstallCommand="/Online /Enable-Feature /FeatureName:NetFx3 /NoRestart /all"
+						PerMachine="yes"
                   >
+			</ExePackage>
+			<ExePackage
+						Id="IIS_reboot"
+						SourceFile="rundism.bat"
+						DisplayName="Installing IIS: Requesting reboot"
+						PerMachine="yes"
+						InstallCondition="NOT WebServerInstalled OR NOT StaticContentInstalled OR NOT DefaultDocumentInstalled OR NOT DirectoryBrowsingInstalled OR NOT HttpErrorsInstalled OR NOT HttpRedirectInstalled OR NOT ASPInstalled OR NOT ASPNETInstalled OR NOT ASPNET45Installed OR NOT NetFxExtensibilityInstalled OR NOT NetFxExtensibility45Installed OR NOT ISAPIExtensionsInstalled OR NOT ISAPIFilterInstalled OR NOT HttpLoggingInstalled OR NOT LoggingLibrariesInstalled OR NOT RequestMonitorInstalled OR NOT HttpTracingInstalled OR NOT CustomLoggingInstalled OR NOT RequestFilteringInstalled OR NOT IPSecurityInstalled OR NOT HttpCompressionStaticInstalled OR NOT ManagementConsoleInstalled OR NOT ManagementScriptingToolsInstalled OR NOT AdminServiceInstalled OR NOT NetFxEnvironmentInstalled OR NOT WASConfigurationAPIInstalled"
+				  >
+				<ExitCode Behavior="forceReboot" />
 			</ExePackage>
 		</PackageGroup>
 	</Fragment>
