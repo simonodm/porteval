@@ -38,15 +38,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="AdditionalContent\web.config" />
-    <Content Include="WixIIsExtension.dll" />
   </ItemGroup>
   <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
     <WixExtension Include="WixUIExtension">
       <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
       <Name>WixUIExtension</Name>
     </WixExtension>
     <WixExtension Include="WixIIsExtension">
-      <HintPath>WixIIsExtension.dll</HintPath>
+      <HintPath>$(WixExtDir)\WixIIsExtension.dll</HintPath>
       <Name>WixIIsExtension</Name>
     </WixExtension>
   </ItemGroup>

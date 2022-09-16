@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<?define UrlRewritePackageFileName=rewrite_amd64_en-US.msi ?>
+	<?define UrlRewriteProductId={9BCA2118-F753-4A1E-BCF3-5A820729965C} ?>
 
 	<Fragment>
 		<PackageGroup Id="IISUrlRewrite">
@@ -8,11 +9,21 @@
 			  Id="IISURLREWRITEMSI"
 			  SourceFile="packages\$(var.UrlRewritePackageFileName)"
 			  Compressed="yes"
-			  Permanent="no"
-			  InstallCondition="1"
+			  Permanent="yes"
 			>
 				<MsiProperty Name="UILevel" Value="2" />
 			</MsiPackage>
+			<!-- IIS Url Rewrite module fix in case it was installed before IIS was enabled -->
+			<!-- Can be run every time -->
+			<ExePackage
+				Id="IISURLREWRITEREPAIR"
+				SourceFile="runmsiexec.bat"
+				Compressed="yes"
+				Permanent="yes"
+				InstallCommand="/quiet /fa $(var.UrlRewriteProductId)"
+				PerMachine="yes"
+				>
+			</ExePackage>
 		</PackageGroup>
 	</Fragment>
 </Wix>

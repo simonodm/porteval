@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Bundle Name="PortEval" Version="1.0.0.0" Manufacturer="Dmitry Simonov" UpgradeCode="cb6989b6-8fd3-4200-8b83-bd21de9c1c3f">
-		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense" />
+		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+			<bal:WixStandardBootstrapperApplication
+				LicenseUrl=""
+				xmlns:bal="http://schemas.microsoft.com/wix/BalExtension" />
+		</BootstrapperApplicationRef>
 
 		<Chain>
 			<PackageGroupRef Id="Sql2019ExprWeb" />

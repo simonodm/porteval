@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension">
-    <Product Id="1e7dd9ae-873a-4359-a4c6-2a47f5b7b994" Name="PortEval" Language="1033" Version="1.0.0.0" Manufacturer="Dmitry Simonov" UpgradeCode="aaeb5c98-d082-4934-bbb3-49553e5a5b48">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+>
+    <Product Id="8ab537b2-a91a-4986-93ae-fce950676ceb" Name="PortEval" Language="1033" Version="1.0.1.0" Manufacturer="Dmitry Simonov" UpgradeCode="aaeb5c98-d082-4934-bbb3-49553e5a5b48">
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -81,50 +83,55 @@
             <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="DataSourcesDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
             <Publish Dialog="WelcomeDlgCustom" Control="Next" Event="NewDialog" Value="DataSourcesDlg">1</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DataSourcesDlg" Order="2">Installed AND PATCH</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DataSourcesDlg" Order="2">WixUI_InstallMode &lt;&gt; &quot;Remove&quot;</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">WixUI_InstallMode = &quot;Remove&quot;</Publish>
 
 			<InstallUISequence>
 				<Show Dialog="WelcomeDlgCustom" Before="MaintenanceWelcomeDlg">NOT Installed OR PATCH</Show>
-				<Show Dialog="MaintenanceWelcomeDlg" Before="ProgressDlg">Installed AND NOT RESUMED AND NOT Preselected AND NOT PATCH</Show>
+				<Show Dialog="MaintenanceWelcomeDlg" Before="ProgressDlg">Installed AND NOT RESUMED AND NOT PATCH</Show>
 			</InstallUISequence>
 			
             <Property Id="ARPNOMODIFY" Value="1" />
         </UI>
         <UIRef Id="WixUI_Common" />
+
+        <SetProperty Id="REINSTALL" Value="ALL" After="FindRelatedProducts">Installed AND NOT PATCH</SetProperty>
+        <SetProperty Id="REINSTALLMODE" Value="omus" After="FindRelatedProducts">Installed AND NOT PATCH</SetProperty>
+
         <Property Id="DataSourcesListBox_Prop" Value="Tiingo" />
-        <Property Id="TIINGO_KEY" Secure="yes" />
+		<Property Id="TIINGO_KEY" Secure="yes" />
 		<Property Id="OPENEXCHANGERATES_KEY" Secure="yes" />
     </Product>
     <Fragment>
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="IISMain" Name="inetpub">
                 <Directory Id="WWWMain" Name="wwwroot">
-					<Directory Id="APIINSTALLFOLDER" ComponentGuidGenerationSeed="f1aefe2e-dbe2-49d9-84a5-64369951a90e" Name="PortEval.API">
+					<Directory Id="APIINSTALLFOLDER" ComponentGuidGenerationSeed="aaa89b0c-384f-4375-a124-df3f062f39de" Name="PortEval.API">
 						<Directory Id="APIFILESFOLDER" Name="APIFiles" />
 					</Directory>
-                    <Directory Id="WEBINSTALLFOLDER" ComponentGuidGenerationSeed="a7447e43-04a5-43bf-b24c-d515a42ef0df" Name="PortEval.Web" />
+                    <Directory Id="WEBINSTALLFOLDER" ComponentGuidGenerationSeed="9bb816bc-1e4a-4047-99ee-a4a218bc0b8e" Name="PortEval.Web" />
                 </Directory>
             </Directory>
         </Directory>
     </Fragment>
     <Fragment>
-		<Component Id="URLRewriteWebConfigFile" Guid="35af0d06-6883-40f7-9ce4-bfa1fe86e3ac" Directory="WEBINSTALLFOLDER">
+		<Component Id="URLRewriteWebConfigFile" Guid="e409f22a-266b-481a-85ec-963eefd5f2f1" Directory="WEBINSTALLFOLDER">
 			<File Id="PortEval.Web.WebConfig" KeyPath="yes" Source="AdditionalContent\web.config" />
 		</Component>
-        <Component Id="APIAppPool" Guid="8360b1f2-1170-403a-8ac3-85f80297f29c" Win64="yes" Directory="APIINSTALLFOLDER">
+        <Component Id="APIAppPool" Guid="7fa616c4-b8ae-46df-a826-bc38e13df54e" Win64="yes" Directory="APIINSTALLFOLDER">
             <iis:WebAppPool Id="PortEvalAppPool" Name="PortEval App Pool" Identity="localSystem" ManagedPipelineMode="Integrated" ManagedRuntimeVersion="v4.0" RecycleMinutes="200" />
             <CreateFolder />
 			<CreateFolder Directory="APIFILESFOLDER" />
         </Component>
-		<Component Id="WEBAppPool" Guid="" Win64="yes" Directory="WEBINSTALLFOLDER">
+		<Component Id="WEBAppPool" Guid="8ccf83ea-8296-4b3c-bb46-db8c91846f48" Win64="yes" Directory="WEBINSTALLFOLDER">
 			<iis:WebAppPool Id="PortEvalWebAppPool" Name="PortEval Web App Pool" Identity="applicationPoolIdentity" ManagedPipelineMode="Integrated" ManagedRuntimeVersion="v4.0" RecycleMinutes="200" />
 			<CreateFolder />
  		</Component>
-		<Component Id="RegistryKeys" Guid="c551bf99-b1fb-45f2-9eef-1c00216788e7" Directory="APIINSTALLFOLDER" Win64="yes">
+		<Component Id="RegistryKeys" Guid="dc75fd14-e2f4-436f-81ae-d1b294bb41b6" Directory="APIINSTALLFOLDER" Win64="yes">
 			<RegistryKey Root="HKLM" Key="Software\PortEval\Configuration" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
 				<RegistryValue Type="string" Name="PORTEVAL_Tiingo_Key" Value="[TIINGO_KEY]" KeyPath="yes" />
 				<RegistryValue Type="string" Name="PORTEVAL_OpenExchangeRates_Key" Value="[OPENEXCHANGERATES_KEY]" />
@@ -132,7 +139,7 @@
 			</RegistryKey>
 		</Component>
 		<ComponentGroup Id="WebsiteComponents" Directory="WEBINSTALLFOLDER">
-			<Component Id="PortEval.Web.IISWebSite" Guid="b4fb0353-fb39-4375-8e46-ff95c328b165">
+			<Component Id="PortEval.Web.IISWebSite" Guid="aa57b60a-5f9c-49f7-8075-cbd699256691">
 				<iis:WebSite Id="PortEval.Web" Description="PortEval Web" Directory="WEBINSTALLFOLDER">
                     <iis:WebAddress Id="PortEval.Web.WebAddress" Port="5432" />
 					<iis:WebApplication Id="PortEvalWebApp" Name="PortEval.Web" WebAppPool="PortEvalWebAppPool" />

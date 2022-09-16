@@ -30,12 +30,10 @@ https://www.microsoft.com/en-us/sql-server/sql-server-2019
 			  Name="SQLEXPR_x64_ENU.exe"
 			  Compressed="no"
 			  DetectCondition="SqlInstanceFound"
-			  Permanent="yes"
+			  Permanent="no"
 			  InstallCommand="$(var.Sql2019ExprInstallCommand)"
 			  UninstallCommand="$(var.Sql2019ExprUninstallCommand)"
 			  RepairCommand="$(var.Sql2019ExprRepairCommand)">
-				<!--If you want to uninstall Server 2019 Express when uninstalling
-your bundle, then set Permanent="no" in the ExePackage node above-->
 				<RemotePayload
 					Description="Microsoft SQL Server 2019 Express"
 					ProductName="Microsoft SQL Server 2019 Express"

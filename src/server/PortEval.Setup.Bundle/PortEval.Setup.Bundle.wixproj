@@ -39,7 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <WixExtension Include="WixUtilExtension">
-      <HintPath>WixUtilExtension.dll</HintPath>
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
       <Name>WixUtilExtension</Name>
     </WixExtension>
     <WixExtension Include="WixBalExtension">
@@ -60,7 +60,7 @@
   <ItemGroup>
     <Content Include="packages\rewrite_amd64_en-US.msi" />
     <Content Include="rundism.bat" />
-    <Content Include="WixUtilExtension.dll" />
+    <Content Include="runmsiexec.bat" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="packages" />
