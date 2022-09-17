@@ -85,7 +85,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                         CurrencyCode = "USD",
                         Price = price.Price,
                         Symbol = symbol,
-                        Time = price.Time
+                        Time = price.Time.ToUniversalTime()
                     })
             };
         }
@@ -121,7 +121,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                         CurrencyCode = "USD",
                         Price = price.Price,
                         Symbol = symbol,
-                        Time = price.Time
+                        Time = price.Time.ToUniversalTime()
                     })
             };
         }
@@ -144,7 +144,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                     CurrencyCode = "USD",
                     Price = result.Result.First().Price,
                     Symbol = symbol,
-                    Time = DateTime.Now
+                    Time = DateTime.UtcNow
                 }
                 : null
             };
@@ -168,7 +168,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                         CurrencyCode = currency,
                         Price = result.Result.First().Data.First().LastPrice,
                         Symbol = ticker,
-                        Time = DateTime.Now
+                        Time = DateTime.UtcNow
                     }
                     : null
             };
@@ -272,7 +272,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                         CurrencyCode = currency,
                         Price = price.Price,
                         Symbol = ticker,
-                        Time = price.Time
+                        Time = price.Time.ToUniversalTime()
                     })
             };
         }

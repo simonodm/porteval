@@ -37,7 +37,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
         /// <returns>A task representing the asynchronous job processing operation.</returns>
         public async Task Run()
         {
-            var currentTime = DateTime.Now;
+            var currentTime = DateTime.UtcNow;
             _logger.LogInformation($"Missing exchange rates job started at {currentTime}.");
 
             var currencies = await _context.Currencies.AsNoTracking().ToListAsync();
@@ -66,7 +66,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                 await ProcessCurrencyRange(currencies, defaultCurrency, range, currentTime);
             }
 
-            _logger.LogInformation($"Missing exchange rates job finished at {DateTime.Now}.");
+            _logger.LogInformation($"Missing exchange rates job finished at {DateTime.UtcNow}.");
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             var currenciesList = currencies.ToList();
             int i = 0;
             var newExchangeRates = new List<CurrencyExchangeRate>();
-            var minTime = DateTime.Now;
+            var minTime = DateTime.UtcNow;
             foreach (var exchangeRateData in fetchResult.Result)
             {
                 if (exchangeRateData.Time < range.From || exchangeRateData.Time > range.To) continue;

@@ -35,7 +35,7 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
         /// <returns>A task representing the asynchronous job processing operation.</returns>
         public async Task Run()
         {
-            var startTime = DateTime.Now;
+            var startTime = DateTime.UtcNow;
             _logger.LogInformation($"Instrument price cleanup started at {startTime}.");
 
             var instruments = await _context.Instruments.AsNoTracking().ToListAsync();
@@ -46,7 +46,7 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
             }
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation($"Instrument price cleanup finished at {DateTime.Now}.");
+            _logger.LogInformation($"Instrument price cleanup finished at {DateTime.UtcNow}.");
         }
 
         /// <summary>

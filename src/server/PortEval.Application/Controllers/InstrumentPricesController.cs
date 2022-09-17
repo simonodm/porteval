@@ -67,7 +67,7 @@ namespace PortEval.Application.Controllers
         {
             _logger.LogInformation($"Current price of instrument {instrumentId} requested.");
 
-            var price = await _instrumentQueries.GetInstrumentPrice(instrumentId, DateTime.Now);
+            var price = await _instrumentQueries.GetInstrumentPrice(instrumentId, DateTime.UtcNow);
             if (price.Status == QueryStatus.NotFound)
             {
                 return NotFound($"Instrument {instrumentId} not found.");

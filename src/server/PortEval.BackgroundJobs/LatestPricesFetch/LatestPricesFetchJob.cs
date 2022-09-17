@@ -35,7 +35,7 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
         /// <returns>A task representing the asynchronous job processing operation.</returns>
         public async Task Run()
         {
-            var startTime = DateTime.Now;
+            var startTime = DateTime.UtcNow;
             _logger.LogInformation($"Running latest price fetch job at {startTime}.");
             var instruments = await _context.Instruments.AsNoTracking().ToListAsync();
 
@@ -65,7 +65,7 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
             }
 
             await _context.SaveChangesAsync();
-            _logger.LogInformation($"Finished latest price fetch job at {DateTime.Now}.");
+            _logger.LogInformation($"Finished latest price fetch job at {DateTime.UtcNow}.");
         }
     }
 }

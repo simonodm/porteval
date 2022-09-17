@@ -36,7 +36,7 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
         /// <returns>A task representing the asynchronous job processing operation.</returns>
         public async Task Run()
         {
-            var startTime = DateTime.Now;
+            var startTime = DateTime.UtcNow;
             _logger.LogInformation($"Latest exchange rates fetch job started at {startTime}.");
 
             var currencies = await _context.Currencies.AsNoTracking().ToListAsync();
@@ -66,7 +66,7 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
             defaultCurrency.TrackingInfo.Update(startTime);
             _context.Update(defaultCurrency);
             await _context.SaveChangesAsync();
-            _logger.LogInformation($"Latest exchange rates fetch job finished at {DateTime.Now}.");
+            _logger.LogInformation($"Latest exchange rates fetch job finished at {DateTime.UtcNow}.");
         }
     }
 }

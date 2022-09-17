@@ -47,7 +47,7 @@ namespace PortEval.FinancialDataFetcher.APIs.OpenExchangeRates
             {
                 Currency = response.Base,
                 Rates = response.Rates,
-                Time = response.Time
+                Time = response.Time.ToUniversalTime()
             };
         }
     }

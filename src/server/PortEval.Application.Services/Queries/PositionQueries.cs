@@ -419,7 +419,7 @@ namespace PortEval.Application.Services.Queries
         /// <inheritdoc cref="IPositionQueries.GetPortfolioPositionsStatistics"/>
         public async Task<QueryResponse<IEnumerable<PositionStatisticsDto>>> GetPortfolioPositionsStatistics(int portfolioId)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             var positions = await GetPortfolioPositions(portfolioId);
 
@@ -434,7 +434,7 @@ namespace PortEval.Application.Services.Queries
         /// <inheritdoc cref="IPositionQueries.GetPositionStatistics"/>
         public async Task<QueryResponse<PositionStatisticsDto>> GetPositionStatistics(int id)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             var performanceTotal = await GetPositionPerformance(id, new DateRangeParams { To = now });
             var performanceLastDay = await GetPositionPerformance(id, new DateRangeParams { From = now.AddDays(-1), To = now });
             var performanceLastWeek = await GetPositionPerformance(id, new DateRangeParams { From = now.AddDays(-7), To = now });

@@ -43,14 +43,14 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
         /// <returns>A task representing the asynchronous job processing operation.</returns>
         public async Task Run(int instrumentId)
         {
-            _logger.LogInformation($"First price fetch for instrument {instrumentId} at {DateTime.Now}.");
+            _logger.LogInformation($"First price fetch for instrument {instrumentId} at {DateTime.UtcNow}.");
             var instrument = await _context.Instruments.FirstOrDefaultAsync(i => i.Id == instrumentId);
             if (instrument == null)
             {
                 _logger.LogError($"No instrument with id {instrumentId} found.");
                 return;
             }
-            var fetchStart = DateTime.Now;
+            var fetchStart = DateTime.UtcNow;
 
             var fiveDaysCutoffDate = fetchStart - PriceUtils.FiveDays;
             var oneDayCutoffDate = fetchStart - PriceUtils.FiveDays;
@@ -74,7 +74,7 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
                 await SavePrices(instrument, pricesWithMissingRangesFilled);
             }
 
-            _logger.LogInformation($"First price fetch for instrument {instrumentId} finished at {DateTime.Now}.");
+            _logger.LogInformation($"First price fetch for instrument {instrumentId} finished at {DateTime.UtcNow}.");
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
             }
 
             var pricesToAdd = new List<InstrumentPrice>();
-            var minTime = DateTime.Now;
+            var minTime = DateTime.UtcNow;
             foreach (var pricePoint in prices)
             {
                 var price = await PriceUtils.GetConvertedPricePointPrice(_context, instrument, pricePoint);
@@ -135,7 +135,7 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
             }
 
             instrument.SetTrackingFrom(minTime);
-            instrument.TrackingInfo.Update(DateTime.Now);
+            instrument.TrackingInfo.Update(DateTime.UtcNow);
             _context.Update(instrument);
             await _context.SaveChangesAsync();
             await _context.BulkInsertAsync(pricesToAdd);

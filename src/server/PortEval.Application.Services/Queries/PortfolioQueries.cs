@@ -314,7 +314,7 @@ namespace PortEval.Application.Services.Queries
         /// <inheritdoc cref="IPortfolioQueries.GetAllPortfoliosStatistics"/>
         public async Task<QueryResponse<IEnumerable<EntityStatisticsDto>>> GetAllPortfoliosStatistics()
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             var portfolios = await GetPortfolios();
 
@@ -329,7 +329,7 @@ namespace PortEval.Application.Services.Queries
         /// <inheritdoc cref="IPortfolioQueries.GetPortfolioStatistics"/>
         public async Task<QueryResponse<EntityStatisticsDto>> GetPortfolioStatistics(int id)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             var performanceTotal = await GetPortfolioPerformance(id, new DateRangeParams { To = now });
             var performanceLastDay = await GetPortfolioPerformance(id, new DateRangeParams { From = now.AddDays(-1), To = now });

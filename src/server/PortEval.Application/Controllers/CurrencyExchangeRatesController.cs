@@ -29,7 +29,7 @@ namespace PortEval.Application.Controllers
         {
             _logger.LogInformation($"Requesting {codeFrom} exchange rates at {time}.");
 
-            var exchangeRates = await _exchangeRateQueries.GetExchangeRates(codeFrom, time ?? DateTime.Now);
+            var exchangeRates = await _exchangeRateQueries.GetExchangeRates(codeFrom, time ?? DateTime.UtcNow);
             if (exchangeRates.Status == QueryStatus.NotFound)
             {
                 return NotFound($"Currency {codeFrom} not found.");
@@ -43,7 +43,7 @@ namespace PortEval.Application.Controllers
         {
             _logger.LogInformation($"Requesting latest {codeFrom} exchange rates.");
 
-            var exchangeRates = await _exchangeRateQueries.GetExchangeRates(codeFrom, DateTime.Now);
+            var exchangeRates = await _exchangeRateQueries.GetExchangeRates(codeFrom, DateTime.UtcNow);
             if (exchangeRates.Status == QueryStatus.NotFound)
             {
                 return NotFound($"Currency {codeFrom} not found.");
@@ -58,7 +58,7 @@ namespace PortEval.Application.Controllers
         {
             _logger.LogInformation($"Latest exchange rate from {codeFrom} to {codeTo} requested.");
 
-            var exchangeRate = await _exchangeRateQueries.GetExchangeRateAt(codeFrom, codeTo, DateTime.Now);
+            var exchangeRate = await _exchangeRateQueries.GetExchangeRateAt(codeFrom, codeTo, DateTime.UtcNow);
             if (exchangeRate.Status == QueryStatus.NotFound)
             {
                 return NotFound($"Invalid currency pair: {codeFrom}, {codeTo}.");

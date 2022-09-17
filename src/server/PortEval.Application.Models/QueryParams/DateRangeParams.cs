@@ -14,7 +14,7 @@ namespace PortEval.Application.Models.QueryParams
         public DateTime From { get; set; } = PortEvalConstants.FinancialDataStartTime;
 
         [SwaggerSchema("Period end.")]
-        public DateTime To { get; set; } = DateTime.Now;
+        public DateTime To { get; set; } = DateTime.UtcNow;
 
         public DateRangeParams SetFrom(DateTime from)
         {

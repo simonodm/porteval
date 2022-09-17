@@ -28,7 +28,7 @@ namespace PortEval.FinancialDataFetcher
         {
             lock (_requestLock)
             {
-                var now = DateTime.Now;
+                var now = DateTime.UtcNow;
                 if (now - _windowSize >= _firstWindowRequest)
                 {
                     _currentWindowRequests = 1;

@@ -20,7 +20,7 @@ namespace PortEval.Domain.Models.Entities
             Status = status;
             StatusDetails = statusDetails;
             ErrorLogAvailable = false;
-            Time = DateTime.Now;
+            Time = DateTime.UtcNow;
         }
 
         public void ChangeStatus(ImportStatus status, string statusDetails = "")

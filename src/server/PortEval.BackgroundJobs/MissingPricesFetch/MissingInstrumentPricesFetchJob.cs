@@ -43,7 +43,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
         /// <returns>A task representing the asynchronous job processing operation.</returns>
         public async Task Run()
         {
-            var currentTime = DateTime.Now;
+            var currentTime = DateTime.UtcNow;
             _logger.LogInformation($"Starting missing prices fetch at {currentTime}.");
 
             var instruments = await _context.Instruments.AsNoTracking().ToListAsync();
@@ -72,7 +72,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             }
 
             await _context.SaveChangesAsync(); // persist tracking info updates
-            _logger.LogInformation($"Missing prices fetch finished at {DateTime.Now}.");
+            _logger.LogInformation($"Missing prices fetch finished at {DateTime.UtcNow}.");
         }
 
         /// <summary>

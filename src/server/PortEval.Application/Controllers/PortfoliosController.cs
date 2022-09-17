@@ -88,7 +88,7 @@ namespace PortEval.Application.Controllers
         [HttpGet("{id}/value")]
         public async Task<ActionResult<EntityValueDto>> GetPortfolioValue(int id, [FromQuery] DateTime? at)
         {
-            var time = at ?? DateTime.Now;
+            var time = at ?? DateTime.UtcNow;
             _logger.LogInformation($"Portfolio {id} value at {time} requested.");
 
             var value = await _portfolioQueries.GetPortfolioValue(id, time);

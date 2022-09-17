@@ -74,7 +74,7 @@ namespace PortEval.Application.Controllers
 
         private string GenerateCsvFileName(string prefix)
         {
-            return $"{prefix}_{DateTime.Now:yyyyMMddHHmmss}.csv";
+            return $"{prefix}_{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
         }
     }
 }

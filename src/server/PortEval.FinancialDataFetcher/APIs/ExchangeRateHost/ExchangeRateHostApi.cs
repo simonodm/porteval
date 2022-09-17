@@ -98,7 +98,7 @@ namespace PortEval.FinancialDataFetcher.APIs.ExchangeRateHost
                 result.Add(new ExchangeRates
                 {
                     Currency = response.Base,
-                    Time = TimeZoneInfo.ConvertTimeToUtc(DateTime.Parse(dayKey)),
+                    Time = DateTime.SpecifyKind(DateTime.Parse(dayKey), DateTimeKind.Utc),
                     Rates = exchangeRates
                 });
             }
@@ -110,7 +110,7 @@ namespace PortEval.FinancialDataFetcher.APIs.ExchangeRateHost
         {
             return new ExchangeRates
             {
-                Time = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now),
+                Time = DateTime.UtcNow,
                 Currency = response.Base,
                 Rates = response.Rates
             };

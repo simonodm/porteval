@@ -51,7 +51,7 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<EntityValueDto>> GetPositionValue(int positionId,
             [FromQuery] DateTime? at)
         {
-            var time = at ?? DateTime.Now;
+            var time = at ?? DateTime.UtcNow;
             _logger.LogInformation($"Position {positionId} value at {time} requested.");
 
             var value = await _positionQueries.GetPositionValue(positionId, time);
@@ -97,7 +97,7 @@ namespace PortEval.Application.Controllers
         [HttpGet("{positionId}/bep")]
         public async Task<ActionResult<PositionBreakEvenPointDto>> GetPositionBreakEvenPoint(int positionId, [FromQuery] DateTime? at)
         {
-            var time = at ?? DateTime.Now;
+            var time = at ?? DateTime.UtcNow;
             _logger.LogInformation($"Position {positionId} break-even point at {time} requested.");
 
             var breakEvenPoint = await _positionQueries.GetPositionBreakEvenPoint(positionId, time);

@@ -35,7 +35,7 @@ namespace PortEval.FinancialDataFetcher
 
             if (_lastAttempt != null)
             {
-                var timeSinceLastAttempt = (TimeSpan)(DateTime.Now - _lastAttempt);
+                var timeSinceLastAttempt = (TimeSpan)(DateTime.UtcNow - _lastAttempt);
                 if (timeSinceLastAttempt < currentInterval)
                 {
                     var remainingTime = currentInterval - timeSinceLastAttempt;
@@ -43,7 +43,7 @@ namespace PortEval.FinancialDataFetcher
                 }
             }
 
-            _lastAttempt = DateTime.Now;
+            _lastAttempt = DateTime.UtcNow;
             _attempt++;
 
             return await _func.Invoke();
