@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
 >
-    <Product Id="8ab537b2-a91a-4986-93ae-fce950676ceb" Name="PortEval" Language="1033" Version="1.0.1.0" Manufacturer="Dmitry Simonov" UpgradeCode="aaeb5c98-d082-4934-bbb3-49553e5a5b48">
+    <Product Id="7870e48c-73fd-4ef4-b2f3-188ed7626bdf" Name="PortEval" Language="1033" Version="1.0.0.0" Manufacturer="Dmitry Simonov" UpgradeCode="aaeb5c98-d082-4934-bbb3-49553e5a5b48">
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -99,9 +99,6 @@
         </UI>
         <UIRef Id="WixUI_Common" />
 
-        <SetProperty Id="REINSTALL" Value="ALL" After="FindRelatedProducts">Installed AND NOT PATCH</SetProperty>
-        <SetProperty Id="REINSTALLMODE" Value="omus" After="FindRelatedProducts">Installed AND NOT PATCH</SetProperty>
-
         <Property Id="DataSourcesListBox_Prop" Value="Tiingo" />
 		<Property Id="TIINGO_KEY" Secure="yes" />
 		<Property Id="OPENEXCHANGERATES_KEY" Secure="yes" />
@@ -111,7 +108,7 @@
             <Directory Id="IISMain" Name="inetpub">
                 <Directory Id="WWWMain" Name="wwwroot">
 					<Directory Id="APIINSTALLFOLDER" ComponentGuidGenerationSeed="aaa89b0c-384f-4375-a124-df3f062f39de" Name="PortEval.API">
-						<Directory Id="APIFILESFOLDER" Name="APIFiles" />
+						<Directory Id="APIFILESFOLDER" Name="Files" />
 					</Directory>
                     <Directory Id="WEBINSTALLFOLDER" ComponentGuidGenerationSeed="9bb816bc-1e4a-4047-99ee-a4a218bc0b8e" Name="PortEval.Web" />
                 </Directory>

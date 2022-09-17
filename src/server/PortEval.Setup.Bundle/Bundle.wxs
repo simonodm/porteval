@@ -4,6 +4,7 @@
 		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
 			<bal:WixStandardBootstrapperApplication
 				LicenseUrl=""
+				SuppressOptionsUI="yes"
 				xmlns:bal="http://schemas.microsoft.com/wix/BalExtension" />
 		</BootstrapperApplicationRef>
 
@@ -12,7 +13,7 @@
 			<PackageGroupRef Id="InstallIIS" />
 			<PackageGroupRef Id="IISUrlRewrite" />
 			<PackageGroupRef Id="DotNetHostingBundle" />
-			<MsiPackage SourceFile="$(var.PortEval.Setup.TargetPath)" DisplayInternalUI="yes" />
+			<MsiPackage SourceFile="$(var.PortEval.Setup.TargetPath)" Compressed="yes" DisplayInternalUI="yes" />
 		</Chain>
 	</Bundle>
 </Wix>
