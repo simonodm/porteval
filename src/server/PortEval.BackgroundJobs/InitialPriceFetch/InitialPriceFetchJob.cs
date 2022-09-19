@@ -53,7 +53,7 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
             var fetchStart = DateTime.UtcNow;
 
             var fiveDaysCutoffDate = fetchStart - PriceUtils.FiveDays;
-            var oneDayCutoffDate = fetchStart - PriceUtils.FiveDays;
+            var oneDayCutoffDate = fetchStart - PriceUtils.OneDay;
 
             var dailyPricesResponse = await _fetcher.GetHistoricalDailyPrices(instrument, PortEvalConstants.FinancialDataStartTime,
                 fiveDaysCutoffDate);
