@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
+using PortEval.Application.Services.Extensions;
 using PortEval.Application.Services.Queries.DataQueries;
 using PortEval.Application.Services.Queries.Helpers;
 using PortEval.Application.Services.Queries.Interfaces;
@@ -182,6 +183,17 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
+            var firstTransactionTime = await GetFirstTransactionTime(portfolioId);
+            if (firstTransactionTime == null)
+            {
+                return new QueryResponse<IEnumerable<EntityChartPointDto>>
+                {
+                    Status = QueryStatus.Ok,
+                    Response = Enumerable.Empty<EntityChartPointDto>()
+                };
+            }
+            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstTransactionTime));
+
             var calculations = await CalculationUtils.AggregateCalculations
             (
                 dateRange,
@@ -213,6 +225,17 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
+            var firstTransactionTime = await GetFirstTransactionTime(portfolioId);
+            if (firstTransactionTime == null)
+            {
+                return new QueryResponse<IEnumerable<EntityChartPointDto>>
+                {
+                    Status = QueryStatus.Ok,
+                    Response = Enumerable.Empty<EntityChartPointDto>()
+                };
+            }
+            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstTransactionTime));
+
             var calculations = await CalculationUtils.AggregateCalculations
             (
                 dateRange,
@@ -242,6 +265,17 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
+            var firstTransactionTime = await GetFirstTransactionTime(portfolioId);
+            if (firstTransactionTime == null)
+            {
+                return new QueryResponse<IEnumerable<EntityChartPointDto>>
+                {
+                    Status = QueryStatus.Ok,
+                    Response = Enumerable.Empty<EntityChartPointDto>()
+                };
+            }
+            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstTransactionTime));
+
             var calculations = await CalculationUtils.AggregateCalculations
             (
                 dateRange,
@@ -270,6 +304,17 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
+            var firstTransactionTime = await GetFirstTransactionTime(portfolioId);
+            if (firstTransactionTime == null)
+            {
+                return new QueryResponse<IEnumerable<EntityChartPointDto>>
+                {
+                    Status = QueryStatus.Ok,
+                    Response = Enumerable.Empty<EntityChartPointDto>()
+                };
+            }
+            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstTransactionTime));
+
             var calculations = await CalculationUtils.AggregateCalculations
             (
                 dateRange,
@@ -296,6 +341,17 @@ namespace PortEval.Application.Services.Queries
                     Status = QueryStatus.NotFound
                 };
             }
+
+            var firstTransactionTime = await GetFirstTransactionTime(portfolioId);
+            if (firstTransactionTime == null)
+            {
+                return new QueryResponse<IEnumerable<EntityChartPointDto>>
+                {
+                    Status = QueryStatus.Ok,
+                    Response = Enumerable.Empty<EntityChartPointDto>()
+                };
+            }
+            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstTransactionTime));
 
             var calculations = await CalculationUtils.AggregateCalculations
             (

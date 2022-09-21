@@ -213,11 +213,25 @@ namespace PortEval.Application.Services.Queries
             var firstPrice = (await GetInstrumentPrice(instrumentId, dateRange.From)).Response?.Price ?? 0;
             var secondPrice = (await GetInstrumentPrice(instrumentId, dateRange.To)).Response?.Price ?? 0;
 
+            var calculatedPerformance = 0m;
+            if(firstPrice == 0 && secondPrice > 0)
+            {
+                calculatedPerformance = 1;
+            }
+            else if (firstPrice == 0 && secondPrice == 0)
+            {
+                calculatedPerformance = 0;
+            }
+            else
+            {
+                calculatedPerformance = (secondPrice - firstPrice) / firstPrice;
+            }
+
             var performance = new EntityPerformanceDto
             {
                 From = dateRange.From,
                 To = dateRange.To,
-                Performance = (secondPrice - firstPrice) / Math.Max(1, firstPrice)
+                Performance = calculatedPerformance
             };
 
             return new QueryResponse<EntityPerformanceDto>
@@ -250,7 +264,7 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
+            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
 
             var process = new Func<DateTime, Task<EntityChartPointDto>>(async time =>
             {
@@ -305,7 +319,7 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
+            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
 
             var calculations = await CalculationUtils.AggregateCalculations
             (
@@ -347,7 +361,7 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
+            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
 
             var calculations = await CalculationUtils.AggregateCalculations
             (
@@ -388,7 +402,7 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
+            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
 
             var calculations = await CalculationUtils.AggregateCalculations
             (
@@ -427,7 +441,7 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
+            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
 
             var calculations = await CalculationUtils.AggregateCalculations
             (

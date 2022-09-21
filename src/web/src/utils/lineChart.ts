@@ -349,7 +349,9 @@ class D3LineChart {
                     .style('color', d => d.color)
                     .html(d => {
                         const [, point] = findClosestDataPoints(d.data, time);
-                        return `${d.name}: ${this._yFormat(point ? point.value : 0)}`;
+                        return point
+                            ? `${d.name}: ${this._yFormat(point ? point.value : 0)}`
+                            : ``;
                     });
 
                 if(this._tooltipCallback) {
