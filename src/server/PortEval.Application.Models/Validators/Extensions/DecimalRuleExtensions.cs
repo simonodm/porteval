@@ -6,7 +6,7 @@ namespace PortEval.Application.Models.Validators.Extensions
     {
         private const int MIN_PRICE = 0;
         private const int MAX_PRICE = 500_000;
-        private const int MIN_AMOUNT = 0;
+        private const int MIN_AMOUNT = -500_000;
         private const int MAX_AMOUNT = 500_000;
 
         public static IRuleBuilder<T, decimal> ApplyPriceRangeRule<T>(this IRuleBuilder<T, decimal> builder)
