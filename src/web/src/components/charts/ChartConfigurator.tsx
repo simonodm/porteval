@@ -16,7 +16,7 @@ import CurrencyDropdown from '../forms/fields/CurrencyDropdown';
 import DateTimeSelector from '../forms/fields/DateTimeSelector';
 import useUserSettings from '../../hooks/useUserSettings';
 import NumberInput from '../forms/fields/NumberInput';
-import { subMonths } from 'date-fns';
+import { isAfter, isBefore, subMonths } from 'date-fns';
 
 type Props = {
     onChange?: (chart: ChartConfig) => void;
@@ -93,29 +93,33 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
 
     const handleStartDateChange = (date: Date) => {
         if(currentChart) {
-            const newChart: ChartConfig = {
-                ...currentChart,
-                isToDate: false,
-                dateRangeStart: date.toISOString(),
-                dateRangeEnd: currentChart.isToDate ? new Date().toISOString() : currentChart.dateRangeEnd
+            if(currentChart.isToDate || isBefore(date, new Date(currentChart.dateRangeEnd))) {
+                const newChart: ChartConfig = {
+                    ...currentChart,
+                    isToDate: false,
+                    dateRangeStart: date.toISOString(),
+                    dateRangeEnd: currentChart.isToDate ? new Date().toISOString() : currentChart.dateRangeEnd
+                }
+                setCurrentChart(newChart);
+                onChange && onChange(newChart);
             }
-            setCurrentChart(newChart);
-            onChange && onChange(newChart);
         }
     }
 
     const handleEndDateChange = (date: Date) => {
         if(currentChart) {
-            const newChart: ChartConfig = {
-                ...currentChart,
-                isToDate: false,
-                dateRangeStart: currentChart.isToDate
-                    ? subMonths(date, 1).toISOString()
-                    : currentChart.dateRangeStart,
-                dateRangeEnd: date.toISOString()
+            if(currentChart.isToDate || isAfter(date, new Date(currentChart.dateRangeStart))) {
+                const newChart: ChartConfig = {
+                    ...currentChart,
+                    isToDate: false,
+                    dateRangeStart: currentChart.isToDate
+                        ? subMonths(date, 1).toISOString()
+                        : currentChart.dateRangeStart,
+                    dateRangeEnd: date.toISOString()
+                }
+                setCurrentChart(newChart);
+                onChange && onChange(newChart);
             }
-            setCurrentChart(newChart);
-            onChange && onChange(newChart);
         }
     }
 
@@ -193,7 +197,7 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
                     <DateTimeSelector
                         className='chart-configurator-setting'
                         dateFormat={userSettings.dateFormat}
-                        label='Range start'
+                        label='Range end'
                         onChange={handleEndDateChange}
                         value={currentChart.isToDate
                             ? undefined
