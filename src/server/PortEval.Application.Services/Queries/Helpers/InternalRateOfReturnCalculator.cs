@@ -51,19 +51,32 @@ namespace PortEval.Application.Services.Queries.Helpers
                     / Math.Max(1, transactionValue) + 1);
             }
 
-            initialGuess = Math.Max(0, initialGuess); // fail-safe
-
-            var singlePointPerformance = equation.CalculateRoot(Math.Pow((double)initialGuess, 1.0 / totalIntervalCount));
-            var totalPerformance = Math.Pow(singlePointPerformance, totalIntervalCount);
-
-            if (singlePointPerformance < 0 && totalPerformance > 0) totalPerformance *= -1;
-
-            return new EntityPerformanceDto
+            try
             {
-                From = from,
-                To = to,
-                Performance = (decimal)totalPerformance - 1
-            };
+                initialGuess = Math.Max(0, initialGuess); // fail-safe
+
+                var singlePointPerformance = equation.CalculateRoot(Math.Pow((double)initialGuess, 1.0 / totalIntervalCount));
+                var totalPerformance = Math.Pow(singlePointPerformance, totalIntervalCount);
+
+                if (singlePointPerformance < 0 && totalPerformance > 0) totalPerformance *= -1;
+
+                return new EntityPerformanceDto
+                {
+                    From = from,
+                    To = to,
+                    Performance = (decimal)totalPerformance - 1
+                };
+            }
+            catch (OverflowException)
+            {
+                var simplifiedPerformance = Math.Pow((double)initialGuess, totalIntervalCount);
+                return new EntityPerformanceDto
+                {
+                    From = from,
+                    To = to,
+                    Performance = (decimal)simplifiedPerformance - 1
+                };
+            }   
         }
 
         /// <summary>
