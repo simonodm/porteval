@@ -35,6 +35,8 @@
     <Compile Include="Bundle.wxs" />
     <Compile Include="EnableIIS.wxs" />
     <Compile Include="IISUrlRewrite.wxs" />
+    <Compile Include="ODBC.wxs" />
+    <Compile Include="Reboot.wxs" />
     <Compile Include="SQLExpress.wxs" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +60,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="uninstallodbcs17.bat" />
+    <Content Include="upgradecodeuninstall.ps1" />
     <Content Include="packages\rewrite_amd64_en-US.msi" />
     <Content Include="rundism.bat" />
     <Content Include="runmsiexec.bat" />

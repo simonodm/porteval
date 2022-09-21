@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-	<!--
-        SQL Server 2019 Express installation state properties
-        Official documentation can be found at the following location:
-           SQL Server 2019 -
-https://www.microsoft.com/en-us/sql-server/sql-server-2019
-    -->
-
 	<?define SqlServerInstance=PORTEVALSQL ?>
 	<?define Sql2019ExprDownloadUrl=https://download.microsoft.com/download/8/4/c/84c6c430-e0f5-476d-bf43-eaaa222a72e0/SQLEXPR_x64_ENU.exe ?>
 	<?define Sql2019ExprInstallCommand=/ACTION=Install /QS /IACCEPTSQLSERVERLICENSETERMS /ENU /FEATURES=SQLENGINE /INSTANCENAME=$(var.SqlServerInstance) /SQLSYSADMINACCOUNTS=BUILTIN\Administrators ?>
