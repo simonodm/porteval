@@ -2,6 +2,11 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
 >
+	<?define PortEvalConfigurationRegistry=Software\PortEval\Configuration?>
+	<?define PortEvalTiingoKeyRegistryValue=PORTEVAL_Tiingo_Key?>
+	<?define PortEvalOXRKeyRegistryValue=PORTEVAL_OpenExchangeRates_Key?>
+	<?define PortEvalFileStorageRegistryValue=PORTEVAL_File_Storage?>
+	
     <Product Id="*" Name="PortEval" Language="1033" Version="1.0.1.0" Manufacturer="Dmitry Simonov" UpgradeCode="aaeb5c98-d082-4934-bbb3-49553e5a5b48">
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
@@ -86,7 +91,8 @@
             <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="DataSourcesDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
-            <Publish Dialog="WelcomeDlgCustom" Control="Next" Event="NewDialog" Value="DataSourcesDlg">1</Publish>
+            <Publish Dialog="WelcomeDlgCustom" Control="Next" Event="NewDialog" Value="DataSourcesDlg">NOT Installed</Publish>
+			<Publish Dialog="WelcomeDlgCustom" Control="Next" Event="EndDialog" Value="Return">Installed AND NOT Patch</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DataSourcesDlg" Order="2">WixUI_InstallMode &lt;&gt; &quot;Remove&quot;</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">WixUI_InstallMode = &quot;Remove&quot;</Publish>
 
@@ -99,9 +105,18 @@
         </UI>
         <UIRef Id="WixUI_Common" />
 
+		<Property Id="ApplicationPort" Value="5432" />
         <Property Id="DataSourcesListBox_Prop" Value="Tiingo" />
+		<Property Id="TIINGO_KEY_CURRENT">
+			<RegistrySearch Id="TiingoKeySearch" Root="HKLM" Key="$(var.PortEvalConfigurationRegistry)" Name="$(var.PortEvalTiingoKeyRegistryValue)" Type="raw" Win64="yes"/>
+		</Property>
+		<Property Id="OXR_KEY_CURRENT">
+			<RegistrySearch Id="OXRKeySearch" Root="HKLM" Key="$(var.PortEvalConfigurationRegistry)" Name="$(var.PortEvalOXRKeyRegistryValue)" Type="raw" Win64="yes"/>
+		</Property>
 		<Property Id="TIINGO_KEY" Secure="yes" />
 		<Property Id="OPENEXCHANGERATES_KEY" Secure="yes" />
+		<SetProperty Id="TIINGO_KEY" Value="[TIINGO_KEY_CURRENT]" After="AppSearch" Sequence="ui">TIINGO_KEY_CURRENT</SetProperty>
+		<SetProperty Id="OPENEXCHANGERATES_KEY" Value="[OXR_KEY_CURRENT]" After="AppSearch" Sequence="ui">OXR_KEY_CURRENT</SetProperty>
     </Product>
     <Fragment>
         <Directory Id="TARGETDIR" Name="SourceDir">
@@ -128,17 +143,17 @@
 			<iis:WebAppPool Id="PortEvalWebAppPool" Name="PortEval Web App Pool" Identity="applicationPoolIdentity" ManagedPipelineMode="Integrated" ManagedRuntimeVersion="v4.0" RecycleMinutes="200" />
 			<CreateFolder />
  		</Component>
-		<Component Id="RegistryKeys" Guid="dc75fd14-e2f4-436f-81ae-d1b294bb41b6" Directory="APIINSTALLFOLDER" Win64="yes">
-			<RegistryKey Root="HKLM" Key="Software\PortEval\Configuration" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes">
-				<RegistryValue Type="string" Name="PORTEVAL_Tiingo_Key" Value="[TIINGO_KEY]" KeyPath="yes" />
-				<RegistryValue Type="string" Name="PORTEVAL_OpenExchangeRates_Key" Value="[OPENEXCHANGERATES_KEY]" />
-				<RegistryValue Type="string" Name="PORTEVAL_File_Storage" Value="[APIINSTALLFOLDER]\Files" />
+		<Component Id="RegistryKeys" Guid="*" Directory="APIINSTALLFOLDER" Win64="yes">
+			<RegistryKey Root="HKLM" Key="$(var.PortEvalConfigurationRegistry)" ForceDeleteOnUninstall="yes">
+				<RegistryValue Type="string" Name="$(var.PortEvalTiingoKeyRegistryValue)" Value="[TIINGO_KEY]" />
+				<RegistryValue Type="string" Name="$(var.PortEvalOXRKeyRegistryValue)" Value="[OPENEXCHANGERATES_KEY]" />
+				<RegistryValue Type="string" Name="$(var.PortEvalFileStorageRegistryValue)" Value="[APIINSTALLFOLDER]Files" />
 			</RegistryKey>
 		</Component>
 		<ComponentGroup Id="WebsiteComponents" Directory="WEBINSTALLFOLDER">
 			<Component Id="PortEval.Web.IISWebSite" Guid="aa57b60a-5f9c-49f7-8075-cbd699256691">
 				<iis:WebSite Id="PortEval.Web" Description="PortEval Web" Directory="WEBINSTALLFOLDER">
-                    <iis:WebAddress Id="PortEval.Web.WebAddress" Port="5432" />
+                    <iis:WebAddress Id="PortEval.Web.WebAddress" Port="[ApplicationPort]" />
 					<iis:WebApplication Id="PortEvalWebApp" Name="PortEval.Web" WebAppPool="PortEvalWebAppPool" />
                     <iis:WebVirtualDir Id="PortEval.API.VDir" Alias="api" Directory="APIINSTALLFOLDER">
                         <iis:WebApplication Id="PortEvalAPIWebApp" Name="PortEval.API" WebAppPool="PortEvalAppPool" />

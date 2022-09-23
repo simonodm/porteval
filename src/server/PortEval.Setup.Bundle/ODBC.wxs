@@ -16,7 +16,7 @@
 				DisplayName="Uninstalling ODBC Driver 17"
 				PerMachine="yes"
 				SourceFile="uninstallodbcs17.bat"
-				InstallCondition="Odbc17InstallationFound"
+				InstallCondition="NOT SqlInstanceFound AND Odbc17InstallationFound"
 				Permanent="yes">
 				<Payload Id="UpgradeCodeUninstallScript" SourceFile="upgradecodeuninstall.ps1" />
 			</ExePackage>

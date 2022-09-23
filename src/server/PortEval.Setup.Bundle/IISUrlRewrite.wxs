@@ -13,17 +13,6 @@
 			>
 				<MsiProperty Name="UILevel" Value="2" />
 			</MsiPackage>
-			<!-- IIS Url Rewrite module fix in case it was installed before IIS was enabled -->
-			<!-- Can be run every time -->
-			<ExePackage
-				Id="IISURLREWRITEREPAIR"
-				SourceFile="runmsiexec.bat"
-				Compressed="yes"
-				Permanent="yes"
-				InstallCommand="/quiet /fa $(var.UrlRewriteProductId)"
-				PerMachine="yes"
-				>
-			</ExePackage>
 		</PackageGroup>
 	</Fragment>
 </Wix>

@@ -60,6 +60,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="HyperlinkTheme.xml" />
     <Content Include="uninstallodbcs17.bat" />
     <Content Include="upgradecodeuninstall.ps1" />
     <Content Include="packages\rewrite_amd64_en-US.msi" />
@@ -68,6 +69,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="packages" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="HyperlinkTheme.wxl" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
