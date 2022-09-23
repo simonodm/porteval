@@ -68,7 +68,7 @@ export default function LineChart({ config, lines }: Props): JSX.Element {
     })
 
     useLayoutEffect(generateChart,
-        [lines, containerRef, containerRef.current?.clientHeight, containerRef.current?.clientWidth]);
+        [config, lines, containerRef, containerRef.current?.clientHeight, containerRef.current?.clientWidth]);
 
     return (
         <div className="chart" ref={containerRef}>
