@@ -9,7 +9,7 @@ namespace PortEval.FinancialDataFetcher
     internal class RetryPolicy
     {
         /// <summary>
-        /// Represents the standard retry policy with 1min, 2min, 3min, 5min, 10min, 20min retry intervals.
+        /// Represents the standard retry policy with 1min, 2min, 3min, 5min retry intervals.
         /// </summary>
         public static RetryPolicy Standard
         {
@@ -38,6 +38,8 @@ namespace PortEval.FinancialDataFetcher
                 return policy;
             }
         }
+
+        public static RetryPolicy None => new RetryPolicy();
 
         public List<TimeSpan> RetryIntervals { get; } = new List<TimeSpan>();
     }
