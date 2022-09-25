@@ -29,13 +29,20 @@ namespace PortEval.Application
             catch (Exception ex)
             {
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-
                 logger.LogError(ex, "An error occurred while migrating or seeding the database.");
 
                 throw;
             }
 
-            await host.RunAsync();
+            try
+            {
+                host.Run();
+            }
+            catch
+            {
+                await host.StopAsync();
+                Environment.Exit(-1);
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
