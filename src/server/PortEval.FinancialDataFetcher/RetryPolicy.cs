@@ -20,8 +20,6 @@ namespace PortEval.FinancialDataFetcher
                 policy.RetryIntervals.Add(TimeSpan.FromMinutes(2));
                 policy.RetryIntervals.Add(TimeSpan.FromMinutes(3));
                 policy.RetryIntervals.Add(TimeSpan.FromMinutes(5));
-                policy.RetryIntervals.Add(TimeSpan.FromMinutes(10));
-                policy.RetryIntervals.Add(TimeSpan.FromMinutes(20));
                 return policy;
             }
         }
