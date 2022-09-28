@@ -1,10 +1,13 @@
 import { EntityPerformance, EntityProfit, EntityValue, Position, PositionStatistics } from '../../types';
-
 import { CreatePositionParameters, DateRangeParameters } from './apiTypes';
 import { portEvalApi } from './portEvalApi';
 import { truncateEntityNote } from './apiUtils';
 import { subDays, subMonths, subWeeks } from 'date-fns';
 
+/**
+ * PortEval's position API definition.
+ * @category API
+ */
 const positionApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
         getPositions: build.query<Array<Position>, number>({

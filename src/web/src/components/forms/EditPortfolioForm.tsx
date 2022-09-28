@@ -1,20 +1,33 @@
 import React, { useState } from 'react';
+import LoadingWrapper from '../ui/LoadingWrapper';
+import CurrencyDropdown from './fields/CurrencyDropdown';
+import TextInput from './fields/TextInput';
 
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
-import LoadingWrapper from '../ui/LoadingWrapper';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
 import { useUpdatePortfolioMutation } from '../../redux/api/portfolioApi';
 import { Portfolio } from '../../types';
 
-import CurrencyDropdown from './fields/CurrencyDropdown';
-import TextInput from './fields/TextInput';
-
 type Props = {
+    /**
+     * Portfolio to edit.
+     */
     portfolio: Portfolio;
+
+    /**
+     * A callback which is invoked whenever the form is successfully submitted.
+     */
     onSuccess?: () => void;
 }
 
-export default function EditPortfolioForm({ portfolio, onSuccess }: Props): JSX.Element {
+/**
+ * Renders a portfolio edit form.
+ *  
+ * @category Forms
+ * @subcategory Forms
+ * @component 
+ */
+function EditPortfolioForm({ portfolio, onSuccess }: Props): JSX.Element {
     const [updatePortfolio, mutationStatus] = useUpdatePortfolioMutation();
 
     const [name, setName] = useState(portfolio.name);
@@ -57,3 +70,5 @@ export default function EditPortfolioForm({ portfolio, onSuccess }: Props): JSX.
         
     )
 }
+
+export default EditPortfolioForm;

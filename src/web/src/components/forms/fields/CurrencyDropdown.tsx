@@ -1,16 +1,41 @@
 import React, { useEffect, useState } from 'react';
-
 import { Currency } from '../../../types';
 
 type Props = {
+    /**
+     * Currencies to display in the dropdown.
+     */
     currencies: Array<Currency>;
+
+    /**
+     * Class name to append to the form field.
+     */
     className?: string;
+
+    /**
+     * Determines whether the dropdown is disabled.
+     */
     disabled?: boolean;
+
+    /**
+     * Binding property for the dropdown's current value.
+     */
     value?: string;
+
+    /**
+     * A callback which is invoked every time the dropdown selection changes.
+     */
     onChange?: (currencyCode: string) => void
 }
 
-export default function CurrencyDropdown({ currencies, className, disabled, value, onChange }: Props): JSX.Element {
+/**
+ * Renders a currency dropdown form field.
+ * 
+ * @category Forms
+ * @subcategory Fields
+ * @component
+ */
+function CurrencyDropdown({ currencies, className, disabled, value, onChange }: Props): JSX.Element {
     const [currencyCode, setCurrencyCode] = useState(value);
 
     useEffect(() => {
@@ -41,3 +66,5 @@ export default function CurrencyDropdown({ currencies, className, disabled, valu
         </div>
     )
 }
+
+export default CurrencyDropdown;

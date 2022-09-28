@@ -1,14 +1,27 @@
 import React, { useState } from 'react';
 
-import { ChartLineDashType, ChartLineInstrument, ChartLine } from '../../types';
+import { ChartLineDashType, ChartLine } from '../../types';
 import { API_MAX_CHART_LINE_WIDTH } from '../../constants';
 
 type Props = {
+    /**
+     * Chart line to configure.
+     */
     line: ChartLine;
-    onSave: (line: ChartLineInstrument) => void;
+
+    /**
+     * A callback which is invoked when the new chart line configuration is saved.
+     */
+    onSave: (line: ChartLine) => void;
 }
 
-export default function ChartLineConfigurator({ line: lineProp, onSave }: Props): JSX.Element {
+/**
+ * Renders a chart line configuration component, enabling modification of chart line's width, dash type, and color.
+ * 
+ * @category Chart
+ * @component
+ */
+function ChartLineConfigurator({ line: lineProp, onSave }: Props): JSX.Element {
     const dashTypes: Array<ChartLineDashType> = ['solid', 'dashed', 'dotted'];
     const [line, setLine] = useState(lineProp);
 
@@ -34,7 +47,7 @@ export default function ChartLineConfigurator({ line: lineProp, onSave }: Props)
     }
 
     const handleSubmit = () => {
-        onSave(line as ChartLineInstrument);
+        onSave(line as ChartLine);
     }
 
     return (
@@ -67,3 +80,5 @@ export default function ChartLineConfigurator({ line: lineProp, onSave }: Props)
         </form>
     )
 }
+
+export default ChartLineConfigurator;

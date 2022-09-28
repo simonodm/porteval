@@ -1,33 +1,34 @@
 import React, { useState } from 'react';
-
-import { useParams } from 'react-router-dom';
-
-import { skipToken } from '@reduxjs/toolkit/dist/query';
-
 import LoadingWrapper from '../ui/LoadingWrapper';
-
-import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
-import { useGetInstrumentByIdQuery, useGetInstrumentCurrentPriceQuery } from '../../redux/api/instrumentApi';
-import { checkIsLoaded, checkIsError } from '../../utils/queries';
-
-
-import { getPriceString } from '../../utils/string';
 import PortEvalChart from '../charts/PortEvalChart';
 import ModalWrapper from '../modals/ModalWrapper';
-import { generateDefaultInstrumentChart } from '../../utils/chart';
 import PageHeading from '../ui/PageHeading';
-
-import './InstrumentView.css';
-
 import CreateInstrumentPriceForm from '../forms/CreateInstrumentPriceForm';
 import useUserSettings from '../../hooks/useUserSettings';
 import InstrumentPricesTable from '../tables/InstrumentPricesTable';
 
+import { useGetInstrumentByIdQuery } from '../../redux/api/instrumentApi';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
+import { generateDefaultInstrumentChart } from '../../utils/chart';
+import { getPriceString } from '../../utils/string';
+import { useParams } from 'react-router-dom';
+
+import './InstrumentView.css';
+
 type Params = {
+    /**
+     * ID of instrument to display.
+     */
     instrumentId?: string;
 }
 
-export default function InstrumentView(): JSX.Element {
+/**
+ * Renders an instrument view based on query parameters.
+ * 
+ * @category Views
+ * @component
+ */
+function InstrumentView(): JSX.Element {
     const params = useParams<Params>();
     const instrumentId = params.instrumentId ? parseInt(params.instrumentId) : 0;
 
@@ -128,3 +129,5 @@ export default function InstrumentView(): JSX.Element {
         </LoadingWrapper>
     )
 }
+
+export default InstrumentView;

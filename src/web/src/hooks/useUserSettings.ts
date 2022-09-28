@@ -1,7 +1,7 @@
+import useLocalStorage from './useLocalStorage';
+
 import { useEffect, useState } from 'react';
-
 import { UserSettings } from '../types';
-
 import { DATE_FORMAT_STORAGE_KEY,
     DEFAULT_DATE_FORMAT,
     TIME_FORMAT_STORAGE_KEY,
@@ -12,11 +12,21 @@ import { DATE_FORMAT_STORAGE_KEY,
     DEFAULT_THOUSANDS_SEPARATOR
 } from '../constants';
 
-import useLocalStorage from './useLocalStorage';
-
+/**
+ * A callback to update user settings.
+ * 
+ * @category Hooks
+ * @subcategory Types
+ */
 type SetUserSettingsCallback = (newSettings: UserSettings) => void;
 
-export default function useUserSettings(): [UserSettings, SetUserSettingsCallback] {
+/**
+ * A hook to read and update local user settings.
+ * 
+ * @category Hooks
+ * @returns Current user settings and a callback to update them.
+ */
+function useUserSettings(): [UserSettings, SetUserSettingsCallback] {
     const [dateFormat, setDateFormat] = useLocalStorage(DATE_FORMAT_STORAGE_KEY, DEFAULT_DATE_FORMAT);
     const [timeFormat, setTimeFormat] = useLocalStorage(TIME_FORMAT_STORAGE_KEY, DEFAULT_TIME_FORMAT);
     const [decimalSeparator, setDecimalSeparator] = useLocalStorage(
@@ -53,3 +63,5 @@ export default function useUserSettings(): [UserSettings, SetUserSettingsCallbac
 
     return [settings, changeSettings];
 }
+
+export default useUserSettings;

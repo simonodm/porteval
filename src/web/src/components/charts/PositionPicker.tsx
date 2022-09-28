@@ -1,17 +1,27 @@
 import React, { useContext } from 'react';
-
-import { useGetPositionsQuery } from '../../redux/api/positionApi';
-import { Portfolio } from '../../types';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PositionPickerItem from '../ui/PositionPickerItem';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
+
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
+import { useGetPositionsQuery } from '../../redux/api/positionApi';
+import { Portfolio } from '../../types';
 
 type Props = {
+    /**
+     * Portfolio to load and render positions for.
+     */
     portfolio: Portfolio;
 }
 
-export default function PositionPicker({ portfolio }: Props): JSX.Element {
+/**
+ * Loads and renders a list of portfolio positions which can be added to the chart.
+ * See {@link ChartLineConfigurationContext}.
+ * 
+ * @category Chart
+ * @component
+ */
+function PositionPicker({ portfolio }: Props): JSX.Element {
     const context = useContext(ChartLineConfigurationContext);
     const positions = useGetPositionsQuery(portfolio.id);
 
@@ -57,3 +67,5 @@ export default function PositionPicker({ portfolio }: Props): JSX.Element {
         </div>
     );
 }
+
+export default PositionPicker;

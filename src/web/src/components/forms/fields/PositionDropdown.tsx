@@ -1,16 +1,41 @@
 import React, { useEffect, useState } from 'react';
-
 import { Position } from '../../../types';
 
 type Props = {
+    /**
+     * An array of positions to display in the dropdown.
+     */
     positions: Array<Position>;
+
+    /**
+     * Custom class name to use for the form field.
+     */
     className?: string;
+
+    /**
+     * Determines whether the form field is disabled.
+     */
     disabled?: boolean;
+
+    /**
+     * Binding property for the dropdown's current position ID.
+     */
     value?: number;
+
+    /**
+     * A callback which is invoked whenever dropdown's selection changes.
+     */
     onChange?: (positionId: number) => void;
 }
 
-export default function PositionDropdown({ positions, className, disabled, value, onChange }: Props): JSX.Element {
+/**
+ * Renders a position dropdown form field.
+ * 
+ * @category Forms
+ * @subcategory Fields
+ * @component 
+ */
+function PositionDropdown({ positions, className, disabled, value, onChange }: Props): JSX.Element {
     const [positionId, setPositionId] = useState(value ?? (positions.length > 0 ? positions[0].id : undefined));
 
     const handlePositionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -46,3 +71,5 @@ export default function PositionDropdown({ positions, className, disabled, value
         </div>
     )
 }
+
+export default PositionDropdown;

@@ -1,15 +1,27 @@
 import React, { useState } from 'react';
-
 import { ChartConfig } from '../../types';
-
 import TextInput from './fields/TextInput';
 
 type Props = {
+    /**
+     * Chart to edit.
+     */
     chart: ChartConfig;
+
+    /**
+     * A callback which is invoked whenever the form is submitted.
+     */
     onSave: (updatedChart: ChartConfig) => void;
 }
 
-export default function EditChartMetaForm({ chart, onSave }: Props): JSX.Element {
+/**
+ * Renders a chart metadata edit form.
+ * 
+ * @category Forms
+ * @subcategory Forms
+ * @component
+ */
+function EditChartMetaForm({ chart, onSave }: Props): JSX.Element {
     const [name, setName] = useState(chart.name);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -27,3 +39,5 @@ export default function EditChartMetaForm({ chart, onSave }: Props): JSX.Element
         </form>
     )
 }
+
+export default EditChartMetaForm;

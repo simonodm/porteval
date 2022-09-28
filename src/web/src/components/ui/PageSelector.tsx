@@ -1,13 +1,34 @@
 import React, { useEffect } from 'react';
 
 type Props = {
+    /**
+     * Current page number.
+     */
     page: number,
+
+    /**
+     * Total page count.
+     */
     totalPages: number,
+
+    /**
+     * Callback which is invoked whenever the page is changed.
+     */
     onPageChange?: (page: number) => void;
+
+    /**
+     * Callback which is invoked whenever a page prefetch is requested.
+     */
     prefetch?: (page: number) => void;
 }
 
-export default function PageSelector({ page, totalPages, onPageChange, prefetch }: Props): JSX.Element {
+/**
+ * Renders pagination controls.
+ * 
+ * @category UI
+ * @component
+ */
+function PageSelector({ page, totalPages, onPageChange, prefetch }: Props): JSX.Element {
     const handlePageChange = (newPage: number): void => {
         onPageChange && onPageChange(newPage);
     }
@@ -44,3 +65,5 @@ export default function PageSelector({ page, totalPages, onPageChange, prefetch 
         </span>
     )
 }
+
+export default PageSelector;

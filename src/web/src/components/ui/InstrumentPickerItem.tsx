@@ -1,18 +1,43 @@
 import React from 'react';
-
-import { ChartLine, Instrument } from '../../types';
 import LinePreview from '../charts/LinePreview';
+
 import { LINE_PREVIEW_LENGTH } from '../../constants';
+import { ChartLine, Instrument } from '../../types';
 
 type Props = {
+    /**
+     * Instrument to display.
+     */
     instrument: Instrument;
+
+    /**
+     * Existing chart line for the instrument.
+     */
     line?: ChartLine;
+
+    /**
+     * A callback which is invoked on instrument's addition to a chart.
+     */
     onLineAdd?: () => void;
+
+    /**
+     * A callback which is invoked on instrument's removal from a chart.
+     */
     onLineRemove?: () => void;
+
+    /**
+     * A callback which is invoked when the existing line configuration is to be displayed. 
+     */
     onLineConfigure?: () => void;
 }
 
-export default function InstrumentPickerItem(
+/**
+ * Renders an instrument list item to be added/removed from a chart.
+ * 
+ * @category Chart
+ * @component
+ */
+function InstrumentPickerItem(
     { instrument, line, onLineAdd, onLineRemove, onLineConfigure }: Props
 ): JSX.Element {
     return (
@@ -53,3 +78,5 @@ export default function InstrumentPickerItem(
         </div>
     )
 }
+
+export default InstrumentPickerItem;

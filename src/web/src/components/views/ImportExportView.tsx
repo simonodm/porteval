@@ -1,11 +1,16 @@
 import React from 'react';
-
 import PageHeading from '../ui/PageHeading';
 import ImportDataForm from '../forms/ImportDataForm';
 import ImportsTable from '../tables/ImportsTable';
 import ExportDataForm from '../forms/ExportDataForm';
 
-export default function ImportExportView(): JSX.Element {
+/**
+ * Renders the data import/export view.
+ * 
+ * @category Views
+ * @component
+ */
+function ImportExportView(): JSX.Element {
     return (
         <>
             <PageHeading heading="Data import and export" />
@@ -17,3 +22,5 @@ export default function ImportExportView(): JSX.Element {
         </>
     )
 }
+
+export default ImportExportView;

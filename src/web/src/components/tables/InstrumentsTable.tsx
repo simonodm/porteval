@@ -1,23 +1,25 @@
 import React, { useMemo, useState } from 'react';
-
-import LoadingWrapper from '../ui/LoadingWrapper';
-
-
-import { checkIsLoaded, checkIsError } from '../../utils/queries';
-import { useDeleteInstrumentMutation, useGetInstrumentPageQuery, usePrefetch } from '../../redux/api/instrumentApi';
 import PageSelector from '../ui/PageSelector';
-
 import DataTable, { ColumnDefinition } from './DataTable';
-import { Instrument } from '../../types';
-import { INSTRUMENT_TYPE_TO_STRING } from '../../constants';
-import { getPriceString } from '../../utils/string';
 import useUserSettings from '../../hooks/useUserSettings';
-import { Link, NavLink } from 'react-router-dom';
-import { generateDefaultInstrumentChart } from '../../utils/chart';
 import EditInstrumentForm from '../forms/EditInstrumentForm';
 import ModalWrapper from '../modals/ModalWrapper';
 
-export default function InstrumentsTable(): JSX.Element {
+import { Link, NavLink } from 'react-router-dom';
+import { generateDefaultInstrumentChart } from '../../utils/chart';
+import { Instrument } from '../../types';
+import { INSTRUMENT_TYPE_TO_STRING } from '../../constants';
+import { getPriceString } from '../../utils/string';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
+import { useDeleteInstrumentMutation, useGetInstrumentPageQuery, usePrefetch } from '../../redux/api/instrumentApi';
+
+/**
+ * Loads instruments and renders a paginated instruments table.
+ * 
+ * @category Tables
+ * @component
+ */
+function InstrumentsTable(): JSX.Element {
     const [page, setPage] = useState(1);
     const [pageLimit] = useState(30);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -133,6 +135,7 @@ export default function InstrumentsTable(): JSX.Element {
                 }
             </ModalWrapper>
         </>
-        
     );
 }
+
+export default InstrumentsTable;

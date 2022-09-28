@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from 'react';
-
-import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
-import { useCreatePortfolioMutation } from '../../redux/api/portfolioApi';
-
 import CurrencyDropdown from './fields/CurrencyDropdown';
 import TextInput from './fields/TextInput';
 
+import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
+import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
+import { useCreatePortfolioMutation } from '../../redux/api/portfolioApi';
+
 type Props = {
+    /**
+     * A callback which is invoked whenever the form is successfully submitted.
+     */
     onSuccess?: () => void;
 }
 
-export default function CreatePortfolioForm({ onSuccess }: Props): JSX.Element {
+/**
+ * Renders a portfolio creation form.
+ * 
+ * @category Forms
+ * @subcategory Forms
+ * @component
+ */
+function CreatePortfolioForm({ onSuccess }: Props): JSX.Element {
     const [createPortfolio, mutationStatus] = useCreatePortfolioMutation();
 
     const [name, setName] = useState('');
@@ -65,3 +74,5 @@ export default function CreatePortfolioForm({ onSuccess }: Props): JSX.Element {
         
     )
 }
+
+export default CreatePortfolioForm;

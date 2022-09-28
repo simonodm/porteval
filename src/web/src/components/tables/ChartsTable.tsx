@@ -1,15 +1,19 @@
 import React, { useMemo } from 'react';
-
 import LoadingWrapper from '../ui/LoadingWrapper';
+import DataTable, { ColumnDefinition } from './DataTable';
 
+import { Chart } from '../../types';
+import { Link } from 'react-router-dom';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useDeleteChartMutation, useGetAllChartsQuery } from '../../redux/api/chartApi';
 
-import DataTable, { ColumnDefinition } from './DataTable';
-import { Chart } from '../../types';
-import { Link } from 'react-router-dom';
-
-export default function ChartsTable(): JSX.Element {
+/**
+ * Loads and renders a table of charts.
+ * 
+ * @category Tables
+ * @component
+ */
+function ChartsTable(): JSX.Element {
     const charts = useGetAllChartsQuery();
     const [deleteChart, deletionStatus] = useDeleteChartMutation();
 
@@ -50,3 +54,5 @@ export default function ChartsTable(): JSX.Element {
         </LoadingWrapper>
     )
 }
+
+export default ChartsTable;

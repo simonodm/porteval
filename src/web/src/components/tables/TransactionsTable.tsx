@@ -1,22 +1,38 @@
 import React, { useMemo, useState } from 'react';
+import DataTable, { ColumnDefinition } from './DataTable';
+import useUserSettings from '../../hooks/useUserSettings';
+import ModalWrapper from '../modals/ModalWrapper';
+import EditTransactionForm from '../forms/EditTransactionForm';
 
+import { formatDateTimeString, getPriceString } from '../../utils/string';
 import { useDeleteTransactionMutation, useGetPositionTransactionsQuery } from '../../redux/api/transactionApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { Transaction } from '../../types';
 
-import DataTable, { ColumnDefinition } from './DataTable';
-import useUserSettings from '../../hooks/useUserSettings';
-import { formatDateTimeString, getPriceString } from '../../utils/string';
-import ModalWrapper from '../modals/ModalWrapper';
-import EditTransactionForm from '../forms/EditTransactionForm';
-
 type Props = {
+    /**
+     * Custom class name to use for the table.
+     */
     className?: string;
+
+    /**
+     * ID of position to display transactions for.
+     */
     positionId: number;
+
+    /**
+     * Currency code of currency to display transaction prices in.
+     */
     currencyCode?: string;
 }
 
-export default function TransactionsTable({ className, positionId, currencyCode }: Props): JSX.Element {
+/**
+ * Loads position's transactions and displays them in a table.
+ * 
+ * @category Tables
+ * @component
+ */
+function TransactionsTable({ className, positionId, currencyCode }: Props): JSX.Element {
     const transactions = useGetPositionTransactionsQuery({ positionId });
     const [deleteTransaction, mutationStatus] = useDeleteTransactionMutation();
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -97,3 +113,5 @@ export default function TransactionsTable({ className, positionId, currencyCode 
         </>
     )
 }
+
+export default TransactionsTable;

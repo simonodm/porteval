@@ -1,25 +1,35 @@
 import React, { useEffect, useState } from 'react';
-
-import { useGetPositionQuery } from '../../redux/api/positionApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
-
 import useInstrumentPriceAutoFetchingState from '../../hooks/useInstrumentPriceAutoFetchingState';
-
-import { useAddTransactionMutation } from '../../redux/api/transactionApi';
-
 import useUserSettings from '../../hooks/useUserSettings';
-
 import NumberInput from './fields/NumberInput';
 import DateTimeSelector from './fields/DateTimeSelector';
 import TextInput from './fields/TextInput';
 
+import { useGetPositionQuery } from '../../redux/api/positionApi';
+import { useAddTransactionMutation } from '../../redux/api/transactionApi';
+import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
+
 type Props = {
+    /**
+     * ID of position to create transaction for.
+     */
     positionId: number;
+
+    /**
+     * A callback which is invoked whenever the form is successfully submitted.
+     */
     onSuccess: () => void;
 }
 
-export default function CreateTransactionForm({ positionId, onSuccess }: Props): JSX.Element {
+/**
+ * Renders a transaction creation form.
+ * 
+ * @category Forms
+ * @subcategory Forms
+ * @component
+ */
+function CreateTransactionForm({ positionId, onSuccess }: Props): JSX.Element {
     const [amount, setAmount] = useState<number | undefined>(undefined);
     const [time, setTime] = useState(new Date());
     const [note, setNote] = useState('');
@@ -101,3 +111,5 @@ export default function CreateTransactionForm({ positionId, onSuccess }: Props):
         </LoadingWrapper>
     )
 }
+
+export default CreateTransactionForm;

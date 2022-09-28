@@ -1,10 +1,15 @@
 import React, { Fragment, useState } from 'react';
-
 import PortfoliosTable from '../tables/PortfoliosTable';
 import ModalWrapper from '../modals/ModalWrapper';
 import PageHeading from '../ui/PageHeading';
 import CreatePortfolioForm from '../forms/CreatePortfolioForm';
 
+/**
+ * Renders the portfolio list view.
+ * 
+ * @category Views
+ * @component
+ */
 function PortfolioListView(): JSX.Element {
     const [modalIsOpen, setModalIsOpen] = useState(false);
 

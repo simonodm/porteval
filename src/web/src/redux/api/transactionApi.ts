@@ -1,9 +1,12 @@
 import { Transaction } from '../../types';
-
 import { CreateTransactionParameters } from './apiTypes';
 import { truncateEntityNote } from './apiUtils';
 import { portEvalApi } from './portEvalApi';
 
+/**
+ * PortEval's transaction API definition.
+ * @category API
+ */
 const transactionApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
         getPositionTransactions: build.query<Array<Transaction>, { positionId: number }>({

@@ -1,23 +1,34 @@
 import React, { useState } from 'react';
-
-import { checkIsLoaded, onSuccessfulResponse } from '../../utils/queries';
-import { useUpdateTransactionMutation } from '../../redux/api/transactionApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
-
-import { Transaction } from '../../types';
-
 import useUserSettings from '../../hooks/useUserSettings';
-
 import DateTimeSelector from './fields/DateTimeSelector';
 import NumberInput from './fields/NumberInput';
 import TextInput from './fields/TextInput';
 
+import { checkIsLoaded, onSuccessfulResponse } from '../../utils/queries';
+import { useUpdateTransactionMutation } from '../../redux/api/transactionApi';
+import { Transaction } from '../../types';
+
 type Props = {
+    /**
+     * Transaction to edit.
+     */
     transaction: Transaction;
+
+    /**
+     * A callback which is invoked whenever the form is successfully submitted.
+     */
     onSuccess: () => void;
 }
 
-export default function EditTransactionForm({ transaction, onSuccess }: Props): JSX.Element {
+/**
+ * Renders a transaction edit form.
+ * 
+ * @category Forms
+ * @subcategory Forms
+ * @component
+ */
+function EditTransactionForm({ transaction, onSuccess }: Props): JSX.Element {
     const [amount, setAmount] = useState(transaction.amount);
     const [price, setPrice] = useState(transaction.price);
     const [time, setTime] = useState(new Date(transaction.time));
@@ -63,3 +74,5 @@ export default function EditTransactionForm({ transaction, onSuccess }: Props): 
         </LoadingWrapper>
     )
 }
+
+export default EditTransactionForm;

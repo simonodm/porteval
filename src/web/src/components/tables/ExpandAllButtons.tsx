@@ -1,7 +1,15 @@
 import React from 'react';
 import { COLLAPSE_ALL_ROWS_EVENT_NAME, EXPAND_ALL_ROWS_EVENT_NAME } from '../../constants';
 
-export default function ExpandAllButtons(): JSX.Element {
+/**
+ * Renders "expand all" and "collapse all" buttons. These buttons emit an event which all {@link DataTable} tables react to by expanding or collapsing
+ * all their rows.
+ * 
+ * @category Tables
+ * @subcategory Utilities
+ * @component
+ */
+function ExpandAllButtons(): JSX.Element {
     const handleExpandAllClick = () => {
         window.dispatchEvent(new Event(EXPAND_ALL_ROWS_EVENT_NAME));
     }
@@ -17,3 +25,5 @@ export default function ExpandAllButtons(): JSX.Element {
         </div>
     )
 }
+
+export default ExpandAllButtons;

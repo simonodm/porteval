@@ -1,18 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import GridLayout, { Layout, WidthProvider } from 'react-grid-layout';
-
 import DashboardChart from '../charts/DashboardChart';
-import 'react-grid-layout/css/styles.css';
-import './Dashboard.css';
-import { useGetDashboardLayoutQuery, useUpdateDashboardLayoutMutation } from '../../redux/api/dashboardApi';
-import { useGetAllChartsQuery } from '../../redux/api/chartApi';
 import ModalWrapper from '../modals/ModalWrapper';
 import DashboardChartPicker from '../charts/DashboardChartPicker';
 import PageHeading from '../ui/PageHeading';
 
+import { useGetDashboardLayoutQuery, useUpdateDashboardLayoutMutation } from '../../redux/api/dashboardApi';
+import { useGetAllChartsQuery } from '../../redux/api/chartApi';
+
+import 'react-grid-layout/css/styles.css';
+import './Dashboard.css';
+
 const ResponsiveGridLayout = WidthProvider(GridLayout);
 
-export default function Dashboard(): JSX.Element {
+/**
+ * Renders the dashboard.
+ * 
+ * @category Views
+ * @component
+ */
+function Dashboard(): JSX.Element {
     const layoutQuery = useGetDashboardLayoutQuery();
     const [dashboardLayout, setDashboardLayout] = useState(layoutQuery.data);
     const charts = useGetAllChartsQuery();
@@ -134,3 +141,5 @@ export default function Dashboard(): JSX.Element {
         </>
     )
 }
+
+export default Dashboard;

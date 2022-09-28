@@ -1,34 +1,40 @@
 import React, { useEffect, useState } from 'react';
-
-import { useCreateInstrumentMutation, useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
-
 import useInstrumentPriceAutoFetchingState from '../../hooks/useInstrumentPriceAutoFetchingState';
-
-import { Instrument, InstrumentType } from '../../types';
-
-import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
-
-import { useAddPositionMutation } from '../../redux/api/positionApi';
-
 import useUserSettings from '../../hooks/useUserSettings';
-
 import InstrumentDropdown from './fields/InstrumentDropdown';
-
 import TextInput from './fields/TextInput';
 import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import NumberInput from './fields/NumberInput';
 import DateTimeSelector from './fields/DateTimeSelector';
 import CurrencyDropdown from './fields/CurrencyDropdown';
 
+import { useCreateInstrumentMutation, useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
+import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
+import { Instrument, InstrumentType } from '../../types';
+import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
+import { useAddPositionMutation } from '../../redux/api/positionApi';
 
 type Props = {
+    /**
+     * ID of portfolio to open position for.
+     */
     portfolioId: number;
+
+    /**
+     * A callback which is invoked whenever the form is successfully submitted.
+     */
     onSuccess: () => void;
 }
 
-export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX.Element {
+/**
+ * Renders a position creation form.
+ * 
+ * @category Forms
+ * @subcategory Forms
+ * @component
+ */
+function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX.Element {
     const instruments = useGetAllInstrumentsQuery();
     const currencies = useGetAllKnownCurrenciesQuery();
     
@@ -196,3 +202,5 @@ export default function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX
         </LoadingWrapper>
     )
 }
+
+export default OpenPositionForm;

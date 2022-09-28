@@ -1,16 +1,29 @@
 import React, { useState } from 'react'
-
 import useUserSettings from '../../hooks/useUserSettings';
-import { formatDateTimeString, isValidDateTimeFormat } from '../../utils/string';
-
 import TextInput from './fields/TextInput';
 
+import { isValidDateTimeFormat } from '../../utils/string';
+
 type Props = {
+    /**
+     * A callback which is invoked whenever the form is successfully submitted.
+     */
     onSuccess?: () => void;
+
+    /**
+     * A callback which is invoked whenever the form fails to submit.
+     */
     onFailure?: (error: string) => void;
 }
 
-export default function SettingsForm({ onSuccess, onFailure }: Props): JSX.Element {
+/**
+ * Renders a user settings edit form.
+ * 
+ * @category Forms
+ * @subcategory Forms
+ * @component
+ */
+function SettingsForm({ onSuccess, onFailure }: Props): JSX.Element {
     const [settings, setSettings] = useUserSettings();
 
     const [dateFormatValue, setDateFormatValue] = useState(settings.dateFormat);
@@ -52,3 +65,5 @@ export default function SettingsForm({ onSuccess, onFailure }: Props): JSX.Eleme
         </form>
     )
 }
+
+export default SettingsForm;

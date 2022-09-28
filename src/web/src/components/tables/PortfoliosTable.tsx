@@ -1,25 +1,33 @@
 import React, { useMemo, useState } from 'react';
-
-import { checkIsLoaded, checkIsError } from '../../utils/queries';
-
-import { useDeletePortfolioMutation, useGetAllPortfoliosQuery, useGetAllPortfoliosStatisticsQuery } from '../../redux/api/portfolioApi';
-
-import { EntityStatistics, Portfolio } from '../../types';
 import DataTable, { ColumnDefinition } from './DataTable';
-import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
-import { getPerformanceString, getPriceString } from '../../utils/string';
 import useUserSettings from '../../hooks/useUserSettings';
 import PositionsTable from './PositionsTable';
-import { Link, NavLink } from 'react-router-dom';
-import { generateDefaultPortfolioChart } from '../../utils/chart';
 import EditPortfolioForm from '../forms/EditPortfolioForm';
 import OpenPositionForm from '../forms/OpenPositionForm';
 import ModalWrapper from '../modals/ModalWrapper';
 import ExpandAllButtons from './ExpandAllButtons';
 
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
+import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
+import { getPerformanceString, getPriceString } from '../../utils/string';
+import { useDeletePortfolioMutation, useGetAllPortfoliosQuery, useGetAllPortfoliosStatisticsQuery } from '../../redux/api/portfolioApi';
+import { Link, NavLink } from 'react-router-dom';
+import { generateDefaultPortfolioChart } from '../../utils/chart';
+import { EntityStatistics, Portfolio } from '../../types';
+
+/**
+ * Represents merged portfolio data and its statistics.
+ * @ignore
+ */
 type PortfolioWithStats = Portfolio & EntityStatistics;
 
-export default function PortfoliosTable(): JSX.Element {
+/**
+ * Loads portfolios and renders portfolios table.
+ * 
+ * @category Tables
+ * @component
+ */
+function PortfoliosTable(): JSX.Element {
     const currencies = useGetAllKnownCurrenciesQuery();
     const portfolios = useGetAllPortfoliosQuery();
     const portfolioStats = useGetAllPortfoliosStatisticsQuery();
@@ -199,5 +207,6 @@ export default function PortfoliosTable(): JSX.Element {
             </ModalWrapper>
         </>
     )
-    
 }
+
+export default PortfoliosTable;

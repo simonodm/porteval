@@ -1,25 +1,52 @@
 import { FetchArgs, FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/toolkit/dist/query';
 import { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes';
 import { MaybePromise } from '@reduxjs/toolkit/dist/query/tsHelpers';
-
 import { ChartConfig, PaginatedResponse, ChartLine } from '../../types';
 import * as constants from '../../constants';
 
-export function truncateEntityName<T extends { name: string }>(entity: T, length = constants.API_NAME_MAX_LENGTH): T {
+/**
+ * Truncates an object's `name` property to API name length limit.
+ * 
+ * @category API
+ * @subcategory Utilities
+ * @param entity Object, the name of which is to be truncated.
+ * @param length Length to truncate name to.
+ * @returns The original object with truncated name.
+ */
+function truncateEntityName<T extends { name: string }>(entity: T, length = constants.API_NAME_MAX_LENGTH): T {
     return {
         ...entity,
         name: entity.name.substring(0, length)
     };
 }
 
-export function truncateEntityNote<T extends { note: string }>(entity: T, length = constants.API_NOTE_MAX_LENGTH): T {
+/**
+ * Truncates an object's `note` property to API note length limit.
+ * 
+ * @category API
+ * @subcategory Utilities
+ * @param entity Object, the note of which is to be truncated.
+ * @param length Length to truncate note to.
+ * @returns The original object with truncated note.
+ */
+function truncateEntityNote<T extends { note: string }>(entity: T, length = constants.API_NOTE_MAX_LENGTH): T {
     return {
         ...entity,
         note: entity.note.substring(0, length)
     };
 }
 
-export async function getAllPaginated<T>(
+/**
+ * Fetches all data from a paginated endpoint.
+ * 
+ * @category API
+ * @subcategory Utilities
+ * @param fetchWithBQ RTK base query function.
+ * @param endpointUrl Endpoint URL.
+ * @param params Endpoint query parameters.
+ * @returns An array of all data available from the specified paginated endpoint.
+ */
+async function getAllPaginated<T>(
     fetchWithBQ: (arg: string | FetchArgs) =>
         MaybePromise<QueryReturnValue<unknown, FetchBaseQueryError, FetchBaseQueryMeta>>,
     endpointUrl: string,
@@ -51,7 +78,16 @@ export async function getAllPaginated<T>(
     };
 }
 
-export function buildChartLineDataBaseUrl(chart: ChartConfig, line: ChartLine): string {
+/**
+ * Builds a URL for the chart's line data endpoint based on chart and line configuration.
+ * 
+ * @category API
+ * @subcategory Utilities
+ * @param chart Chart to get data for.
+ * @param line Line to get data for.
+ * @returns URL of the endpoint to call to get the data for the specified chart and line.
+ */
+function buildChartLineDataBaseUrl(chart: ChartConfig, line: ChartLine): string {
     switch(chart.type) {
         case 'price':
             switch(line.type) {
@@ -105,7 +141,17 @@ export function buildChartLineDataBaseUrl(chart: ChartConfig, line: ChartLine): 
     }
 }
 
-export function buildChartLineTransactionsUrl(line: ChartLine, from: string, to: string): string {
+/**
+ * Builds a URL for the chart line's transactions endpoint.
+ * 
+ * @category API
+ * @subcategory Utilities
+ * @param line Chart line to get transactions for.
+ * @param from Date to get transactions from.
+ * @param to Date to get transactions until.
+ * @returns URL of the endpoint to call to get all transactions for the specified chart line.
+ */
+function buildChartLineTransactionsUrl(line: ChartLine, from: string, to: string): string {
     let entityIdQueryParam = '';
     switch(line.type) {
         case 'portfolio':
@@ -125,22 +171,45 @@ export function buildChartLineTransactionsUrl(line: ChartLine, from: string, to:
     return `transactions?${entityIdQueryParam}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
 }
 
-export type ChartLineEntityTag = {
+/**
+ * An RTK query tag for a fetched chart line.
+ * @category API
+ * @subcategory Utilities
+ */
+type ChartLineEntityTag = {
     type: 'Portfolio' | 'Position' | 'Instrument',
     id: string | number
 };
 
-export type ChartLineDataTag = {
+/**
+ * An RTK query tag for fetched chart line data.
+ * @category API
+ * @subcategory Utilities
+ */
+type ChartLineDataTag = {
     type: 'PortfolioCalculations' | 'PositionCalculations' | 'InstrumentCalculations';
     id: string | number
 };
 
-export type ChartLineTransactionTag = {
+/**
+ * An RTK query tag for fetched chart line transactions.
+ * @category API
+ * @subcategory Utilities
+ */
+type ChartLineTransactionTag = {
     type: 'PortfolioTransactions' | 'PositionTransactions' | 'InstrumentTransactions';
     id: string | number
 };
 
-export const generateChartLineReferencedEntityTags = (lines: Array<ChartLine>): Array<ChartLineEntityTag> => {
+/**
+ * Generates RTK query tags for fetched chart lines.
+ * 
+ * @category API
+ * @subcategory Utilities
+ * @param lines Fetched chart lines.
+ * @returns An array of RTK query tags.
+ */
+const generateChartLineReferencedEntityTags = (lines: Array<ChartLine>): Array<ChartLineEntityTag> => {
     return lines.map(line => {
         switch(line.type) {
             case 'portfolio':
@@ -153,7 +222,15 @@ export const generateChartLineReferencedEntityTags = (lines: Array<ChartLine>): 
     })
 }
 
-export const generateChartLineCalcTags = (lines: Array<ChartLine>): Array<ChartLineDataTag> => {
+/**
+ * Generates RTK query tags for fetched chart lines' data.
+ * 
+ * @category API
+ * @subcategory Utilities
+ * @param lines Fetched chart lines.
+ * @returns An array of RTK query tags.
+ */
+const generateChartLineCalcTags = (lines: Array<ChartLine>): Array<ChartLineDataTag> => {
     return lines.map(line => {
             switch(line.type) {
                 case 'portfolio':
@@ -166,7 +243,15 @@ export const generateChartLineCalcTags = (lines: Array<ChartLine>): Array<ChartL
         });
 }
 
-export const generateChartTransactionTags = (lines: Array<ChartLine>): Array<ChartLineTransactionTag> => {
+/**
+ * Generates RTK query tags for fetched chart lines' transactions.
+ * 
+ * @category API
+ * @subcategory Utilities
+ * @param lines Fetched chart lines.
+ * @returns An array of RTK query tags.
+ */
+const generateChartTransactionTags = (lines: Array<ChartLine>): Array<ChartLineTransactionTag> => {
     return lines.map(line => {
         switch(line.type) {
             case 'portfolio':
@@ -188,3 +273,17 @@ function buildUrl(endpointUrl: string, params: Record<string, string | number>) 
 
     return resultUrl;
 }
+
+export {
+    truncateEntityName,
+    truncateEntityNote,
+    getAllPaginated,
+    buildChartLineDataBaseUrl,
+    buildChartLineTransactionsUrl,
+    generateChartLineCalcTags,
+    generateChartLineReferencedEntityTags,
+    generateChartTransactionTags
+}
+export type { ChartLineEntityTag }
+export type { ChartLineDataTag }
+export type { ChartLineTransactionTag }

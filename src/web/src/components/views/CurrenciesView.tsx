@@ -1,26 +1,28 @@
 import React, { useEffect, useState } from 'react'
-import { skipToken } from '@reduxjs/toolkit/dist/query';
-import { toast } from 'react-toastify';
+import LoadingWrapper from '../ui/LoadingWrapper';
+import PageHeading from '../ui/PageHeading';
+import ExchangeRatesTable from '../tables/ExchangeRatesTable';
 
 import { useGetAllKnownCurrenciesQuery,
     useGetLatestExchangeRatesQuery, useUpdateCurrencyMutation } from '../../redux/api/currencyApi';
 import { Currency } from '../../types';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
-import { getPriceString } from '../../utils/string';
-import LoadingWrapper from '../ui/LoadingWrapper';
-import PageHeading from '../ui/PageHeading';
-import './CurrenciesView.css';
-import useUserSettings from '../../hooks/useUserSettings';
-import DataTable from '../tables/DataTable';
-import ExchangeRatesTable from '../tables/ExchangeRatesTable';
+import { skipToken } from '@reduxjs/toolkit/dist/query';
+import { toast } from 'react-toastify';
 
-export default function CurrenciesView(): JSX.Element {
+import './CurrenciesView.css';
+
+/**
+ * Renders the currencies' and their exchange rates view.
+ * 
+ * @category Views
+ * @component
+ */
+function CurrenciesView(): JSX.Element {
     const currencies = useGetAllKnownCurrenciesQuery();
     const [selectedCurrency, setSelectedCurrency] = useState<Currency | undefined>(undefined);
     const exchangeRates = useGetLatestExchangeRatesQuery(selectedCurrency?.code ?? skipToken);
     const [updateCurrency] = useUpdateCurrencyMutation();
-
-    const [userSettings] = useUserSettings();
 
     const isLoaded = checkIsLoaded(currencies, exchangeRates);
     const isError = checkIsError(currencies, exchangeRates);
@@ -86,3 +88,5 @@ export default function CurrenciesView(): JSX.Element {
         </>
     )
 }
+
+export default CurrenciesView;

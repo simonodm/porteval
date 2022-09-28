@@ -3,7 +3,12 @@ import { useDispatch } from 'react-redux';
 import { portEvalApi } from '../redux/api/portEvalApi';
 import './Header.css';
 
-export default function Header(): JSX.Element {
+/**
+ * Renders the application header.
+ * 
+ * @component
+ */
+function Header(): JSX.Element {
     const dispatch = useDispatch();
 
     return (
@@ -19,3 +24,5 @@ export default function Header(): JSX.Element {
         </nav>
     )
 }
+
+export default Header;

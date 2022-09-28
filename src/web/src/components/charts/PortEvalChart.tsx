@@ -1,9 +1,10 @@
 import React from 'react';
+import LoadingWrapper from '../ui/LoadingWrapper';
+import useUserSettings from '../../hooks/useUserSettings';
+import LineChart from './LineChart';
 
 import { skipToken } from '@reduxjs/toolkit/dist/query';
-
 import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
-import LoadingWrapper from '../ui/LoadingWrapper';
 import { ChartConfig, isPriceDataChart } from '../../types';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { getPriceString, getPerformanceString } from '../../utils/string';
@@ -11,17 +12,22 @@ import { convertDashToStrokeDashArray, calculateXAxisInterval, getChartDateRange
     getChartFrequency, getXAxisD3Format, generateTooltipTransactionList,
     generateChartLineTransactionIcons, getXTooltipD3Format } from '../../utils/chart';
 import { useGetChartDataQuery, useGetChartTransactionsQuery } from '../../redux/api/chartApi';
-import { RenderedDataPointInfo } from '../../utils/lineChart';
-
-import useUserSettings from '../../hooks/useUserSettings';
-
-import LineChart from './LineChart';
+import { RenderedLineChartLineDataPoint } from '../../utils/lineChart';
 
 type Props = {
+    /**
+     * Chart to render.
+     */
     chart: ChartConfig;   
 }
 
-export default function PortEvalChart({ chart }: Props): JSX.Element {
+/**
+ * Renders a chart based on the provided chart data.
+ * 
+ * @category Chart
+ * @component
+ */
+function PortEvalChart({ chart }: Props): JSX.Element {
     const [from, to] = getChartDateRange(chart);
     const frequency = getChartFrequency(chart);
 
@@ -40,7 +46,7 @@ export default function PortEvalChart({ chart }: Props): JSX.Element {
         transactions: transactionData?.data ? transactionData.data[idx] : []
     }));
 
-    const transactionSignRenderCallback = (dataPoint: RenderedDataPointInfo) => {
+    const transactionSignRenderCallback = (dataPoint: RenderedLineChartLineDataPoint) => {
         const transactions = lines[dataPoint.lineIndex].transactions;
         return generateChartLineTransactionIcons(dataPoint, transactions);
     }
@@ -68,3 +74,5 @@ export default function PortEvalChart({ chart }: Props): JSX.Element {
         </LoadingWrapper>
     )
 }
+
+export default PortEvalChart;

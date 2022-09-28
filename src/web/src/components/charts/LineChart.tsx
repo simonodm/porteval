@@ -1,36 +1,71 @@
 import React, { useLayoutEffect, useRef } from 'react';
+import createChart, { LineChartLine, RenderCallback, TooltipCallback } from '../../utils/lineChart';
 import * as d3 from 'd3';
 
-import createChart, { RenderCallback , TooltipCallback } from '../../utils/lineChart';
-import './LineChart.css';
-import { EntityChartDataPoint } from '../../types';
 import { getXAxisD3Interval } from '../../utils/chart';
 
+import './LineChart.css';
 
+/**
+ * Represents possible intervals for chart X axis labels.
+ * @category Chart
+ */
 export type XAxisInterval = 'hour' | 'day' | 'week' | 'month' | 'year';
-export type Line = {
-    name: string;
-    color: string;
-    strokeDashArray: string;
-    width: number;
-    data: Array<EntityChartDataPoint>
-}
 
-type ChartConfig = {
+/**
+ * Represents chart rendering configuration.
+ */
+type ChartRenderConfiguration = {
+    /**
+     * X axis label intervals.
+     */
     xInterval?: XAxisInterval;
+
+    /**
+     * X axis label formatting function.
+     */
     xFormat?: (xValue: Date) => string;
+
+    /**
+     * X value tooltip formatting function
+     */
     xTooltipFormat?: (xValue: Date) => string;
+
+    /**
+     * Y axis label formatting function.
+     */
     yFormat?: (yValue: number) => string;
+
+    /**
+     * Tooltip rendering callback. The result is appended to the base tooltip.
+     */
     tooltipCallback?: TooltipCallback;
+
+    /**
+     * Additional rendering callback. The result is rendered on top of the chart line.
+     */
     additionalRenderCallback?: RenderCallback;
 }
 
 type Props = {
-    config?: ChartConfig,
-    lines: Array<Line>
+    /**
+     * Chart rendering configuration.
+     */
+    config?: ChartRenderConfiguration,
+
+    /**
+     * An array of lines to render in the chart.
+     */
+    lines: Array<LineChartLine>
 }
 
-export default function LineChart({ config, lines }: Props): JSX.Element {
+/**
+ * Renders a line chart based on the provided configuration and line data.
+ * 
+ * @category Chart
+ * @component
+ */
+function LineChart({ config, lines }: Props): JSX.Element {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const interval = getXAxisD3Interval(config?.xInterval);
@@ -76,4 +111,4 @@ export default function LineChart({ config, lines }: Props): JSX.Element {
     )
 }
 
-
+export default LineChart;

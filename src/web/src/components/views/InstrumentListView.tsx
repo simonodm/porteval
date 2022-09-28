@@ -1,11 +1,16 @@
 import React, { useState, Fragment } from 'react';
-
 import InstrumentsTable from '../tables/InstrumentsTable';
 import ModalWrapper from '../modals/ModalWrapper';
 import PageHeading from '../ui/PageHeading';
 import CreateInstrumentForm from '../forms/CreateInstrumentForm';
 
-export default function InstrumentListView(): JSX.Element {
+/**
+ * Renders the instrument list view.
+ * 
+ * @category Views
+ * @component
+ */
+function InstrumentListView(): JSX.Element {
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
     return (
@@ -27,3 +32,5 @@ export default function InstrumentListView(): JSX.Element {
         </Fragment>
     )
 }
+
+export default InstrumentListView;

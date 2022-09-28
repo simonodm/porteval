@@ -1,10 +1,14 @@
+import rtkQueryErrorDisplay from './middleware/rtkQueryErrorDisplay';
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
-
 import { portEvalApi } from './api/portEvalApi';
-import { rtkQueryErrorDisplay } from './middleware/rtkQueryErrorDisplay';
 
-export const store = configureStore({
+/**
+ * PortEval's redux store.
+ * 
+ * @category Redux
+ */
+const store = configureStore({
     reducer: {
         [portEvalApi.reducerPath]: portEvalApi.reducer
     },
@@ -15,3 +19,5 @@ export const store = configureStore({
 });
 
 setupListeners(store.dispatch);
+
+export default store;

@@ -1,19 +1,26 @@
 import React, { useState } from 'react'
-
-import { useUploadImportFileMutation } from '../../redux/api/importApi';
-
-import { onSuccessfulResponse } from '../../utils/queries';
-
-import { TemplateType } from '../../types';
-
 import FileUpload from './fields/FileUpload'
 import TemplateTypeDropdown from './fields/TemplateTypeDropdown';
 
+import { useUploadImportFileMutation } from '../../redux/api/importApi';
+import { onSuccessfulResponse } from '../../utils/queries';
+import { TemplateType } from '../../types';
+
 type Props = {
+    /**
+     * A callback which is invoked whenever the form is successfully submitted.
+     */
     onSuccess?: () => void;
 }
 
-export default function ImportDataForm({ onSuccess }: Props): JSX.Element {
+/**
+ * Renders a CSV data import form.
+ * 
+ * @category Forms
+ * @subcategory Forms
+ * @component
+ */
+function ImportDataForm({ onSuccess }: Props): JSX.Element {
     const [file, setFile] = useState<File | undefined>(undefined);
     const [templateType, setTemplateType] = useState<TemplateType>('portfolios');
 
@@ -68,3 +75,5 @@ export default function ImportDataForm({ onSuccess }: Props): JSX.Element {
         </form>
     )
 }
+
+export default ImportDataForm;

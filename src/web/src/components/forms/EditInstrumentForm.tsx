@@ -1,22 +1,34 @@
 import React, { useState } from 'react';
-
-import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
-import { Instrument, InstrumentType } from '../../types';
-
-import { useUpdateInstrumentMutation } from '../../redux/api/instrumentApi';
-
 import TextInput from './fields/TextInput';
 import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import CurrencyDropdown from './fields/CurrencyDropdown';
 
+import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
+import { Instrument, InstrumentType } from '../../types';
+import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
+import { useUpdateInstrumentMutation } from '../../redux/api/instrumentApi';
+
 type Props = {
+    /**
+     * Instrument to edit.
+     */
     instrument: Instrument;
+
+    /**
+     * A callback which is invoked whenever the form is successfully submitted.
+     */
     onSuccess?: () => void;
 }
 
-export default function EditInstrumentForm({ instrument, onSuccess }: Props): JSX.Element {
+/**
+ * Renders an instrument edit form.
+ * 
+ * @category Forms
+ * @subcategory Forms
+ * @component
+ */
+function EditInstrumentForm({ instrument, onSuccess }: Props): JSX.Element {
     const currencies = useGetAllKnownCurrenciesQuery();
     const [updateInstrument, mutationStatus] = useUpdateInstrumentMutation();
 
@@ -66,3 +78,5 @@ export default function EditInstrumentForm({ instrument, onSuccess }: Props): JS
         </LoadingWrapper>
     )
 }
+
+export default EditInstrumentForm;

@@ -1,15 +1,16 @@
 import { FetchBaseQueryError, FetchBaseQueryMeta } from '@reduxjs/toolkit/dist/query';
-
 import { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes';
-
 import { Chart, ChartConfig, AggregationFrequency,
     EntityChartDataPoint, isPriceDataChart, Transaction } from '../../types';
-
 import { buildChartLineDataBaseUrl, buildChartLineTransactionsUrl,
     generateChartLineCalcTags, truncateEntityName, generateChartTransactionTags, ChartLineEntityTag,
     generateChartLineReferencedEntityTags } from './apiUtils';
 import { portEvalApi } from './portEvalApi';
 
+/**
+ * PortEval's chart API definition.
+ * @category API
+ */
 const chartApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
         getAllCharts: build.query<Array<Chart>, void>({

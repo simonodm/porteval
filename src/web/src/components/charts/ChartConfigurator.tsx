@@ -1,28 +1,36 @@
 import React, { useContext, useEffect, useState } from 'react';
-
-import { Popover } from 'react-tiny-popover';
-
-import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
-import { ChartConfig, isPriceDataChart, isAggregatedChart,
-    AggregationFrequency, ChartType, ChartToDateRange } from '../../types';
-import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import LoadingWrapper from '../ui/LoadingWrapper';
-
-import 'react-datepicker/dist/react-datepicker.css';
-import './ChartConfigurator.css';
-import { camelToProperCase } from '../../utils/string';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
 import CurrencyDropdown from '../forms/fields/CurrencyDropdown';
 import DateTimeSelector from '../forms/fields/DateTimeSelector';
 import useUserSettings from '../../hooks/useUserSettings';
 import NumberInput from '../forms/fields/NumberInput';
+
 import { isAfter, isBefore, subMonths } from 'date-fns';
+import { Popover } from 'react-tiny-popover';
+import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
+import { ChartConfig, isPriceDataChart, isAggregatedChart,
+    AggregationFrequency, ChartType, ChartToDateRange } from '../../types';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
+import { camelToProperCase } from '../../utils/string';
+
+import 'react-datepicker/dist/react-datepicker.css';
+import './ChartConfigurator.css';
 
 type Props = {
+    /**
+     * A callback which is invoked every time the chart configuration changes.
+     */
     onChange?: (chart: ChartConfig) => void;
 }
 
-export default function ChartConfigurator({ onChange }: Props): JSX.Element {
+/**
+ * Renders a chart configuration component, enabling modification of the chart's type, date range, frequency, and currency.
+ *
+ * @category Chart
+ * @component
+ */
+function ChartConfigurator({ onChange }: Props): JSX.Element {
     const frequencies: AggregationFrequency[] = ['day', 'week', 'month', 'year'];
     const types: ChartType[] = ['price', 'profit', 'performance', 'aggregatedProfit', 'aggregatedPerformance'];
     const toDateRanges: ChartToDateRange[] = [
@@ -256,3 +264,5 @@ export default function ChartConfigurator({ onChange }: Props): JSX.Element {
         </LoadingWrapper>
     )
 }
+
+export default ChartConfigurator;

@@ -1,22 +1,32 @@
 import React, { useState } from 'react';
-
-import { useAddInstrumentPriceMutation } from '../../redux/api/instrumentApi';
-
-import { checkIsLoaded, onSuccessfulResponse } from '../../utils/queries';
-
 import LoadingWrapper from '../ui/LoadingWrapper';
-
 import useUserSettings from '../../hooks/useUserSettings';
-
 import DateTimeSelector from './fields/DateTimeSelector';
 import NumberInput from './fields/NumberInput';
 
+import { useAddInstrumentPriceMutation } from '../../redux/api/instrumentApi';
+import { checkIsLoaded, onSuccessfulResponse } from '../../utils/queries';
+
 type Props = {
+    /**
+     * ID of the instrument to create price for.
+     */
     instrumentId: number;
+
+    /**
+     * A callback which is invoked whenever the form is successfully submitted.
+     */
     onSuccess?: () => void;
 }
 
-export default function CreateInstrumentPriceForm({ instrumentId, onSuccess }: Props): JSX.Element {
+/**
+ * Renders an instrument price creation form.
+ * 
+ * @category Forms
+ * @subcategory Forms
+ * @component
+ */
+function CreateInstrumentPriceForm({ instrumentId, onSuccess }: Props): JSX.Element {
     const [addPrice, mutationStatus] = useAddInstrumentPriceMutation();
 
     const [price, setPrice] = useState(0);
@@ -56,3 +66,5 @@ export default function CreateInstrumentPriceForm({ instrumentId, onSuccess }: P
         </LoadingWrapper>        
     )
 }
+
+export default CreateInstrumentPriceForm;

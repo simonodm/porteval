@@ -1,16 +1,41 @@
 import React, { useEffect, useState } from 'react';
-
 import { Portfolio } from '../../../types';
 
 type Props = {
+    /**
+     * An array of portfolios to display in the dropdown.
+     */
     portfolios: Array<Portfolio>;
+
+    /**
+     * Custom class name to use for the form field.
+     */
     className?: string;
+
+    /**
+     * Determines whether the form field is disabled.
+     */
     disabled?: boolean;
+
+    /**
+     * Binding property for the dropdown's current portfolio ID.
+     */
     value?: number;
+
+    /**
+     * A callback which is invoked whenever the dropdown's selection changes.
+     */
     onChange?: (portfolioId: number) => void;
 }
 
-export default function PortfolioDropdown({ className, portfolios, disabled, value, onChange }: Props): JSX.Element {
+/**
+ * Renders a portfolio dropdown form field.
+ * 
+ * @category Forms
+ * @subcategory Fields
+ * @component
+ */
+function PortfolioDropdown({ className, portfolios, disabled, value, onChange }: Props): JSX.Element {
     const [portfolioId, setPortfolioId] = useState(value);
 
     const handlePortfolioChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -45,3 +70,5 @@ export default function PortfolioDropdown({ className, portfolios, disabled, val
         </div>
     )
 }
+
+export default PortfolioDropdown;

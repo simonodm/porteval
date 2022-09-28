@@ -1,24 +1,35 @@
 import React, { useState } from 'react';
-
-import { useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
-import { useGetAllPortfoliosQuery } from '../../redux/api/portfolioApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
-
-import { useUpdatePositionMutation } from '../../redux/api/positionApi';
-
-import { Position } from '../../types';
-
 import PortfolioDropdown from './fields/PortfolioDropdown';
 import InstrumentDropdown from './fields/InstrumentDropdown';
 import TextInput from './fields/TextInput';
 
+import { useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
+import { useGetAllPortfoliosQuery } from '../../redux/api/portfolioApi';
+import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
+import { useUpdatePositionMutation } from '../../redux/api/positionApi';
+import { Position } from '../../types';
+
 type Props = {
+    /**
+     * Position to edit.
+     */
     position: Position;
+
+    /**
+     * A callback which is invoked whenever the form is successfully submitted.
+     */
     onSuccess?: () => void;
 }
 
-export default function EditPositionForm({ position, onSuccess }: Props): JSX.Element {
+/**
+ * Renders a position edit form.
+ * 
+ * @category Forms
+ * @subcategory Forms
+ * @component
+ */
+function EditPositionForm({ position, onSuccess }: Props): JSX.Element {
     const [updatePosition, mutationStatus] = useUpdatePositionMutation();
     const [note, setNote] = useState(position.note);
 
@@ -52,3 +63,5 @@ export default function EditPositionForm({ position, onSuccess }: Props): JSX.El
         </LoadingWrapper>
     )
 }
+
+export default EditPositionForm;

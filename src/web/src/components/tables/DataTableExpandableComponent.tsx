@@ -1,12 +1,29 @@
 import React from 'react';
 
 type Props = {
+    /**
+     * Number of data columns in the parent row.
+     */
     originalRowColumnCount: number;
+
+    /**
+     * Determines whether the expanded content is hidden.
+     */
     hidden?: boolean;
+
+    /**
+     * Callback to render the expanded content.
+     */
     render: () => JSX.Element | null;
 }
 
-export default function DataTableExpandableComponent({ originalRowColumnCount, hidden, render }: Props): JSX.Element {
+/**
+ * A wrapper for the expandable row content.
+ * 
+ * @category Tables
+ * @component
+ */
+function DataTableExpandableComponent({ originalRowColumnCount, hidden, render }: Props): JSX.Element {
     return (
         <tr style={{display: hidden ? 'none' : 'table-row'}}>
             <td/>
@@ -16,3 +33,5 @@ export default function DataTableExpandableComponent({ originalRowColumnCount, h
         </tr>
     )
 }
+
+export default DataTableExpandableComponent;

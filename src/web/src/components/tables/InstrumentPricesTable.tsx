@@ -1,20 +1,25 @@
 import React, { useEffect, useMemo, useState } from 'react';
-
 import Select from 'react-select';
+import PageSelector from '../ui/PageSelector';
+import useUserSettings from '../../hooks/useUserSettings';
+import DataTable, { ColumnDefinition } from './DataTable';
 
 import { useDeleteInstrumentPriceMutation, useGetInstrumentPricePageQuery,
     usePrefetch } from '../../redux/api/instrumentApi';
 import { REFRESH_INTERVAL } from '../../constants';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
-import { formatDateTimeString, getPriceString, getPerformanceString } from '../../utils/string';
-import LoadingWrapper from '../ui/LoadingWrapper';
-import PageSelector from '../ui/PageSelector';
-import useUserSettings from '../../hooks/useUserSettings';
+import { formatDateTimeString, getPriceString } from '../../utils/string';
 import { AggregationFrequency, InstrumentPrice } from '../../types';
-import DataTable, { ColumnDefinition } from './DataTable';
 
 type Props = {
+    /**
+     * ID of the instrument to load and display prices for.
+     */
     instrumentId: number;
+
+    /**
+     * Currency code to display prices in.
+     */
     currencyCode?: string;
 }
 
@@ -23,7 +28,13 @@ type SelectOption = {
     value?: AggregationFrequency;
 }
 
-export default function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Element {
+/**
+ * Loads instrument prices and renders an instrument prices' table.
+ * 
+ * @category Tables
+ * @component
+ */
+function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Element {
     const [page, setPage] = useState(1);
     const [pageLimit] = useState(100);
     const [frequency, setFrequency] = useState<AggregationFrequency | undefined>(undefined);
@@ -122,6 +133,7 @@ export default function InstrumentPricesTable({ instrumentId, currencyCode }: Pr
                 />
             </div>
         </div>
-        
     )
 }
+
+export default InstrumentPricesTable;

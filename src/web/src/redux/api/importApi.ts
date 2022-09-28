@@ -1,7 +1,10 @@
 import { ImportEntry, ImportStartedResponse } from '../../types';
-
 import { portEvalApi } from './portEvalApi';
 
+/**
+ * PortEval's data import API definition.
+ * @category API
+ */
 const importApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
         getAllImports: build.query<Array<ImportEntry>, void>({

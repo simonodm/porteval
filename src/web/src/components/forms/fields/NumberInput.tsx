@@ -1,17 +1,55 @@
 import React, { useEffect, useState } from 'react';
 
 type Props = {
+    /**
+     * Custom class name to use for the form field.
+     */
     className?: string;
+
+    /**
+     * Custom label to use for the form field.
+     */
     label?: string;
+
+    /**
+     * Binding property for the input's current value.
+     */
     value?: number;
+    
+    /**
+     * Determines whether the form field is disabled.
+     */
     disabled?: boolean;
+
+    /**
+     * Determines whether negative numeric values are allowed.
+     */
     allowNegativeValues?: boolean;
+
+    /**
+     * Determines whether decimal values are allowed.
+     */
     allowFloat?: boolean;
+
+    /**
+     * Validator function. The return value of this determines whether {@link onChange} is invoked.
+     */
     validator?: (num: number) => boolean;
+
+    /**
+     * A callback which is invoked whenever input's value changes and passes the validator.
+     */
     onChange?: (num: number) => void;
 }
 
-export default function NumberInput(
+/**
+ * Renders a number input form field.
+ * 
+ * @category Forms
+ * @subcategory Fields
+ * @component
+ */
+function NumberInput(
     { className, label, value, disabled, allowNegativeValues, allowFloat, validator, onChange }: Props
 ): JSX.Element {
     const [numberText, setNumberText] = useState(value?.toString() ?? '');
@@ -76,3 +114,5 @@ export default function NumberInput(
         </div>
     )    
 }
+
+export default NumberInput;

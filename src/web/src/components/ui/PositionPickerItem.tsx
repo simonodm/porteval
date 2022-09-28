@@ -1,18 +1,43 @@
 import React from 'react';
-
-import { ChartLine, Position } from '../../types';
 import LinePreview from '../charts/LinePreview';
+
 import { LINE_PREVIEW_LENGTH } from '../../constants';
+import { ChartLine, Position } from '../../types';
 
 type Props = {
+    /**
+     * Position to display.
+     */
     position: Position;
+
+    /**
+     * Existing chart line for the position.
+     */
     line?: ChartLine;
-    onLineAdd?: () => void;
-    onLineRemove?: () => void;
-    onLineConfigure?: () => void;
+
+    /**
+     * A callback which is invoked on position's addition to a chart.
+     */
+     onLineAdd?: () => void;
+
+     /**
+      * A callback which is invoked on position's removal from a chart.
+      */
+     onLineRemove?: () => void;
+ 
+     /**
+      * A callback which is invoked when the existing line configuration is to be displayed. 
+      */
+     onLineConfigure?: () => void;
 }
 
-export default function PositionPickerItem(
+/**
+ * Renders a position list item to be added/removed from a chart.
+ * 
+ * @category Chart
+ * @component 
+ */
+function PositionPickerItem(
     { position, line, onLineAdd, onLineRemove, onLineConfigure }: Props
 ): JSX.Element {
     return (
@@ -54,3 +79,5 @@ export default function PositionPickerItem(
         </div>
     )
 }
+
+export default PositionPickerItem;

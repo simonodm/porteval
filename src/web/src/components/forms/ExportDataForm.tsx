@@ -1,21 +1,27 @@
 import React, { useState } from 'react';
-
-import { useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
-
-import { TemplateType } from '../../types';
-
-import { checkIsError, checkIsLoaded } from '../../utils/queries';
-
 import LoadingWrapper from '../ui/LoadingWrapper';
-
 import InstrumentDropdown from './fields/InstrumentDropdown';
 import TemplateTypeDropdown from './fields/TemplateTypeDropdown';
 
+import { useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
+import { TemplateType } from '../../types';
+import { checkIsError, checkIsLoaded } from '../../utils/queries';
+
 type Props = {
+    /**
+     * A callback which is invoked whenever the form is successfully submitted.
+     */
     onSuccess?: () => void;
 }
 
-export default function ExportDataForm({ onSuccess }: Props): JSX.Element {
+/**
+ * Renders a CSV data export form.
+ * 
+ * @category Forms
+ * @subcategory Forms
+ * @component
+ */
+function ExportDataForm({ onSuccess }: Props): JSX.Element {
     const [templateType, setTemplateType] = useState<TemplateType>('portfolios');
     
     const [instrumentId, setInstrumentId] = useState<number | undefined>(undefined);
@@ -68,3 +74,5 @@ export default function ExportDataForm({ onSuccess }: Props): JSX.Element {
         </div>
     )
 }
+
+export default ExportDataForm;

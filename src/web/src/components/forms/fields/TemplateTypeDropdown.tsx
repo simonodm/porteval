@@ -1,15 +1,36 @@
 import React, { useState } from 'react';
-
 import { TemplateType } from '../../../types';
 
 type Props = {
+    /**
+     * Custom class name to use for the form field.
+     */
     className?: string;
+
+    /**
+     * Binding property for the dropdown's current value.
+     */
     value?: TemplateType;
+
+    /**
+     * Determines whether the form field is disabled.
+     */
     disabled?: boolean;
+
+    /**
+     * A callback which is invoked whenever the dropdown's selection changes.
+     */
     onChange?: (value: TemplateType) => void;
 }
 
-export default function TemplateTypeDropdown({ className, value, disabled, onChange }: Props): JSX.Element {
+/**
+ * Renders an import template type dropdown form field.
+ * 
+ * @category Forms
+ * @subcategory Fields
+ * @component
+ */
+function TemplateTypeDropdown({ className, value, disabled, onChange }: Props): JSX.Element {
     const types: Array<TemplateType> = ['portfolios', 'positions', 'instruments', 'prices', 'transactions'];
     const [type, setType] = useState<TemplateType>(value ?? 'portfolios');
 
@@ -34,3 +55,5 @@ export default function TemplateTypeDropdown({ className, value, disabled, onCha
         </div>
     )
 }
+
+export default TemplateTypeDropdown;

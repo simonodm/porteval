@@ -1,16 +1,37 @@
 import React, { useEffect, useState } from 'react';
-
 import { InstrumentType } from '../../../types';
 import * as constants from '../../../constants';
 
 type Props = {
+    /**
+     * Custom class name to use for the form field.
+     */
     className?: string;
+
+    /**
+     * Binding property for the dropdown's current value.
+     */
     value?: InstrumentType;
+
+    /**
+     * Determines whether the form field is disabled.
+     */
     disabled?: boolean;
+
+    /**
+     * A callback which is invoked whenever the dropdown's selection changes.
+     */
     onChange?: (type: InstrumentType) => void;
 }
 
-export default function InstrumentTypeDropdown({ className, value, disabled, onChange }: Props): JSX.Element {
+/**
+ * Renders an instrument type dropdown form field.
+ * 
+ * @category Forms
+ * @subcategory Fields
+ * @component
+ */
+function InstrumentTypeDropdown({ className, value, disabled, onChange }: Props): JSX.Element {
     const types: Array<InstrumentType> =
         ['stock', 'bond', 'mutualFund', 'commodity', 'cryptoCurrency', 'etf', 'index', 'other']
     const [type, setType] = useState<InstrumentType>(value ?? 'stock');
@@ -49,3 +70,5 @@ export default function InstrumentTypeDropdown({ className, value, disabled, onC
         </div>
     )
 }
+
+export default InstrumentTypeDropdown;

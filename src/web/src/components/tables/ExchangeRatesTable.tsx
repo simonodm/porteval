@@ -1,16 +1,26 @@
 import React, { useMemo } from 'react';
 import useUserSettings from '../../hooks/useUserSettings';
+import DataTable, { ColumnDefinition } from './DataTable';
+
 import { useGetLatestExchangeRatesQuery } from '../../redux/api/currencyApi';
 import { CurrencyExchangeRate } from '../../types';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { getPriceString } from '../../utils/string';
-import DataTable, { ColumnDefinition } from './DataTable';
 
 type Props = {
+    /**
+     * Currency code of the source currency to be used for conversion.
+     */
     sourceCurrencyCode: string;
 }
 
-export default function ExchangeRatesTable({ sourceCurrencyCode }: Props): JSX.Element {
+/**
+ * Loads exchange rates for the specified currency and renders an exchange rates table.
+ * 
+ * @category Tables
+ * @component
+ */
+function ExchangeRatesTable({ sourceCurrencyCode }: Props): JSX.Element {
     const exchangeRates = useGetLatestExchangeRatesQuery(sourceCurrencyCode);
     
     const [userSettings] = useUserSettings();
@@ -46,3 +56,5 @@ export default function ExchangeRatesTable({ sourceCurrencyCode }: Props): JSX.E
         />
     )
 }
+
+export default ExchangeRatesTable;

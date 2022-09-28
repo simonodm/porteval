@@ -1,35 +1,36 @@
 import React, { Fragment, useState } from 'react';
-
-import { useParams } from 'react-router-dom';
-
-import { skipToken } from '@reduxjs/toolkit/dist/query';
-
-import PortfoliosTableHeaders from '../tables/PortfoliosTableHeaders';
 import PositionsTable from '../tables/PositionsTable';
 import LoadingWrapper from '../ui/LoadingWrapper';
-
-import useGetPortfolioToDatePerformanceQueryWrapper from '../../hooks/useGetPortfolioToDatePerformanceQueryWrapper';
-import useGetPortfolioToDateProfitsQueryWrapper from '../../hooks/useGetPortfolioToDateProfitsQueryWrapper';
-import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
-import { useGetPortfolioByIdQuery, useGetPortfolioCurrentValueQuery, useGetPortfolioStatisticsQuery } from '../../redux/api/portfolioApi';
-import { checkIsLoaded, checkIsError } from '../../utils/queries';
-
-
-import { getPerformanceString, getPriceString } from '../../utils/string';
-import * as constants from '../../constants';
 import PortEvalChart from '../charts/PortEvalChart';
-import { generateDefaultPortfolioChart } from '../../utils/chart';
 import PageHeading from '../ui/PageHeading';
 import useUserSettings from '../../hooks/useUserSettings';
 import ModalWrapper from '../modals/ModalWrapper';
 import OpenPositionForm from '../forms/OpenPositionForm';
 import ExpandAllButtons from '../tables/ExpandAllButtons';
+import * as constants from '../../constants';
+
+import { useParams } from 'react-router-dom';
+import { generateDefaultPortfolioChart } from '../../utils/chart';
+import { skipToken } from '@reduxjs/toolkit/dist/query';
+import { getPerformanceString, getPriceString } from '../../utils/string';
+import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
+import { useGetPortfolioByIdQuery, useGetPortfolioCurrentValueQuery, useGetPortfolioStatisticsQuery } from '../../redux/api/portfolioApi';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
 type Params = {
+    /**
+     * ID of portfolio to display.
+     */
     portfolioId?: string;
 }
 
-export default function PortfolioView(): JSX.Element {
+/**
+ * Renders a portfolio view based on query parameters.
+ * 
+ * @category Views
+ * @component
+ */
+function PortfolioView(): JSX.Element {
     const params = useParams<Params>();
     const portfolioId = params.portfolioId ? parseInt(params.portfolioId) : 0;
     const portfolio = useGetPortfolioByIdQuery(portfolioId);
@@ -171,3 +172,5 @@ export default function PortfolioView(): JSX.Element {
         </LoadingWrapper>
     )
 }
+
+export default PortfolioView;

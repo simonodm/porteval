@@ -1,9 +1,9 @@
 import { isRejectedWithValue } from '@reduxjs/toolkit';
 import { Middleware } from 'redux';
 import { toast } from 'react-toastify';
+import { isRequestErrorResponse, isValidationErrorResponse } from '../api/apiTypes';
 
 import * as constants from '../../constants';
-import { isRequestErrorResponse, isValidationErrorResponse } from '../api/apiTypes';
 
 const toastOptions = {
     position: toast.POSITION.BOTTOM_RIGHT,
@@ -15,7 +15,13 @@ const toastOptions = {
     progress: undefined,
 };
 
-export const rtkQueryErrorDisplay: Middleware = () => (next) => (action) => {
+/**
+ * An RTK middleware which is invoked whenever an RTK query fails.
+ * 
+ * @category Redux
+ * @returns {Middleware} Middleware to be added to the RTK middleware chain.
+ */
+const rtkQueryErrorDisplay: Middleware = () => (next) => (action) => {
     if(isRejectedWithValue(action)) {
         const data = action.payload?.data;
         if(isRequestErrorResponse(data)) {
@@ -33,3 +39,5 @@ export const rtkQueryErrorDisplay: Middleware = () => (next) => (action) => {
 
     return next(action);
 }
+
+export default rtkQueryErrorDisplay;

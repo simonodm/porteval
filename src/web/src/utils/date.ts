@@ -1,6 +1,6 @@
-// While the result number of seconds may not be applicable to arithmetic with dates (due to different month lengths, leap years, etc.), it
-// is deterministic, which makes it applicable for duration comparisons.
 function getDurationSeconds(duration: globalThis.Duration): number {
+    // While the result number of seconds may not be applicable to arithmetic with dates (due to different month lengths, leap years, etc.), it
+    // is deterministic, which makes it applicable for duration comparisons.
     let result = 0;
     if(duration.years !== undefined) {
         result += duration.years * 365 * 24 * 60 * 60;
@@ -27,18 +27,61 @@ function getDurationSeconds(duration: globalThis.Duration): number {
     return result;
 }
 
-export function durationGreaterThan(first: globalThis.Duration, second: globalThis.Duration) {
+/**
+ * Compares two durations and returns `true` if the first duration is longer than the second duration.
+ * 
+ * @category Utilities
+ * @subcategory Date
+ * @param first 
+ * @param second 
+ * @returns `true` if the first duration is longer than the second duration, `false` otherwise.
+ */
+function durationGreaterThan(first: globalThis.Duration, second: globalThis.Duration): boolean {
     return getDurationSeconds(first) > getDurationSeconds(second);
 }
 
-export function durationGreaterThanOrEqualTo(first: globalThis.Duration, second: globalThis.Duration) {
+/**
+ * Compares two durations and returns `true` if the first duration is longer than or equal to the second duration.
+ * 
+ * @category Utilities
+ * @subcategory Date
+ * @param first 
+ * @param second 
+ * @returns `true` if the first duration is longer than or equal to the second duration, `false` otherwise.
+ */
+function durationGreaterThanOrEqualTo(first: globalThis.Duration, second: globalThis.Duration): boolean {
     return getDurationSeconds(first) >= getDurationSeconds(second);
 }
 
-export function durationLessThan(first: globalThis.Duration, second: globalThis.Duration) {
+/**
+ * Compares two durations and returns `true` if the first duration is shorter than the second duration.
+ * 
+ * @category Utilities
+ * @subcategory Date
+ * @param first 
+ * @param second 
+ * @returns `true` if the first duration is shorter than the second duration, `false` otherwise.
+ */
+function durationLessThan(first: globalThis.Duration, second: globalThis.Duration): boolean {
     return getDurationSeconds(first) < getDurationSeconds(second);
 }
 
-export function durationLessThanOrEqualTo(first: globalThis.Duration, second: globalThis.Duration) {
+/**
+ * Compares two durations and returns `true` if the first duration is shorter than or equal to the second duration.
+ * 
+ * @category Utilities
+ * @subcategory Date
+ * @param first 
+ * @param second 
+ * @returns `true` if the first duration is shorter than or equal to the second duration, `false` otherwise.
+ */
+function durationLessThanOrEqualTo(first: globalThis.Duration, second: globalThis.Duration): boolean {
     return getDurationSeconds(first) <= getDurationSeconds(second);
+}
+
+export {
+    durationGreaterThan,
+    durationGreaterThanOrEqualTo,
+    durationLessThan,
+    durationLessThanOrEqualTo
 }

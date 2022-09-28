@@ -1,30 +1,43 @@
 import React, { useMemo, useState } from 'react';
-
-import { checkIsLoaded, checkIsError } from '../../utils/queries';
-import { useDeletePositionMutation, useGetPortfolioPositionsStatisticsQuery, useGetPositionsQuery } from '../../redux/api/positionApi';
-
-import { Position, PositionStatistics } from '../../types';
 import DataTable, { ColumnDefinition } from './DataTable';
-import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
-import useCurrencyCodeMap from '../../hooks/useCurrencyCodeMap';
 import useUserSettings from '../../hooks/useUserSettings';
-import { getPriceString, getPerformanceString } from '../../utils/string';
 import TransactionsTable from './TransactionsTable';
-import DataTableExpandableComponent from './DataTableExpandableComponent';
-import { Link, NavLink } from 'react-router-dom';
-import { generateDefaultPositionChart } from '../../utils/chart';
 import CreateTransactionForm from '../forms/CreateTransactionForm';
 import EditPositionForm from '../forms/EditPositionForm';
 import ModalWrapper from '../modals/ModalWrapper';
 
+import { Link, NavLink } from 'react-router-dom';
+import { generateDefaultPositionChart } from '../../utils/chart';
+import { getPriceString, getPerformanceString } from '../../utils/string';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
+import { useDeletePositionMutation, useGetPortfolioPositionsStatisticsQuery, useGetPositionsQuery } from '../../redux/api/positionApi';
+import { Position, PositionStatistics } from '../../types';
+
 type Props = {
+    /**
+     * Custom class name to use for the table.
+     */
     className?: string;
+
+    /**
+     * ID of portfolio to display positions for.
+     */
     portfolioId: number;
 }
 
+/**
+ * Represents merged position data and its statistics.
+ * @ignore
+ */
 type PositionWithStats = Position & PositionStatistics;
 
-export default function PositionsTable({ className, portfolioId }: Props): JSX.Element {
+/**
+ * Loads positions for the specified portfolio and renders them in a table.
+ * 
+ * @category Tables
+ * @component
+ */
+function PositionsTable({ className, portfolioId }: Props): JSX.Element {
     const positions = useGetPositionsQuery(portfolioId);
     const positionStats = useGetPortfolioPositionsStatisticsQuery(portfolioId);
     const positionsWithStats = useMemo(() => {
@@ -225,3 +238,5 @@ export default function PositionsTable({ className, portfolioId }: Props): JSX.E
         </>
     )
 }
+
+export default PositionsTable;

@@ -1,13 +1,19 @@
 import React, { useContext } from 'react';
-
-import { useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
-import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import InstrumentPickerItem from '../ui/InstrumentPickerItem';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
 
+import { useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
-export default function InstrumentPicker(): JSX.Element {
+/**
+ * Loads and renders a list of instruments which can be added to the chart.
+ * See {@link ChartLineConfigurationContext}.
+ * 
+ * @category Chart
+ * @component
+ */
+function InstrumentPicker(): JSX.Element {
     const instruments = useGetAllInstrumentsQuery();
     const context = useContext(ChartLineConfigurationContext);
 
@@ -37,3 +43,5 @@ export default function InstrumentPicker(): JSX.Element {
         </div>
     )
 }
+
+export default InstrumentPicker;

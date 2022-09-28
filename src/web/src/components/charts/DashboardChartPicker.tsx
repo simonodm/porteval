@@ -1,13 +1,25 @@
 import React from 'react';
-
 import { Chart } from '../../types';
 
 type Props = {
+    /**
+     * A list of charts to render.
+     */
     charts: Array<Chart>;
+
+    /**
+     * A callback which is invoked every time a chart is dragged.
+     */
     onDrag: (id: number) => void;
 }
 
-export default function DashboardChartPicker({ charts, onDrag }: Props): JSX.Element {   
+/**
+ * Renders a list of draggable charts.
+ * 
+ * @category Chart
+ * @component
+ */
+function DashboardChartPicker({ charts, onDrag }: Props): JSX.Element {   
     const handleDrag = (id: number) => {
         onDrag(id);
     }
@@ -28,3 +40,5 @@ export default function DashboardChartPicker({ charts, onDrag }: Props): JSX.Ele
         </div>
     )
 }
+
+export default DashboardChartPicker;

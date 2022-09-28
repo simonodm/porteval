@@ -1,17 +1,35 @@
 import React from 'react';
 import ReactModal from 'react-modal';
-
-import './ModalWrapper.css';
-import { ModalCallbacks } from '../../types';
 import PageHeading from '../ui/PageHeading';
 
+import { ModalCallbacks } from '../../types';
+
+import './ModalWrapper.css';
+
 type Props = {
+    /**
+     * Modal header.
+     */
     heading?: string;
+
+    /**
+     * Modal content.
+     */
     children?: Array<JSX.Element> | JSX.Element | null;
+
+    /**
+     * Determines whether the modal is displayed.
+     */
     isOpen: boolean;
 } & ModalCallbacks
 
-export default function ModalWrapper({ heading, children, isOpen, closeModal }: Props): JSX.Element {
+/**
+ * Renders a modal containing the specified children.
+ * 
+ * @category Modal
+ * @component
+ */
+function ModalWrapper({ heading, children, isOpen, closeModal }: Props): JSX.Element {
     return (
         <ReactModal
             isOpen={isOpen}
@@ -36,3 +54,5 @@ export default function ModalWrapper({ heading, children, isOpen, closeModal }: 
         </ReactModal>
     )
 }
+
+export default ModalWrapper;

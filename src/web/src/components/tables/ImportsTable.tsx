@@ -1,13 +1,19 @@
 import React, { useMemo } from 'react';
+import useUserSettings from '../../hooks/useUserSettings';
+import DataTable, { ColumnDefinition } from './DataTable';
 
 import { useGetAllImportsQuery } from '../../redux/api/importApi';
 import { checkIsError, checkIsLoaded } from '../../utils/queries';
-import useUserSettings from '../../hooks/useUserSettings';
 import { formatDateTimeString } from '../../utils/string';
 import { ImportEntry } from '../../types';
-import DataTable, { ColumnDefinition } from './DataTable';
 
-export default function ImportsTable(): JSX.Element {
+/**
+ * Renders data imports' table.
+ * 
+ * @category Tables
+ * @component
+ */
+function ImportsTable(): JSX.Element {
     const imports = useGetAllImportsQuery();
 
     const [userSettings] = useUserSettings();
@@ -75,3 +81,5 @@ export default function ImportsTable(): JSX.Element {
         />
     )
 }
+
+export default ImportsTable;

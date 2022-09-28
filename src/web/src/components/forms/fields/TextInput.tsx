@@ -1,16 +1,50 @@
 import React, { useEffect, useState } from 'react';
 
 type Props = {
+    /**
+     * Custom label to use for the form field.
+     */
     label: string;
+
+    /**
+     * Custom class name to use for the form field.
+     */
     className?: string;
+
+    /**
+     * Placeholder text to display in the text input.
+     */
     placeholder?: string;
+
+    /**
+     * Determines whether the form field is disabled.
+     */
     disabled?: boolean;
+
+    /**
+     * Binding property for the text input's current value.
+     */
     value?: string;
+
+    /**
+     * Validator function. The return value of this determines whether {@link onChange} is invoked.
+     */
     validator?: (value: string) => boolean;
+
+    /**
+     * A callback which is invoked whenever input's value changes and passes the validator.
+     */
     onChange?: (value: string) => void;
 }
 
-export default function TextInput(
+/**
+ * Renders a text input form field.
+ * 
+ * @category Forms
+ * @subcategory Fields
+ * @component
+ */
+function TextInput(
     { label, className, placeholder, disabled, value, validator, onChange }: Props
 ): JSX.Element {
     const [text, setText] = useState(value ?? '');
@@ -43,3 +77,5 @@ export default function TextInput(
         </div>
     )
 }
+
+export default TextInput;

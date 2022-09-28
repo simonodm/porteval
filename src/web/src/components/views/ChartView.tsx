@@ -1,38 +1,40 @@
 import React, { useRef, useState , useLayoutEffect } from 'react';
-
-import { skipToken } from '@reduxjs/toolkit/dist/query';
-
-import { useParams } from 'react-router';
-
-import { toast } from 'react-toastify';
-
-import { useCreateChartMutation, useGetChartQuery, useUpdateChartMutation } from '../../redux/api/chartApi';
-import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PortEvalChart from '../charts/PortEvalChart';
 import useGetRouteState from '../../hooks/useGetRouteState';
-import { ChartConfig, ChartLine, ChartLineConfigurationContextType,
-    ChartLineInstrument, ChartLinePortfolio, ChartLinePosition, Instrument, Portfolio, Position } from '../../types';
-
-
 import ChartConfigurator from '../charts/ChartConfigurator';
 import PortfolioPicker from '../charts/PortfolioPicker';
 import InstrumentPicker from '../charts/InstrumentPicker';
 import ModalWrapper from '../modals/ModalWrapper';
 import ChartLineConfigurator from '../charts/ChartLineConfigurator';
-import * as constants from '../../constants';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
-
-
 import PageHeading from '../ui/PageHeading';
-import { isSuccessfulResponse } from '../../redux/api/apiTypes';
 import EditChartMetaForm from '../forms/EditChartMetaForm';
+import * as constants from '../../constants';
+
+import { skipToken } from '@reduxjs/toolkit/dist/query';
+import { isSuccessfulResponse } from '../../redux/api/apiTypes';
+import { useParams } from 'react-router';
+import { ChartConfig, ChartLine, ChartLineConfigurationContextType,
+    ChartLineInstrument, ChartLinePortfolio, ChartLinePosition, Instrument, Portfolio, Position } from '../../types';
+import { toast } from 'react-toastify';
+import { useCreateChartMutation, useGetChartQuery, useUpdateChartMutation } from '../../redux/api/chartApi';
+import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
 type Params = {
+    /**
+     * ID of chart to render.
+     */
     chartId: string;
 }
 
-export default function ChartView(): JSX.Element {
+/**
+ * Renders a full-page view of a chart based on query parameters or route state.
+ * 
+ * @category Views
+ * @component 
+ */
+function ChartView(): JSX.Element {
     const [chartId, setChartId] = useState(useParams<Params>().chartId);
     const [chart, setChart] = useState(useGetRouteState<ChartConfig>('chart'));
 
@@ -238,3 +240,5 @@ export default function ChartView(): JSX.Element {
         </LoadingWrapper>
     )
 }
+
+export default ChartView;

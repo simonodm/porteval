@@ -1,19 +1,30 @@
 import React from 'react'
+import PortEvalChart from './PortEvalChart';
 
 import { Link } from 'react-router-dom';
-
 import { Chart } from '../../types'
-
-import PortEvalChart from './PortEvalChart';
 
 import './DashboardChart.css';
 
 type Props = {
+    /**
+     * Chart to render.
+     */
     chart: Chart;
+
+    /**
+     * Determines whether the header link to full-page chart view is disabled.
+     */
     disabled?: boolean;
 }
 
-export default function DashboardChart({ chart, disabled }: Props): JSX.Element {
+/**
+ * Renders a single chart for the dashboard grid.
+ * 
+ * @category Chart
+ * @component
+ */
+function DashboardChart({ chart, disabled }: Props): JSX.Element {
     return (
         <div className="dashboard-chart-item-wrapper">
             {
@@ -28,3 +39,5 @@ export default function DashboardChart({ chart, disabled }: Props): JSX.Element 
         </div>
     )
 }
+
+export default DashboardChart;

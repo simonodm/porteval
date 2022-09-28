@@ -1,37 +1,127 @@
 import * as d3 from 'd3';
-
 import { CHART_TICK_INTERVAL } from '../constants';
 
-export type Line = {
+/**
+ * Represents complete data needed to render a line in a line chart.
+ * @category Chart
+ * @subcategory LineChart
+ */
+export type LineChartLine = {
+    /**
+     * Line name.
+     */
     name: string;
+
+    /**
+     * Line color.
+     */
     color: string;
+
+    /**
+     * Line strokeDashArray as expected by SVG CSS.
+     */
     strokeDashArray: string;
+
+    /**
+     * Line width in pixels.
+     */
     width: number;
-    data: Array<LineData>;
+
+    /**
+     * Line data.
+     */
+    data: Array<LineChartLineDataPoint>;
 }
 
-export type LineData = {
+/**
+ * Represents a single chart line data point to render.
+ * @category Chart
+ * @subcategory LineChart
+ */
+export type LineChartLineDataPoint = {
+    /**
+     * Data point time in ISO format.
+     */
     time: string;
+
+    /**
+     * Data point value.
+     */
     value: number;
 }
 
-export type RenderedDataPointInfo = {
+/**
+ * Represents a single rendered chart line data point.
+ * @category Chart
+ * @subcategory LineChart
+ */
+export type RenderedLineChartLineDataPoint = {
+    /**
+     * X value.
+     */
     x: number;
+
+    /**
+     * Y value.
+     */
     y: number;
-    point: LineData;
-    nextPoint: LineData | undefined;
+
+    /**
+     * Original line data point.
+     */
+    point: LineChartLineDataPoint;
+
+    /**
+     * Next line data point if such exists.
+     */
+    nextPoint: LineChartLineDataPoint | undefined;
+
+    /**
+     * Index of the line as perceived by the line chart.
+     */
     lineIndex: number;
 }
 
+/**
+ * A callback to render additional tooltip information.
+ * 
+ * @category Chart
+ * @subcategory LineChart
+ * @param from ISO string of the start of the date range represented by the current hover point.
+ * @param to ISO string of the end of the date range represented by the current hover point.
+ * @returns An HTML element representing content to append to existing tooltip.
+ */
 export type TooltipCallback = (from: string | undefined, to: string | undefined) => HTMLElement | null;
-export type RenderCallback = (dataPoint: RenderedDataPointInfo) => SVGElement;
 
+/**
+ * A callback to render additional SVG on the line point represented by the provided rendered data point.
+ * 
+ * @category Chart
+ * @subcategory LineChart
+ * @param dataPoint Rendered data point to draw resulting SVG on top of.
+ * @return An SVG element representing graphics to draw on top of the provided data point.
+ */
+export type RenderCallback = (dataPoint: RenderedLineChartLineDataPoint) => SVGElement;
+
+/**
+ * Creates an empty line chart.
+ * 
+ * @category Chart
+ * @subcategory LineChart
+ * @returns An empty line chart.
+ */
 export default function createChart(): D3LineChart {
     return new D3LineChart();
 }
 
+/**
+ * Represents an SVG line chart rendered using D3.
+ * 
+ * @category Chart
+ * @subcategory LineChart
+ */
 class D3LineChart {
-    _lines: Array<Line> = [];
+    _lines: Array<LineChartLine> = [];
     _svg: d3.Selection<SVGGElement, unknown, null, undefined> | null = null;
 
     _xScale: d3.ScaleTime<number, number> | null = null;
@@ -46,7 +136,7 @@ class D3LineChart {
     _width = 0;
     _height = 0;
 
-    _d3Lines: Array<d3.Line<LineData>> = [];
+    _d3Lines: Array<d3.Line<LineChartLineDataPoint>> = [];
     _container: HTMLElement | null = null;
     
     _tooltip: d3.Selection<HTMLDivElement, unknown, null, undefined> | null = null;
@@ -58,41 +148,88 @@ class D3LineChart {
     _margins = { top: 0, left: 0, bottom: 0, right: 0 };
     _fontSize = 10;
 
+    /**
+     * Specifies lines to be rendered in the chart.
+     * 
+     * @param lines Lines to render in the chart.
+     * @returns An updated {@link D3LineChart}.
+     */
     withLines(lines: typeof this._lines) {
         this._lines = lines;
         return this;
     }
 
+    /**
+     * Specifies X axis format to be used in the chart.
+     * 
+     * @param xFormat Date format function.
+     * @returns An updated {@link D3LineChart}.
+     */
     withXFormat(xFormat: typeof this._xFormat) {
         this._xFormat = xFormat;
         return this;
     }
 
+    /**
+     * Specifies tooltip date format to be used in the chart.
+     * 
+     * @param xTooltipFormat Date format function.
+     * @returns An updated {@link D3LineChart}.
+     */
     withXTooltipFormat(xTooltipFormat: typeof this._xTooltipFormat) {
         this._xTooltipFormat = xTooltipFormat;
         return this;
     }
 
+    /**
+     * Specifies Y axis format to be used in the chart.
+     * 
+     * @param yFormat Number format function.
+     * @returns An updated {@link D3LineChart}.
+     */
     withYFormat(yFormat: typeof this._yFormat) {
         this._yFormat = yFormat;
         return this;
     }
 
+    /**
+     * Specifies `d3` time interval function to be used in the chart.
+     * 
+     * @param intervalFunction `d3` time interval function.
+     * @returns An updated {@link D3LineChart}.
+     */
     withInterval(intervalFunction: typeof this._xInterval) {
         this._xInterval = intervalFunction;
         return this;
     }
 
+    /**
+     * Specifies an additional tooltip render callback to be used in the chart.
+     * The result of this method is appended to the base tooltip.
+     * 
+     * @param tooltipCallback Tooltip render callback.
+     * @returns An updated {@link D3LineChart}.
+     */
     withTooltipCallback(tooltipCallback: typeof this._tooltipCallback) {
         this._tooltipCallback = tooltipCallback;
         return this;
     }
 
+    /**
+     * Specifies an additional SVG line render callback to be used in the chart.
+     * The result of this method is rendered on top of the data point provided in callback parameter.
+     * 
+     * @param renderCallback SVG render callback.
+     * @returns An updated {@link D3LineChart}.
+     */
     withAdditionalRenderCallback(renderCallback: typeof this._renderCallback) {
         this._renderCallback = renderCallback;
         return this;
     }
 
+    /**
+     * Appends the chart to the specified HTML element.
+     */
     appendTo(container: HTMLElement) {
         this._generateMargins();
         this._container = container;
@@ -161,7 +298,7 @@ class D3LineChart {
     _generateD3Lines() {
         if(this._xScale && this._yScale) {
             this._lines.forEach(() => {
-                const d3Line = d3.line<LineData>()
+                const d3Line = d3.line<LineChartLineDataPoint>()
                     .x(d => this._xScale!(new Date(d.time)))
                     .y(d => this._yScale!(d.value))
 
@@ -260,7 +397,7 @@ class D3LineChart {
                                 ? this._lines[index].data[pointIndex + 1]
                                 : undefined;
 
-                        const pointInfo: RenderedDataPointInfo = {
+                        const pointInfo: RenderedLineChartLineDataPoint = {
                             x: this._xScale!(new Date(dataPoint.time)),
                             y: this._yScale!(dataPoint.value),
                             point: dataPoint,
@@ -289,7 +426,7 @@ class D3LineChart {
             .attr('height', this._height)
             .attr('opacity', 0)
 
-        const findClosestDataPoints = (data: LineData[], time: number): [LineData?, LineData?, LineData?] => {
+        const findClosestDataPoints = (data: LineChartLineDataPoint[], time: number): [LineChartLineDataPoint?, LineChartLineDataPoint?, LineChartLineDataPoint?] => {
             if(data.length === 0) {
                 return [undefined, undefined, undefined];
             }
@@ -326,7 +463,7 @@ class D3LineChart {
         const drawTooltip = (event: MouseEvent) => {
             if(!this._xScale || !this._container || !this._tooltip || !this._tooltipLine) return;
             if(this._lines.length > 0) {
-                const longestLine = this._lines.reduce<Array<LineData>>(
+                const longestLine = this._lines.reduce<Array<LineChartLineDataPoint>>(
                     (prev, curr) => curr.data.length >= prev.length ? curr.data : prev, []
                 );
                 const time = Math.floor(this._xScale.invert(d3.pointer(event)[0]).getTime());

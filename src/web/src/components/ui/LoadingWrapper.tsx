@@ -5,12 +5,29 @@ import * as constants from '../../constants';
 import './LoadingWrapper.css';
 
 type Props = {
+    /**
+     * Wrapped content.
+     */
     children?: React.ReactNode;
+
+    /**
+     * Determines whether loading was successfully finished.
+     */
     isLoaded: boolean;
+
+    /**
+     * Determines whether loading failed.
+     */
     isError?: boolean;
 }
 
-export default function LoadingWrapper({ children, isLoaded, isError = false}: Props): JSX.Element {   
+/**
+ * A wrapper for content being asynchronously loaded. Displays a spinning wheel when laoding.
+ * 
+ * @category UI
+ * @component
+ */
+function LoadingWrapper({ children, isLoaded, isError = false}: Props): JSX.Element {   
     if(!isLoaded) {
         return (
             <div className="loading-wrapper">
@@ -31,3 +48,5 @@ export default function LoadingWrapper({ children, isLoaded, isError = false}: P
         </>
     );
 }
+
+export default LoadingWrapper;

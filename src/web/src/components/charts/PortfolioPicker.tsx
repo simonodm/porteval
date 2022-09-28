@@ -1,17 +1,22 @@
 import React, { useContext, useState } from 'react';
+import LoadingWrapper from '../ui/LoadingWrapper';
+import PortfolioPickerItem from '../ui/PortfolioPickerItem';
+import ModalWrapper from '../modals/ModalWrapper';
+import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
+import ChartPortfolioConfigurator from './ChartPortfolioConfigurator';
 
 import { useGetAllPortfoliosQuery } from '../../redux/api/portfolioApi';
 import { Portfolio } from '../../types';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
-import LoadingWrapper from '../ui/LoadingWrapper';
-import PortfolioPickerItem from '../ui/PortfolioPickerItem';
-import ModalWrapper from '../modals/ModalWrapper';
 
-import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
-
-import ChartPortfolioConfigurator from './ChartPortfolioConfigurator';
-
-export default function PortfolioPicker(): JSX.Element {
+/**
+ * Loads and renders a list of portfolios which can be added to the chart.
+ * See {@link ChartLineConfigurationContext}.
+ * 
+ * @category Chart
+ * @component
+ */
+function PortfolioPicker(): JSX.Element {
     const context = useContext(ChartLineConfigurationContext);
     const portfolios = useGetAllPortfoliosQuery();
 
@@ -57,3 +62,5 @@ export default function PortfolioPicker(): JSX.Element {
         </div>
     )
 }
+
+export default PortfolioPicker;

@@ -1,25 +1,54 @@
 import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query';
 import { SerializedError } from '@reduxjs/toolkit';
-
 import { Instrument, Portfolio, Position, Transaction } from '../../types'
 
+/**
+ * Parameters required to create an instrument using PortEval's API.
+ * @category API
+ */
 export type CreateInstrumentParameters = Omit<Instrument, 'id'>;
+
+/**
+ * Parameters required to create a portfolio using PortEval's API.
+ * @category API
+ */
 export type CreatePortfolioParameters = Omit<Portfolio, 'id'>;
+
+/**
+ * Parameters required to create a position using PortEval's API.
+ * @category API
+ */
 export type CreatePositionParameters = Omit<Position, 'id' | 'instrument' | 'positionSize'> 
     & Omit<CreateTransactionParameters, 'positionId' | 'note'>
 
+/**
+ * Parameters required to create a transaction using PortEval's API.
+ * @category API
+ */
 export type CreateTransactionParameters = Omit<Transaction, 'id' | 'instrument' | 'portfolioId'>;
 
+/**
+ * PortEval's API pagination query parameters
+ * @category API
+ */
 export type PaginationParameters = {
     page?: number;
     limit?: number;
 }
 
+/**
+ * PortEval's API date range query parameters.
+ * @category API
+ */
 export type DateRangeParameters = {
     from?: string;
     to?: string;
 }
 
+/**
+ * PortEval's API generic error response.
+ * @category API
+ */
 export type RequestErrorResponse = {
     statusCode: number;
     errorMessage: string;
@@ -32,6 +61,10 @@ export function isRequestErrorResponse(value: unknown): value is RequestErrorRes
             && valueAsResponse.errorMessage !== undefined;            
 }
 
+/**
+ * PortEval's API data validation error response.
+ * @category API
+ */
 export type ValidationErrorResponse = {
     errors: {
         [key: string]: Array<string>

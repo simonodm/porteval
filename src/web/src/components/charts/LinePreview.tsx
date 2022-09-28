@@ -4,13 +4,26 @@ import { ChartLine } from '../../types';
 import { convertDashToStrokeDashArray } from '../../utils/chart';
 
 type Props = {
+    /**
+     * Chart line to preview.
+     */
     line: ChartLine;
+
+    /**
+     * Preview line length in pixels.
+     */
     length: number;
 }
 
 type ContainerRefCallback = (node: HTMLSpanElement) => void;
 
-export default function LinePreview({ line, length }: Props): JSX.Element {
+/**
+ * Renders a preview of a chart line.
+ * 
+ * @category Chart
+ * @component
+ */
+function LinePreview({ line, length }: Props): JSX.Element {
     const [height, setHeight] = useState(0);
 
     const containerRef = useCallback<ContainerRefCallback>(node => {
@@ -37,3 +50,5 @@ export default function LinePreview({ line, length }: Props): JSX.Element {
         
     )
 }
+
+export default LinePreview;

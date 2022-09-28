@@ -1,7 +1,10 @@
 import { Currency, CurrencyExchangeRate } from '../../types';
-
 import { portEvalApi } from './portEvalApi';
 
+/**
+ * PortEval's currency API definition.
+ * @category API
+ */
 const currencyApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
         getAllKnownCurrencies: build.query<Array<Currency>, void>({

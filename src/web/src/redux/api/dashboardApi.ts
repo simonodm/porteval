@@ -1,7 +1,10 @@
 import { DashboardLayout } from '../../types';
-
 import { portEvalApi } from './portEvalApi';
 
+/**
+ * PortEval's dashboard API definition.
+ * @category API
+ */
 const dashboardApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
         getDashboardLayout: build.query<DashboardLayout, void>({

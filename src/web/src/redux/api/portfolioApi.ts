@@ -1,10 +1,13 @@
 import { subDays, subMonths, subWeeks } from 'date-fns';
 import { EntityPerformance, EntityProfit, EntityStatistics, EntityValue, Portfolio } from '../../types';
-
 import { CreatePortfolioParameters, DateRangeParameters } from './apiTypes';
 import { truncateEntityName, truncateEntityNote } from './apiUtils';
 import { portEvalApi } from './portEvalApi';
 
+/**
+ * PortEval's portfolio API definition.
+ * @category API
+ */
 const portfolioApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
         getAllPortfolios: build.query<Array<Portfolio>, void>({

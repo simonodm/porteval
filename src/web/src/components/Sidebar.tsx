@@ -1,9 +1,13 @@
-import './Sidebar.css';
-import { NavLink } from 'react-router-dom';
 import React from 'react';
+import { NavLink } from 'react-router-dom';
+import './Sidebar.css';
 
-
-export default function Sidebar(): JSX.Element {
+/**
+ * Renders the application sidebar.
+ * 
+ * @component
+ */
+function Sidebar(): JSX.Element {
     return (
         <nav className="bg-dark" id="sidebar">
             <ul className="list-unstyled">
@@ -32,3 +36,5 @@ export default function Sidebar(): JSX.Element {
         </nav>
     )
 }
+
+export default Sidebar;

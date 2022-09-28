@@ -1,10 +1,13 @@
 import { Instrument, InstrumentPrice, PaginatedResponse,
     EntityProfit, EntityPerformance, InstrumentPriceConfig, AggregationFrequency } from '../../types';
-
 import { portEvalApi } from './portEvalApi';
 import { CreateInstrumentParameters, DateRangeParameters, PaginationParameters } from './apiTypes';
 import { getAllPaginated, truncateEntityName, truncateEntityNote } from './apiUtils';
 
+/**
+ * PortEval's instrument API definition.
+ * @category API
+ */
 const instrumentApi = portEvalApi.injectEndpoints({
     endpoints: (build) => ({
         getAllInstruments: build.query<Array<Instrument>, void>({

@@ -1,11 +1,17 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-
 import ChartsTable from '../tables/ChartsTable';
 import PageHeading from '../ui/PageHeading';
 import * as constants from '../../constants';
 
-export default function ChartListView(): JSX.Element {
+import { NavLink } from 'react-router-dom';
+
+/**
+ * Renders the list of created charts view.
+ * 
+ * @category Views
+ * @component
+ */
+function ChartListView(): JSX.Element {
     return (
         <>
             <PageHeading heading="Charts">
@@ -20,3 +26,5 @@ export default function ChartListView(): JSX.Element {
         </>
     )
 }
+
+export default ChartListView;

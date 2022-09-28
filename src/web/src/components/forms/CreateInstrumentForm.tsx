@@ -1,24 +1,31 @@
 import React, { useState, useEffect } from 'react';
-
-import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
-import { InstrumentType } from '../../types';
-
-import { useCreateInstrumentMutation } from '../../redux/api/instrumentApi';
-
-import { useGetAllKnownExchangesQuery } from '../../redux/api/exchangeApi';
-
 import TextInput from './fields/TextInput';
 import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import CurrencyDropdown from './fields/CurrencyDropdown';
 import ExchangeDropdown from './fields/ExchangeDropdown';
 
+import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
+import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
+import { InstrumentType } from '../../types';
+import { useCreateInstrumentMutation } from '../../redux/api/instrumentApi';
+import { useGetAllKnownExchangesQuery } from '../../redux/api/exchangeApi';
+
 type Props = {
+    /**
+     * A callback which is invoked whenever the form is successfully submitted.
+     */
     onSuccess?: () => void;
 }
 
-export default function CreateInstrumentForm({ onSuccess }: Props): JSX.Element {
+/**
+ * Renders an instrument creation form.
+ * 
+ * @category Forms
+ * @subcategory Forms
+ * @component
+ */
+function CreateInstrumentForm({ onSuccess }: Props): JSX.Element {
     const currencies = useGetAllKnownCurrenciesQuery();
     const exchanges = useGetAllKnownExchangesQuery();
     const [createInstrument, mutationStatus] = useCreateInstrumentMutation();
@@ -81,3 +88,5 @@ export default function CreateInstrumentForm({ onSuccess }: Props): JSX.Element 
         </LoadingWrapper>
     )
 }
+
+export default CreateInstrumentForm;

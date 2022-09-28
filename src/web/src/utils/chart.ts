@@ -4,19 +4,27 @@ import { DEFAULT_CHART_TODATE_RANGE, CHART_TRANSACTION_SIGN_CIRCLE_RADIUS,
     CHART_TRANSACTION_SIGN_SIZE } from '../constants';
 import { ChartConfig, AggregationFrequency, ChartLine, ChartLineDashType,
     ChartToDateRange, Instrument, isAggregatedChart, Portfolio, Position, Transaction, UserSettings } from '../types';
-import { Line, XAxisInterval } from '../components/charts/LineChart';
+import { XAxisInterval } from '../components/charts/LineChart';
 
-import { RenderedDataPointInfo } from './lineChart';
+import { LineChartLine, RenderedLineChartLineDataPoint } from './lineChart';
 import { getPriceString } from './string';
 import { removeDuplicates } from './array';
 import { Duration, intervalToDuration, sub } from 'date-fns';
 import { durationGreaterThan, durationGreaterThanOrEqualTo } from './date';
 
-type LineWithTransactions = Line & {
+type LineWithTransactions = LineChartLine & {
     transactions: Array<Transaction>
 };
 
-export function convertDashToStrokeDashArray(dash: ChartLineDashType): string {
+/**
+ * Converts {@link ChartLineDashType} to CSS stroke dash array.
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param dash Dash name.
+ * @returns A string representing the value of the appropriate strokeDashArray.
+ */
+function convertDashToStrokeDashArray(dash: ChartLineDashType): string {
     switch(dash) {
         case 'solid':
             return '0';
@@ -27,7 +35,16 @@ export function convertDashToStrokeDashArray(dash: ChartLineDashType): string {
     }
 }
 
-export function calculateXAxisInterval(from: Date, to: Date): XAxisInterval {
+/**
+ * Calculates appropriate X axis label interval based on the provided date range.
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param from Date range start.
+ * @param to Date range end.
+ * @returns X axis label interval to use in the line chart.
+ */
+function calculateXAxisInterval(from: Date, to: Date): XAxisInterval {
     const diff = intervalToDuration({
         start: from,
         end: to
@@ -41,7 +58,15 @@ export function calculateXAxisInterval(from: Date, to: Date): XAxisInterval {
     return 'hour';
 }
 
-export function getXAxisD3Interval(interval: XAxisInterval | undefined): d3.CountableTimeInterval {
+/**
+ * Converts {@link XAxisInterval} to `d3` time interval definition.
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param interval X axis label interval
+ * @returns Time interval accepted by `d3`
+ */
+function getXAxisD3Interval(interval: XAxisInterval | undefined): d3.CountableTimeInterval {
     switch(interval) {
         case 'hour':
             return d3.timeHour;
@@ -57,7 +82,16 @@ export function getXAxisD3Interval(interval: XAxisInterval | undefined): d3.Coun
     }
 }
 
-export function getXAxisD3Format(from: Date, to: Date): (date: Date) => string {
+/**
+ * Generates appropriate `d3` X axis date format function based on the provided date range.
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param from Date range start.
+ * @param to Date range end.
+ * @returns A date format function.
+ */
+function getXAxisD3Format(from: Date, to: Date): (date: Date) => string {
     const diff = intervalToDuration({
         start: from,
         end: to
@@ -76,7 +110,16 @@ export function getXAxisD3Format(from: Date, to: Date): (date: Date) => string {
     return d3.timeFormat('%H:%M');
 }
 
-export function getXTooltipD3Format(from: Date, to: Date): (date: Date) => string {
+/**
+ * Generates appropriate `d3` tooltip date format function based on the provided date range.
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param from Date range start.
+ * @param to Date range end.
+ * @returns A date format function.
+ */
+function getXTooltipD3Format(from: Date, to: Date): (date: Date) => string {
     const diff = intervalToDuration({
         start: from,
         end: to
@@ -92,7 +135,16 @@ export function getXTooltipD3Format(from: Date, to: Date): (date: Date) => strin
     return d3.timeFormat('%H:%M');
 }
 
-export function calculateAppropriateChartFrequency(from: Date, to: Date): AggregationFrequency {
+/**
+ * Calculates appropriate chart data frequency based on the provided date range.
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param from Date range start.
+ * @param to Date range end. 
+ * @returns Appropriate data frequency to use in the chart.
+ */
+function calculateAppropriateChartFrequency(from: Date, to: Date): AggregationFrequency {
     const diff = intervalToDuration({
         start: from,
         end: to
@@ -107,7 +159,15 @@ export function calculateAppropriateChartFrequency(from: Date, to: Date): Aggreg
     return '5min';
 }
 
-export function getChartFrequency(chart: ChartConfig): AggregationFrequency {
+/**
+ * Calculates chart's data frequency based on its configuration.
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param chart Chart configuration.
+ * @returns Appropriate data frequency to use in the chart.
+ */
+function getChartFrequency(chart: ChartConfig): AggregationFrequency {
     if(isAggregatedChart(chart)) {
         return chart.frequency;
     }
@@ -116,7 +176,15 @@ export function getChartFrequency(chart: ChartConfig): AggregationFrequency {
     return calculateAppropriateChartFrequency(from, to);
 }
 
-export function getChartDateRange(chart: ChartConfig): [Date, Date] {
+/**
+ * Calculates chart's date range based on its configuration.
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param chart Chart configuration.
+ * @returns An array of two dates representing chart's date range start and end.
+ */
+function getChartDateRange(chart: ChartConfig): [Date, Date] {
     const currentTime = Date.now();
 
     let from: Date, to: Date;
@@ -133,7 +201,15 @@ export function getChartDateRange(chart: ChartConfig): [Date, Date] {
     return [from, to];
 }
 
-export function generateDefaultInstrumentChart(instrument: Instrument): ChartConfig {
+/**
+ * Generates the default chart configuration for the provided instrument. 
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param instrument Instrument to generate chart for.
+ * @returns A default chart configuration for the provided instrument.
+ */
+function generateDefaultInstrumentChart(instrument: Instrument): ChartConfig {
     const instrumentPriceLine: ChartLine = {
         instrumentId: instrument.id,
         width: 1,
@@ -155,7 +231,15 @@ export function generateDefaultInstrumentChart(instrument: Instrument): ChartCon
     return instrumentPriceChart;
 }
 
-export function generateDefaultPortfolioChart(portfolio: Portfolio): ChartConfig {
+/**
+ * Generates the default chart configuration for the provided portfolio.
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param portfolio Portfolio to generate chart for.
+ * @returns A default chart configuration for the provided portfolio.
+ */
+function generateDefaultPortfolioChart(portfolio: Portfolio): ChartConfig {
     const portfolioPriceLine: ChartLine = {
         portfolioId: portfolio.id,
         width: 1,
@@ -177,7 +261,15 @@ export function generateDefaultPortfolioChart(portfolio: Portfolio): ChartConfig
     return portfolioPriceChart;
 }
 
-export function generateDefaultPositionChart(position: Position): ChartConfig {
+/**
+ * Generates the default chart configuration for the provided position.
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param position Position to generate chart for.
+ * @returns A default chart configuration for the provided position.
+ */
+function generateDefaultPositionChart(position: Position): ChartConfig {
     const positionPriceLine: ChartLine = {
         positionId: position.id,
         width: 1,
@@ -199,7 +291,18 @@ export function generateDefaultPositionChart(position: Position): ChartConfig {
     return positionPriceChart;
 }
 
-export function generateTooltipTransactionList(
+/**
+ * Generates an HTML element containing transactions' information to use in a chart's tooltip.
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param settings User settings.
+ * @param lines Chart line data with applicable transactions.
+ * @param from Date to filter transactions from.
+ * @param to Date to filter transactions until.
+ * @returns An HTML element displaying the lines' transactions between the provided dates.
+ */
+function generateTooltipTransactionList(
     settings: UserSettings, lines: Array<LineWithTransactions>, from: string | undefined, to: string | undefined
 ): HTMLElement | null {
     let transactions = lines.reduce<Array<Transaction>>((prev, curr) => {
@@ -234,8 +337,17 @@ export function generateTooltipTransactionList(
     return null;
 }
 
-export function generateChartLineTransactionIcons(
-    dataPoint: RenderedDataPointInfo, transactions: Array<Transaction>
+/**
+ * Generates an SVG element displaying `+` or `-` depending on transactions' amounts at the specified chart's data point.
+ * 
+ * @category Utilities
+ * @subcategory Chart
+ * @param dataPoint Chart's data point.
+ * @param transactions Array of possible transactions.
+ * @returns An SVG element displaying `+` or `-`.
+ */
+function generateChartLineTransactionIcons(
+    dataPoint: RenderedLineChartLineDataPoint, transactions: Array<Transaction>
 ): SVGElement {
     const amount = getTransactionTotalAmount(transactions, dataPoint.point.time, dataPoint.nextPoint?.time);
 
@@ -305,4 +417,20 @@ function getDurationFromToDateRange(toDateRange: ChartToDateRange): Duration {
         case 'year':
             return { years: toDateRange.value };
     }
+}
+
+export {
+    convertDashToStrokeDashArray,
+    calculateXAxisInterval,
+    calculateAppropriateChartFrequency,
+    getXAxisD3Format,
+    getXTooltipD3Format,
+    getXAxisD3Interval,
+    getChartFrequency,
+    getChartDateRange,
+    generateDefaultInstrumentChart,
+    generateDefaultPortfolioChart,
+    generateDefaultPositionChart,
+    generateChartLineTransactionIcons,
+    generateTooltipTransactionList
 }
