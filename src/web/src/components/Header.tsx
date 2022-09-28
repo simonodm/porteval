@@ -9,7 +9,7 @@ import './Header.css';
  * @component
  */
 function Header(): JSX.Element {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch(); // used to invalidate all API cache on refresh
 
     return (
         <nav className="navbar navbar-dark bg-dark p-0">

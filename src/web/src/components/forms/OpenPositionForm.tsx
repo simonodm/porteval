@@ -43,6 +43,7 @@ function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX.Element {
 
     const [instrumentId, setInstrumentId] = useState<number | undefined>(undefined);
 
+    // State related to instrument creation subform
     const [isNewInstrument, setIsNewInstrument] = useState(false);
     const [instrumentSymbol, setInstrumentSymbol] = useState('');
     const [instrumentName, setInstrumentName] = useState('');
@@ -67,6 +68,7 @@ function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX.Element {
     const isLoaded = checkIsLoaded(instruments, currencies, instrumentMutationStatus, positionMutationStatus);
     const isError = checkIsError(instruments, currencies);
 
+    // set instrument currency to default after currencies are loaded
     useEffect(() => {
         if(currencies.data) {
             const defaultCurrency = currencies.data.find(c => c.isDefault);
@@ -124,6 +126,7 @@ function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX.Element {
             }
         }
 
+        // If new instrument is being created, then it needs to be successfully created first before we attempt to create the position.
         if(isNewInstrument) {
             createInstrument({
                 symbol: instrumentSymbol,

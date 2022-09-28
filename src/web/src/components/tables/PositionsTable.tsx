@@ -40,6 +40,8 @@ type PositionWithStats = Position & PositionStatistics;
 function PositionsTable({ className, portfolioId }: Props): JSX.Element {
     const positions = useGetPositionsQuery(portfolioId);
     const positionStats = useGetPortfolioPositionsStatisticsQuery(portfolioId);
+
+    // As positions' data and statistics need to be retrieved from 2 separate endpoints, we merge and memoize them here
     const positionsWithStats = useMemo(() => {
         if(positions.data && positionStats.data && positions.data.length == positionStats.data.length) {
             return positions.data.map((position, idx) => ({

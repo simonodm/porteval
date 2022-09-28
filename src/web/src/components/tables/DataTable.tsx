@@ -169,6 +169,8 @@ function getColumnCount<T extends Record<string, unknown>>(columns: Array<Column
 function DataTable<T extends Record<string, unknown>>(
     { className, columns, data, idSelector, sortable, expandable, expandElement }: Props<T>
 ) {
+    // Column definitions need to be converted, expander column needs to be added and the result needs to be memoized
+    // to work correctly with `react-table`.
     const convertedColumns = useMemo<Array<Column<T>>>(() => {
         return [
             ...(expandable ? [getExpanderColumn<T>()] : []),
@@ -195,6 +197,7 @@ function DataTable<T extends Record<string, unknown>>(
       useExpanded
     );
 
+    // add/remove expand all and collapse all event listeners on `expandable` prop change
     useEffect(() => {
         if(expandable) {
             const expandListener = () => toggleAllRowsExpanded(true);

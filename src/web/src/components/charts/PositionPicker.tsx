@@ -29,6 +29,7 @@ function PositionPicker({ portfolio }: Props): JSX.Element {
     const isError = checkIsError(positions);
     
     const handleAddAllPositions = () => {
+        // filter only to positions which are not yet in the chart
         const positionsToAdd = positions.data?.filter(
             position => 
                 !context.chart?.lines.find(line => line.type === 'position' && line.positionId === position.id)

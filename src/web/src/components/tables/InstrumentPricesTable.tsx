@@ -57,6 +57,7 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
 
     const [userSettings] = useUserSettings();
 
+    // reset page to 1 if price aggregation frequency changes
     useEffect(() => {
         setPage(1);
     }, [frequency]);

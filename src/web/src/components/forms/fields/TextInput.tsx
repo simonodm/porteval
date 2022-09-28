@@ -56,6 +56,7 @@ function TextInput(
         }
     }
 
+    // adjust internal state on `value` prop change
     useEffect(() => {
         if(value !== undefined) {
             setText(value);

@@ -60,7 +60,7 @@ type Props = {
 }
 
 /**
- * Renders a line chart based on the provided configuration and line data.
+ * Renders a line chart based on the provided render configuration and line data.
  * 
  * @category Chart
  * @component
@@ -93,7 +93,7 @@ function LineChart({ config, lines }: Props): JSX.Element {
         }
     }
 
-
+    // refresh chart if window is resized
     useLayoutEffect(() => {
         window.addEventListener('resize', generateChart);
 
@@ -102,6 +102,7 @@ function LineChart({ config, lines }: Props): JSX.Element {
         }
     })
 
+    // refresh chart if dimensions or configuration changes
     useLayoutEffect(generateChart,
         [config, lines, containerRef, containerRef.current?.clientHeight, containerRef.current?.clientWidth]);
 

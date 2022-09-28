@@ -46,12 +46,14 @@ function PortfolioDropdown({ className, portfolios, disabled, value, onChange }:
         }
     }
 
+    // adjust internal state to `value` prop if it's changed
     useEffect(() => {
         if(value !== undefined) {
             setPortfolioId(value);
         }
     }, [value]);
 
+    // refresh dropdown if input portfolio list changes
     useEffect(() => {
         if(!portfolioId && portfolios.length > 0) {
             setPortfolioId(portfolios[0].id);

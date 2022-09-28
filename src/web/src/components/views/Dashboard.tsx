@@ -63,6 +63,7 @@ function Dashboard(): JSX.Element {
         }
     }
 
+    // Refresh layout if new layout is received from query
     useEffect(() => {
         if(layoutQuery.data) {
             setDashboardLayout(layoutQuery.data);

@@ -50,6 +50,7 @@ function CreateTransactionForm({ positionId, onSuccess }: Props): JSX.Element {
     const isLoaded = checkIsLoaded(position, mutationStatus);
     const isError = checkIsError(position);
 
+    // set price auto-fetcher instrument ID to position's instrument ID after position is loaded
     useEffect(() => {
         if(position.data) {
             setPriceFetchInstrument(position.data.instrumentId);

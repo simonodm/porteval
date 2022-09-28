@@ -73,6 +73,7 @@ function DateTimeSelector({
         onChange && onChange(dt);
     }
     
+    // adjust internal state on `value` prop change
     useEffect(() => {
         setTime(value);
     }, [value]);

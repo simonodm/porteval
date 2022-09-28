@@ -33,6 +33,7 @@ function CreatePortfolioForm({ onSuccess }: Props): JSX.Element {
     const isLoaded = checkIsLoaded(currencies, mutationStatus);
     const isError = checkIsError(currencies);
 
+    // set portfolio currency to default after currencies are loaded
     useEffect(() => {
         if(currencies.data) {
             const defaultCurrency = currencies.data.find(c => c.isDefault);

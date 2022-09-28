@@ -42,12 +42,14 @@ function InstrumentTypeDropdown({ className, value, disabled, onChange }: Props)
         onChange && onChange(newType);
     }
 
+    // adjust internal state on `value` prop change
     useEffect(() => {
         if(value !== undefined) {
             setType(value);
         }
     }, [value]);
 
+    // simulate dropdown value change to default if no `value` is available on first render
     useEffect(() => {
         if(value === undefined) {
             setType('stock');

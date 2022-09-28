@@ -40,6 +40,7 @@ function CreateInstrumentForm({ onSuccess }: Props): JSX.Element {
     const isLoaded = checkIsLoaded(currencies, exchanges, mutationStatus);
     const isError = checkIsError(currencies);
 
+    // set currency to default when currencies are loaded
     useEffect(() => {
         if(currencies.data) {
             const defaultCurrency = currencies.data.find(c => c.isDefault);

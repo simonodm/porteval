@@ -75,6 +75,7 @@ function InstrumentDropdown(
         setCreatingNew(!creatingNew);
     }
 
+    // simulate dropdown value change to first available value if source instruments change
     useEffect(() => {
         if(!instrumentId && instruments.length > 0) {
             setInstrumentId(instruments[0].id);

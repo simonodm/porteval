@@ -38,12 +38,14 @@ type Props = {
 function CurrencyDropdown({ currencies, className, disabled, value, onChange }: Props): JSX.Element {
     const [currencyCode, setCurrencyCode] = useState(value);
 
+    // adjust internal state if `value` prop changes
     useEffect(() => {
         if(value !== undefined) {
             handleCurrencyChange(value);
         }
     }, [value]);
 
+    // simulate dropdown value change to first available value if source currencies change
     useEffect(() => {
         if(!currencyCode && currencies.length > 0) {
             handleCurrencyChange(currencies[0].code);

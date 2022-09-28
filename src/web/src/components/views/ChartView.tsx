@@ -29,7 +29,7 @@ type Params = {
 }
 
 /**
- * Renders a full-page view of a chart based on query parameters or route state.
+ * Renders a full-page view of a chart and its configuration based on query parameters or route state.
  * 
  * @category Views
  * @component 

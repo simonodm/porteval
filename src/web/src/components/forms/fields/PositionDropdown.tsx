@@ -46,12 +46,14 @@ function PositionDropdown({ positions, className, disabled, value, onChange }: P
         }
     }
 
+    // adjust internal state on `value` prop change
     useEffect(() => {
         if(value !== undefined) {
             setPositionId(value);
         }
     }, [value]);
 
+    // simulate dropdown value change to first available value if source positions change
     useEffect(() => {
         if(!positionId && positions.length > 0) {
             setPositionId(positions[0].id);

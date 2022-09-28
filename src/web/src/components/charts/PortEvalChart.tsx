@@ -22,7 +22,7 @@ type Props = {
 }
 
 /**
- * Renders a chart based on the provided chart data.
+ * Renders a chart based on the provided chart configuration.
  * 
  * @category Chart
  * @component
@@ -37,6 +37,7 @@ function PortEvalChart({ chart }: Props): JSX.Element {
 
     const [userSettings] = useUserSettings();
 
+    // convert to chart line data which can be used by both <LineChart /> and render callbacks
     const lines = chart.lines.map((line, idx) => ({
         name: line.name,
         width: line.width,
@@ -51,7 +52,7 @@ function PortEvalChart({ chart }: Props): JSX.Element {
         return generateChartLineTransactionIcons(dataPoint, transactions);
     }
 
-    const config = {
+    const chartRenderConfig = {
         yFormat: isPriceDataChart(chart)
             ? (yValue: number) => getPriceString(yValue, currency.data?.code, userSettings)
             : (yValue: number) => getPerformanceString(yValue, userSettings),
@@ -61,7 +62,7 @@ function PortEvalChart({ chart }: Props): JSX.Element {
         tooltipCallback: transactionData?.data
             ? (from: string | undefined, to: string | undefined) =>
                 generateTooltipTransactionList(userSettings, lines, from, to)
-            : () => null,
+            : () => null, // skip render function if no transactions are available
         additionalRenderCallback: transactionSignRenderCallback
     };
 
@@ -70,7 +71,7 @@ function PortEvalChart({ chart }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <LineChart config={config} lines={lines} />
+            <LineChart config={chartRenderConfig} lines={lines} />
         </LoadingWrapper>
     )
 }

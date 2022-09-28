@@ -52,6 +52,8 @@ type Props = {
 function NumberInput(
     { className, label, value, disabled, allowNegativeValues, allowFloat, validator, onChange }: Props
 ): JSX.Element {
+    
+    // separate state bound to <input /> `value` attribute, needed to allow incomplete values such as "1." in the input
     const [numberText, setNumberText] = useState(value?.toString() ?? '');
 
     const updateNumber = (value: string) => {
@@ -64,7 +66,11 @@ function NumberInput(
         }
     }
 
-    const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
+    const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // We do two separate input validations - one to test whether the text is valid (only contains valid symbols), and another
+        // to check if the text is a valid number.
+        // The reason for that is to allow users to type in values like "1." or "-" without breaking the input or parent state.
+        // The number change callback only gets called if the text is a valid number, otherwise old number persists.
         let inputRegexPattern = '\\d*';
         let numberRegexPattern = '\\d+';
         if(allowFloat) {

@@ -60,6 +60,7 @@ function useInstrumentPriceAutoFetchingState(
             instrumentId && autoUpdateEnabled ? { instrumentId, time: time.toISOString() } : skipToken
         );
 
+    // update state if new price is received from query
     useEffect(() => {
         if(instrumentPrice.data && autoUpdateEnabled) {
             setPrice(instrumentPrice.data.price);

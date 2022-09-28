@@ -22,7 +22,7 @@ type Props = {
 }
 
 /**
- * A wrapper for content being asynchronously loaded. Displays a spinning wheel when laoding.
+ * A wrapper for content being asynchronously loaded. Displays a spinning wheel when loading.
  * 
  * @category UI
  * @component

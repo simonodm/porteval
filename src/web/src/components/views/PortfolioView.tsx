@@ -11,9 +11,7 @@ import * as constants from '../../constants';
 
 import { useParams } from 'react-router-dom';
 import { generateDefaultPortfolioChart } from '../../utils/chart';
-import { skipToken } from '@reduxjs/toolkit/dist/query';
 import { getPerformanceString, getPriceString } from '../../utils/string';
-import { useGetCurrencyQuery } from '../../redux/api/currencyApi';
 import { useGetPortfolioByIdQuery, useGetPortfolioCurrentValueQuery, useGetPortfolioStatisticsQuery } from '../../redux/api/portfolioApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
@@ -39,7 +37,6 @@ function PortfolioView(): JSX.Element {
     
     const value = useGetPortfolioCurrentValueQuery(portfolioId, { pollingInterval: constants.REFRESH_INTERVAL });
     const stats = useGetPortfolioStatisticsQuery(portfolioId);
-    const currency = useGetCurrencyQuery(portfolio.data?.currencyCode ?? skipToken);
 
     const [userSettings] = useUserSettings();
 

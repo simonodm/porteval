@@ -47,6 +47,8 @@ function ChartConfigurator({ onChange }: Props): JSX.Element {
     const context = useContext(ChartLineConfigurationContext);
 
     const currencies = useGetAllKnownCurrenciesQuery();
+
+    // get default currency from query response if there is one, set to USD otherwise
     const defaultCurrency = currencies.data ? currencies.data.find(c => c.isDefault)?.code ?? 'USD' : 'USD';
 
     const [currentChart, setCurrentChart] = useState(context.chart);
@@ -56,6 +58,7 @@ function ChartConfigurator({ onChange }: Props): JSX.Element {
     const isLoaded = checkIsLoaded(currencies);
     const isError = checkIsError(currencies);
 
+    // adjust internal state chart if context chart changes
     useEffect(() => {
         setCurrentChart(context.chart);
     }, [context.chart]);
@@ -68,11 +71,13 @@ function ChartConfigurator({ onChange }: Props): JSX.Element {
 
             newChart.type = type;
 
+            // set frequency if new chart type is aggregated
             if(newChart.type === 'aggregatedProfit' || newChart.type === 'aggregatedPerformance') {
                 const frequency = isAggregatedChart(currentChart) ? newChart.frequency : 'week';
                 newChart.frequency = frequency;
             }
 
+            // set currency if new chart type is price-based
             if(newChart.type === 'price' || newChart.type === 'profit' || newChart.type === 'aggregatedProfit') {
                 const currencyCode = isPriceDataChart(currentChart) ? currentChart.currencyCode : defaultCurrency;
                 newChart.currencyCode = currencyCode;

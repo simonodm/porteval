@@ -45,6 +45,7 @@ function useUserSettings(): [UserSettings, SetUserSettingsCallback] {
         thousandsSeparator
     });
 
+    // update local storage whenever any setting changes
     useEffect(() => {
         setSettings({
             dateFormat,

@@ -41,6 +41,7 @@ function PortfoliosTable(): JSX.Element {
 
     const [userSettings] = useUserSettings();
 
+    // As portfolios' data and statistics are retrieved from 2 separate endpoints, we merge and memoize them here 
     const portfoliosWithStats = useMemo<Array<PortfolioWithStats>>(() => {
         if(portfolios.data && portfolioStats.data && portfolios.data.length == portfolioStats.data.length) {
             return portfolios.data.map((portfolio, idx) => ({
