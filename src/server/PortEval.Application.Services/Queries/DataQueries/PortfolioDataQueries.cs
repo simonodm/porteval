@@ -25,16 +25,16 @@ namespace PortEval.Application.Services.Queries.DataQueries
         }
 
         public static QueryWrapper<IEnumerable<TransactionDetailsQueryModel>> GetPortfolioDetailedTransactions(
-            int portfolioId, DateTime from, DateTime to)
+            int portfolioId, DateTime transactionsFrom, DateTime transactionsTo, DateTime pricesFrom, DateTime pricesTo)
         {
             return new QueryWrapper<IEnumerable<TransactionDetailsQueryModel>>
             {
                 Query = @"WITH rownum_prices_start AS (
 	                          SELECT InstrumentId, Price AS InstrumentPriceAtRangeStart, ROW_NUMBER() OVER(PARTITION BY InstrumentId ORDER BY Time DESC) as rownum_start FROM dbo.InstrumentPrices
-	                          WHERE Time <= @TimeFrom
+	                          WHERE Time <= @PricesFrom
                           ), rownum_prices_end AS (
 	                          SELECT InstrumentId, Price AS InstrumentPriceAtRangeEnd, ROW_NUMBER() OVER(PARTITION BY InstrumentId ORDER BY Time DESC) as rownum_end FROM dbo.InstrumentPrices
-	                          WHERE Time <= @TimeTo
+	                          WHERE Time <= @PricesTo
                           )
  
                           SELECT PortfolioId, Instruments.Id as InstrumentId, pTransactions.PositionId, pTransactions.Id AS TransactionId, Time, Amount,
@@ -44,19 +44,20 @@ namespace PortEval.Application.Services.Queries.DataQueries
 	                          SELECT Transactions.Id, PortfolioId, Time, Amount, Price, PositionId, InstrumentId FROM dbo.Positions
 	                          INNER JOIN dbo.Transactions ON PositionId = Positions.Id
                               WHERE Time <= @TimeTo
+                              AND Time >= @TimeFrom
                           ) AS pTransactions ON Portfolios.Id = pTransactions.PortfolioId
                           INNER JOIN dbo.Instruments ON Instruments.Id = InstrumentId
-                          INNER JOIN (
-	                          SELECT rownum_prices_start.InstrumentId, InstrumentPriceAtRangeStart, InstrumentPriceAtRangeEnd FROM rownum_prices_start
-	                          INNER JOIN (
-		                          SELECT InstrumentId, InstrumentPriceAtRangeEnd FROM rownum_prices_end
-		                          WHERE rownum_end = 1
-	                          ) AS prices_end ON prices_end.InstrumentId = rownum_prices_start.InstrumentId
+                          LEFT JOIN (
+	                          SELECT rownum_prices_start.InstrumentId, InstrumentPriceAtRangeStart FROM rownum_prices_start
 	                          WHERE rownum_start = 1
-                          ) AS Prices ON Prices.InstrumentId = Instruments.Id
+                          ) AS PricesStart ON PricesStart.InstrumentId = Instruments.Id
+                          LEFT JOIN (
+	                          SELECT rownum_prices_end.InstrumentId, InstrumentPriceAtRangeEnd FROM rownum_prices_end
+	                          WHERE rownum_end = 1
+                          ) AS PricesEnd on PricesEnd.InstrumentId = Instruments.Id
                           WHERE PortfolioId = @PortfolioId
                           ORDER BY Time DESC",
-                Params = new { PortfolioId = portfolioId, TimeFrom = from, TimeTo = to }
+                Params = new { PortfolioId = portfolioId, TimeFrom = transactionsFrom, TimeTo = transactionsTo, PricesFrom = pricesFrom, PricesTo = pricesTo }
             };
         }
 

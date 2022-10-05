@@ -167,24 +167,30 @@ namespace PortEval.Application.Services.Queries
             var instrumentPriceAtRangeEnd =
                 (await _instrumentQueries.GetInstrumentPrice(position.Response.InstrumentId, dateRange.To)).Response?.Price ?? 0m;
 
-            var profitAtRangeEnd = 0m;
-            var profitAtRangeStart = 0m;
+            var amountAtRangeStart = 0m;
+            var amountAtRangeEnd = 0m;
+            var profitInRange = 0m;
             foreach (var transaction in transactions.Response)
             {
-                if (transaction.Time <= dateRange.From)
+                if (transaction.Time < dateRange.From)
                 {
-                    profitAtRangeStart += (transaction.Amount * instrumentPriceAtRangeStart) -
-                                          (transaction.Amount * transaction.Price);
+                    amountAtRangeStart += transaction.Amount;
                 }
-                profitAtRangeEnd += (transaction.Amount * instrumentPriceAtRangeEnd) -
-                                    (transaction.Amount * transaction.Price);
+                else
+                {
+                    profitInRange -= (transaction.Amount * transaction.Price); // realized profit
+                }
+                amountAtRangeEnd += transaction.Amount;
             }
+
+            profitInRange += amountAtRangeEnd * instrumentPriceAtRangeEnd; // unrealized profit
+            var totalProfit = profitInRange - amountAtRangeStart * instrumentPriceAtRangeStart; // subtract value at range start
 
             var profit = new EntityProfitDto
             {
                 From = dateRange.From,
                 To = dateRange.To,
-                Profit = profitAtRangeEnd - profitAtRangeStart
+                Profit = totalProfit
             };
 
             return new QueryResponse<EntityProfitDto>
