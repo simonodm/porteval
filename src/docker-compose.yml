@@ -33,6 +33,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - FILE_STORAGE=/app/files
+      - "CUSTOMCONNSTR_PortEvalDb=Server=porteval-db;Database=PortEvalDbContext;User=sa;Password=Hw82@malzsA!"
       
   porteval-web:
     image: ${DOCKER_REGISTRY-}porteval-web:dev
@@ -44,6 +45,7 @@ services:
       - "3000:3000"
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - API_PROXY_URL=http://porteval-api/
     volumes:
     - ./web:/app
 
