@@ -6,6 +6,7 @@ using PortEval.Application.Services.Queries.DataQueries;
 using PortEval.Application.Services.Queries.Helpers;
 using PortEval.Application.Services.Queries.Interfaces;
 using PortEval.Application.Services.Queries.Models;
+using PortEval.Domain;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
@@ -170,7 +171,7 @@ namespace PortEval.Application.Services.Queries
             List<PortfolioTransactionDetailsQueryModel> transactions;
             using (var connection = _connectionCreator.CreateConnection())
             {
-                transactions = (await GetTransactionsConvertedToPortfolioCurrency(connection, portfolioId, dateRange)).ToList();
+                transactions = (await GetTransactionsConvertedToPortfolioCurrency(connection, portfolioId, dateRange.SetFrom(PortEvalConstants.FinancialDataStartTime), dateRange)).ToList();
             }
 
             var performance = InternalRateOfReturnCalculator.CalculateIrr(transactions, dateRange.From, dateRange.To);
@@ -471,10 +472,10 @@ namespace PortEval.Application.Services.Queries
                 return Enumerable.Empty<PortfolioTransactionDetailsQueryModel>();
             }
 
-            var transactionsTimeFrom = new DateTime(Math.Max(transactionDateRange.From.Ticks, ((DateTime)firstTransactionTime).Ticks));
+            var transactionsTimeFrom = transactionDateRange.From;
             var transactionsTimeTo = transactionDateRange.To;
             var pricesTimeFrom = instrumentPricesDateRange?.From ?? transactionsTimeFrom;
-            var pricesTimeTo = instrumentPricesDateRange?.To ?? transactionsTimeTo;
+            var pricesTimeTo = instrumentPricesDateRange?.To ?? new DateTime(Math.Max(transactionsTimeFrom.Ticks, ((DateTime)firstTransactionTime).Ticks));
             var transactionQuery = PortfolioDataQueries.GetPortfolioDetailedTransactions(
                 portfolioId,
                 transactionsTimeFrom,
