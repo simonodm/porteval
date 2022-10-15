@@ -72,7 +72,7 @@ function CreateInstrumentForm({ onSuccess }: Props): JSX.Element {
                 <TextInput label='Symbol' onChange={(val) => setSymbol(val)} placeholder='e.g. AAPL'
                     value={symbol}
                 />
-                <ExchangeDropdown exchanges={exchanges.data ?? []} onChange={(e) => setExchange(e.name)} />
+                <ExchangeDropdown exchanges={exchanges.data ?? []} onChange={(e) => setExchange(e.symbol)} />
                 <InstrumentTypeDropdown onChange={(t) => setType(t)} value={type} />
                 <CurrencyDropdown
                     currencies={currencies.data ?? []}

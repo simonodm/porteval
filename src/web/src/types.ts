@@ -301,7 +301,8 @@ export type DashboardLayout = {
  * Represents a stock exchange.
  */
 export type Exchange = {
-    name: string;
+    symbol: string;
+    name?: string;
 }
 
 /**

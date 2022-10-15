@@ -49,7 +49,7 @@ function ExchangeDropdown({ className, value, disabled, exchanges, onChange }: P
             return;
         }
         const newExchange: Exchange = {
-            name: newValue.value
+            symbol: newValue.value
         };
 
         setExchange(newExchange);
@@ -58,8 +58,8 @@ function ExchangeDropdown({ className, value, disabled, exchanges, onChange }: P
 
     const createOption = (e: Exchange): Option => {
         return {
-            label: e.name,
-            value: e.name
+            label: e.name ?? e.symbol,
+            value: e.symbol
         };
     }
 
@@ -71,7 +71,7 @@ function ExchangeDropdown({ className, value, disabled, exchanges, onChange }: P
                 isDisabled={disabled}
                 isSearchable
                 onChange={handleExchangeChange}
-                options={exchanges.map(e => ({ label: e.name, value: e.name }))}
+                options={exchanges.map(e => ({ label: e.name ?? e.symbol, value: e.symbol }))}
                 placeholder='e.g. NASDAQ'
                 value={exchange ? createOption(exchange) : undefined}
             />
