@@ -30,6 +30,7 @@ namespace PortEval.Infrastructure
             new DashboardItemConfiguration().Configure(modelBuilder.Entity<DashboardItem>());
             new DashboardChartItemConfiguration().Configure(modelBuilder.Entity<DashboardChartItem>());
             new DataImportConfiguration().Configure(modelBuilder.Entity<DataImport>());
+            new ExchangeConfiguration().Configure(modelBuilder.Entity<Exchange>());
         }
 
         public void Commit()
@@ -53,22 +54,6 @@ namespace PortEval.Infrastructure
         public DbSet<ChartLine> ChartLines { get; set; }
         public DbSet<DashboardItem> DashboardItems { get; set; }
         public DbSet<DataImport> Imports { get; set; }
-
-        private async Task HandleConcurrencyException(DbUpdateConcurrencyException exception)
-        {
-            foreach(var entry in exception.Entries)
-            {
-                if(entry.Entity is VersionedEntity)
-                {
-                    var currentValues = entry.CurrentValues;
-                    var dbValues = await entry.GetDatabaseValuesAsync();
-                    foreach(var property in currentValues.Properties)
-                    {
-                        var currentValue = currentValues[property];
-                        var dbValue = dbValues[property];
-                    }
-                }
-            }
-        }
+        public DbSet<Exchange> Exchanges { get; set; }
     }
 }

@@ -14,11 +14,13 @@ namespace PortEval.Application.Services
     {
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly ICurrencyRepository _currencyRepository;
+        private readonly IExchangeRepository _exchangeRepository;
 
-        public InstrumentService(IInstrumentRepository instrumentRepository, ICurrencyRepository currencyRepository)
+        public InstrumentService(IInstrumentRepository instrumentRepository, ICurrencyRepository currencyRepository, IExchangeRepository exchangeRepository)
         {
             _instrumentRepository = instrumentRepository;
             _currencyRepository = currencyRepository;
+            _exchangeRepository = exchangeRepository;
         }
 
         /// <inheritdoc cref="IInstrumentService.CreateInstrumentAsync"/>
@@ -27,6 +29,12 @@ namespace PortEval.Application.Services
             if (!(await _currencyRepository.Exists(options.CurrencyCode)))
             {
                 throw new ItemNotFoundException($"Currency {options.CurrencyCode} does not exist.");
+            }
+
+            if(!(await _exchangeRepository.Exists(options.Exchange)))
+            {
+                var newExchange = new Exchange(options.Exchange);
+                _exchangeRepository.Add(newExchange);
             }
 
             var instrument = new Instrument(options.Name, options.Symbol, options.Exchange, options.Type, options.CurrencyCode, options.Note);

@@ -94,14 +94,6 @@ namespace PortEval.Application.Services.Queries.DataQueries
             };
         }
 
-        public static QueryWrapper<IEnumerable<InstrumentExchangeQueryModel>> GetKnownExchangesQuery()
-        {
-            return new QueryWrapper<IEnumerable<InstrumentExchangeQueryModel>>
-            {
-                Query = @"SELECT DISTINCT Exchange FROM dbo.Instruments"
-            };
-        }
-
         public static QueryWrapper<IEnumerable<InstrumentPriceDto>> GetInstrumentPricesPage(int instrumentId, DateTime from, DateTime to,
             PaginationParams pagination, AggregationFrequency? frequency)
         {

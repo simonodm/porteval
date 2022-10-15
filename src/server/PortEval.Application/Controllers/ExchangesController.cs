@@ -12,12 +12,12 @@ namespace PortEval.Application.Controllers
     [ApiController]
     public class ExchangesController : ControllerBase
     {
-        private readonly IInstrumentQueries _instrumentQueries;
+        private readonly IExchangeQueries _exchangeQueries;
         private readonly ILogger _logger;
 
-        public ExchangesController(IInstrumentQueries instrumentQueries, ILoggerFactory loggerFactory)
+        public ExchangesController(IExchangeQueries exchangeQueries, ILoggerFactory loggerFactory)
         {
-            _instrumentQueries = instrumentQueries;
+            _exchangeQueries = exchangeQueries;
             _logger = loggerFactory.CreateLogger(typeof(ExchangesController));
         }
 
@@ -26,7 +26,7 @@ namespace PortEval.Application.Controllers
         {
             _logger.LogInformation("Known exchanges requested.");
 
-            var result = await _instrumentQueries.GetKnownExchanges();
+            var result = await _exchangeQueries.GetKnownExchanges();
 
             return result.Response.ToList();
         }

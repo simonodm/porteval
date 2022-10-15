@@ -76,21 +76,6 @@ namespace PortEval.Application.Services.Queries
             };
         }
 
-        /// <inheritdoc cref="IInstrumentQueries.GetKnownExchanges"/>
-        public async Task<QueryResponse<IEnumerable<ExchangeDto>>> GetKnownExchanges()
-        {
-            var query = InstrumentDataQueries.GetKnownExchangesQuery();
-
-            using var connection = _connectionCreator.CreateConnection();
-            var exchanges = await connection.QueryAsync<InstrumentExchangeQueryModel>(query.Query, query.Params);
-
-            return new QueryResponse<IEnumerable<ExchangeDto>>
-            {
-                Status = QueryStatus.Ok,
-                Response = exchanges.Select(e => new ExchangeDto { Name = e.Exchange })
-            };
-        }
-
         /// <inheritdoc cref="IInstrumentQueries.GetInstrumentPrices"/>
         public async Task<QueryResponse<IEnumerable<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId,
             DateRangeParams dateRange)

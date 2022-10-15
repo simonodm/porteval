@@ -23,6 +23,10 @@ namespace PortEval.Infrastructure.Configurations
                 .IsRequired()
                 .HasMaxLength(10);
             builder
+                .HasOne<Exchange>()
+                .WithMany()
+                .HasForeignKey(i => i.Exchange);
+            builder
                 .Property(i => i.Exchange)
                 .IsRequired()
                 .HasMaxLength(32);

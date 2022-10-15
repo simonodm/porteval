@@ -75,6 +75,7 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IChartRepository, ChartRepository>();
             services.AddScoped<IDashboardItemRepository, DashboardItemRepository>();
             services.AddScoped<IDataImportRepository, DataImportRepository>();
+            services.AddScoped<IExchangeRepository, ExchangeRepository>();
         }
 
         /// <summary>
@@ -108,6 +109,7 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IChartQueries, ChartQueries>();
             services.AddScoped<IDashboardLayoutQueries, DashboardLayoutQueries>();
             services.AddScoped<IDataImportQueries, DataImportQueries>();
+            services.AddScoped<IExchangeQueries, ExchangeQueries>();
         }
 
         /// <summary>
