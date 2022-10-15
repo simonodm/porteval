@@ -54,9 +54,14 @@ function ChartLineConfigurator({ line: lineProp, onSave }: Props): JSX.Element {
         <form onSubmit={handleSubmit}>
             <div className="form-group">
                 <label htmlFor="width">Width:</label>
-                <input className="form-control" id="width" max={API_MAX_CHART_LINE_WIDTH}
-                    onChange={(e) => handleWidthChange(parseInt(e.target.value))} type="number" value={line.width}
-                />
+                <div id="width">
+                    <input type="radio" id="width-thin" name="width" checked={line.width === 1} value={1} onChange={(e) => handleWidthChange(parseInt(e.target.value))} />
+                    <label htmlFor='width-thin' className="mr-2">thin</label>
+                    <input type="radio" id="width-medium" name="width" checked={line.width === 3} value={3} onChange={(e) => handleWidthChange(parseInt(e.target.value))} />
+                    <label htmlFor='width-medium' className="mr-2">medium</label>
+                    <input type="radio" id="width-thick" name="width" checked={line.width === 5} value={5} onChange={(e) => handleWidthChange(parseInt(e.target.value))} />
+                    <label htmlFor='width-thick' className="mr-2">thick</label>
+                </div>
             </div>
             <div className="form-group">
                 <label htmlFor="color">Color:</label>
@@ -66,15 +71,25 @@ function ChartLineConfigurator({ line: lineProp, onSave }: Props): JSX.Element {
             </div>
             <div className="form-group">
                 <label htmlFor="dash">Dash:</label>
-                <select
-                    className="form-control"
-                    id="dash"
-                    onChange={(e) => handleDashChange(e.target.value as ChartLineDashType)}
-                >
-                    {dashTypes.map(dashType =>
-                        <option key={dashType} selected={line.dash === dashType}>{dashType}</option>)
+                <div id="dash">
+                    {
+                        dashTypes.map(dashType =>
+                            <>
+                                <input 
+                                    key={dashType}
+                                    id={`dash-${dashType}`}
+                                    type="radio"
+                                    name="dash"
+                                    checked={line.dash === dashType} 
+                                    value={dashType}
+                                    onChange={(e) => handleDashChange(e.target.value as ChartLineDashType)}
+                                />
+                                <label htmlFor={`dash-${dashType}`} className="mr-2">{dashType}</label>
+                            </>
+                        )
                     }
-                </select>
+                </div>
+                
             </div>
             <button className="btn btn-primary" role="button">Save</button>
         </form>
