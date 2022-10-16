@@ -125,6 +125,89 @@ namespace PortEval.Application.Services.Queries.DataQueries
             };
         }
 
+        public static QueryWrapper<int> GetInstrumentPriceCompressedCount(int instrumentId, DateTime from, DateTime to,
+            AggregationFrequency? frequency)
+        {
+            var partitionCalc = GetInstrumentPriceIntervalPartitionCalc(frequency);
+            return new QueryWrapper<int>
+            {
+                Query = @$"WITH added_row_number_time AS (
+	                          SELECT *,
+  		                          ROW_NUMBER() OVER(
+			                          PARTITION BY {partitionCalc}
+			                          ORDER BY [Time]) AS row_number_time
+                              FROM dbo.InstrumentPrices
+                              WHERE InstrumentId = @InstrumentId
+                              AND Time >= @TimeFrom
+                              AND Time <= @TimeTo
+                          ),
+                          aggregated_prices AS (
+	                          SELECT *
+	                          FROM added_row_number_time
+	                          WHERE row_number_time = 1
+                          ),
+                          added_row_number_price AS (
+	                          SELECT *,
+		                          ROW_NUMBER() OVER (
+			                          PARTITION BY [Price]
+			                          ORDER BY [Time]) AS row_number_price
+	                          FROM aggregated_prices
+                          )
+                          SELECT COUNT(*) FROM added_row_number_price
+                          WHERE row_number_price = 1",
+                Params = new
+                {
+                    InstrumentId = instrumentId,
+                    TimeFrom = from,
+                    TimeTo = to
+                }
+            };
+        }
+
+        public static QueryWrapper<IEnumerable<InstrumentPriceDto>> GetInstrumentPricesPageCompressed(int instrumentId, DateTime from, DateTime to,
+            PaginationParams pagination, AggregationFrequency? frequency)
+        {
+            var partitionCalc = GetInstrumentPriceIntervalPartitionCalc(frequency);
+            return new QueryWrapper<IEnumerable<InstrumentPriceDto>>
+            {
+                Query = @$"WITH added_row_number_time AS (
+	                          SELECT *,
+  		                          ROW_NUMBER() OVER(
+			                          PARTITION BY {partitionCalc}
+			                          ORDER BY [Time]) AS row_number_time
+                              FROM dbo.InstrumentPrices
+                              WHERE InstrumentId = @InstrumentId
+                              AND Time >= @TimeFrom
+                              AND Time <= @TimeTo
+                          ),
+                          aggregated_prices AS (
+	                          SELECT *
+	                          FROM added_row_number_time
+	                          WHERE row_number_time = 1
+                          ),
+                          added_row_number_price AS (
+	                          SELECT *,
+		                          ROW_NUMBER() OVER (
+			                          PARTITION BY [Price]
+			                          ORDER BY [Time]) AS row_number_price
+	                          FROM aggregated_prices
+                          )
+                          SELECT * FROM added_row_number_price
+                          WHERE row_number_price = 1
+                          ORDER BY Time DESC
+                          OFFSET @Offset ROWS
+                          FETCH NEXT @Rows ROWS ONLY",
+                Params = new
+                {
+                    InstrumentId = instrumentId,
+                    TimeFrom = from,
+                    TimeTo = to,
+                    Offset = (pagination.Page - 1) * pagination.Limit,
+                    Rows = pagination.Limit
+                }
+            };
+        }
+
         public static QueryWrapper<InstrumentPriceDto> GetInstrumentPrice(int instrumentId, DateTime time)
         {
             return new QueryWrapper<InstrumentPriceDto>

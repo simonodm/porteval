@@ -38,6 +38,7 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
     const [page, setPage] = useState(1);
     const [pageLimit] = useState(100);
     const [frequency, setFrequency] = useState<AggregationFrequency | undefined>(undefined);
+    const [compressPrices, setCompressPrices] = useState(false);
 
     const frequencyOptions: Array<SelectOption> = [
         { label: 'All', value: undefined },
@@ -49,7 +50,7 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
     ]
 
     const prices = useGetInstrumentPricePageQuery(
-        { instrumentId, page, limit: pageLimit, frequency: frequency },
+        { instrumentId, page, limit: pageLimit, frequency: frequency, compressed: compressPrices },
         { pollingInterval: REFRESH_INTERVAL }
     );
     const prefetchPrices = usePrefetch('getInstrumentPricePage');
@@ -112,6 +113,10 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
                     onChange={(newValue) => newValue && setFrequency(newValue.value)}
                     options={frequencyOptions}
                 />
+                <div className="form-group float-left">
+                    <input id="compress-prices" type="checkbox" checked={compressPrices} onClick={() => setCompressPrices(!compressPrices)} />
+                    <label htmlFor="compress-prices">Only display price changes</label>
+                </div>
             </div>
             
             <DataTable 
@@ -129,7 +134,7 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
                     onPageChange={(p) => setPage(p)}
                     page={page}
                     prefetch={(p) => 
-                        prefetchPrices({ instrumentId, page: p, limit: pageLimit, frequency })}
+                        prefetchPrices({ instrumentId, page: p, limit: pageLimit, frequency, compressed: compressPrices })}
                     totalPages={prices.data ? prices.data.totalCount / pageLimit : 1}
                 />
             </div>

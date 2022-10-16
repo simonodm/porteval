@@ -33,11 +33,12 @@ namespace PortEval.Application.Controllers
         // GET: api/instruments/1/prices
         [HttpGet]
         public async Task<ActionResult<PaginatedResponse<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId,
-            [FromQuery] DateRangeParams dateRange, [FromQuery] PaginationParams pagination, [FromQuery] AggregationFrequency? frequency = null)
+            [FromQuery] DateRangeParams dateRange, [FromQuery] PaginationParams pagination, [FromQuery] AggregationFrequency? frequency = null,
+            [FromQuery] bool compressed = false)
         {
             _logger.LogInformation($"Prices requested for instrument {instrumentId} (page {pagination.Page}, limit {pagination.Limit}).");
 
-            var prices = await _instrumentQueries.GetInstrumentPricesPage(instrumentId, pagination, dateRange, frequency);
+            var prices = await _instrumentQueries.GetInstrumentPricesPage(instrumentId, pagination, dateRange, compressed, frequency);
             if (prices.Status == QueryStatus.NotFound)
             {
                 return NotFound($"Instrument {instrumentId} not found.");

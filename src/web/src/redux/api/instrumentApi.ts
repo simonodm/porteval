@@ -99,14 +99,16 @@ const instrumentApi = portEvalApi.injectEndpoints({
         getInstrumentPricePage: build.query<
             PaginatedResponse<InstrumentPrice>,
             { instrumentId: number } & PaginationParameters & DateRangeParameters & { frequency?: AggregationFrequency }
+                & { compressed?: boolean }
         >({
-            query: ({ instrumentId, from, to, frequency, page = 1, limit = 100 }) => ({
+            query: ({ instrumentId, from, to, frequency, page = 1, limit = 100, compressed = false }) => ({
                 url: `instruments/${instrumentId}/prices` +
                     `?page=${page}` +
                     `&limit=${limit}` +
                     `${frequency ? `&frequency=${frequency}` : ''}` +
                     `${from ? `&from=${encodeURIComponent(from)}` : ''}` +
-                    `${to ? `&to=${encodeURIComponent(to)}` : ''}`
+                    `${to ? `&to=${encodeURIComponent(to)}` : ''}` +
+                    `${compressed ? '&compressed=true' : ''}`
             }),
             providesTags: (result, error, arg) =>
                 result
