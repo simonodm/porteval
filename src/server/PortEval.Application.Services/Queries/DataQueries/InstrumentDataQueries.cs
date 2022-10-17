@@ -146,15 +146,12 @@ namespace PortEval.Application.Services.Queries.DataQueries
 	                          FROM added_row_number_time
 	                          WHERE row_number_time = 1
                           ),
-                          added_row_number_price AS (
-	                          SELECT *,
-		                          ROW_NUMBER() OVER (
-			                          PARTITION BY [Price]
-			                          ORDER BY [Time]) AS row_number_price
+                          added_prev_price AS (
+	                          SELECT *, LAG([Price], 1, 0) OVER (ORDER BY [Time]) AS prev_price
 	                          FROM aggregated_prices
                           )
-                          SELECT COUNT(*) FROM added_row_number_price
-                          WHERE row_number_price = 1",
+                          SELECT COUNT(*) FROM added_prev_price
+                          WHERE [Price] <> prev_price",
                 Params = new
                 {
                     InstrumentId = instrumentId,
@@ -185,15 +182,12 @@ namespace PortEval.Application.Services.Queries.DataQueries
 	                          FROM added_row_number_time
 	                          WHERE row_number_time = 1
                           ),
-                          added_row_number_price AS (
-	                          SELECT *,
-		                          ROW_NUMBER() OVER (
-			                          PARTITION BY [Price]
-			                          ORDER BY [Time]) AS row_number_price
+                          added_prev_price AS (
+	                          SELECT *, LAG([Price], 1, 0) OVER (ORDER BY [Time]) AS prev_price
 	                          FROM aggregated_prices
                           )
-                          SELECT * FROM added_row_number_price
-                          WHERE row_number_price = 1
+                          SELECT [Id], [Time], [Price], [InstrumentId] FROM added_prev_price
+                          WHERE [Price] <> prev_price
                           ORDER BY Time DESC
                           OFFSET @Offset ROWS
                           FETCH NEXT @Rows ROWS ONLY",
