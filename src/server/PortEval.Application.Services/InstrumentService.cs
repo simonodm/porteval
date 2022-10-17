@@ -31,13 +31,14 @@ namespace PortEval.Application.Services
                 throw new ItemNotFoundException($"Currency {options.CurrencyCode} does not exist.");
             }
 
-            if(!(await _exchangeRepository.Exists(options.Exchange)))
+            if(!string.IsNullOrEmpty(options.Exchange) && !(await _exchangeRepository.Exists(options.Exchange)))
             {
                 var newExchange = new Exchange(options.Exchange);
                 _exchangeRepository.Add(newExchange);
             }
 
-            var instrument = new Instrument(options.Name, options.Symbol, options.Exchange, options.Type, options.CurrencyCode, options.Note);
+            var instrument = new Instrument(options.Name, options.Symbol, string.IsNullOrEmpty(options.Exchange) ? null : options.Exchange,
+                options.Type, options.CurrencyCode, options.Note);
             var createdInstrument = _instrumentRepository.Add(instrument);
             await _instrumentRepository.UnitOfWork.CommitAsync();
             BackgroundJob.Enqueue<IInitialPriceFetchJob>(job => job.Run(createdInstrument.Id));

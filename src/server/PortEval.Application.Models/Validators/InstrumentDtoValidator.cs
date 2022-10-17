@@ -16,8 +16,6 @@ namespace PortEval.Application.Models.Validators
                 .MinimumLength(1)
                 .MaximumLength(64);
             RuleFor(i => i.Exchange)
-                .NotEmpty()
-                .MinimumLength(1)
                 .MaximumLength(32);
             RuleFor(i => i.CurrencyCode)
                 .NotEmpty()

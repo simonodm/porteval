@@ -25,10 +25,10 @@ namespace PortEval.Infrastructure.Configurations
             builder
                 .HasOne<Exchange>()
                 .WithMany()
-                .HasForeignKey(i => i.Exchange);
+                .HasForeignKey(i => i.Exchange)
+                .OnDelete(DeleteBehavior.Cascade);
             builder
                 .Property(i => i.Exchange)
-                .IsRequired()
                 .HasMaxLength(32);
             builder
                 .Property(i => i.Type)

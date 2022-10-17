@@ -59,7 +59,7 @@ export type Instrument = {
     name: string;
     symbol: string;
     type: InstrumentType;
-    exchange: string;
+    exchange?: string;
     currencyCode: string;
     currentPrice?: number;
     note: string;

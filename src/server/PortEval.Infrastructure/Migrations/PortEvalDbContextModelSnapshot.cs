@@ -1430,8 +1430,8 @@ namespace PortEval.Infrastructure.Migrations
             modelBuilder.Entity("PortEval.Domain.Models.Entities.Exchange", b =>
                 {
                     b.Property<string>("Symbol")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(64)
@@ -1950,7 +1950,6 @@ namespace PortEval.Infrastructure.Migrations
                         .HasColumnType("nvarchar(3)");
 
                     b.Property<string>("Exchange")
-                        .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
@@ -2338,8 +2337,7 @@ namespace PortEval.Infrastructure.Migrations
                     b.HasOne("PortEval.Domain.Models.Entities.Exchange", null)
                         .WithMany()
                         .HasForeignKey("Exchange")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.OwnsOne("PortEval.Domain.Models.ValueObjects.TrackingInformation", "TrackingInfo", b1 =>
                         {
