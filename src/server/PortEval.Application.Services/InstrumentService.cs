@@ -31,11 +31,7 @@ namespace PortEval.Application.Services
                 throw new ItemNotFoundException($"Currency {options.CurrencyCode} does not exist.");
             }
 
-            if(!string.IsNullOrEmpty(options.Exchange) && !(await _exchangeRepository.Exists(options.Exchange)))
-            {
-                var newExchange = new Exchange(options.Exchange);
-                _exchangeRepository.Add(newExchange);
-            }
+            await CreateExchangeIfDoesNotExist(options.Exchange);
 
             var instrument = new Instrument(options.Name, options.Symbol, string.IsNullOrEmpty(options.Exchange) ? null : options.Exchange,
                 options.Type, options.CurrencyCode, options.Note);
@@ -54,7 +50,10 @@ namespace PortEval.Application.Services
                 throw new ItemNotFoundException($"Instrument {options.Id} does not exist.");
             }
 
+            await CreateExchangeIfDoesNotExist(options.Exchange);
+
             existingInstrument.Rename(options.Name);
+            existingInstrument.SetExchange(string.IsNullOrEmpty(options.Exchange) ? null : options.Exchange);
             existingInstrument.SetNote(options.Note);
             existingInstrument.IncreaseVersion();
             _instrumentRepository.Update(existingInstrument);
@@ -72,6 +71,15 @@ namespace PortEval.Application.Services
 
             await _instrumentRepository.Delete(id);
             await _instrumentRepository.UnitOfWork.CommitAsync();
+        }
+
+        private async Task CreateExchangeIfDoesNotExist(string exchange)
+        {
+            if(!string.IsNullOrEmpty(exchange) && !(await _exchangeRepository.Exists(exchange)))
+            {
+                var newExchange = new Exchange(exchange);
+                _exchangeRepository.Add(newExchange);
+            }
         }
     }
 }

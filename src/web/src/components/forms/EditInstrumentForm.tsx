@@ -5,9 +5,11 @@ import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import CurrencyDropdown from './fields/CurrencyDropdown';
 
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
-import { Instrument, InstrumentType } from '../../types';
+import { Exchange, Instrument, InstrumentType } from '../../types';
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { useUpdateInstrumentMutation } from '../../redux/api/instrumentApi';
+import ExchangeDropdown from './fields/ExchangeDropdown';
+import { useGetAllKnownExchangesQuery } from '../../redux/api/exchangeApi';
 
 type Props = {
     /**
@@ -30,17 +32,18 @@ type Props = {
  */
 function EditInstrumentForm({ instrument, onSuccess }: Props): JSX.Element {
     const currencies = useGetAllKnownCurrenciesQuery();
+    const exchanges = useGetAllKnownExchangesQuery();
     const [updateInstrument, mutationStatus] = useUpdateInstrumentMutation();
 
     const [name, setName] = useState(instrument.name);
     const [symbol, setSymbol] = useState(instrument.symbol);
-    const [exchange, setExchange] = useState(instrument.exchange);
+    const [exchange, setExchange] = useState<string | undefined>(instrument.exchange);
     const [currencyCode, setCurrencyCode] = useState(instrument.currencyCode);
     const [note, setNote] = useState(instrument.note);
     const [type, setType] = useState<InstrumentType>(instrument.type);
 
-    const isLoaded = checkIsLoaded(currencies, mutationStatus);
-    const isError = checkIsError(currencies);
+    const isLoaded = checkIsLoaded(currencies, exchanges, mutationStatus);
+    const isError = checkIsError(currencies, exchanges);
 
     const handleSubmit = (e: React.FormEvent) => {
         updateInstrument({
@@ -63,7 +66,7 @@ function EditInstrumentForm({ instrument, onSuccess }: Props): JSX.Element {
                 <TextInput disabled label='Symbol' onChange={(val) => setSymbol(val)}
                     value={symbol}
                 />
-                <TextInput label='Exchange' onChange={(val) => setExchange(val)} value={exchange} />
+                <ExchangeDropdown exchanges={exchanges.data ?? []} onChange={(e) => setExchange(e.symbol)} value={exchange ? { symbol: exchange } : undefined} />
                 <InstrumentTypeDropdown disabled onChange={(t) => setType(t)} value={type} />
                 <CurrencyDropdown currencies={currencies.data ?? []} disabled onChange={(code) => setCurrencyCode(code)}
                     value={currencyCode}

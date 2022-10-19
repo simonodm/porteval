@@ -32,6 +32,11 @@ namespace PortEval.Domain.Models.Entities
             Name = name;
         }
 
+        public void SetExchange(string exchange)
+        {
+            Exchange = exchange;
+        }
+
         public void SetNote(string note)
         {
             Note = note;
