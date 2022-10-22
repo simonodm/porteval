@@ -15,12 +15,14 @@ namespace PortEval.Application.Services
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly ICurrencyRepository _currencyRepository;
         private readonly IExchangeRepository _exchangeRepository;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
-        public InstrumentService(IInstrumentRepository instrumentRepository, ICurrencyRepository currencyRepository, IExchangeRepository exchangeRepository)
+        public InstrumentService(IInstrumentRepository instrumentRepository, ICurrencyRepository currencyRepository, IExchangeRepository exchangeRepository, IBackgroundJobClient backgroundJobClient)
         {
             _instrumentRepository = instrumentRepository;
             _currencyRepository = currencyRepository;
             _exchangeRepository = exchangeRepository;
+            _backgroundJobClient = backgroundJobClient;
         }
 
         /// <inheritdoc cref="IInstrumentService.CreateInstrumentAsync"/>
@@ -37,7 +39,7 @@ namespace PortEval.Application.Services
                 options.Type, options.CurrencyCode, options.Note);
             var createdInstrument = _instrumentRepository.Add(instrument);
             await _instrumentRepository.UnitOfWork.CommitAsync();
-            BackgroundJob.Enqueue<IInitialPriceFetchJob>(job => job.Run(createdInstrument.Id));
+            _backgroundJobClient.Enqueue<IInitialPriceFetchJob>(job => job.Run(createdInstrument.Id));
             return createdInstrument;
         }
 
