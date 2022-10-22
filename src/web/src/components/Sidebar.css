@@ -1,0 +1,22 @@
+#sidebar {
+    width: 250px;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+#sidebar li a {
+    display: block;
+    color: #fff;
+    width: 100%;
+    padding: 12px 24px 12px 36px;
+}
+
+#sidebar li a:hover {
+    background-color: #3d4e5b;
+    text-decoration: none;
+}
+
+#sidebar .active {
+    background-color: #3d4e5b;
+    padding-left: 48px;
+}

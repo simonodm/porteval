@@ -1,0 +1,330 @@
+[
+  {
+    "symbol": "AEX",
+    "name": "NYSE Euronext Amsterdam"
+  },
+  {
+    "symbol": "ALBRTA",
+    "name": "Alberta Stock Exchange"
+  },
+  {
+    "symbol": "AMEX",
+    "name": "American Stock Exchange"
+  },
+  {
+    "symbol": "ASE",
+    "name": "Athens Stock Exchange"
+  },
+  {
+    "symbol": "ASX",
+    "name": "Australian Stock Exchange"
+  },
+  {
+    "symbol": "BAR",
+    "name": "Barcelona Stock Exchange"
+  },
+  {
+    "symbol": "BATS",
+    "name": "BATS Global Markets"
+  },
+  {
+    "symbol": "BEL",
+    "name": "NYSE Euronext Brussels"
+  },
+  {
+    "symbol": "BER",
+    "name": "Berlin Stock Exchange"
+  },
+  {
+    "symbol": "BIL",
+    "name": "Bilbao Stock Exchange"
+  },
+  {
+    "symbol": "BME",
+    "name": "BME Spanish Exchanges"
+  },
+  {
+    "symbol": "BSE",
+    "name": "Bombay Stock Exchange Limited"
+  },
+  {
+    "symbol": "BUE",
+    "name": "Bolsa de Comercio de Buenos Aires"
+  },
+  {
+    "symbol": "BVC",
+    "name": "Bolsa de Valores de Caracas"
+  },
+  {
+    "symbol": "BVMF",
+    "name": "BM&F Bovespa"
+  },
+  {
+    "symbol": "CBOT",
+    "name": "Chicago Board of Trade"
+  },
+  {
+    "symbol": "CDNX",
+    "name": "Canadian Securities Exchange"
+  },
+  {
+    "symbol": "CME",
+    "name": "Chicago Mercantile Exchange"
+  },
+  {
+    "symbol": "CSE",
+    "name": "NASDAQ OMX Copenhagen"
+  },
+  {
+    "symbol": "DIV",
+    "name": "DIV"
+  },
+  {
+    "symbol": "DUS",
+    "name": "Dusseldorf Stock Exchange"
+  },
+  {
+    "symbol": "ETF",
+    "name": "ETF"
+  },
+  {
+    "symbol": "FRA",
+    "name": "Deutsche B�rse Frankfurt Stock Exchange"
+  },
+  {
+    "symbol": "FUND",
+    "name": "Mutual Fund"
+  },
+  {
+    "symbol": "GREY",
+    "name": "Grey Market"
+  },
+  {
+    "symbol": "HAM",
+    "name": "Hamburg Stock Exchange"
+  },
+  {
+    "symbol": "HAN",
+    "name": "Hanover Stock Exchange"
+  },
+  {
+    "symbol": "HKEX",
+    "name": "Hong Kong Stock Exchange"
+  },
+  {
+    "symbol": "ICEX",
+    "name": "NASDAQ OMX Iceland"
+  },
+  {
+    "symbol": "IDX",
+    "name": "Indonesia Stock Exchange"
+  },
+  {
+    "symbol": "INDEX",
+    "name": "Indices"
+  },
+  {
+    "symbol": "IST",
+    "name": "Borsa Istanbul"
+  },
+  {
+    "symbol": "JSE",
+    "name": "Johannesburg Stock Exchange"
+  },
+  {
+    "symbol": "KSC",
+    "name": "Korea Stock Exchange"
+  },
+  {
+    "symbol": "KSCQ",
+    "name": "KOSDAQ"
+  },
+  {
+    "symbol": "LSE",
+    "name": "London Stock Exchange"
+  },
+  {
+    "symbol": "MAD",
+    "name": "Madrid Stock Exchange"
+  },
+  {
+    "symbol": "MEX",
+    "name": "Mexico Stock Exchange"
+  },
+  {
+    "symbol": "MF",
+    "name": "Madrid Fixed Income Market"
+  },
+  {
+    "symbol": "MICEX",
+    "name": "Moscow Exchange"
+  },
+  {
+    "symbol": "MIL",
+    "name": "Borsa Italiana Milan Stock Exchange"
+  },
+  {
+    "symbol": "MSE",
+    "name": "Madrid SE C.A.T.S."
+  },
+  {
+    "symbol": "MUN",
+    "name": "Munich Stock Exchange"
+  },
+  {
+    "symbol": "MX",
+    "name": "Montreal Stock Exchange"
+  },
+  {
+    "symbol": "NASDAQ",
+    "name": "NASDAQ Stock Exchange"
+  },
+  {
+    "symbol": "NSE",
+    "name": "National Stock Exchange of India"
+  },
+  {
+    "symbol": "NYBOT",
+    "name": "New York Board of Trade"
+  },
+  {
+    "symbol": "NYMEX",
+    "name": "New York Mercantile Exchange"
+  },
+  {
+    "symbol": "NYSE",
+    "name": "New York Stock Exchange"
+  },
+  {
+    "symbol": "NZE",
+    "name": "New Zealand Stock Exchange"
+  },
+  {
+    "symbol": "OMXH",
+    "name": "NASDAQ OMX Helsinki"
+  },
+  {
+    "symbol": "OPRA",
+    "name": "Options Pricing Authority Options Chains"
+  },
+  {
+    "symbol": "OSL",
+    "name": "Oslo Stock Exchange"
+  },
+  {
+    "symbol": "OTC",
+    "name": "OTC Market"
+  },
+  {
+    "symbol": "PAR",
+    "name": "NYSE Euronext Paris"
+  },
+  {
+    "symbol": "PINK",
+    "name": "OTC Markets Pink Sheets"
+  },
+  {
+    "symbol": "PSI",
+    "name": "NYSE Euronext Lisbon"
+  },
+  {
+    "symbol": "QSE",
+    "name": "Qatar Stock Exchange"
+  },
+  {
+    "symbol": "RSE",
+    "name": "NASDAQ OMX Riga"
+  },
+  {
+    "symbol": "SAO",
+    "name": "Sao Paolo Stock Exchange (BOVESPA)"
+  },
+  {
+    "symbol": "SEK",
+    "name": "NASDAQ OMX Stockholm"
+  },
+  {
+    "symbol": "SET",
+    "name": "Thailand Stock Exchange"
+  },
+  {
+    "symbol": "SGO",
+    "name": "Santiago Stock Exchange"
+  },
+  {
+    "symbol": "SGX",
+    "name": "Singapore Stock Exchange"
+  },
+  {
+    "symbol": "SIX",
+    "name": "SIX Swiss Exchange"
+  },
+  {
+    "symbol": "SSE",
+    "name": "Shanghai Stock Exchange"
+  },
+  {
+    "symbol": "STU",
+    "name": "Stuttgart Stock Exchange"
+  },
+  {
+    "symbol": "SZSE",
+    "name": "Shenzhen Stock Exchange"
+  },
+  {
+    "symbol": "TADAWUL",
+    "name": "Saudi Stock Exchange"
+  },
+  {
+    "symbol": "TAIEX",
+    "name": "Taiwan Stock Exchange"
+  },
+  {
+    "symbol": "TAL",
+    "name": "NASDAQ OMX Tallinn"
+  },
+  {
+    "symbol": "TLV",
+    "name": "Tel Aviv Stock Exchange"
+  },
+  {
+    "symbol": "TSE",
+    "name": "Tokyo Stock Exchange"
+  },
+  {
+    "symbol": "TSX",
+    "name": "Toronto Stock Exchange"
+  },
+  {
+    "symbol": "TSXV",
+    "name": "TSX Venture Exchange"
+  },
+  {
+    "symbol": "TWO",
+    "name": "Taiwan OTC Exchange"
+  },
+  {
+    "symbol": "VSE",
+    "name": "NASDAQ OMX Vilnius"
+  },
+  {
+    "symbol": "VTX",
+    "name": "SIX Swiss Exchange"
+  },
+  {
+    "symbol": "WBAG",
+    "name": "Vienna Stock Exchange (Wiener Borse)"
+  },
+  {
+    "symbol": "WSE",
+    "name": "Warsaw Stock Exchange"
+  },
+  {
+    "symbol": "XETRA",
+    "name": "Deutsche Borse XETRA"
+  },
+  {
+    "symbol": "XPRA",
+    "name": "Prague Stock Exchange"
+  }
+]

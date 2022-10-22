@@ -1,0 +1,54 @@
+version: '3.4'
+
+services:
+  porteval-db:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Hw82@malzsA!
+    ports:
+      - "5433:1433"
+    volumes:
+      - porteval_db_dev:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$${SA_PASSWORD}" -Q "SELECT 1" -b -o /dev/null
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  porteval-api:
+    image: ${DOCKER_REGISTRY-}porteval-api:dev
+    build:
+      context: ./server
+    depends_on:
+      - porteval-db
+    ports:
+      - "4680:80"
+    volumes:
+      - porteval_api_files:/app/files
+    env_file:
+      - ./.env.dev
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - FILE_STORAGE=/app/files
+      - "CUSTOMCONNSTR_PortEvalDb=Server=porteval-db;Database=PortEvalDbContext;User=sa;Password=Hw82@malzsA!"
+      
+  porteval-web:
+    image: ${DOCKER_REGISTRY-}porteval-web:dev
+    build:
+      context: ./web
+    depends_on:
+      - porteval-api
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - API_PROXY_URL=http://porteval-api/
+    volumes:
+    - ./web:/app
+
+volumes:
+    porteval_db_dev:
+    porteval_api_files:

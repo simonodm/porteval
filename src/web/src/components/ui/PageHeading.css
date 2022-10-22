@@ -1,0 +1,9 @@
+#content-heading {
+    display: inline-block;
+}
+
+.heading-row {
+    border-bottom: 1px solid #343a40;
+    min-width: 180px;
+    margin-bottom: 1em;
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+	<?define ODBC17UpgradeCode={0123A210-9B73-46E7-B5CE-7F33630300E7} ?>
+	
+	<Fragment>
+		<util:RegistrySearch
+			Id="ODBC17Found"
+			Root="HKLM"
+			Key="SOFTWARE\Microsoft\Microsoft ODBC Driver 17 for SQL Server"
+			Result="exists"
+			Variable="Odbc17InstallationFound"
+		/>
+		<PackageGroup Id="ODBCUninstall">
+			<ExePackage
+				Id="ODBC17Uninstall"
+				DisplayName="Uninstalling ODBC Driver 17"
+				PerMachine="yes"
+				SourceFile="uninstallodbcs17.bat"
+				InstallCondition="NOT SqlInstanceFound AND Odbc17InstallationFound"
+				Permanent="yes">
+				<Payload Id="UpgradeCodeUninstallScript" SourceFile="upgradecodeuninstall.ps1" />
+			</ExePackage>
+		</PackageGroup>
+	</Fragment>
+</Wix>

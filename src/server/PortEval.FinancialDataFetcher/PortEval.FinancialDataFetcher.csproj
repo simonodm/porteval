@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Configurations>Debug;Release</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="APIs\Currencies\**" />
+    <EmbeddedResource Remove="APIs\Currencies\**" />
+    <None Remove="APIs\Currencies\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PortEval.Domain\PortEval.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

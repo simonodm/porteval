@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Bundle Name="PortEval" Version="1.0.3.0" Manufacturer="Dmitry Simonov" UpgradeCode="cb6989b6-8fd3-4200-8b83-bd21de9c1c3f">
+		<?define ApplicationPort=5432 ?>
+
+		<Variable Name="ApplicationPort" Value="$(var.ApplicationPort)" />
+		
+		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+			<bal:WixStandardBootstrapperApplication
+				LicenseUrl=""
+				SuppressOptionsUI="yes"
+				ThemeFile="HyperlinkTheme.xml"
+				LocalizationFile="HyperlinkTheme.wxl"
+				xmlns:bal="http://schemas.microsoft.com/wix/BalExtension" />
+		</BootstrapperApplicationRef>
+
+		<Chain>
+			<PackageGroupRef Id="ODBCUninstall"/>
+			<PackageGroupRef Id="InstallIIS" />
+			<PackageGroupRef Id="RebootIfNecessary"/>
+			<PackageGroupRef Id="Sql2019ExprWeb" />
+			<PackageGroupRef Id="IISUrlRewrite" />
+			<PackageGroupRef Id="DotNetHostingBundle" />
+			<MsiPackage SourceFile="$(var.PortEval.Setup.TargetPath)" Compressed="yes" DisplayInternalUI="yes">
+				<MsiProperty Name="ApplicationPort" Value="$(var.ApplicationPort)" />
+			</MsiPackage>
+		</Chain>
+	</Bundle>
+</Wix>

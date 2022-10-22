@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+	<?define UrlRewritePackageFileName=rewrite_amd64_en-US.msi ?>
+	<?define UrlRewriteProductId={9BCA2118-F753-4A1E-BCF3-5A820729965C} ?>
+
+	<Fragment>
+		<PackageGroup Id="IISUrlRewrite">
+			<MsiPackage
+			  Id="IISURLREWRITEMSI"
+			  SourceFile="packages\$(var.UrlRewritePackageFileName)"
+			  Compressed="yes"
+			  Permanent="yes"
+			>
+				<MsiProperty Name="UILevel" Value="2" />
+			</MsiPackage>
+		</PackageGroup>
+	</Fragment>
+</Wix>
