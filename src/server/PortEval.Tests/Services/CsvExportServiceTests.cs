@@ -31,7 +31,7 @@ namespace PortEval.Tests.Services
 
             var convertedBytes = sut.ConvertToCsv(Enumerable.Empty<CsvConversionTestType>());
             var bytesAsString = Encoding.Default.GetString(convertedBytes);
-            var lines = bytesAsString.Split(Environment.NewLine);
+            var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(GenerateExpectedHeader(), lines[0]);
         }
@@ -48,7 +48,7 @@ namespace PortEval.Tests.Services
 
             var convertedBytes = sut.ConvertToCsv(rows);
             var bytesAsString = Encoding.Default.GetString(convertedBytes);
-            var lines = bytesAsString.Split(Environment.NewLine);
+            var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(7, lines.Length);
         }
@@ -65,7 +65,7 @@ namespace PortEval.Tests.Services
 
             var convertedBytes = sut.ConvertToCsv(rows);
             var bytesAsString = Encoding.Default.GetString(convertedBytes);
-            var lines = bytesAsString.Split(Environment.NewLine);
+            var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(5, lines[0].Split(",").Length);
         }
@@ -82,7 +82,7 @@ namespace PortEval.Tests.Services
 
             var convertedBytes = sut.ConvertToCsv(rows);
             var bytesAsString = Encoding.Default.GetString(convertedBytes);
-            var lines = bytesAsString.Split(Environment.NewLine);
+            var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(rows.First().FirstColumn, lines[1].Split(",")[0]);
         }
@@ -99,7 +99,7 @@ namespace PortEval.Tests.Services
 
             var convertedBytes = sut.ConvertToCsv(rows);
             var bytesAsString = Encoding.Default.GetString(convertedBytes);
-            var lines = bytesAsString.Split(Environment.NewLine);
+            var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(rows.First().ThirdColumn.ToString(), lines[1].Split(",")[2]);
         }
@@ -116,7 +116,7 @@ namespace PortEval.Tests.Services
 
             var convertedBytes = sut.ConvertToCsv(rows);
             var bytesAsString = Encoding.Default.GetString(convertedBytes);
-            var lines = bytesAsString.Split(Environment.NewLine);
+            var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(rows.First().FourthColumn.ToString(CultureInfo.CurrentCulture), lines[1].Split(",")[3]);
         }
@@ -133,7 +133,7 @@ namespace PortEval.Tests.Services
 
             var convertedBytes = sut.ConvertToCsv(rows);
             var bytesAsString = Encoding.Default.GetString(convertedBytes);
-            var lines = bytesAsString.Split(Environment.NewLine);
+            var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(
                 rows.First().FifthColumn,
