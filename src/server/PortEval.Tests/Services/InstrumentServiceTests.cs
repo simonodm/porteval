@@ -134,7 +134,7 @@ namespace PortEval.Tests.Services
         }
 
         [Fact]
-        public async Task CreatingInstrumentSuccessfully_CreatesInitialPriceFetchJobForInstrument()
+        public async Task CreatingInstrument_CreatesInitialPriceFetchJobForInstrument_WhenInstrumentIsCreatedSuccessfully()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());

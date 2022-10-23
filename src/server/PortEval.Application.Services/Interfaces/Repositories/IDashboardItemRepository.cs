@@ -8,7 +8,7 @@ namespace PortEval.Application.Services.Interfaces.Repositories
     {
         public Task<IEnumerable<DashboardItem>> GetDashboardItems();
         public DashboardItem Add(DashboardItem item);
-        public Task<DashboardItem> Update(DashboardItem item);
+        public DashboardItem Update(DashboardItem item);
         public Task Remove(DashboardItem item);
     }
 }

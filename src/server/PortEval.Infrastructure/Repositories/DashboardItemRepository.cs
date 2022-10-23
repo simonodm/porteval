@@ -26,9 +26,8 @@ namespace PortEval.Infrastructure.Repositories
             return _context.DashboardItems.Add(item).Entity;
         }
 
-        public async Task<DashboardItem> Update(DashboardItem item)
+        public DashboardItem Update(DashboardItem item)
         {
-            var existingItem = await _context.DashboardItems.FirstOrDefaultAsync(i => i.Id == item.Id);
             return _context.DashboardItems.Update(item).Entity;
         }
 
