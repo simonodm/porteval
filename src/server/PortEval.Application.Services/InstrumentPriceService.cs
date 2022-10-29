@@ -53,6 +53,10 @@ namespace PortEval.Application.Services
         /// <inheritdoc cref="IInstrumentPriceService.DeletePricePointByIdAsync"/>
         public async Task DeletePricePointByIdAsync(int instrumentId, int priceId)
         {
+            if (!(await _instrumentPriceRepository.Exists(instrumentId, priceId)))
+            {
+                throw new ItemNotFoundException($"Price {priceId} does not exist on instrument {instrumentId}.");
+            }
             await _instrumentPriceRepository.DeleteInstrumentPriceAsync(instrumentId, priceId);
             await _instrumentPriceRepository.UnitOfWork.CommitAsync();
         }

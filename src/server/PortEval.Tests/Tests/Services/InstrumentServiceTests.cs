@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Hangfire;
 using Hangfire.Common;
@@ -10,11 +11,10 @@ using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
-using System.Threading.Tasks;
 using PortEval.Tests.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.Services
+namespace PortEval.Tests.Tests.Services
 {
     public class InstrumentServiceTests
     {
@@ -27,9 +27,9 @@ namespace PortEval.Tests.Services
 
             var instrument = fixture.Create<InstrumentDto>();
 
-            var instrumentRepository = fixture.GetDefaultIInstrumentRepositoryMock();
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
-            var exchangeRepository = fixture.GetDefaultIExchangeRepositoryMock();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
+            fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
 
@@ -55,9 +55,9 @@ namespace PortEval.Tests.Services
 
             var instrumentDto = fixture.Create<InstrumentDto>();
 
-            var instrumentRepository = fixture.GetDefaultIInstrumentRepositoryMock();
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
-            var exchangeRepository = fixture.GetDefaultIExchangeRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
+            fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
 
@@ -77,10 +77,10 @@ namespace PortEval.Tests.Services
 
             var instrument = fixture.Create<InstrumentDto>();
 
-            var instrumentRepository = fixture.GetDefaultIInstrumentRepositoryMock();
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
-            var exchangeRepository = fixture.GetDefaultIExchangeRepositoryMock();
+            var exchangeRepository = fixture.CreateDefaultExchangeRepositoryMock();
             exchangeRepository
                 .Setup(e => e.Exists(It.IsAny<string>()))
                 .Returns(Task.FromResult(false));
@@ -102,9 +102,9 @@ namespace PortEval.Tests.Services
 
             var instrument = fixture.Create<InstrumentDto>();
 
-            var instrumentRepository = fixture.GetDefaultIInstrumentRepositoryMock();
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
-            var exchangeRepository = fixture.GetDefaultIExchangeRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
+            var exchangeRepository = fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
             await sut.CreateInstrumentAsync(instrument);
@@ -123,7 +123,7 @@ namespace PortEval.Tests.Services
 
             var instrument = fixture.Create<InstrumentDto>();
 
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
+            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
                 .Setup(c => c.Exists(It.IsAny<string>()))
                 .Returns(Task.FromResult(false));
@@ -146,8 +146,8 @@ namespace PortEval.Tests.Services
                 .Setup(i => i.Add(It.IsAny<Instrument>()))
                 .Returns<Instrument>((i) => fixture.Create<Instrument>());
 
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
-            var exchangeRepository = fixture.GetDefaultIExchangeRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
+            fixture.CreateDefaultExchangeRepositoryMock();
 
             var backgroundJobClient = fixture.Freeze<Mock<IBackgroundJobClient>>();
 
@@ -171,12 +171,12 @@ namespace PortEval.Tests.Services
             var updatedInstrumentDto = fixture.Create<InstrumentDto>();
             updatedInstrumentDto.Id = instrument.Id;
 
-            var instrumentRepository = fixture.GetDefaultIInstrumentRepositoryMock();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.FindAsync(updatedInstrumentDto.Id))
                 .Returns(Task.FromResult(instrument));
 
-            var exchangeRepository = fixture.GetDefaultIExchangeRepositoryMock();
+            fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
             await sut.UpdateInstrumentAsync(updatedInstrumentDto);
@@ -200,7 +200,7 @@ namespace PortEval.Tests.Services
 
             var updatedInstrumentDto = fixture.Create<InstrumentDto>();
 
-            var instrumentRepository = fixture.GetDefaultIInstrumentRepositoryMock();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.FindAsync(updatedInstrumentDto.Id))
                 .Returns(Task.FromResult<Instrument>(null));
@@ -223,12 +223,12 @@ namespace PortEval.Tests.Services
             var updatedInstrumentDto = fixture.Create<InstrumentDto>();
             updatedInstrumentDto.Id = instrument.Id;
 
-            var instrumentRepository = fixture.GetDefaultIInstrumentRepositoryMock();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.FindAsync(updatedInstrumentDto.Id))
                 .Returns(Task.FromResult(instrument));
 
-            var exchangeRepository = fixture.GetDefaultIExchangeRepositoryMock();
+            fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
             var updatedInstrument = await sut.UpdateInstrumentAsync(updatedInstrumentDto);
@@ -249,12 +249,12 @@ namespace PortEval.Tests.Services
             var updatedInstrumentDto = fixture.Create<InstrumentDto>();
             updatedInstrumentDto.Id = instrument.Id;
 
-            var instrumentRepository = fixture.GetDefaultIInstrumentRepositoryMock();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.FindAsync(updatedInstrumentDto.Id))
                 .Returns(Task.FromResult(instrument));
 
-            var exchangeRepository = fixture.GetDefaultIExchangeRepositoryMock();
+            var exchangeRepository = fixture.CreateDefaultExchangeRepositoryMock();
             exchangeRepository
                 .Setup(e => e.Exists(updatedInstrumentDto.Exchange))
                 .Returns(Task.FromResult(false));
@@ -275,7 +275,7 @@ namespace PortEval.Tests.Services
             var updatedInstrumentDto = fixture.Create<InstrumentDto>();
             updatedInstrumentDto.Id = instrument.Id;
 
-            var instrumentRepository = fixture.GetDefaultIInstrumentRepositoryMock();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.FindAsync(instrument.Id))
                 .Returns(Task.FromResult(instrument));
@@ -299,13 +299,13 @@ namespace PortEval.Tests.Services
 
             var instrumentId = fixture.Create<int>();
 
-            var instrumentRepository = fixture.GetDefaultIInstrumentRepositoryMock();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.Exists(It.Is<int>(id => id == instrumentId)))
                 .Returns(Task.FromResult(true));
 
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
-            var exchangeRepository = fixture.GetDefaultIExchangeRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
+            fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
 
@@ -322,13 +322,13 @@ namespace PortEval.Tests.Services
 
             var instrumentId = fixture.Create<int>();
 
-            var instrumentRepository = fixture.GetDefaultIInstrumentRepositoryMock();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.Exists(instrumentId))
                 .Returns(Task.FromResult(false));
 
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
-            var exchangeRepository = fixture.GetDefaultIExchangeRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
+            fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
 

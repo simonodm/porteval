@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using PortEval.Application.Services;
 using Xunit;
 
-namespace PortEval.Tests.Services
+namespace PortEval.Tests.Tests.Services
 {
-    internal class CsvConversionTestType {
+    internal class CsvConversionTestType
+    {
         public string FirstColumn { get; set; }
         public string SecondColumn { get; set; }
         public int ThirdColumn { get; set; }
@@ -26,14 +25,14 @@ namespace PortEval.Tests.Services
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
-
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(Enumerable.Empty<CsvConversionTestType>());
+
             var bytesAsString = Encoding.Default.GetString(convertedBytes);
             var lines = bytesAsString.Split("\r\n");
-
-            Assert.Equal(GenerateExpectedHeader(), lines[0]);
+            var header = GenerateExpectedHeader();
+            Assert.Equal(header, lines[0]);
         }
 
         [Fact]
@@ -41,9 +40,7 @@ namespace PortEval.Tests.Services
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
-
             var rows = fixture.CreateMany<CsvConversionTestType>(5);
-
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
@@ -58,9 +55,7 @@ namespace PortEval.Tests.Services
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
-
             var rows = fixture.CreateMany<CsvConversionTestType>(1);
-
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
@@ -75,9 +70,7 @@ namespace PortEval.Tests.Services
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
-
             var rows = fixture.CreateMany<CsvConversionTestType>(1);
-
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
@@ -92,9 +85,7 @@ namespace PortEval.Tests.Services
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
-
             var rows = fixture.CreateMany<CsvConversionTestType>(1);
-
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
@@ -109,9 +100,7 @@ namespace PortEval.Tests.Services
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
-
             var rows = fixture.CreateMany<CsvConversionTestType>(1);
-
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
@@ -128,7 +117,6 @@ namespace PortEval.Tests.Services
                 .Customize(new AutoMoqCustomization());
 
             var rows = fixture.CreateMany<CsvConversionTestType>(1);
-
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);

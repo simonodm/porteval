@@ -4,6 +4,7 @@ using Moq;
 using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using System.Threading.Tasks;
+using AutoFixture.Dsl;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Services.Interfaces;
 
@@ -13,7 +14,7 @@ namespace PortEval.Tests.Extensions
     {
         #region Repository Mocks
 
-        public static Mock<ICurrencyRepository> GetDefaultICurrencyRepositoryMock(this IFixture fixture)
+        public static Mock<ICurrencyRepository> CreateDefaultCurrencyRepositoryMock(this IFixture fixture)
         {
             var mock = fixture.Freeze<Mock<ICurrencyRepository>>();
             mock
@@ -40,7 +41,7 @@ namespace PortEval.Tests.Extensions
             return mock;
         }
 
-        public static Mock<IExchangeRepository> GetDefaultIExchangeRepositoryMock(this IFixture fixture)
+        public static Mock<IExchangeRepository> CreateDefaultExchangeRepositoryMock(this IFixture fixture)
         {
             var mock = fixture.Freeze<Mock<IExchangeRepository>>();
             mock
@@ -59,7 +60,7 @@ namespace PortEval.Tests.Extensions
             return mock;
         }
 
-        public static Mock<IInstrumentRepository> GetDefaultIInstrumentRepositoryMock(this IFixture fixture)
+        public static Mock<IInstrumentRepository> CreateDefaultInstrumentRepositoryMock(this IFixture fixture)
         {
             var mock = fixture.Freeze<Mock<IInstrumentRepository>>();
             mock
@@ -81,7 +82,7 @@ namespace PortEval.Tests.Extensions
             return mock;
         }
 
-        public static Mock<IPortfolioRepository> GetDefaultIPortfolioRepositoryMock(this IFixture fixture)
+        public static Mock<IPortfolioRepository> CreateDefaultPortfolioRepositoryMock(this IFixture fixture)
         {
             var mock = fixture.Freeze<Mock<IPortfolioRepository>>();
             mock
@@ -103,7 +104,7 @@ namespace PortEval.Tests.Extensions
             return mock;
         }
 
-        public static Mock<IPositionRepository> GetDefaultIPositionRepositoryMock(this IFixture fixture)
+        public static Mock<IPositionRepository> CreateDefaultPositionRepositoryMock(this IFixture fixture)
         {
             var mock = fixture.Freeze<Mock<IPositionRepository>>();
             mock
@@ -128,7 +129,7 @@ namespace PortEval.Tests.Extensions
             return mock;
         }
 
-        public static Mock<IInstrumentPriceRepository> GetDefaultIInstrumentPriceRepositoryMock(this IFixture fixture)
+        public static Mock<IInstrumentPriceRepository> CreateDefaultInstrumentPriceRepositoryMock(this IFixture fixture)
         {
             var mock = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
             mock
@@ -150,7 +151,7 @@ namespace PortEval.Tests.Extensions
             return mock;
         }
 
-        public static Mock<IChartRepository> GetDefaultIChartRepositoryMock(this IFixture fixture)
+        public static Mock<IChartRepository> CreateDefaultChartRepositoryMock(this IFixture fixture)
         {
             var mock = fixture.Freeze<Mock<IChartRepository>>();
             mock
@@ -172,12 +173,12 @@ namespace PortEval.Tests.Extensions
             return mock;
         }
 
-        public static Mock<IDashboardItemRepository> GetDefaultDashboardItemRepositoryMock(this IFixture fixture)
+        public static Mock<IDashboardItemRepository> CreateDefaultDashboardItemRepositoryMock(this IFixture fixture)
         {
             var mock = fixture.Freeze<Mock<IDashboardItemRepository>>();
             mock
                 .Setup(m => m.GetDashboardItems())
-                .Returns(Task.FromResult(fixture.CreateMany<DashboardItem>()));
+                .ReturnsAsync(fixture.CreateMany<DashboardChartItem>());
             mock
                 .Setup(m => m.Add(It.IsAny<DashboardItem>()))
                 .Returns<DashboardItem>(i => i);
@@ -188,7 +189,7 @@ namespace PortEval.Tests.Extensions
             return mock;
         }
 
-        public static Mock<IDataImportRepository> GetDefaultDataImportRepositoryMock(this IFixture fixture)
+        public static Mock<IDataImportRepository> CreateDefaultDataImportRepositoryMock(this IFixture fixture)
         {
             var mock = fixture.Freeze<Mock<IDataImportRepository>>();
             mock
@@ -210,7 +211,7 @@ namespace PortEval.Tests.Extensions
 
         #region Service Mocks
 
-        public static Mock<IInstrumentPriceService> GetDefaultInstrumentPriceServiceMock(this IFixture fixture)
+        public static Mock<IInstrumentPriceService> CreateDefaultInstrumentPriceServiceMock(this IFixture fixture)
         {
             var mock = fixture.Freeze<Mock<IInstrumentPriceService>>();
             mock
@@ -222,6 +223,59 @@ namespace PortEval.Tests.Extensions
 
             return mock;
         }
+
+        public static Mock<IPortfolioService> CreateDefaultPortfolioServiceMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<IPortfolioService>>();
+            mock
+                .Setup(m => m.CreatePortfolioAsync(It.IsAny<PortfolioDto>()))
+                .ReturnsAsync(fixture.Create<Portfolio>());
+            mock
+                .Setup(m => m.UpdatePortfolioAsync(It.IsAny<PortfolioDto>()))
+                .ReturnsAsync(fixture.Create<Portfolio>());
+
+            return mock;
+        }
+
+        public static Mock<IPositionService> CreateDefaultPositionServiceMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<IPositionService>>();
+            mock
+                .Setup(m => m.OpenPositionAsync(It.IsAny<PositionDto>()))
+                .ReturnsAsync(fixture.Create<Position>());
+            mock
+                .Setup(m => m.UpdatePositionAsync(It.IsAny<PositionDto>()))
+                .ReturnsAsync(fixture.Create<Position>());
+
+            return mock;
+        }
+
+        public static Mock<IInstrumentService> CreateDefaultInstrumentServiceMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<IInstrumentService>>();
+            mock
+                .Setup(m => m.CreateInstrumentAsync(It.IsAny<InstrumentDto>()))
+                .ReturnsAsync(fixture.Create<Instrument>());
+            mock
+                .Setup(m => m.UpdateInstrumentAsync(It.IsAny<InstrumentDto>()))
+                .ReturnsAsync(fixture.Create<Instrument>());
+
+            return mock;
+        }
+
+        public static Mock<ITransactionService> CreateDefaultTransactionServiceMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<ITransactionService>>();
+            mock
+                .Setup(m => m.AddTransactionAsync(It.IsAny<TransactionDto>()))
+                .ReturnsAsync(fixture.Create<Transaction>());
+            mock
+                .Setup(m => m.UpdateTransactionAsync(It.IsAny<TransactionDto>()))
+                .ReturnsAsync(fixture.Create<Transaction>());
+
+            return mock;
+        }
+
         #endregion
     }
 }

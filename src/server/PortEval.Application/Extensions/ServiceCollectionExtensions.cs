@@ -11,6 +11,7 @@ using PortEval.Infrastructure;
 using PortEval.Infrastructure.Repositories;
 using System;
 using System.Data;
+using System.IO.Abstractions;
 using PortEval.Application.Services.BulkImportExport;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Application.Services.Queries;
@@ -21,8 +22,6 @@ using PortEval.BackgroundJobs.DataImport;
 using PortEval.BackgroundJobs.InitialPriceFetch;
 using PortEval.BackgroundJobs.LatestPricesFetch;
 using PortEval.BackgroundJobs.MissingPricesFetch;
-using System.Runtime.InteropServices;
-using Microsoft.Win32;
 
 namespace PortEval.Application.Extensions
 {
@@ -47,9 +46,10 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IDashboardService, DashboardService>();
 
             var fileStoragePath = configuration.GetConfigurationValue("PORTEVAL_File_Storage");
+            services.AddScoped<IFileSystem, FileSystem>();
             services.AddScoped<ICsvImportService, CsvImportService>(
                 provider =>
-                    new CsvImportService(provider.GetRequiredService<IDataImportRepository>(), fileStoragePath)
+                    new CsvImportService(provider.GetRequiredService<IDataImportRepository>(), provider.GetRequiredService<IBackgroundJobClient>(), provider.GetRequiredService<IFileSystem>(), fileStoragePath)
             );
             services.AddScoped<ICsvExportService, CsvExportService>();
             services.AddScoped<PortfolioImportProcessor>();

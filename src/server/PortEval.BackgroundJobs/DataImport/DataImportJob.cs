@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 
 namespace PortEval.BackgroundJobs.DataImport
@@ -25,14 +26,16 @@ namespace PortEval.BackgroundJobs.DataImport
 
         private readonly IServiceProvider _serviceProvider;
         private readonly IDataImportRepository _importRepository;
+        private readonly IFileSystem _fileSystem;
         private readonly ILogger _logger;
         private readonly CsvConfiguration _csvConfig;
         private readonly List<RawRowErrorLogEntry> _parsingErrors;
 
-        public DataImportJob(IServiceProvider serviceProvider, IDataImportRepository importRepository, ILoggerFactory loggerFactory)
+        public DataImportJob(IServiceProvider serviceProvider, IDataImportRepository importRepository, IFileSystem fileSystem, ILoggerFactory loggerFactory)
         {
             _serviceProvider = serviceProvider;
             _importRepository = importRepository;
+            _fileSystem = fileSystem;
             _logger = loggerFactory.CreateLogger(typeof(DataImportJob));
             _parsingErrors = new List<RawRowErrorLogEntry>();
             _csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -51,9 +54,15 @@ namespace PortEval.BackgroundJobs.DataImport
         {
             try
             {
-                using var reader = new StreamReader(inputFileName);
+                using var fs = _fileSystem.FileStream.Create(inputFileName, FileMode.Open);
+                using var reader = new StreamReader(fs);
                 using var csv = new CsvReader(reader, _csvConfig);
                 csv.RegisterImportClassMaps();
+
+                importEntry.ChangeStatus(ImportStatus.InProgress);
+                importEntry.IncreaseVersion();
+                _importRepository.Update(importEntry);
+                await _importRepository.UnitOfWork.CommitAsync();
 
                 await ProcessImportFromType(importEntry.TemplateType, csv, logPath);
 
@@ -79,6 +88,7 @@ namespace PortEval.BackgroundJobs.DataImport
             }
             finally
             {
+                importEntry.IncreaseVersion();
                 _importRepository.Update(importEntry);
                 await _importRepository.UnitOfWork.CommitAsync();
                 DeleteFile(inputFileName);
@@ -119,7 +129,8 @@ namespace PortEval.BackgroundJobs.DataImport
 
         private void SaveErrorLog<T>(IEnumerable<ProcessedRowErrorLogEntry<T>> processedErrorLog, IEnumerable<RawRowErrorLogEntry> parsingErrorLog, string filename)
         {
-            using var sw = new StreamWriter(filename);
+            using var fs = _fileSystem.FileStream.Create(filename, FileMode.Create);
+            using var sw = new StreamWriter(fs);
             using var csv = new CsvWriter(sw, _csvConfig);
             csv.RegisterImportClassMaps();
 
@@ -136,9 +147,9 @@ namespace PortEval.BackgroundJobs.DataImport
 
         private void DeleteFile(string filePath)
         {
-            if (File.Exists(filePath))
+            if (_fileSystem.File.Exists(filePath))
             {
-                File.Delete(filePath);
+                _fileSystem.File.Delete(filePath);
             }
         }
     }

@@ -14,7 +14,7 @@ namespace PortEval.Application.Services.BulkImportExport
             _portfolioService = portfolioService;
         }
 
-        public override async Task<ProcessedRowErrorLogEntry<PortfolioDto>> ProcessItem(PortfolioDto row)
+        protected override async Task<ProcessedRowErrorLogEntry<PortfolioDto>> ProcessItem(PortfolioDto row)
         {
             var logEntry = new ProcessedRowErrorLogEntry<PortfolioDto>(row);
 

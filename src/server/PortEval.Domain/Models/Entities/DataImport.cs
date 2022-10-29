@@ -3,7 +3,7 @@ using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Domain.Models.Entities
 {
-    public class DataImport : IAggregateRoot
+    public class DataImport : VersionedEntity, IAggregateRoot
     {
         public Guid Id { get; private set; }
         public DateTime Time { get; private set; }

@@ -15,6 +15,12 @@ namespace PortEval.Domain.Models.ValueObjects
             {
                 throw new OperationNotAllowedException("Chart dashboard item coordinates cannot be less than zero.");
             }
+
+            if (width <= 0 || height <= 0)
+            {
+                throw new OperationNotAllowedException("Chart dashboard width and height must be above zero.");
+            }
+
             if (x >= 6 || (x + width - 1) >= 6)
             {
                 throw new OperationNotAllowedException("Chart dashboard width must fit within 6 columns.");

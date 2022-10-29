@@ -12,23 +12,25 @@ namespace PortEval.Application.Services.BulkImportExport
     public class InstrumentImportProcessor : ImportProcessor<InstrumentDto, InstrumentDtoValidator>
     {
         private readonly IInstrumentService _instrumentService;
+        private readonly IBackgroundJobClient _jobClient;
         private readonly List<Instrument> _newInstruments;
 
-        public InstrumentImportProcessor(IInstrumentService instrumentService) : base()
+        public InstrumentImportProcessor(IInstrumentService instrumentService, IBackgroundJobClient jobClient) : base()
         {
             _instrumentService = instrumentService;
+            _jobClient = jobClient;
             _newInstruments = new List<Instrument>();
 
             OnImportFinish = () =>
             {
                 foreach (var instrument in _newInstruments)
                 {
-                    BackgroundJob.Enqueue<IInitialPriceFetchJob>(job => job.Run(instrument.Id));
+                    _jobClient.Enqueue<IInitialPriceFetchJob>(job => job.Run(instrument.Id));
                 }
             };
         }
 
-        public override async Task<ProcessedRowErrorLogEntry<InstrumentDto>> ProcessItem(InstrumentDto row)
+        protected override async Task<ProcessedRowErrorLogEntry<InstrumentDto>> ProcessItem(InstrumentDto row)
         {
             var logEntry = new ProcessedRowErrorLogEntry<InstrumentDto>(row);
 

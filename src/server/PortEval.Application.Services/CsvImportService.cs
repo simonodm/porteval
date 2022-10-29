@@ -9,6 +9,7 @@ using PortEval.Domain.Models.Enums;
 using System;
 using System.Globalization;
 using System.IO;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 
 namespace PortEval.Application.Services
@@ -16,11 +17,15 @@ namespace PortEval.Application.Services
     public class CsvImportService : ICsvImportService
     {
         private IDataImportRepository _importRepository;
+        private IBackgroundJobClient _jobClient;
+        private IFileSystem _fileSystem;
         private readonly string _storagePath;
 
-        public CsvImportService(IDataImportRepository importRepository, string storagePath)
+        public CsvImportService(IDataImportRepository importRepository, IBackgroundJobClient jobClient, IFileSystem fileSystem, string storagePath)
         {
             _importRepository = importRepository;
+            _jobClient = jobClient;
+            _fileSystem = fileSystem;
             _storagePath = storagePath;
         }
 
@@ -31,12 +36,12 @@ namespace PortEval.Application.Services
             var tempFilePath = GetTemporaryFilePath(guid);
             var logFilePath = GetErrorLogPath(guid);
 
-            using var fs = new FileStream(tempFilePath, FileMode.Create);
-            inputFileStream.CopyTo(fs);
+            await using var fs = _fileSystem.FileStream.Create(tempFilePath, FileMode.Create);
+            await inputFileStream.CopyToAsync(fs);
             fs.Close();
 
             var importEntry = await SaveNewImportEntry(guid, templateType);
-            BackgroundJob.Enqueue<IDataImportJob>(job => job.Run(importEntry, tempFilePath, logFilePath));
+            _jobClient.Enqueue<IDataImportJob>(job => job.Run(importEntry, tempFilePath, logFilePath));
 
             return importEntry;
         }
@@ -45,9 +50,9 @@ namespace PortEval.Application.Services
         {
             try
             {
-                return new FileStream(GetErrorLogPath(guid), FileMode.Open);
+                return _fileSystem.FileStream.Create(GetErrorLogPath(guid), FileMode.Open);
             }
-            catch
+            catch (Exception ex)
             {
                 return null;
             }
@@ -56,12 +61,12 @@ namespace PortEval.Application.Services
         public Stream GetCsvTemplate(TemplateType templateType)
         {
             var path = GetTemplatePath(templateType);
-            if(!File.Exists(path))
+            if(!_fileSystem.File.Exists(path))
             {
                 GenerateTemplate(path, templateType);
             }
 
-            return new FileStream(path, FileMode.Open);
+            return _fileSystem.FileStream.Create(path, FileMode.Open);
         }
 
         private string GetTemporaryFilePath(Guid guid)
@@ -81,7 +86,8 @@ namespace PortEval.Application.Services
 
         private void GenerateTemplate(string path, TemplateType templateType)
         {
-            using var sw = new StreamWriter(path);
+            using var fs = _fileSystem.FileStream.Create(path, FileMode.Create);
+            using var sw = new StreamWriter(fs);
             using var csv = new CsvWriter(sw, CultureInfo.InvariantCulture);
             csv.RegisterImportClassMaps();
 
@@ -92,7 +98,7 @@ namespace PortEval.Application.Services
 
         private async Task<DataImport> SaveNewImportEntry(Guid guid, TemplateType templateType)
         {
-            var importEntry = new DataImport(guid, templateType, ImportStatus.InProgress);
+            var importEntry = new DataImport(guid, templateType, ImportStatus.Pending);
             _importRepository.Add(importEntry);
             await _importRepository.UnitOfWork.CommitAsync();
 

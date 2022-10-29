@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Models.DTOs;
@@ -6,10 +7,9 @@ using PortEval.Application.Services;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Extensions;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace PortEval.Tests.Services
+namespace PortEval.Tests.Tests.Services
 {
     public class PortfolioServiceTests
     {
@@ -21,8 +21,8 @@ namespace PortEval.Tests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            var portfolioRepository = fixture.GetDefaultIPortfolioRepositoryMock();
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
 
@@ -43,7 +43,7 @@ namespace PortEval.Tests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
+            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
                 .Setup(r => r.Exists(portfolioDto.CurrencyCode))
                 .Returns(Task.FromResult(false));
@@ -61,8 +61,8 @@ namespace PortEval.Tests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            var portfolioRepository = fixture.GetDefaultIPortfolioRepositoryMock();
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
 
@@ -81,8 +81,8 @@ namespace PortEval.Tests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            var portfolioRepository = fixture.GetDefaultIPortfolioRepositoryMock();
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
 
@@ -103,8 +103,8 @@ namespace PortEval.Tests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            var portfolioRepository = fixture.GetDefaultIPortfolioRepositoryMock();
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
                 .Setup(r => r.Exists(portfolioDto.CurrencyCode))
                 .Returns(Task.FromResult(false));
@@ -122,14 +122,14 @@ namespace PortEval.Tests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            var portfolioRepository = fixture.GetDefaultIPortfolioRepositoryMock();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
                 .Setup(r => r.Exists(portfolioDto.Id))
                 .Returns(Task.FromResult(false));
             portfolioRepository
                 .Setup(r => r.FindAsync(portfolioDto.Id))
                 .Returns(Task.FromResult<Portfolio>(null));
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
 
@@ -144,8 +144,8 @@ namespace PortEval.Tests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            var portfolioRepository = fixture.GetDefaultIPortfolioRepositoryMock();
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
 
@@ -164,8 +164,8 @@ namespace PortEval.Tests.Services
 
             var portfolioId = fixture.Create<int>();
 
-            var portfolioRepository = fixture.GetDefaultIPortfolioRepositoryMock();
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
 
@@ -182,11 +182,11 @@ namespace PortEval.Tests.Services
 
             var portfolioId = fixture.Create<int>();
 
-            var portfolioRepository = fixture.GetDefaultIPortfolioRepositoryMock();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
                 .Setup(r => r.Exists(portfolioId))
                 .Returns(Task.FromResult(false));
-            var currencyRepository = fixture.GetDefaultICurrencyRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
 
