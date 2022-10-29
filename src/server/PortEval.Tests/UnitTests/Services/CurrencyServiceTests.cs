@@ -9,7 +9,7 @@ using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Services
+namespace PortEval.Tests.UnitTests.Services
 {
     public class CurrencyServiceTests
     {

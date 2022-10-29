@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using PortEval.Application.Models.DTOs;
@@ -10,10 +7,17 @@ using PortEval.Application.Models.Validators;
 using PortEval.Domain;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Models.Validators
+namespace PortEval.Tests.UnitTests.Models.Validators
 {
     public class CurrencyExchangeRateDtoValidatorTests
     {
+        public static IEnumerable<object[]> ValidExchangeRates = new List<object[]>
+        {
+            new object[] { "USD", "EUR", 1.04, DateTime.Parse("2022-01-01 12:00") },
+            new object[] { "EUR", "USD", 1.0, DateTime.Parse("2022-10-27 00:00") },
+            new object[] { "USD", "CZK", 25.21, DateTime.Parse("2022-10-17") }
+        };
+
         [Theory]
         [MemberData(nameof(ValidExchangeRates))]
         public void Validate_ValidatesSuccessfully_WhenExchangeRateIsValid(string currencyFrom, string currencyTo,
@@ -151,12 +155,5 @@ namespace PortEval.Tests.Tests.Models.Validators
             Assert.False(validationResult.IsValid);
             Assert.Contains(validationResult.Errors, e => e.PropertyName == nameof(exchangeRate.ExchangeRate));
         }
-
-        public static IEnumerable<object[]> ValidExchangeRates = new List<object[]>()
-        {
-            new object[] { "USD", "EUR", 1.04, DateTime.Parse("2022-01-01 12:00") },
-            new object[] { "EUR", "USD", 1.0, DateTime.Parse("2022-10-27 00:00") },
-            new object[] { "USD", "CZK", 25.21, DateTime.Parse("2022-10-17") }
-        };
     }
 }

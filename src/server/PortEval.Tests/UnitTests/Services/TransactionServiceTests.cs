@@ -10,7 +10,7 @@ using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Services
+namespace PortEval.Tests.UnitTests.Services
 {
     public class TransactionServiceTests
     {
@@ -38,7 +38,8 @@ namespace PortEval.Tests.Tests.Services
 
             positionRepository.Verify(r => r.Update(It.Is<Position>(p =>
                 p.Id == transaction.PositionId &&
-                p.Transactions.FirstOrDefault(t => t.Time == transaction.Time && t.Price == transaction.Price && t.Note == transaction.Note) != null
+                p.Transactions.FirstOrDefault(t =>
+                    t.Time == transaction.Time && t.Price == transaction.Price && t.Note == transaction.Note) != null
             )));
         }
 
@@ -86,7 +87,8 @@ namespace PortEval.Tests.Tests.Services
 
             await sut.AddTransactionAsync(transaction);
 
-            priceService.Verify(s => s.AddPriceIfNotExistsAsync(position.InstrumentId, transaction.Time, transaction.Price));
+            priceService.Verify(s =>
+                s.AddPriceIfNotExistsAsync(position.InstrumentId, transaction.Time, transaction.Price));
         }
     }
 }

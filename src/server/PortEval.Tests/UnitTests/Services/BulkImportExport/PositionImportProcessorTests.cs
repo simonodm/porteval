@@ -9,7 +9,7 @@ using PortEval.Application.Services.BulkImportExport;
 using PortEval.Tests.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Services.BulkImportExport
+namespace PortEval.Tests.UnitTests.Services.BulkImportExport
 {
     public class PositionImportProcessorTests
     {

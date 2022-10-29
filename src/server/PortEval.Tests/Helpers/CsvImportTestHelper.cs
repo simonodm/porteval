@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Tests.Helpers
@@ -38,23 +34,23 @@ namespace PortEval.Tests.Helpers
         {
             {
                 TemplateType.Instruments,
-                new [] { "1","AAPL","Apple Inc.","NASDAQ","Stock","USD","Test Note" }
+                new[] { "1", "AAPL", "Apple Inc.", "NASDAQ", "Stock", "USD", "Test Note" }
             },
             {
                 TemplateType.Portfolios,
-                new [] { "2","US stocks","USD","Test Note Portfolio" }
+                new[] { "2", "US stocks", "USD", "Test Note Portfolio" }
             },
             {
                 TemplateType.Positions,
-                new [] { "3","1","1","Test Note Position","2021/06/12 13:35","1","120" }
+                new[] { "3", "1", "1", "Test Note Position", "2021/06/12 13:35", "1", "120" }
             },
             {
                 TemplateType.Transactions,
-                new [] { "4","2","5","2022/01/05 12:00" }
+                new[] { "4", "2", "5", "2022/01/05 12:00" }
             },
             {
                 TemplateType.Prices,
-                new [] { "5","3","124.41","2022/10/22 00:00" }
+                new[] { "5", "3", "124.41", "2022/10/22 00:00" }
             }
         };
     }

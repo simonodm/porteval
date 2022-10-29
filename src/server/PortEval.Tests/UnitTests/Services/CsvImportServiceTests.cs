@@ -21,7 +21,7 @@ using PortEval.Tests.Extensions;
 using PortEval.Tests.Helpers;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Services
+namespace PortEval.Tests.UnitTests.Services
 {
     internal class CsvImportServiceStoragePathArg : ISpecimenBuilder
     {

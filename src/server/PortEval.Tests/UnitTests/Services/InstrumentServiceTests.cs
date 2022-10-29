@@ -14,11 +14,10 @@ using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Services
+namespace PortEval.Tests.UnitTests.Services
 {
     public class InstrumentServiceTests
     {
-
         [Fact]
         public async Task CreatingInstrument_AddsInstrumentToInstrumentRepository_WhenWellFormed()
         {
@@ -134,7 +133,8 @@ namespace PortEval.Tests.Tests.Services
         }
 
         [Fact]
-        public async Task CreatingInstrument_CreatesInitialPriceFetchJobForInstrument_WhenInstrumentIsCreatedSuccessfully()
+        public async Task
+            CreatingInstrument_CreatesInitialPriceFetchJobForInstrument_WhenInstrumentIsCreatedSuccessfully()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -144,7 +144,7 @@ namespace PortEval.Tests.Tests.Services
             var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
             instrumentRepository
                 .Setup(i => i.Add(It.IsAny<Instrument>()))
-                .Returns<Instrument>((i) => fixture.Create<Instrument>());
+                .Returns<Instrument>(i => fixture.Create<Instrument>());
 
             fixture.CreateDefaultCurrencyRepositoryMock();
             fixture.CreateDefaultExchangeRepositoryMock();
@@ -156,7 +156,9 @@ namespace PortEval.Tests.Tests.Services
             var createdInstrument = await sut.CreateInstrumentAsync(instrument);
 
             backgroundJobClient.Verify(c => c.Create(
-                It.Is<Job>(job => job.Method.Name == "Run" && (int)job.Args[0]== createdInstrument.Id && job.Type.IsAssignableTo(typeof(IInitialPriceFetchJob))),
+                It.Is<Job>(job =>
+                    job.Method.Name == "Run" && (int)job.Args[0] == createdInstrument.Id &&
+                    job.Type.IsAssignableTo(typeof(IInitialPriceFetchJob))),
                 It.IsAny<EnqueuedState>()
             ));
         }
@@ -182,12 +184,12 @@ namespace PortEval.Tests.Tests.Services
             await sut.UpdateInstrumentAsync(updatedInstrumentDto);
 
             instrumentRepository.Verify(r => r.Update(
-                It.Is<Instrument>(i =>
-                    i.Id == updatedInstrumentDto.Id &&
-                    i.Name == updatedInstrumentDto.Name &&
-                    i.Symbol == instrument.Symbol &&
-                    i.Exchange == updatedInstrumentDto.Exchange &&
-                    i.Note == updatedInstrumentDto.Note)),
+                    It.Is<Instrument>(i =>
+                        i.Id == updatedInstrumentDto.Id &&
+                        i.Name == updatedInstrumentDto.Name &&
+                        i.Symbol == instrument.Symbol &&
+                        i.Exchange == updatedInstrumentDto.Exchange &&
+                        i.Note == updatedInstrumentDto.Note)),
                 Times.Once()
             );
         }
@@ -210,7 +212,8 @@ namespace PortEval.Tests.Tests.Services
 
             var sut = fixture.Create<InstrumentService>();
 
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await sut.UpdateInstrumentAsync(updatedInstrumentDto));
+            await Assert.ThrowsAsync<ItemNotFoundException>(async () =>
+                await sut.UpdateInstrumentAsync(updatedInstrumentDto));
         }
 
         [Fact]
@@ -262,7 +265,8 @@ namespace PortEval.Tests.Tests.Services
             var sut = fixture.Create<InstrumentService>();
             await sut.UpdateInstrumentAsync(updatedInstrumentDto);
 
-            exchangeRepository.Verify(r => r.Add(It.Is<Exchange>(e => e.Symbol == updatedInstrumentDto.Exchange)), Times.Once());
+            exchangeRepository.Verify(r => r.Add(It.Is<Exchange>(e => e.Symbol == updatedInstrumentDto.Exchange)),
+                Times.Once());
         }
 
         [Fact]

@@ -15,13 +15,78 @@ using PortEval.Domain.Models.ValueObjects;
 using PortEval.Tests.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Services
+namespace PortEval.Tests.UnitTests.Services
 {
     public class ChartServiceTests
     {
+        public static IEnumerable<object[]> WellFormedData => new List<object[]>
+        {
+            new object[]
+            {
+                ChartType.Price,
+                true,
+                null,
+                null,
+                DateRangeUnit.DAY,
+                3,
+                null
+            },
+            new object[]
+            {
+                ChartType.Profit,
+                false,
+                DateTime.Parse("2021-01-01"),
+                DateTime.Parse("2022-06-01"),
+                null,
+                null,
+                null
+            },
+            new object[]
+            {
+                ChartType.Performance,
+                false,
+                DateTime.Parse("2022-01-03 12:00"),
+                DateTime.Parse("2022-01-06 18:35"),
+                null,
+                null,
+                null
+            },
+            new object[]
+            {
+                ChartType.AggregatedProfit,
+                true,
+                null,
+                null,
+                DateRangeUnit.YEAR,
+                1,
+                AggregationFrequency.Week
+            },
+            new object[]
+            {
+                ChartType.AggregatedPerformance,
+                true,
+                null,
+                null,
+                DateRangeUnit.WEEK,
+                2,
+                AggregationFrequency.Hour
+            },
+            new object[]
+            {
+                ChartType.Price,
+                true,
+                null,
+                null,
+                DateRangeUnit.MONTH,
+                4,
+                null
+            }
+        };
+
         [Theory]
         [MemberData(nameof(WellFormedData))]
-        public async Task CreatingChart_AddsChartToRepository_WhenWellFormed(ChartType type, bool isToDate, DateTime? startDt, DateTime? endDt,
+        public async Task CreatingChart_AddsChartToRepository_WhenWellFormed(ChartType type, bool isToDate,
+            DateTime? startDt, DateTime? endDt,
             DateRangeUnit? toDateRangeUnit, int? toDateRangeValue, AggregationFrequency? frequency)
         {
             var fixture = new Fixture()
@@ -263,7 +328,8 @@ namespace PortEval.Tests.Tests.Services
 
         [Theory]
         [MemberData(nameof(WellFormedData))]
-        public async Task UpdatingChart_UpdatesChartInRepository_WhenWellFormed(ChartType type, bool isToDate, DateTime? startDt, DateTime? endDt,
+        public async Task UpdatingChart_UpdatesChartInRepository_WhenWellFormed(ChartType type, bool isToDate,
+            DateTime? startDt, DateTime? endDt,
             DateRangeUnit? toDateRangeUnit, int? toDateRangeValue, AggregationFrequency? frequency)
         {
             var fixture = new Fixture()
@@ -573,19 +639,13 @@ namespace PortEval.Tests.Tests.Services
 
         private bool LineDtosMatchLineEntities(IReadOnlyList<ChartLineDto> dtos, IReadOnlyList<ChartLine> entities)
         {
-            if (dtos.Count != entities.Count)
-            {
-                return false;
-            }
+            if (dtos.Count != entities.Count) return false;
 
             for (var i = 0; i < dtos.Count; i++)
             {
                 var dto = dtos[i];
                 var entity = entities[i];
-                if (!LineDtoMatchesLineEntity(dto, entity))
-                {
-                    return false;
-                }
+                if (!LineDtoMatchesLineEntity(dto, entity)) return false;
             }
 
             return true;
@@ -628,69 +688,5 @@ namespace PortEval.Tests.Tests.Services
         {
             return type == ChartType.Price || type == ChartType.Profit || type == ChartType.AggregatedProfit;
         }
-
-        public static IEnumerable<object[]> WellFormedData => new List<object[]>
-        {
-            new object[]
-            {
-                ChartType.Price,
-                true,
-                null,
-                null,
-                DateRangeUnit.DAY,
-                3,
-                null
-            },
-            new object[]
-            {
-                ChartType.Profit,
-                false,
-                DateTime.Parse("2021-01-01"),
-                DateTime.Parse("2022-06-01"),
-                null,
-                null,
-                null
-            },
-            new object[]
-            {
-                ChartType.Performance,
-                false,
-                DateTime.Parse("2022-01-03 12:00"),
-                DateTime.Parse("2022-01-06 18:35"),
-                null,
-                null,
-                null
-            },
-            new object[]
-            {
-                ChartType.AggregatedProfit,
-                true,
-                null,
-                null,
-                DateRangeUnit.YEAR,
-                1,
-                AggregationFrequency.Week
-            },
-            new object[]
-            {
-                ChartType.AggregatedPerformance,
-                true,
-                null,
-                null,
-                DateRangeUnit.WEEK,
-                2,
-                AggregationFrequency.Hour
-            },
-            new object[]
-            {
-                ChartType.Price,
-                true,
-                null,
-                null,
-                DateRangeUnit.MONTH,
-                4,
-                null
-            }
-        };
     }
 }

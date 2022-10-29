@@ -5,10 +5,17 @@ using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.Validators;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Models.Validators
+namespace PortEval.Tests.UnitTests.Models.Validators
 {
     public class CurrencyDtoValidatorTests
     {
+        public static IEnumerable<object[]> ValidCurrencies = new List<object[]>
+        {
+            new object[] { "US Dollar", "USD", "$" },
+            new object[] { "Euro", "EUR", "€" },
+            new object[] { "Czech Crown", "CZK", "Kč" }
+        };
+
         [Theory]
         [MemberData(nameof(ValidCurrencies))]
         public void Validate_ValidatesSuccessfully_WhenCurrenciesAreValid(string name, string code, string symbol)
@@ -33,7 +40,7 @@ namespace PortEval.Tests.Tests.Models.Validators
         [InlineData("")]
         [InlineData("A")]
         [InlineData("ABCD")]
-        public void Validate_FailsToValidate_WhenCurrencyCodeIsInvalid(string currencyCode)
+        public void Validate_FailsValidation_WhenCurrencyCodeIsInvalid(string currencyCode)
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -50,7 +57,7 @@ namespace PortEval.Tests.Tests.Models.Validators
         }
 
         [Fact]
-        public void Validate_FailsToValidate_WhenSymbolIsLongerThanFourCharacters()
+        public void Validate_FailsValidation_WhenSymbolIsLongerThanFourCharacters()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -68,7 +75,7 @@ namespace PortEval.Tests.Tests.Models.Validators
         }
 
         [Fact]
-        public void Validate_FailsToValidate_WhenNameIsLongerThanSixtyFourCharacters()
+        public void Validate_FailsValidation_WhenNameIsLongerThanSixtyFourCharacters()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -85,12 +92,5 @@ namespace PortEval.Tests.Tests.Models.Validators
             Assert.False(validationResult.IsValid);
             Assert.Contains(validationResult.Errors, e => e.PropertyName == nameof(currency.Name));
         }
-
-        public static IEnumerable<object[]> ValidCurrencies = new List<object[]>()
-        {
-            new object[] { "US Dollar", "USD", "$" },
-            new object[] { "Euro", "EUR", "€" },
-            new object[] { "Czech Crown", "CZK", "Kč" }
-        };
     }
 }

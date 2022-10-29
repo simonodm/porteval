@@ -1,16 +1,25 @@
-﻿using AutoFixture;
+﻿using System;
+using System.Collections.Generic;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Application.Models.Validators;
 using PortEval.Domain;
-using System;
-using System.Collections.Generic;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Models.Validators
+namespace PortEval.Tests.UnitTests.Models.Validators
 {
     public class DateRangeParamsValidatorTests
     {
+        public static IEnumerable<object[]> ValidDateRanges = new List<object[]>
+        {
+            new object[] { DateTime.Parse("2022-01-01"), DateTime.Parse("2022-01-02") },
+            new object[] { DateTime.Parse("2004-06-12 13:33"), DateTime.Parse("2022-01-02") },
+            new object[] { DateTime.Parse("2022-07-31 12:01"), DateTime.Parse("2022-07-31 14:00") },
+            new object[] { DateTime.Parse("2016-02-29"), DateTime.Parse("2016-03-01") },
+            new object[] { DateTime.Parse("2001-05-05 23:59"), DateTime.Parse("2001-05-06") }
+        };
+
         [Theory]
         [MemberData(nameof(ValidDateRanges))]
         public void Validate_ValidatesSuccessfully_WhenProvidedDateRangeIsValid(DateTime from, DateTime to)
@@ -83,14 +92,5 @@ namespace PortEval.Tests.Tests.Models.Validators
 
             Assert.False(validationResult.IsValid);
         }
-
-        public static IEnumerable<object[]> ValidDateRanges = new List<object[]>()
-        {
-            new object[] { DateTime.Parse("2022-01-01"), DateTime.Parse("2022-01-02") },
-            new object[] { DateTime.Parse("2004-06-12 13:33"), DateTime.Parse("2022-01-02") },
-            new object[] { DateTime.Parse("2022-07-31 12:01"), DateTime.Parse("2022-07-31 14:00") },
-            new object[] { DateTime.Parse("2016-02-29"), DateTime.Parse("2016-03-01") },
-            new object[] { DateTime.Parse("2001-05-05 23:59"), DateTime.Parse("2001-05-06") }
-        };
     }
 }

@@ -8,7 +8,7 @@ using FluentValidation;
 using PortEval.Application.Services.BulkImportExport;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Services.BulkImportExport
+namespace PortEval.Tests.UnitTests.Services.BulkImportExport
 {
     internal class TestRow
     {

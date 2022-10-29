@@ -9,7 +9,7 @@ using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Services
+namespace PortEval.Tests.UnitTests.Services
 {
     public class PortfolioServiceTests
     {
@@ -28,7 +28,7 @@ namespace PortEval.Tests.Tests.Services
 
             await sut.CreatePortfolioAsync(portfolioDto);
 
-            portfolioRepository.Verify(r => r.Add(It.Is<Portfolio>(p => 
+            portfolioRepository.Verify(r => r.Add(It.Is<Portfolio>(p =>
                 p.Name == portfolioDto.Name &&
                 p.Note == portfolioDto.Note &&
                 p.CurrencyCode == portfolioDto.CurrencyCode

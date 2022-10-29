@@ -11,7 +11,7 @@ using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Services
+namespace PortEval.Tests.UnitTests.Services
 {
     public class InstrumentPriceServiceTests
     {
@@ -114,7 +114,8 @@ namespace PortEval.Tests.Tests.Services
                 .ReturnsAsync((InstrumentPrice)null);
             priceRepository
                 .Setup(r => r.FindPriceAt(priceDto.InstrumentId, It.Is<DateTime>(dt => dt <= priceDto.Time)))
-                .ReturnsAsync<int, DateTime, IInstrumentPriceRepository, InstrumentPrice>((id, dt) => new InstrumentPrice(dt, priceDto.Price + 1m, priceDto.InstrumentId));
+                .ReturnsAsync<int, DateTime, IInstrumentPriceRepository, InstrumentPrice>((id, dt) =>
+                    new InstrumentPrice(dt, priceDto.Price + 1m, priceDto.InstrumentId));
 
             var sut = fixture.Create<InstrumentPriceService>();
 
@@ -148,7 +149,8 @@ namespace PortEval.Tests.Tests.Services
                 .ReturnsAsync((InstrumentPrice)null);
             priceRepository
                 .Setup(r => r.FindPriceAt(priceDto.InstrumentId, It.Is<DateTime>(dt => dt <= priceDto.Time)))
-                .ReturnsAsync<int, DateTime, IInstrumentPriceRepository, InstrumentPrice>((id, dt) => new InstrumentPrice(dt.AddSeconds(-1), priceDto.Price, priceDto.InstrumentId));
+                .ReturnsAsync<int, DateTime, IInstrumentPriceRepository, InstrumentPrice>((id, dt) =>
+                    new InstrumentPrice(dt.AddSeconds(-1), priceDto.Price, priceDto.InstrumentId));
 
             var sut = fixture.Create<InstrumentPriceService>();
 
@@ -176,7 +178,8 @@ namespace PortEval.Tests.Tests.Services
 
             var sut = fixture.Create<InstrumentPriceService>();
 
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await sut.AddPriceIfNotExistsAsync(priceDto.InstrumentId, priceDto.Time, priceDto.Price));
+            await Assert.ThrowsAsync<ItemNotFoundException>(async () =>
+                await sut.AddPriceIfNotExistsAsync(priceDto.InstrumentId, priceDto.Time, priceDto.Price));
         }
 
         [Fact]
@@ -228,7 +231,8 @@ namespace PortEval.Tests.Tests.Services
 
             var sut = fixture.Create<InstrumentPriceService>();
 
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await sut.DeletePricePointByIdAsync(priceDto.InstrumentId, priceDto.Id));
+            await Assert.ThrowsAsync<ItemNotFoundException>(async () =>
+                await sut.DeletePricePointByIdAsync(priceDto.InstrumentId, priceDto.Id));
         }
     }
 }

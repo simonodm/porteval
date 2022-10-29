@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 using AutoFixture;
 using Moq;
-using PortEval.Application.Services.Interfaces.Repositories;
-using PortEval.Domain.Models.Entities;
-using System.Threading.Tasks;
-using AutoFixture.Dsl;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Services.Interfaces;
+using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Domain.Models.Entities;
 
 namespace PortEval.Tests.Extensions
 {
@@ -207,6 +206,7 @@ namespace PortEval.Tests.Extensions
 
             return mock;
         }
+
         #endregion
 
         #region Service Mocks

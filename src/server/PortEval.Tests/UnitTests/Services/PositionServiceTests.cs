@@ -13,7 +13,7 @@ using PortEval.Domain.Models.Enums;
 using PortEval.Tests.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Services
+namespace PortEval.Tests.UnitTests.Services
 {
     public class PositionServiceTests
     {
@@ -219,7 +219,8 @@ namespace PortEval.Tests.Tests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var position = fixture.Build<PositionDto>().With(p => p.Time, PortEvalConstants.FinancialDataStartTime.AddDays(-1)).Create();
+            var position = fixture.Build<PositionDto>()
+                .With(p => p.Time, PortEvalConstants.FinancialDataStartTime.AddDays(-1)).Create();
 
             fixture.CreateDefaultPortfolioRepositoryMock();
             fixture.CreateDefaultPositionRepositoryMock();
@@ -291,7 +292,7 @@ namespace PortEval.Tests.Tests.Services
             var sut = fixture.Create<PositionService>();
 
             await sut.RemovePositionAsync(positionId);
-            
+
             positionRepository.Verify(r => r.Delete(positionId), Times.Once());
         }
 

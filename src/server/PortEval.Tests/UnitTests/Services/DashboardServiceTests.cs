@@ -11,7 +11,7 @@ using PortEval.Domain.Models.ValueObjects;
 using PortEval.Tests.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.Tests.Services
+namespace PortEval.Tests.UnitTests.Services
 {
     public class DashboardServiceTests
     {
@@ -35,9 +35,7 @@ namespace PortEval.Tests.Tests.Services
             await sut.UpdateDashboardLayout(newDashboardItems);
 
             foreach (var item in existingDashboardItems)
-            {
                 dashboardItemRepository.Verify(r => r.Remove(item), Times.Once());
-            }
         }
 
         [Fact]
@@ -60,7 +58,6 @@ namespace PortEval.Tests.Tests.Services
             await sut.UpdateDashboardLayout(newDashboardItems);
 
             foreach (var item in newDashboardItems)
-            {
                 dashboardItemRepository.Verify(r => r.Add(It.Is<DashboardChartItem>(i =>
                     i.Position.X == item.DashboardPositionX &&
                     i.Position.Y == item.DashboardPositionY &&
@@ -68,7 +65,6 @@ namespace PortEval.Tests.Tests.Services
                     i.Position.Height == item.DashboardHeight &&
                     i.ChartId == item.ChartId
                 )), Times.Once());
-            }
         }
 
         [Fact]
@@ -88,7 +84,8 @@ namespace PortEval.Tests.Tests.Services
 
             var sut = fixture.Create<DashboardService>();
 
-            await Assert.ThrowsAsync<OperationNotAllowedException>(async () => await sut.UpdateDashboardLayout(newDashboardItems));
+            await Assert.ThrowsAsync<OperationNotAllowedException>(async () =>
+                await sut.UpdateDashboardLayout(newDashboardItems));
         }
 
         [Fact]
@@ -108,7 +105,8 @@ namespace PortEval.Tests.Tests.Services
 
             var sut = fixture.Create<DashboardService>();
 
-            await Assert.ThrowsAsync<OperationNotAllowedException>(async () => await sut.UpdateDashboardLayout(newDashboardItems));
+            await Assert.ThrowsAsync<OperationNotAllowedException>(async () =>
+                await sut.UpdateDashboardLayout(newDashboardItems));
         }
 
         [Fact]
@@ -131,7 +129,8 @@ namespace PortEval.Tests.Tests.Services
 
             var sut = fixture.Create<DashboardService>();
 
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await sut.UpdateDashboardLayout(newDashboardItems));
+            await Assert.ThrowsAsync<ItemNotFoundException>(async () =>
+                await sut.UpdateDashboardLayout(newDashboardItems));
         }
 
         private List<DashboardItem> GenerateValidDashboardItemEntities(IFixture fixture)
