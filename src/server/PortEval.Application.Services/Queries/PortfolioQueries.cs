@@ -179,7 +179,12 @@ namespace PortEval.Application.Services.Queries
             return new QueryResponse<EntityPerformanceDto>
             {
                 Status = QueryStatus.Ok,
-                Response = performance
+                Response = new EntityPerformanceDto
+                {
+                    From = dateRange.From,
+                    To = dateRange.To,
+                    Performance = performance
+                }
             };
         }
 
