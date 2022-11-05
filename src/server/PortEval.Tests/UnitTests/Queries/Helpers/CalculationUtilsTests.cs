@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Application.Services.Queries.Helpers;
 using PortEval.Domain.Models.Enums;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Services.Helpers
+namespace PortEval.Tests.UnitTests.Queries.Helpers
 {
     public class CalculationUtilsTests
     {

@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoFixture;
-using AutoFixture.AutoMoq;
-using PortEval.Application.Services.Queries.Helpers;
+using PortEval.Application.Services.Queries.Calculators;
 using PortEval.Application.Services.Queries.Models;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Services.Helpers
+namespace PortEval.Tests.UnitTests.Queries.Calculators
 {
-    public class InternalRateOfReturnCalculatorTests
+    public class IrrPerformanceCalculatorTests
     {
         [Theory]
         [MemberData(nameof(GenerateTestData))]
         public void CalculateIrr_ReturnsCorrectRateOfReturn(IEnumerable<TransactionDetailsQueryModel> transactions, DateTime start, DateTime end, decimal expectedIrr)
         {
-            var result = InternalRateOfReturnCalculator.CalculateIrr(transactions, start, end);
+            var calculator = new IrrPerformanceCalculator();
+
+            var result = calculator.CalculatePerformance(transactions, start, end);
 
             Assert.InRange(result, expectedIrr - 0.01m, expectedIrr + 0.01m);
         }
@@ -25,7 +23,9 @@ namespace PortEval.Tests.UnitTests.Services.Helpers
         [Fact]
         public void CalculateIrr_ReturnsZeroIrr_WhenNoTransactionsAreProvided()
         {
-            var result = InternalRateOfReturnCalculator.CalculateIrr(Enumerable.Empty<TransactionDetailsQueryModel>(),
+            var calculator = new IrrPerformanceCalculator();
+
+            var result = calculator.CalculatePerformance(Enumerable.Empty<TransactionDetailsQueryModel>(),
                 DateTime.MinValue, DateTime.MaxValue);
 
             Assert.Equal(0, result);

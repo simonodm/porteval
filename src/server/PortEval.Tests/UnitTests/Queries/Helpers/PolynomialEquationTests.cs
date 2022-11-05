@@ -1,7 +1,7 @@
 ﻿using PortEval.Application.Services.Queries.Helpers;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Services.Helpers
+namespace PortEval.Tests.UnitTests.Queries.Helpers
 {
     public class PolynomialEquationTests
     {
