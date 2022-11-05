@@ -1,24 +1,27 @@
-﻿using PortEval.Application.Models.DTOs;
+﻿using PortEval.Application.Services.Queries.Calculators.Interfaces;
+using PortEval.Application.Services.Queries.Helpers;
 using PortEval.Application.Services.Queries.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PortEval.Application.Services.Queries.Helpers
+namespace PortEval.Application.Services.Queries.Calculators
 {
     /// <summary>
     /// Calculates approximate internal rate of return of a position.
     /// </summary>
-    internal static class InternalRateOfReturnCalculator
+    internal class IrrPerformanceCalculator : ITransactionBasedPerformanceCalculator
     {
         /// <summary>
-        /// Calculates approximate internal rate of return in the given range using Newton's method.
+        /// Calculates approximate performance in the given range using Internal Rate of Return.
+        ///
+        /// IRR is approximated using Newton's method.
         /// </summary>
         /// <param name="transactions">All transactions.</param>
         /// <param name="from">Start range.</param>
         /// <param name="to">End range.</param>
         /// <returns>Total performance of the financial entity represented by the provided transactions.</returns>
-        public static decimal CalculateIrr(IEnumerable<TransactionDetailsQueryModel> transactions, DateTime from, DateTime to)
+        public decimal CalculatePerformance(IEnumerable<TransactionDetailsQueryModel> transactions, DateTime from, DateTime to)
         {
             var transactionsList = transactions.OrderBy(t => t.Time).ToList();
             if (transactionsList.Count == 0)
@@ -74,7 +77,7 @@ namespace PortEval.Application.Services.Queries.Helpers
             {
                 var simplifiedPerformance = Math.Pow((double)initialGuess, totalIntervalCount);
                 return (decimal)simplifiedPerformance - 1;
-            }   
+            }
         }
 
         /// <summary>
