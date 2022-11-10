@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
@@ -12,7 +9,7 @@ using PortEval.Application.Services.Queries.Interfaces;
 using PortEval.Infrastructure;
 using Xunit;
 
-namespace PortEval.Tests.Functional.QueryTests
+namespace PortEval.Tests.Integration.QueryTests
 {
     [Collection("Integration test collection")]
     public class TransactionQueriesTests
@@ -34,7 +31,7 @@ namespace PortEval.Tests.Functional.QueryTests
                 await _transactionQueries.GetTransactions(new TransactionFilters(), new DateRangeParams());
 
             Assert.Equal(QueryStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsInitialBTCTransaction, AssertIsInitialAAPLTransaction);
+            Assert.Collection(queryResult.Response, AssertIsInitialAAPLTransaction, AssertIsInitialBTCTransaction);
         }
 
         [Fact]
@@ -113,7 +110,7 @@ namespace PortEval.Tests.Functional.QueryTests
             });
 
             Assert.Equal(QueryStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsInitialAAPLTransaction);
+            Assert.Collection(queryResult.Response, AssertIsInitialBTCTransaction);
         }
 
         [Fact]
@@ -144,7 +141,7 @@ namespace PortEval.Tests.Functional.QueryTests
             Assert.Equal("NASDAQ", t.Instrument.Exchange);
             Assert.Equal("USD", t.Instrument.CurrencyCode);
             Assert.Equal("", t.Note);
-            Assert.Equal(DateTime.UtcNow.AddDays(-1), t.Time, TimeSpan.FromHours(1));
+            Assert.Equal(DateTime.UtcNow.AddDays(-2), t.Time, TimeSpan.FromHours(1));
             Assert.Equal("", t.Note);
         }
 
@@ -157,7 +154,7 @@ namespace PortEval.Tests.Functional.QueryTests
             Assert.Null(t.Instrument.Exchange);
             Assert.Equal("USD", t.Instrument.CurrencyCode);
             Assert.Equal("bitcoin", t.Instrument.Note);
-            Assert.Equal(DateTime.UtcNow.AddDays(-2), t.Time, TimeSpan.FromHours(1));
+            Assert.Equal(DateTime.UtcNow.AddDays(-1), t.Time, TimeSpan.FromHours(1));
             Assert.Equal("bitcoin", t.Note);
         }
     }

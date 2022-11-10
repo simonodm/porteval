@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using PortEval.Application.Models.DTOs;
@@ -12,7 +10,7 @@ using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure;
 using Xunit;
 
-namespace PortEval.Tests.Functional.QueryTests
+namespace PortEval.Tests.Integration.QueryTests
 {
     [Collection("Integration test collection")]
     public class InstrumentQueriesTests
@@ -233,6 +231,10 @@ namespace PortEval.Tests.Functional.QueryTests
 
             Assert.Equal(QueryStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
+            {
+                Assert.Equal(3960m, p.Value);
+                Assert.Equal(DateTime.UtcNow.AddDays(-2), p.Time, TimeSpan.FromHours(1));
+            }, p =>
             {
                 Assert.Equal(3960m, p.Value);
                 Assert.Equal(DateTime.UtcNow.Date.AddDays(-1), p.Time, TimeSpan.FromHours(1));

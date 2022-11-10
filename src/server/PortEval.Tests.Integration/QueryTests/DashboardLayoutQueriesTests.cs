@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using PortEval.Application.Services.Queries;
 using PortEval.Application.Services.Queries.Interfaces;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace PortEval.Tests.Functional.QueryTests
+namespace PortEval.Tests.Integration.QueryTests
 {
     [Collection("Integration test collection")]
     public class DashboardLayoutQueriesTests

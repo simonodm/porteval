@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PortEval.Domain.Models.Entities;
@@ -10,7 +9,7 @@ using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using PortEval.Infrastructure;
 
-namespace PortEval.Tests.Functional
+namespace PortEval.Tests.Integration
 {
     internal class IntegrationTestDataSeeder
     {
@@ -23,14 +22,15 @@ namespace PortEval.Tests.Functional
 
         public async Task SeedDatabase()
         {
+            
             var currencies = await SeedCurrencies();
+            var exchangeRates = await SeedCurrencyExchangeRates();
             var exchanges = await SeedExchanges();
-            var portfolios = await SeedPortfolios();
             var instruments = await SeedInstruments();
             var prices = await SeedInstrumentPrices(instruments);
+            var portfolios = await SeedPortfolios();
             var positions = await SeedPositions(portfolios, instruments);
             var transactions = await SeedTransactions(positions);
-            var exchangeRates = await SeedCurrencyExchangeRates();
             var charts = await SeedCharts(portfolios, positions, instruments);
             var dashboardItems = await SeedDashboardItems(charts);
             var dataImports = await SeedDataImports();
@@ -114,8 +114,8 @@ namespace PortEval.Tests.Functional
 
             var transactions = new List<Transaction>
             {
-                new Transaction(positionsList[0].Id, DateTime.UtcNow.AddDays(-1), 1m, 100m, ""),
-                new Transaction(positionsList[1].Id, DateTime.UtcNow.AddDays(-2), 5m, 5000m, "bitcoin")
+                new Transaction(positionsList[0].Id, DateTime.UtcNow.AddDays(-2), 1m, 100m, ""),
+                new Transaction(positionsList[1].Id, DateTime.UtcNow.AddDays(-1), 5m, 5000m, "bitcoin")
             };
 
             _context.Transactions.AddRange(transactions);

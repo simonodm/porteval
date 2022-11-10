@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PortEval.Application;
 using PortEval.Infrastructure;
-using System;
 
-namespace PortEval.Tests.Functional
+namespace PortEval.Tests.Integration
 {
     public class IntegrationTestFixture : IDisposable
     {
