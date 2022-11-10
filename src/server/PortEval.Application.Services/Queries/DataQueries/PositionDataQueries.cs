@@ -21,7 +21,8 @@ namespace PortEval.Application.Services.Queries.DataQueries
                           LEFT JOIN (SELECT ROW_NUMBER() OVER (PARTITION BY InstrumentId ORDER BY Time DESC) row_num, InstrumentId AS PriceInstrumentId, Price as CurrentPrice FROM dbo.InstrumentPrices) AS p
                           ON p.PriceInstrumentId = dbo.Instruments.Id
                           WHERE (p.row_num = 1
-                          OR p.row_num IS NULL)"
+                          OR p.row_num IS NULL)
+                          ORDER BY dbo.Instruments.Symbol"
             };
         }
 
@@ -40,7 +41,8 @@ namespace PortEval.Application.Services.Queries.DataQueries
                           ON p.PriceInstrumentId = dbo.Instruments.Id
                           WHERE (p.row_num = 1
                           OR p.row_num IS NULL)
-                          AND Positions.PortfolioId = @PortfolioId",
+                          AND Positions.PortfolioId = @PortfolioId
+                          ORDER BY dbo.Instruments.Symbol",
                 Params = new { PortfolioId = portfolioId }
             };
         }
@@ -66,37 +68,45 @@ namespace PortEval.Application.Services.Queries.DataQueries
         }
 
         public static QueryWrapper<IEnumerable<TransactionDetailsQueryModel>> GetDetailedTransactionsQuery(
-            int positionId, DateTime from, DateTime to)
+            int positionId, DateTime transactionFrom, DateTime transactionTo, DateTime priceFrom, DateTime priceTo)
         {
             return new QueryWrapper<IEnumerable<TransactionDetailsQueryModel>>
             {
                 Query = @"WITH rownum_prices_start AS (
 	                          SELECT InstrumentId, Price AS InstrumentPriceAtRangeStart,
                                 ROW_NUMBER() OVER(PARTITION BY InstrumentId ORDER BY Time DESC) as rownum_start FROM dbo.InstrumentPrices
-	                          WHERE Time <= @TimeFrom
+	                          WHERE Time <= @PriceTimeFrom
                           ), rownum_prices_end AS (
 	                          SELECT InstrumentId, Price AS InstrumentPriceAtRangeEnd,
                                 ROW_NUMBER() OVER(PARTITION BY InstrumentId ORDER BY Time DESC) as rownum_end FROM dbo.InstrumentPrices
-	                          WHERE Time <= @TimeTo
+	                          WHERE Time <= @PriceTimeTo
                           )
  
                           SELECT Time, Amount, Price, InstrumentPriceAtRangeStart, InstrumentPriceAtRangeEnd FROM dbo.Positions
                           INNER JOIN (
 	                          SELECT PositionId, Time, Amount, Price FROM dbo.Transactions
-	                          WHERE Time <= @TimeTo
+	                          WHERE Time <= @TransactionTimeTo
+                              AND Time >= @TransactionTimeFrom
                           ) AS Transactions ON PositionId = Positions.Id
                           INNER JOIN dbo.Instruments ON Instruments.Id = InstrumentId
-                          INNER JOIN (
-	                          SELECT rownum_prices_start.InstrumentId, InstrumentPriceAtRangeStart, InstrumentPriceAtRangeEnd FROM rownum_prices_start
-	                          INNER JOIN (
-		                          SELECT InstrumentId, InstrumentPriceAtRangeEnd FROM rownum_prices_end
-		                          WHERE rownum_end = 1
-	                          ) AS prices_end ON prices_end.InstrumentId = rownum_prices_start.InstrumentId
+                          LEFT JOIN (
+	                          SELECT rownum_prices_start.InstrumentId, InstrumentPriceAtRangeStart FROM rownum_prices_start
 	                          WHERE rownum_start = 1
-                          ) AS Prices ON Positions.InstrumentId = Prices.InstrumentId
+                          ) AS PricesStart ON PricesStart.InstrumentId = Instruments.Id
+                          LEFT JOIN (
+	                          SELECT rownum_prices_end.InstrumentId, InstrumentPriceAtRangeEnd FROM rownum_prices_end
+	                          WHERE rownum_end = 1
+                          ) AS PricesEnd on PricesEnd.InstrumentId = Instruments.Id
                           WHERE Transactions.PositionId = @PositionId
                           ORDER BY Time DESC",
-                Params = new { PositionId = positionId, TimeFrom = from, TimeTo = to }
+                Params = new
+                {
+                    PositionId = positionId,
+                    TransactionTimeFrom = transactionFrom,
+                    TransactionTimeTo = transactionTo,
+                    PriceTimeFrom = priceFrom,
+                    PriceTimeTo = priceTo
+                }
             };
         }
 

@@ -22,7 +22,6 @@ namespace PortEval.Application.Services.Queries
     public class PositionQueries : IPositionQueries
     {
         private readonly IDbConnectionCreator _connectionCreator;
-        private readonly IInstrumentQueries _instrumentQueries;
         private readonly ICurrencyExchangeRateQueries _exchangeRateQueries;
         private readonly ITransactionQueries _transactionQueries;
 
@@ -31,10 +30,9 @@ namespace PortEval.Application.Services.Queries
         private readonly ITransactionBasedPerformanceCalculator _performanceCalculator;
 
         public PositionQueries(IDbConnectionCreator connection,
-            IInstrumentQueries instrumentQueries, ICurrencyExchangeRateQueries exchangeRateQueries, ITransactionQueries transactionQueries)
+            ICurrencyExchangeRateQueries exchangeRateQueries, ITransactionQueries transactionQueries)
         {
             _connectionCreator = connection;
-            _instrumentQueries = instrumentQueries;
             _exchangeRateQueries = exchangeRateQueries;
             _transactionQueries = transactionQueries;
 
@@ -126,14 +124,19 @@ namespace PortEval.Application.Services.Queries
             }
 
             using var connection = _connectionCreator.CreateConnection();
-            var transactions = await GetDetailedTransactionData(connection, positionId, new DateRangeParams { To = time });
+            var dateRange = new DateRangeParams
+            {
+                To = time
+            };
+            var transactions = await GetDetailedTransactionData(connection, positionId, dateRange.SetFrom(PortEvalConstants.FinancialDataStartTime), dateRange);
 
             var value = _valueCalculator.CalculateValue(transactions, time);
 
             var result = new EntityValueDto
             {
                 Time = time,
-                Value = value
+                Value = value,
+                CurrencyCode = position.Response.Instrument.CurrencyCode
             };
 
             return new QueryResponse<EntityValueDto>
@@ -156,7 +159,7 @@ namespace PortEval.Application.Services.Queries
             }
 
             using var connection = _connectionCreator.CreateConnection();
-            var transactions = await GetDetailedTransactionData(connection, positionId, dateRange);
+            var transactions = await GetDetailedTransactionData(connection, positionId, dateRange.SetFrom(PortEvalConstants.FinancialDataStartTime), dateRange);
 
             var profit = _profitCalculator.CalculateProfit(transactions, dateRange.From, dateRange.To);
 
@@ -164,7 +167,8 @@ namespace PortEval.Application.Services.Queries
             {
                 From = dateRange.From,
                 To = dateRange.To,
-                Profit = profit
+                Profit = profit,
+                CurrencyCode = position.Response.Instrument.CurrencyCode
             };
 
             return new QueryResponse<EntityProfitDto>
@@ -187,7 +191,7 @@ namespace PortEval.Application.Services.Queries
             }
 
             using var connection = _connectionCreator.CreateConnection();
-            var transactions = await GetDetailedTransactionData(connection, positionId, dateRange);
+            var transactions = await GetDetailedTransactionData(connection, positionId, dateRange.SetFrom(PortEvalConstants.FinancialDataStartTime), dateRange);
 
             var performance = _performanceCalculator.CalculatePerformance(transactions, dateRange.From, dateRange.To);
 
@@ -506,10 +510,10 @@ namespace PortEval.Application.Services.Queries
             return time.Time;
         }
 
-        private async Task<IEnumerable<TransactionDetailsQueryModel>> GetDetailedTransactionData(IDbConnection connection, int positionId, DateRangeParams dateRange)
+        private async Task<IEnumerable<TransactionDetailsQueryModel>> GetDetailedTransactionData(IDbConnection connection, int positionId, DateRangeParams transactionDateRange, DateRangeParams priceDateRange)
         {
             var transactionDetailsQuery =
-                PositionDataQueries.GetDetailedTransactionsQuery(positionId, dateRange.From, dateRange.To);
+                PositionDataQueries.GetDetailedTransactionsQuery(positionId, transactionDateRange.From, transactionDateRange.To, priceDateRange.From, priceDateRange.To);
             var transactionData = await connection.QueryAsync<TransactionDetailsQueryModel>(transactionDetailsQuery.Query,
                 transactionDetailsQuery.Params);
 

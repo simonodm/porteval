@@ -81,17 +81,19 @@ namespace PortEval.Application.Services.Queries
             }
 
             using var connection = _connectionCreator.CreateConnection();
-            var transactions = await GetTransactionsConvertedToPortfolioCurrency(connection, portfolioId, new DateRangeParams
+            var dateRange = new DateRangeParams
             {
                 To = time
-            });
+            };
+            var transactions = await GetTransactionsConvertedToPortfolioCurrency(connection, portfolioId, dateRange, dateRange);
 
             var value = _valueCalculator.CalculateValue(transactions, time);
 
             var valueDto = new EntityValueDto
             {
                 Time = time,
-                Value = value
+                Value = value,
+                CurrencyCode = portfolio.Response.CurrencyCode
             };
 
             return new QueryResponse<EntityValueDto>
@@ -152,7 +154,7 @@ namespace PortEval.Application.Services.Queries
             List<PortfolioTransactionDetailsQueryModel> transactions;
             using (var connection = _connectionCreator.CreateConnection())
             {
-                transactions = (await GetTransactionsConvertedToPortfolioCurrency(connection, portfolioId, dateRange, dateRange)).ToList();
+                transactions = (await GetTransactionsConvertedToPortfolioCurrency(connection, portfolioId, new DateRangeParams { To = dateRange.To }, dateRange)).ToList();
             }
 
             var performance = _performanceCalculator.CalculatePerformance(transactions, dateRange.From, dateRange.To);
@@ -447,25 +449,14 @@ namespace PortEval.Application.Services.Queries
         /// with prices converted to portfolio's currency.
         /// </returns>
         private async Task<IEnumerable<PortfolioTransactionDetailsQueryModel>> GetTransactionsConvertedToPortfolioCurrency(IDbConnection connection,
-            int portfolioId, DateRangeParams transactionDateRange, DateRangeParams instrumentPricesDateRange = null)
+            int portfolioId, DateRangeParams transactionDateRange, DateRangeParams instrumentPricesDateRange)
         {
-            var firstTransactionTime = await GetFirstTransactionTime(portfolioId);
-
-            if (firstTransactionTime == null)
-            {
-                return Enumerable.Empty<PortfolioTransactionDetailsQueryModel>();
-            }
-
-            var transactionsTimeFrom = transactionDateRange.From;
-            var transactionsTimeTo = transactionDateRange.To;
-            var pricesTimeFrom = instrumentPricesDateRange?.From ?? transactionsTimeFrom;
-            var pricesTimeTo = instrumentPricesDateRange?.To ?? new DateTime(Math.Max(transactionsTimeFrom.Ticks, ((DateTime)firstTransactionTime).Ticks));
             var transactionQuery = PortfolioDataQueries.GetPortfolioDetailedTransactions(
                 portfolioId,
-                transactionsTimeFrom,
-                transactionsTimeTo,
-                pricesTimeFrom,
-                pricesTimeTo 
+                transactionDateRange.From,
+                transactionDateRange.To,
+                instrumentPricesDateRange.From,
+                instrumentPricesDateRange.To
             );
             var transactions =
                 await connection.QueryAsync<PortfolioTransactionDetailsQueryModel>(transactionQuery.Query, transactionQuery.Params);
@@ -483,14 +474,14 @@ namespace PortEval.Application.Services.Queries
                 {
                     instrumentConvertedRangeStartPrices[transaction.InstrumentId] = await _exchangeRateQueries.Convert(
                         transaction.TransactionCurrency, transaction.PortfolioCurrency,
-                        transaction.InstrumentPriceAtRangeStart, pricesTimeFrom);
+                        transaction.InstrumentPriceAtRangeStart, instrumentPricesDateRange.From);
                 }
 
                 if (!instrumentConvertedRangeEndPrices.ContainsKey(transaction.InstrumentId))
                 {
                     instrumentConvertedRangeEndPrices[transaction.InstrumentId] = await _exchangeRateQueries.Convert(
                         transaction.TransactionCurrency, transaction.PortfolioCurrency,
-                        transaction.InstrumentPriceAtRangeEnd, pricesTimeTo);
+                        transaction.InstrumentPriceAtRangeEnd, instrumentPricesDateRange.To);
                 }
 
                 transaction.Price = convertedTransactionPrice;
