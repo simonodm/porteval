@@ -187,7 +187,8 @@ namespace PortEval.Application.Services.Queries
             {
                 From = dateRange.From,
                 To = dateRange.To,
-                Profit = profit
+                Profit = profit,
+                CurrencyCode = instrument.Response.CurrencyCode
             };
             return new QueryResponse<EntityProfitDto>
             {

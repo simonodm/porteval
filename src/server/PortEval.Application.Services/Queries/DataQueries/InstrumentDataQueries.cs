@@ -82,7 +82,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
                 Query = @$"WITH added_row_number AS (
 	                          SELECT *, ROW_NUMBER() OVER(
                                   PARTITION BY {partitionCalc}
-                                  ORDER BY [Time]) AS row_number
+                                  ORDER BY [Time] DESC) AS row_number
                               FROM dbo.InstrumentPrices
                               WHERE InstrumentId = @InstrumentId
                               AND Time >= @TimeFrom
@@ -103,7 +103,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
                 Query = @$"WITH added_row_number AS (
 	                          SELECT *, ROW_NUMBER() OVER(
                                   PARTITION BY {partitionCalc}
-                                  ORDER BY [Time]) AS row_number
+                                  ORDER BY [Time] DESC) AS row_number
                               FROM dbo.InstrumentPrices
                               WHERE InstrumentId = @InstrumentId
                               AND Time >= @TimeFrom
@@ -135,7 +135,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
 	                          SELECT *,
   		                          ROW_NUMBER() OVER(
 			                          PARTITION BY {partitionCalc}
-			                          ORDER BY [Time]) AS row_number_time
+			                          ORDER BY [Time] DESC) AS row_number_time
                               FROM dbo.InstrumentPrices
                               WHERE InstrumentId = @InstrumentId
                               AND Time >= @TimeFrom
@@ -171,7 +171,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
 	                          SELECT *,
   		                          ROW_NUMBER() OVER(
 			                          PARTITION BY {partitionCalc}
-			                          ORDER BY [Time]) AS row_number_time
+			                          ORDER BY [Time] DESC) AS row_number_time
                               FROM dbo.InstrumentPrices
                               WHERE InstrumentId = @InstrumentId
                               AND Time >= @TimeFrom

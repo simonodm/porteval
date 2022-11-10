@@ -60,7 +60,6 @@ namespace PortEval.BackgroundJobs.DataImport
                 csv.RegisterImportClassMaps();
 
                 importEntry.ChangeStatus(ImportStatus.InProgress);
-                importEntry.IncreaseVersion();
                 _importRepository.Update(importEntry);
                 await _importRepository.UnitOfWork.CommitAsync();
 
@@ -88,7 +87,6 @@ namespace PortEval.BackgroundJobs.DataImport
             }
             finally
             {
-                importEntry.IncreaseVersion();
                 _importRepository.Update(importEntry);
                 await _importRepository.UnitOfWork.CommitAsync();
                 DeleteFile(inputFileName);
