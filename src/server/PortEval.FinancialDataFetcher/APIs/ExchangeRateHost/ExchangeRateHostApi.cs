@@ -60,7 +60,7 @@ namespace PortEval.FinancialDataFetcher.APIs.ExchangeRateHost
         public async Task<Response<ExchangeRates>> Process(LatestExchangeRatesRequest request)
         {
             var queryUrl = $"{_baseUrl}/latest?base={request.CurrencyCode}";
-            var response = await _httpClient.FetchJson<ExchangeRatesLatestResponseModel>(queryUrl, _rateLimiter);
+            var response = await _httpClient.GetJson<ExchangeRatesLatestResponseModel>(queryUrl, _rateLimiter);
 
             return new Response<ExchangeRates>
             {
@@ -83,7 +83,7 @@ namespace PortEval.FinancialDataFetcher.APIs.ExchangeRateHost
                 var endDate = i == ranges.Count - 1 ? ranges[i] : ranges[i].AddDays(-1);
                 var queryUrl =
                     $"{_baseUrl}/timeseries?start_date={startDate:yyyy-MM-dd}&end_date={endDate:yyyy-MM-dd}&base={request.CurrencyCode}";
-                var task = Task.Run(async () => await _httpClient.FetchJson<ExchangeRatesTimeSeriesResponseModel>(queryUrl, _rateLimiter));
+                var task = Task.Run(async () => await _httpClient.GetJson<ExchangeRatesTimeSeriesResponseModel>(queryUrl, _rateLimiter));
                 tasks.Add(task);
             }
 

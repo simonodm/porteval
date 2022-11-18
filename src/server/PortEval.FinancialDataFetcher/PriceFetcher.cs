@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
+using PortEval.FinancialDataFetcher.APIs.RapidAPIMboum;
 
 namespace PortEval.FinancialDataFetcher
 {
@@ -59,6 +60,17 @@ namespace PortEval.FinancialDataFetcher
         public void AddTiingo(string apiKey, RateLimiter rateLimiter = null)
         {
             var client = new TiingoApi(_httpClient, apiKey, rateLimiter);
+            _registeredClients.Add(client);
+        }
+
+        /// <summary>
+        /// Adds RapidAPI's Mboum API to available APIs.
+        /// </summary>
+        /// <param name="apiKey">RapidAPI Mboum API key</param>
+        /// <param name="rateLimiter">Request rate limiter</param>
+        public void AddMboum(string apiKey, RateLimiter rateLimiter = null)
+        {
+            var client = new MboumApi(_httpClient, apiKey, rateLimiter);
             _registeredClients.Add(client);
         }
 
