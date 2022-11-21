@@ -4,22 +4,22 @@ using Microsoft.Extensions.DependencyInjection;
 using PortEval.Application;
 using PortEval.Infrastructure;
 
-namespace PortEval.Tests.Integration
+namespace PortEval.Tests.Integration.QueryTests
 {
-    public class IntegrationTestFixture : IDisposable
+    public class QueryTestFixture : IDisposable
     {
-        internal readonly IntegrationTestFactory<Program> Factory;
+        internal readonly DockerDatabaseIntegrationTestFactory<Program> Factory;
 
-        public IntegrationTestFixture()
+        public QueryTestFixture()
         {
-            Factory = new IntegrationTestFactory<Program>();
+            Factory = new DockerDatabaseIntegrationTestFactory<Program>();
             Factory.InitializeAsync().Wait();
             using var scope = Factory.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<PortEvalDbContext>();
             db.Database.EnsureDeleted();
             db.Database.Migrate();
 
-            var seeder = new IntegrationTestDataSeeder(db);
+            var seeder = new DbContextDataSeeder(db);
             seeder.SeedDatabase().Wait();
         }
 

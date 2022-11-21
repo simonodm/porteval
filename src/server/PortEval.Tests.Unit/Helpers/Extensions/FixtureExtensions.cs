@@ -2,12 +2,17 @@
 using System.Threading.Tasks;
 using AutoFixture;
 using Moq;
+using PortEval.Application.Models;
 using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.QueryParams;
 using PortEval.Application.Services.Interfaces;
 using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Application.Services.Queries;
+using PortEval.Application.Services.Queries.Interfaces;
 using PortEval.Domain.Models.Entities;
+using PortEval.Domain.Models.Enums;
 
-namespace PortEval.Tests.Extensions
+namespace PortEval.Tests.Unit.Helpers.Extensions
 {
     internal static class FixtureExtensions
     {
@@ -20,7 +25,7 @@ namespace PortEval.Tests.Extensions
                 .Setup(m => m.FindAsync(It.IsAny<string>()))
                 .Returns(Task.FromResult(fixture.Create<Currency>()));
             mock
-                .Setup(m => m.Exists(It.IsAny<string>()))
+                .Setup(m => m.ExistsAsync(It.IsAny<string>()))
                 .Returns(Task.FromResult(true));
             mock
                 .Setup(m => m.Update(It.IsAny<Currency>()))
@@ -50,7 +55,7 @@ namespace PortEval.Tests.Extensions
                 .Setup(m => m.FindAsync(It.IsAny<string>()))
                 .Returns(Task.FromResult(fixture.Create<Exchange>()));
             mock
-                .Setup(m => m.Exists(It.IsAny<string>()))
+                .Setup(m => m.ExistsAsync(It.IsAny<string>()))
                 .Returns(Task.FromResult(true));
             mock
                 .Setup(m => m.Add(It.IsAny<Exchange>()))
@@ -66,7 +71,7 @@ namespace PortEval.Tests.Extensions
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .Returns(Task.FromResult(fixture.Create<Instrument>()));
             mock
-                .Setup(m => m.Exists(It.IsAny<int>()))
+                .Setup(m => m.ExistsAsync(It.IsAny<int>()))
                 .Returns(Task.FromResult(true));
             mock
                 .Setup(m => m.Add(It.IsAny<Instrument>()))
@@ -91,7 +96,7 @@ namespace PortEval.Tests.Extensions
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .Returns(Task.FromResult(fixture.Create<Portfolio>()));
             mock
-                .Setup(m => m.Exists(It.IsAny<int>()))
+                .Setup(m => m.ExistsAsync(It.IsAny<int>()))
                 .Returns(Task.FromResult(true));
             mock
                 .Setup(m => m.Add(It.IsAny<Portfolio>()))
@@ -107,7 +112,7 @@ namespace PortEval.Tests.Extensions
         {
             var mock = fixture.Freeze<Mock<IPositionRepository>>();
             mock
-                .Setup(m => m.ListAsync(It.IsAny<int>()))
+                .Setup(m => m.ListPortfolioPositionsAsync(It.IsAny<int>()))
                 .Returns(Task.FromResult(fixture.CreateMany<Position>()));
             mock
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
@@ -119,10 +124,10 @@ namespace PortEval.Tests.Extensions
                 .Setup(m => m.Update(It.IsAny<Position>()))
                 .Returns<Position>(p => p);
             mock
-                .Setup(m => m.FindParentPosition(It.IsAny<int>()))
+                .Setup(m => m.FindParentPositionAsync(It.IsAny<int>()))
                 .Returns(Task.FromResult(fixture.Create<Position>()));
             mock
-                .Setup(m => m.Exists(It.IsAny<int>()))
+                .Setup(m => m.ExistsAsync(It.IsAny<int>()))
                 .Returns(Task.FromResult(true));
 
             return mock;
@@ -132,19 +137,19 @@ namespace PortEval.Tests.Extensions
         {
             var mock = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
             mock
-                .Setup(m => m.FindPriceAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(m => m.FindPriceByIdAsync(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns(Task.FromResult(fixture.Create<InstrumentPrice>()));
             mock
-                .Setup(m => m.FindPriceAt(It.IsAny<int>(), It.IsAny<DateTime>()))
+                .Setup(m => m.FindPriceAtAsync(It.IsAny<int>(), It.IsAny<DateTime>()))
                 .Returns(Task.FromResult(fixture.Create<InstrumentPrice>()));
             mock
-                .Setup(m => m.Exists(It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(m => m.ExistsAsync(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns(Task.FromResult(true));
             mock
-                .Setup(m => m.Exists(It.IsAny<int>(), It.IsAny<DateTime>()))
+                .Setup(m => m.ExistsAsync(It.IsAny<int>(), It.IsAny<DateTime>()))
                 .Returns(Task.FromResult(true));
             mock
-                .Setup(m => m.AddInstrumentPrice(It.IsAny<InstrumentPrice>()))
+                .Setup(m => m.Add(It.IsAny<InstrumentPrice>()))
                 .Returns<InstrumentPrice>(p => p);
 
             return mock;
@@ -166,7 +171,7 @@ namespace PortEval.Tests.Extensions
                 .Setup(m => m.Update(It.IsAny<Chart>()))
                 .Returns<Chart>(c => c);
             mock
-                .Setup(m => m.Exists(It.IsAny<int>()))
+                .Setup(m => m.ExistsAsync(It.IsAny<int>()))
                 .Returns(Task.FromResult(true));
 
             return mock;
@@ -176,7 +181,7 @@ namespace PortEval.Tests.Extensions
         {
             var mock = fixture.Freeze<Mock<IDashboardItemRepository>>();
             mock
-                .Setup(m => m.GetDashboardItems())
+                .Setup(m => m.GetDashboardItemsAsync())
                 .ReturnsAsync(fixture.CreateMany<DashboardChartItem>());
             mock
                 .Setup(m => m.Add(It.IsAny<DashboardItem>()))
@@ -195,7 +200,7 @@ namespace PortEval.Tests.Extensions
                 .Setup(m => m.ListAllAsync())
                 .Returns(Task.FromResult(fixture.CreateMany<DataImport>()));
             mock
-                .Setup(m => m.Exists(It.IsAny<Guid>()))
+                .Setup(m => m.ExistsAsync(It.IsAny<Guid>()))
                 .Returns(Task.FromResult(true));
             mock
                 .Setup(m => m.Add(It.IsAny<DataImport>()))

@@ -45,7 +45,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
-                .Setup(r => r.Exists(portfolioDto.CurrencyCode))
+                .Setup(r => r.ExistsAsync(portfolioDto.CurrencyCode))
                 .Returns(Task.FromResult(false));
 
             var sut = fixture.Create<PortfolioService>();
@@ -106,7 +106,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultPortfolioRepositoryMock();
             var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
-                .Setup(r => r.Exists(portfolioDto.CurrencyCode))
+                .Setup(r => r.ExistsAsync(portfolioDto.CurrencyCode))
                 .Returns(Task.FromResult(false));
 
             var sut = fixture.Create<PortfolioService>();
@@ -124,7 +124,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
-                .Setup(r => r.Exists(portfolioDto.Id))
+                .Setup(r => r.ExistsAsync(portfolioDto.Id))
                 .Returns(Task.FromResult(false));
             portfolioRepository
                 .Setup(r => r.FindAsync(portfolioDto.Id))
@@ -171,7 +171,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             await sut.DeletePortfolioAsync(portfolioId);
 
-            portfolioRepository.Verify(r => r.Delete(portfolioId), Times.Once());
+            portfolioRepository.Verify(r => r.DeleteAsync(portfolioId), Times.Once());
         }
 
         [Fact]
@@ -184,7 +184,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
-                .Setup(r => r.Exists(portfolioId))
+                .Setup(r => r.ExistsAsync(portfolioId))
                 .Returns(Task.FromResult(false));
             fixture.CreateDefaultCurrencyRepositoryMock();
 

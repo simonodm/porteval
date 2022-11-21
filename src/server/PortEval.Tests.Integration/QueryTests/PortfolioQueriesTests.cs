@@ -13,7 +13,7 @@ using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
-    [Collection("Integration test collection")]
+    [Collection("Query test collection")]
     public class PortfolioQueriesTests
     {
         private readonly IPortfolioQueries _portfolioQueries;
@@ -21,7 +21,7 @@ namespace PortEval.Tests.Integration.QueryTests
         private readonly int _firstPortfolioId;
         private readonly int _secondPortfolioId;
 
-        public PortfolioQueriesTests(IntegrationTestFixture fixture)
+        public PortfolioQueriesTests(QueryTestFixture fixture)
         {
             using var scope = fixture.Factory.Services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<PortEvalDbContext>();

@@ -12,7 +12,7 @@ using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
-    [Collection("Integration test collection")]
+    [Collection("Query test collection")]
     public class InstrumentQueriesTests
     {
         private readonly IInstrumentQueries _instrumentQueries;
@@ -20,7 +20,7 @@ namespace PortEval.Tests.Integration.QueryTests
         private readonly int _appleInstrumentId;
         private readonly int _btcInstrumentId;
 
-        public InstrumentQueriesTests(IntegrationTestFixture fixture)
+        public InstrumentQueriesTests(QueryTestFixture fixture)
         {
             var scope = fixture.Factory.Services.CreateScope();
             _instrumentQueries = scope.ServiceProvider.GetRequiredService<IInstrumentQueries>();

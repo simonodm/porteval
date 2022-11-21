@@ -6,9 +6,9 @@ namespace PortEval.Application.Services.Interfaces.Repositories
 {
     public interface IDashboardItemRepository : IRepository
     {
-        public Task<IEnumerable<DashboardItem>> GetDashboardItems();
+        public Task<IEnumerable<DashboardItem>> GetDashboardItemsAsync();
         public DashboardItem Add(DashboardItem item);
         public DashboardItem Update(DashboardItem item);
-        public Task Remove(DashboardItem item);
+        public Task DeleteAsync(DashboardItem item);
     }
 }

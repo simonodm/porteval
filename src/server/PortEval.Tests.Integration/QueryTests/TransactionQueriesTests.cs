@@ -11,13 +11,13 @@ using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
-    [Collection("Integration test collection")]
+    [Collection("Query test collection")]
     public class TransactionQueriesTests
     {
         private readonly PortEvalDbContext _context;
         private readonly ITransactionQueries _transactionQueries;
 
-        public TransactionQueriesTests(IntegrationTestFixture fixture)
+        public TransactionQueriesTests(QueryTestFixture fixture)
         {
             var scope = fixture.Factory.Services.CreateScope();
             _context = scope.ServiceProvider.GetRequiredService<PortEvalDbContext>();

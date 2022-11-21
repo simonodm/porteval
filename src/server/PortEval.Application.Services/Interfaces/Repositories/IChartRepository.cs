@@ -41,13 +41,13 @@ namespace PortEval.Application.Services.Interfaces.Repositories
         /// </summary>
         /// <param name="chartId">Id of chart to delete.</param>
         /// <returns>A task representing the asynchronous deletion operation.</returns>
-        public Task Delete(int chartId);
+        public Task DeleteAsync(int chartId);
 
         /// <summary>
         /// Checks whether a chart with the supplied id exists.
         /// </summary>
         /// <param name="id">Chart id.</param>
         /// <returns>true if a chart with the supplied id exists in the database, false otherwise</returns>
-        public Task<bool> Exists(int id);
+        public Task<bool> ExistsAsync(int id);
     }
 }

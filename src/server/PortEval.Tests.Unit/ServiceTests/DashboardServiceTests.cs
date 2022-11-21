@@ -27,7 +27,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultChartRepositoryMock();
             var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
             dashboardItemRepository
-                .Setup(r => r.GetDashboardItems())
+                .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
 
             var sut = fixture.Create<DashboardService>();
@@ -35,7 +35,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             await sut.UpdateDashboardLayout(newDashboardItems);
 
             foreach (var item in existingDashboardItems)
-                dashboardItemRepository.Verify(r => r.Remove(item), Times.Once());
+                dashboardItemRepository.Verify(r => r.DeleteAsync(item), Times.Once());
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultChartRepositoryMock();
             var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
             dashboardItemRepository
-                .Setup(r => r.GetDashboardItems())
+                .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
 
             var sut = fixture.Create<DashboardService>();
@@ -79,7 +79,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultChartRepositoryMock();
             var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
             dashboardItemRepository
-                .Setup(r => r.GetDashboardItems())
+                .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
 
             var sut = fixture.Create<DashboardService>();
@@ -100,7 +100,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultChartRepositoryMock();
             var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
             dashboardItemRepository
-                .Setup(r => r.GetDashboardItems())
+                .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
 
             var sut = fixture.Create<DashboardService>();
@@ -120,11 +120,11 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
-                .Setup(r => r.Exists(It.IsAny<int>()))
+                .Setup(r => r.ExistsAsync(It.IsAny<int>()))
                 .ReturnsAsync(false);
             var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
             dashboardItemRepository
-                .Setup(r => r.GetDashboardItems())
+                .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
 
             var sut = fixture.Create<DashboardService>();

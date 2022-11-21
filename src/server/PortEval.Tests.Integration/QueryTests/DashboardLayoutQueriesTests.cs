@@ -6,12 +6,12 @@ using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
-    [Collection("Integration test collection")]
+    [Collection("Query test collection")]
     public class DashboardLayoutQueriesTests
     {
         private readonly IDashboardLayoutQueries _dashboardLayoutQueries;
 
-        public DashboardLayoutQueriesTests(IntegrationTestFixture fixture)
+        public DashboardLayoutQueriesTests(QueryTestFixture fixture)
         {
             var scope = fixture.Factory.Services.CreateScope();
             _dashboardLayoutQueries = scope.ServiceProvider.GetRequiredService<IDashboardLayoutQueries>();

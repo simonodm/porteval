@@ -53,7 +53,7 @@ namespace PortEval.Application.Services
         /// <inheritdoc cref="ITransactionService.DeleteTransactionAsync"/>
         public async Task DeleteTransactionAsync(int transactionId)
         {
-            var position = await _positionRepository.FindParentPosition(transactionId);
+            var position = await _positionRepository.FindParentPositionAsync(transactionId);
             if (position == null)
             {
                 throw new ItemNotFoundException($"Transaction {transactionId} does not exist.");

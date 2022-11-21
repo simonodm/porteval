@@ -28,7 +28,7 @@ namespace PortEval.Application.Services
         /// <inheritdoc cref="IInstrumentService.CreateInstrumentAsync"/>
         public async Task<Instrument> CreateInstrumentAsync(InstrumentDto options)
         {
-            if (!(await _currencyRepository.Exists(options.CurrencyCode)))
+            if (!(await _currencyRepository.ExistsAsync(options.CurrencyCode)))
             {
                 throw new ItemNotFoundException($"Currency {options.CurrencyCode} does not exist.");
             }
@@ -66,18 +66,18 @@ namespace PortEval.Application.Services
         /// <inheritdoc cref="IInstrumentService.DeleteAsync"/>
         public async Task DeleteAsync(int id)
         {
-            if (!(await _instrumentRepository.Exists(id)))
+            if (!(await _instrumentRepository.ExistsAsync(id)))
             {
                 throw new ItemNotFoundException($"Instrument {id} does not exist.");
             }
 
-            await _instrumentRepository.Delete(id);
+            await _instrumentRepository.DeleteAsync(id);
             await _instrumentRepository.UnitOfWork.CommitAsync();
         }
 
         private async Task CreateExchangeIfDoesNotExist(string exchange)
         {
-            if(!string.IsNullOrEmpty(exchange) && !(await _exchangeRepository.Exists(exchange)))
+            if(!string.IsNullOrEmpty(exchange) && !(await _exchangeRepository.ExistsAsync(exchange)))
             {
                 var newExchange = new Exchange(exchange);
                 _exchangeRepository.Add(newExchange);

@@ -22,6 +22,7 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<IEnumerable<Currency>> ListAllAsync()
         {
             return await _context.Currencies
+                .OrderBy(c => c.Code)
                 .ToListAsync();
         }
 
@@ -50,8 +51,8 @@ namespace PortEval.Infrastructure.Repositories
             return _context.Currencies.Update(currency).Entity;
         }
 
-        /// <inheritdoc cref="ICurrencyRepository.Exists"/>
-        public async Task<bool> Exists(string currencyCode)
+        /// <inheritdoc cref="ICurrencyRepository.ExistsAsync"/>
+        public async Task<bool> ExistsAsync(string currencyCode)
         {
             return await _context.Currencies.AnyAsync(c => c.Code == currencyCode);
         }

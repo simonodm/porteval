@@ -6,12 +6,12 @@ using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
-    [Collection("Integration test collection")]
+    [Collection("Query test collection")]
     public class ExchangeQueriesTests
     {
         private readonly IExchangeQueries _exchangeQueries;
 
-        public ExchangeQueriesTests(IntegrationTestFixture fixture)
+        public ExchangeQueriesTests(QueryTestFixture fixture)
         {
             var scope = fixture.Factory.Services.CreateScope();
             _exchangeQueries = scope.ServiceProvider.GetRequiredService<IExchangeQueries>();

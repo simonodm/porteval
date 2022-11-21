@@ -18,13 +18,13 @@ using Xunit;
 
 namespace PortEval.Tests.Integration
 {
-    public class IntegrationTestFactory<TProgram> : WebApplicationFactory<TProgram>, IAsyncLifetime
+    public class DockerDatabaseIntegrationTestFactory<TProgram> : WebApplicationFactory<TProgram>, IAsyncLifetime
         where TProgram : class
     {
         private IConfiguration _configuration;
         private readonly TestcontainerDatabase _container;
 
-        public IntegrationTestFactory()
+        public DockerDatabaseIntegrationTestFactory()
         {
             _container = new TestcontainersBuilder<MsSqlTestcontainer>()
                 .WithDatabase(new MsSqlTestcontainerConfiguration

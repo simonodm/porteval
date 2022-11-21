@@ -17,26 +17,26 @@ namespace PortEval.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<InstrumentPrice> FindPriceAsync(int instrumentId, int priceId)
+        public async Task<InstrumentPrice> FindPriceByIdAsync(int instrumentId, int priceId)
         {
             return await _context.InstrumentPrices
                 .Where(price => price.InstrumentId == instrumentId && price.Id == priceId)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<InstrumentPrice> FindPriceAt(int instrumentId, DateTime time)
+        public async Task<InstrumentPrice> FindPriceAtAsync(int instrumentId, DateTime time)
         {
             return await _context.InstrumentPrices
                 .OrderByDescending(price => price.Time)
                 .FirstOrDefaultAsync(price => price.InstrumentId == instrumentId && price.Time <= time);
         }
 
-        public InstrumentPrice AddInstrumentPrice(InstrumentPrice price)
+        public InstrumentPrice Add(InstrumentPrice price)
         {
             return _context.InstrumentPrices.Add(price).Entity;
         }
 
-        public async Task DeleteInstrumentPriceAsync(int instrumentId, int priceId)
+        public async Task DeleteAsync(int instrumentId, int priceId)
         {
             var foundPrice = await _context.InstrumentPrices
                 .FirstOrDefaultAsync(price => price.InstrumentId == instrumentId && price.Id == priceId);
@@ -47,13 +47,13 @@ namespace PortEval.Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> Exists(int instrumentId, int priceId)
+        public async Task<bool> ExistsAsync(int instrumentId, int priceId)
         {
             return await _context.InstrumentPrices
                 .AnyAsync(price => price.Id == priceId && price.InstrumentId == instrumentId);
         }
 
-        public async Task<bool> Exists(int instrumentId, DateTime time)
+        public async Task<bool> ExistsAsync(int instrumentId, DateTime time)
         {
             return await _context.InstrumentPrices
                 .AnyAsync(price => price.InstrumentId == instrumentId && price.Time == time);

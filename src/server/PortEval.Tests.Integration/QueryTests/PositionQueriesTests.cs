@@ -16,7 +16,7 @@ using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
-    [Collection("Integration test collection")]
+    [Collection("Query test collection")]
     public class PositionQueriesTests
     {
         private readonly IPositionQueries _positionQueries;
@@ -28,7 +28,7 @@ namespace PortEval.Tests.Integration.QueryTests
         private readonly int _btcInstrumentId;
         private readonly int _btcPositionId;
 
-        public PositionQueriesTests(IntegrationTestFixture fixture)
+        public PositionQueriesTests(QueryTestFixture fixture)
         {
             using var scope = fixture.Factory.Services.CreateScope();
             _positionQueries = scope.ServiceProvider.GetRequiredService<IPositionQueries>();

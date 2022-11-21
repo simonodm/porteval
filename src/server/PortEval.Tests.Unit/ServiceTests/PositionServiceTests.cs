@@ -55,7 +55,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
-                .Setup(r => r.Exists(position.PortfolioId))
+                .Setup(r => r.ExistsAsync(position.PortfolioId))
                 .Returns(Task.FromResult(false));
             portfolioRepository
                 .Setup(r => r.FindAsync(position.PortfolioId))
@@ -81,7 +81,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultPositionRepositoryMock();
             var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
-                .Setup(r => r.Exists(position.InstrumentId))
+                .Setup(r => r.ExistsAsync(position.InstrumentId))
                 .Returns(Task.FromResult(false));
             instrumentRepository
                 .Setup(r => r.FindAsync(position.InstrumentId))
@@ -266,7 +266,7 @@ namespace PortEval.Tests.Unit.ServiceTests
                 .Setup(r => r.FindAsync(position.Id))
                 .Returns(Task.FromResult<Position>(null));
             positionRepository
-                .Setup(r => r.Exists(position.Id))
+                .Setup(r => r.ExistsAsync(position.Id))
                 .Returns(Task.FromResult(false));
             fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.CreateDefaultInstrumentPriceServiceMock();
@@ -293,7 +293,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             await sut.RemovePositionAsync(positionId);
 
-            positionRepository.Verify(r => r.Delete(positionId), Times.Once());
+            positionRepository.Verify(r => r.DeleteAsync(positionId), Times.Once());
         }
 
         [Fact]
@@ -307,7 +307,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultPortfolioRepositoryMock();
             var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
-                .Setup(r => r.Exists(positionId))
+                .Setup(r => r.ExistsAsync(positionId))
                 .Returns(Task.FromResult(false));
             positionRepository
                 .Setup(r => r.FindAsync(positionId))

@@ -28,7 +28,7 @@ namespace PortEval.Application.Services
 
             var pricePoint = new InstrumentPrice(options.Time.RoundDown(TimeSpan.FromMinutes(1)), options.Price,
                 options.InstrumentId);
-            _instrumentPriceRepository.AddInstrumentPrice(pricePoint);
+            _instrumentPriceRepository.Add(pricePoint);
             await _instrumentPriceRepository.UnitOfWork.CommitAsync();
             return pricePoint;
         }
@@ -38,14 +38,14 @@ namespace PortEval.Application.Services
         {
             await ValidateInstrumentExists(instrumentId);
 
-            var existingPrice = await _instrumentPriceRepository.FindPriceAt(instrumentId, time);
+            var existingPrice = await _instrumentPriceRepository.FindPriceAtAsync(instrumentId, time);
             if(existingPrice != null && existingPrice.Price == price)
             {
                 return existingPrice;
             }
 
             var pricePoint = new InstrumentPrice(time.RoundDown(TimeSpan.FromMinutes(1)), price, instrumentId);
-            _instrumentPriceRepository.AddInstrumentPrice(pricePoint);
+            _instrumentPriceRepository.Add(pricePoint);
             await _instrumentPriceRepository.UnitOfWork.CommitAsync();
             return pricePoint;
         }
@@ -53,11 +53,11 @@ namespace PortEval.Application.Services
         /// <inheritdoc cref="IInstrumentPriceService.DeletePricePointByIdAsync"/>
         public async Task DeletePricePointByIdAsync(int instrumentId, int priceId)
         {
-            if (!(await _instrumentPriceRepository.Exists(instrumentId, priceId)))
+            if (!(await _instrumentPriceRepository.ExistsAsync(instrumentId, priceId)))
             {
                 throw new ItemNotFoundException($"Price {priceId} does not exist on instrument {instrumentId}.");
             }
-            await _instrumentPriceRepository.DeleteInstrumentPriceAsync(instrumentId, priceId);
+            await _instrumentPriceRepository.DeleteAsync(instrumentId, priceId);
             await _instrumentPriceRepository.UnitOfWork.CommitAsync();
         }
 
@@ -69,7 +69,7 @@ namespace PortEval.Application.Services
         /// <returns>A task representing the asynchronous search operation.</returns>
         private async Task ValidateInstrumentExists(int instrumentId)
         {
-            if (!await _instrumentRepository.Exists(instrumentId))
+            if (!await _instrumentRepository.ExistsAsync(instrumentId))
             {
                 throw new ItemNotFoundException($"Instrument {instrumentId} does not exist.");
             }

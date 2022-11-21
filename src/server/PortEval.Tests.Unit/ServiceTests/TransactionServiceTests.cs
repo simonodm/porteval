@@ -56,7 +56,7 @@ namespace PortEval.Tests.Unit.ServiceTests
                 .Setup(r => r.FindAsync(transaction.PositionId))
                 .ReturnsAsync((Position)null);
             positionRepository
-                .Setup(r => r.Exists(transaction.PositionId))
+                .Setup(r => r.ExistsAsync(transaction.PositionId))
                 .ReturnsAsync(false);
             fixture.CreateDefaultInstrumentPriceServiceMock();
 

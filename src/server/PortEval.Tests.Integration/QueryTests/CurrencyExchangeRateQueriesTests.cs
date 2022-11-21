@@ -8,12 +8,12 @@ using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
-    [Collection("Integration test collection")]
+    [Collection("Query test collection")]
     public class CurrencyExchangeRateQueriesTests
     {
         private readonly ICurrencyExchangeRateQueries _currencyExchangeRateQueries;
 
-        public CurrencyExchangeRateQueriesTests(IntegrationTestFixture fixture)
+        public CurrencyExchangeRateQueriesTests(QueryTestFixture fixture)
         {
             var scope = fixture.Factory.Services.CreateScope();
             _currencyExchangeRateQueries = scope.ServiceProvider.GetRequiredService<ICurrencyExchangeRateQueries>();

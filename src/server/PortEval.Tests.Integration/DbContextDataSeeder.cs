@@ -11,11 +11,11 @@ using PortEval.Infrastructure;
 
 namespace PortEval.Tests.Integration
 {
-    internal class IntegrationTestDataSeeder
+    internal class DbContextDataSeeder
     {
         private readonly PortEvalDbContext _context;
 
-        public IntegrationTestDataSeeder(PortEvalDbContext context)
+        public DbContextDataSeeder(PortEvalDbContext context)
         {
             _context = context;
         }

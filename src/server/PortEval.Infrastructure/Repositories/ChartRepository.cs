@@ -2,6 +2,7 @@
 using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PortEval.Infrastructure.Repositories
@@ -20,7 +21,7 @@ namespace PortEval.Infrastructure.Repositories
         /// <inheritdoc cref="IChartRepository.ListAllAsync"/>
         public async Task<IEnumerable<Chart>> ListAllAsync()
         {
-            return await _context.Charts.Include(c => c.Lines).ToListAsync();
+            return await _context.Charts.Include(c => c.Lines).OrderBy(c => c.Name).ToListAsync();
         }
 
         /// <inheritdoc cref="IChartRepository.FindAsync"/>
@@ -47,15 +48,15 @@ namespace PortEval.Infrastructure.Repositories
             return updatedChart;
         }
 
-        /// <inheritdoc cref="IChartRepository.Delete"/>
-        public async Task Delete(int chartId)
+        /// <inheritdoc cref="IChartRepository.DeleteAsync"/>
+        public async Task DeleteAsync(int chartId)
         {
             var foundChartEntity = await _context.Charts.FirstOrDefaultAsync(c => c.Id == chartId);
             _context.Charts.Remove(foundChartEntity);
         }
 
-        /// <inheritdoc cref="IChartRepository.Exists"/>
-        public async Task<bool> Exists(int id)
+        /// <inheritdoc cref="IChartRepository.ExistsAsync"/>
+        public async Task<bool> ExistsAsync(int id)
         {
             return await _context.Charts.AnyAsync(c => c.Id == id);
         }

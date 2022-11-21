@@ -9,12 +9,12 @@ using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
-    [Collection("Integration test collection")]
+    [Collection("Query test collection")]
     public class DataImportQueriesTests
     {
         private readonly IDataImportQueries _dataImportQueries;
 
-        public DataImportQueriesTests(IntegrationTestFixture fixture)
+        public DataImportQueriesTests(QueryTestFixture fixture)
         {
             var scope = fixture.Factory.Services.CreateScope();
             _dataImportQueries = scope.ServiceProvider.GetRequiredService<IDataImportQueries>();

@@ -13,7 +13,7 @@ using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
-    [Collection("Integration test collection")]
+    [Collection("Query test collection")]
     public class ChartQueriesTests
     {
         private readonly PortEvalDbContext _context;
@@ -25,7 +25,7 @@ namespace PortEval.Tests.Integration.QueryTests
         private readonly int _appleInstrumentId;
         private readonly int _applePositionId;
 
-        public ChartQueriesTests(IntegrationTestFixture fixture)
+        public ChartQueriesTests(QueryTestFixture fixture)
         {
             var scope = fixture.Factory.Services.CreateScope();
             _chartQueries = scope.ServiceProvider.GetRequiredService<IChartQueries>();

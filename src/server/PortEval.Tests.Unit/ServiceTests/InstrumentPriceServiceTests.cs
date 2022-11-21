@@ -30,7 +30,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             await sut.AddPricePointAsync(priceDto);
 
-            priceRepository.Verify(r => r.AddInstrumentPrice(It.Is<InstrumentPrice>(p =>
+            priceRepository.Verify(r => r.Add(It.Is<InstrumentPrice>(p =>
                 p.InstrumentId == priceDto.InstrumentId &&
                 p.Price == priceDto.Price &&
                 Math.Abs(priceDto.Time.Ticks - p.Time.Ticks) <= TimeSpan.FromMinutes(1).Ticks
@@ -47,7 +47,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
-                .Setup(r => r.Exists(priceDto.InstrumentId))
+                .Setup(r => r.ExistsAsync(priceDto.InstrumentId))
                 .ReturnsAsync(false);
             instrumentRepository
                 .Setup(r => r.FindAsync(priceDto.InstrumentId))
@@ -70,23 +70,23 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultInstrumentRepositoryMock();
             var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
-                .Setup(r => r.Exists(priceDto.InstrumentId, priceDto.Id))
+                .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Id))
                 .ReturnsAsync(false);
             priceRepository
-                .Setup(r => r.Exists(priceDto.InstrumentId, priceDto.Time))
+                .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Time))
                 .ReturnsAsync(false);
             priceRepository
-                .Setup(r => r.FindPriceAsync(priceDto.InstrumentId, priceDto.Id))
+                .Setup(r => r.FindPriceByIdAsync(priceDto.InstrumentId, priceDto.Id))
                 .ReturnsAsync((InstrumentPrice)null);
             priceRepository
-                .Setup(r => r.FindPriceAt(priceDto.InstrumentId, It.Is<DateTime>(dt => dt <= priceDto.Time)))
+                .Setup(r => r.FindPriceAtAsync(priceDto.InstrumentId, It.Is<DateTime>(dt => dt <= priceDto.Time)))
                 .ReturnsAsync((InstrumentPrice)null);
 
             var sut = fixture.Create<InstrumentPriceService>();
 
             await sut.AddPriceIfNotExistsAsync(priceDto.InstrumentId, priceDto.Time, priceDto.Price);
 
-            priceRepository.Verify(r => r.AddInstrumentPrice(It.Is<InstrumentPrice>(p =>
+            priceRepository.Verify(r => r.Add(It.Is<InstrumentPrice>(p =>
                 p.InstrumentId == priceDto.InstrumentId &&
                 p.Price == priceDto.Price &&
                 Math.Abs(priceDto.Time.Ticks - p.Time.Ticks) <= TimeSpan.FromMinutes(1).Ticks
@@ -104,16 +104,16 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultInstrumentRepositoryMock();
             var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
-                .Setup(r => r.Exists(priceDto.InstrumentId, priceDto.Id))
+                .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Id))
                 .ReturnsAsync(false);
             priceRepository
-                .Setup(r => r.Exists(priceDto.InstrumentId, priceDto.Time))
+                .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Time))
                 .ReturnsAsync(false);
             priceRepository
-                .Setup(r => r.FindPriceAsync(priceDto.InstrumentId, priceDto.Id))
+                .Setup(r => r.FindPriceByIdAsync(priceDto.InstrumentId, priceDto.Id))
                 .ReturnsAsync((InstrumentPrice)null);
             priceRepository
-                .Setup(r => r.FindPriceAt(priceDto.InstrumentId, It.Is<DateTime>(dt => dt <= priceDto.Time)))
+                .Setup(r => r.FindPriceAtAsync(priceDto.InstrumentId, It.Is<DateTime>(dt => dt <= priceDto.Time)))
                 .ReturnsAsync<int, DateTime, IInstrumentPriceRepository, InstrumentPrice>((id, dt) =>
                     new InstrumentPrice(dt, priceDto.Price + 1m, priceDto.InstrumentId));
 
@@ -121,7 +121,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             await sut.AddPriceIfNotExistsAsync(priceDto.InstrumentId, priceDto.Time, priceDto.Price);
 
-            priceRepository.Verify(r => r.AddInstrumentPrice(It.Is<InstrumentPrice>(p =>
+            priceRepository.Verify(r => r.Add(It.Is<InstrumentPrice>(p =>
                 p.InstrumentId == priceDto.InstrumentId &&
                 p.Price == priceDto.Price &&
                 Math.Abs(priceDto.Time.Ticks - p.Time.Ticks) <= TimeSpan.FromMinutes(1).Ticks
@@ -139,16 +139,16 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultInstrumentRepositoryMock();
             var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
-                .Setup(r => r.Exists(priceDto.InstrumentId, priceDto.Id))
+                .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Id))
                 .ReturnsAsync(false);
             priceRepository
-                .Setup(r => r.Exists(priceDto.InstrumentId, priceDto.Time))
+                .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Time))
                 .ReturnsAsync(false);
             priceRepository
-                .Setup(r => r.FindPriceAsync(priceDto.InstrumentId, priceDto.Id))
+                .Setup(r => r.FindPriceByIdAsync(priceDto.InstrumentId, priceDto.Id))
                 .ReturnsAsync((InstrumentPrice)null);
             priceRepository
-                .Setup(r => r.FindPriceAt(priceDto.InstrumentId, It.Is<DateTime>(dt => dt <= priceDto.Time)))
+                .Setup(r => r.FindPriceAtAsync(priceDto.InstrumentId, It.Is<DateTime>(dt => dt <= priceDto.Time)))
                 .ReturnsAsync<int, DateTime, IInstrumentPriceRepository, InstrumentPrice>((id, dt) =>
                     new InstrumentPrice(dt.AddSeconds(-1), priceDto.Price, priceDto.InstrumentId));
 
@@ -156,7 +156,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             await sut.AddPriceIfNotExistsAsync(priceDto.InstrumentId, priceDto.Time, priceDto.Price);
 
-            priceRepository.Verify(r => r.AddInstrumentPrice(It.IsAny<InstrumentPrice>()), Times.Never());
+            priceRepository.Verify(r => r.Add(It.IsAny<InstrumentPrice>()), Times.Never());
         }
 
         [Fact]
@@ -169,7 +169,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
-                .Setup(r => r.Exists(priceDto.InstrumentId))
+                .Setup(r => r.ExistsAsync(priceDto.InstrumentId))
                 .ReturnsAsync(false);
             instrumentRepository
                 .Setup(r => r.FindAsync(priceDto.InstrumentId))
@@ -199,17 +199,17 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultInstrumentRepositoryMock();
             var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
-                .Setup(r => r.Exists(priceDto.InstrumentId, priceDto.Id))
+                .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Id))
                 .ReturnsAsync(true);
             priceRepository
-                .Setup(r => r.FindPriceAsync(priceDto.InstrumentId, priceDto.Id))
+                .Setup(r => r.FindPriceByIdAsync(priceDto.InstrumentId, priceDto.Id))
                 .ReturnsAsync(price);
 
             var sut = fixture.Create<InstrumentPriceService>();
 
             await sut.DeletePricePointByIdAsync(priceDto.InstrumentId, priceDto.Id);
 
-            priceRepository.Verify(r => r.DeleteInstrumentPriceAsync(priceDto.InstrumentId, priceDto.Id), Times.Once());
+            priceRepository.Verify(r => r.DeleteAsync(priceDto.InstrumentId, priceDto.Id), Times.Once());
         }
 
         [Fact]
@@ -223,10 +223,10 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultInstrumentRepositoryMock();
             var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
-                .Setup(r => r.Exists(priceDto.InstrumentId, priceDto.Id))
+                .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Id))
                 .ReturnsAsync(false);
             priceRepository
-                .Setup(r => r.FindPriceAsync(priceDto.InstrumentId, priceDto.Id))
+                .Setup(r => r.FindPriceByIdAsync(priceDto.InstrumentId, priceDto.Id))
                 .ReturnsAsync((InstrumentPrice)null);
 
             var sut = fixture.Create<InstrumentPriceService>();

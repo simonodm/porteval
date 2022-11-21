@@ -81,7 +81,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var exchangeRepository = fixture.CreateDefaultExchangeRepositoryMock();
             exchangeRepository
-                .Setup(e => e.Exists(It.IsAny<string>()))
+                .Setup(e => e.ExistsAsync(It.IsAny<string>()))
                 .Returns(Task.FromResult(false));
 
             var sut = fixture.Create<InstrumentService>();
@@ -124,7 +124,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
-                .Setup(c => c.Exists(It.IsAny<string>()))
+                .Setup(c => c.ExistsAsync(It.IsAny<string>()))
                 .Returns(Task.FromResult(false));
 
             var sut = fixture.Create<InstrumentService>();
@@ -207,7 +207,7 @@ namespace PortEval.Tests.Unit.ServiceTests
                 .Setup(i => i.FindAsync(updatedInstrumentDto.Id))
                 .Returns(Task.FromResult<Instrument>(null));
             instrumentRepository
-                .Setup(i => i.Exists(updatedInstrumentDto.Id))
+                .Setup(i => i.ExistsAsync(updatedInstrumentDto.Id))
                 .Returns(Task.FromResult(false));
 
             var sut = fixture.Create<InstrumentService>();
@@ -259,7 +259,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var exchangeRepository = fixture.CreateDefaultExchangeRepositoryMock();
             exchangeRepository
-                .Setup(e => e.Exists(updatedInstrumentDto.Exchange))
+                .Setup(e => e.ExistsAsync(updatedInstrumentDto.Exchange))
                 .Returns(Task.FromResult(false));
 
             var sut = fixture.Create<InstrumentService>();
@@ -286,7 +286,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var exchangeRepository = fixture.Freeze<Mock<IExchangeRepository>>();
             exchangeRepository
-                .Setup(e => e.Exists(updatedInstrumentDto.Exchange))
+                .Setup(e => e.ExistsAsync(updatedInstrumentDto.Exchange))
                 .Returns(Task.FromResult(true));
 
             var sut = fixture.Create<InstrumentService>();
@@ -305,7 +305,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
-                .Setup(i => i.Exists(It.Is<int>(id => id == instrumentId)))
+                .Setup(i => i.ExistsAsync(It.Is<int>(id => id == instrumentId)))
                 .Returns(Task.FromResult(true));
 
             fixture.CreateDefaultCurrencyRepositoryMock();
@@ -315,7 +315,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             await sut.DeleteAsync(instrumentId);
 
-            instrumentRepository.Verify(r => r.Delete(instrumentId), Times.Once());
+            instrumentRepository.Verify(r => r.DeleteAsync(instrumentId), Times.Once());
         }
 
         [Fact]
@@ -328,7 +328,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
-                .Setup(i => i.Exists(instrumentId))
+                .Setup(i => i.ExistsAsync(instrumentId))
                 .Returns(Task.FromResult(false));
 
             fixture.CreateDefaultCurrencyRepositoryMock();

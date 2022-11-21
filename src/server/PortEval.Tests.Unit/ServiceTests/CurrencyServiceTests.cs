@@ -79,7 +79,7 @@ namespace PortEval.Tests.Unit.ServiceTests
                 .Setup(r => r.FindAsync(currencyDto.Code))
                 .Returns(Task.FromResult<Currency>(null));
             currencyRepository
-                .Setup(r => r.Exists(currencyDto.Code))
+                .Setup(r => r.ExistsAsync(currencyDto.Code))
                 .Returns(Task.FromResult(false));
 
             var sut = fixture.Create<CurrencyService>();

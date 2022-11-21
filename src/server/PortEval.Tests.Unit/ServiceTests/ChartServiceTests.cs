@@ -137,7 +137,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultInstrumentRepositoryMock();
             var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
-                .Setup(r => r.Exists(chart.CurrencyCode))
+                .Setup(r => r.ExistsAsync(chart.CurrencyCode))
                 .ReturnsAsync(false);
             currencyRepository
                 .Setup(r => r.FindAsync(chart.CurrencyCode))
@@ -253,7 +253,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultChartRepositoryMock();
             var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
-                .Setup(r => r.Exists((int)portfolioLine.PortfolioId))
+                .Setup(r => r.ExistsAsync((int)portfolioLine.PortfolioId))
                 .ReturnsAsync(false);
             portfolioRepository
                 .Setup(r => r.FindAsync((int)portfolioLine.PortfolioId))
@@ -283,7 +283,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultPortfolioRepositoryMock();
             var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
-                .Setup(r => r.Exists((int)positionLine.PositionId))
+                .Setup(r => r.ExistsAsync((int)positionLine.PositionId))
                 .ReturnsAsync(false);
             positionRepository
                 .Setup(r => r.FindAsync((int)positionLine.PositionId))
@@ -313,7 +313,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultPositionRepositoryMock();
             var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
-                .Setup(r => r.Exists((int)instrumentLine.InstrumentId))
+                .Setup(r => r.ExistsAsync((int)instrumentLine.InstrumentId))
                 .ReturnsAsync(false);
             instrumentRepository
                 .Setup(r => r.FindAsync((int)instrumentLine.InstrumentId))
@@ -380,7 +380,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultInstrumentRepositoryMock();
             var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
-                .Setup(r => r.Exists(chart.CurrencyCode))
+                .Setup(r => r.ExistsAsync(chart.CurrencyCode))
                 .ReturnsAsync(false);
             currencyRepository
                 .Setup(r => r.FindAsync(chart.CurrencyCode))
@@ -496,7 +496,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultChartRepositoryMock();
             var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
-                .Setup(r => r.Exists((int)portfolioLine.PortfolioId))
+                .Setup(r => r.ExistsAsync((int)portfolioLine.PortfolioId))
                 .ReturnsAsync(false);
             portfolioRepository
                 .Setup(r => r.FindAsync((int)portfolioLine.PortfolioId))
@@ -526,7 +526,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultPortfolioRepositoryMock();
             var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
-                .Setup(r => r.Exists((int)positionLine.PositionId))
+                .Setup(r => r.ExistsAsync((int)positionLine.PositionId))
                 .ReturnsAsync(false);
             positionRepository
                 .Setup(r => r.FindAsync((int)positionLine.PositionId))
@@ -556,7 +556,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             fixture.CreateDefaultPositionRepositoryMock();
             var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
-                .Setup(r => r.Exists((int)instrumentLine.InstrumentId))
+                .Setup(r => r.ExistsAsync((int)instrumentLine.InstrumentId))
                 .ReturnsAsync(false);
             instrumentRepository
                 .Setup(r => r.FindAsync((int)instrumentLine.InstrumentId))
@@ -578,7 +578,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             var chart = fixture.Create<ChartDto>();
             var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
-                .Setup(r => r.Exists(chart.Id))
+                .Setup(r => r.ExistsAsync(chart.Id))
                 .ReturnsAsync(false);
             chartRepository
                 .Setup(r => r.FindAsync(chart.Id))
@@ -610,7 +610,7 @@ namespace PortEval.Tests.Unit.ServiceTests
 
             await sut.DeleteChartAsync(id);
 
-            chartRepository.Verify(r => r.Delete(id), Times.Once());
+            chartRepository.Verify(r => r.DeleteAsync(id), Times.Once());
         }
 
         [Fact]
@@ -622,7 +622,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             var id = fixture.Create<int>();
             var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
-                .Setup(r => r.Exists(id))
+                .Setup(r => r.ExistsAsync(id))
                 .ReturnsAsync(false);
             chartRepository
                 .Setup(r => r.FindAsync(id))

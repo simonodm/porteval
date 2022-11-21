@@ -79,17 +79,17 @@ namespace PortEval.Application.Services
         /// <inheritdoc cref="IPositionService.RemovePositionAsync"/>
         public async Task RemovePositionAsync(int positionId)
         {
-            if (!await _positionRepository.Exists(positionId))
+            if (!await _positionRepository.ExistsAsync(positionId))
             {
                 throw new ItemNotFoundException($"Position {positionId} does not exist.");
             }
-            await _positionRepository.Delete(positionId);
+            await _positionRepository.DeleteAsync(positionId);
             await _positionRepository.UnitOfWork.CommitAsync();
         }
 
         private async Task ValidatePortfolioExists(int portfolioId)
         {
-            if (!(await _portfolioRepository.Exists(portfolioId)))
+            if (!(await _portfolioRepository.ExistsAsync(portfolioId)))
             {
                 throw new ItemNotFoundException($"Portfolio {portfolioId} does not exist.");
             }
