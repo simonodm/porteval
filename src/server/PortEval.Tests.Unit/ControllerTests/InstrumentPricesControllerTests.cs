@@ -17,7 +17,7 @@ namespace PortEval.Tests.Unit.ControllerTests
     public class InstrumentPricesControllerTests
     {
         [Fact]
-        public async Task GetInstrumentPriceAt_ReturnsInstrumentPriceFromQueries_WhenQueryReturnsData()
+        public async Task GetInstrumentPriceAt_ReturnsInstrumentPrice_WhenPriceExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -60,7 +60,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetLatestInstrumentPrice_ReturnsCurrentPriceFromQueries_WhenQueriesReturnsData()
+        public async Task GetLatestInstrumentPrice_ReturnsCurrentPrice_WhenPriceExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -83,7 +83,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetLatestInstrumentPrice_ReturnsNotFound_WhenQueryReturnsNotFound()
+        public async Task GetLatestInstrumentPrice_ReturnsNotFound_WhenPriceDoesNotExist()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -104,7 +104,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task PostPricePoint_CreatesPriceUsingPriceService()
+        public async Task PostPricePoint_CreatesPrice()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -145,7 +145,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task DeletePricePoint_DeletesPriceUsingPriceService()
+        public async Task DeletePricePoint_DeletesPrice()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());

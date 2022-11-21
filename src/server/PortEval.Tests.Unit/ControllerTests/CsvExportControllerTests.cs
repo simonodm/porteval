@@ -20,7 +20,7 @@ namespace PortEval.Tests.Unit.ControllerTests
     public class CsvExportControllerTests
     {
         [Fact]
-        public async Task GetPortfoliosExport_ReturnsCsvFileWithPortfoliosFromQuery()
+        public async Task GetPortfoliosExport_ReturnsCsvFileWithPortfolioData()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -45,7 +45,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositionsExport_ReturnsCsvFileWithPositionsFromQuery()
+        public async Task GetPositionsExport_ReturnsCsvFileWithPositionsData()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -70,7 +70,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetTransactionsExport_ReturnsCsvFileWithTransactionsFromQuery()
+        public async Task GetTransactionsExport_ReturnsCsvFileWithTransactionsData()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -97,7 +97,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetInstrumentExport_ReturnsCsvFileWithInstrumentsFromQuery()
+        public async Task GetInstrumentExport_ReturnsCsvFileWithInstrumentsData()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -122,7 +122,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPricesExport_ReturnsCsvFileWithPricesFromQuery()
+        public async Task GetPricesExport_ReturnsCsvFileWithPricesData()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());

@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoFixture;
-using AutoFixture.AutoMoq;
 using PortEval.Application.Services.Queries.Calculators;
 using PortEval.Application.Services.Queries.Models;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Queries.Calculators
+namespace PortEval.Tests.Unit.QueryTests.Calculators
 {
     public class TransactionBasedValueCalculatorTests
     {

@@ -17,11 +17,11 @@ using PortEval.Application.Services;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
-using PortEval.Tests.Extensions;
-using PortEval.Tests.Helpers;
+using PortEval.Tests.Unit.Helpers;
+using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Services
+namespace PortEval.Tests.Unit.ServiceTests
 {
     internal class CsvImportServiceStoragePathArg : ISpecimenBuilder
     {

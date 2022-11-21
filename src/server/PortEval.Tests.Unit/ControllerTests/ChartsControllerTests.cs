@@ -16,7 +16,7 @@ namespace PortEval.Tests.Unit.ControllerTests
     public class ChartsControllerTests
     {
         [Fact]
-        public async Task GetAllCharts_ReturnsChartsFromQueries()
+        public async Task GetAllCharts_ReturnsCharts()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -36,7 +36,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetChart_ReturnsCorrectChartFromQueries_WhenChartExists()
+        public async Task GetChart_ReturnsCorrectChart_WhenChartExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -78,7 +78,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task PostChart_CreatesChartUsingService()
+        public async Task PostChart_CreatesChart()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -97,7 +97,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task PutChart_UpdatesChartUsingService()
+        public async Task PutChart_UpdatesChart()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -130,7 +130,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task DeleteChart_DeletesChartUsingService()
+        public async Task DeleteChart_DeletesChart()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());

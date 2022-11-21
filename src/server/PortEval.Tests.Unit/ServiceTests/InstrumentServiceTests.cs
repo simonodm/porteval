@@ -11,10 +11,10 @@ using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
-using PortEval.Tests.Extensions;
+using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Services
+namespace PortEval.Tests.Unit.ServiceTests
 {
     public class InstrumentServiceTests
     {

@@ -6,7 +6,7 @@ using PortEval.Application.Services.Queries.Helpers;
 using PortEval.Domain.Models.Enums;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Queries.Helpers
+namespace PortEval.Tests.Unit.QueryTests.Helpers
 {
     public class CalculationUtilsTests
     {

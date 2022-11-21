@@ -9,7 +9,7 @@ using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Models.Validators
+namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class ChartDtoValidatorTests
     {

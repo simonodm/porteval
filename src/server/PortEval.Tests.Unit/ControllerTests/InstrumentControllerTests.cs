@@ -23,7 +23,7 @@ namespace PortEval.Tests.Unit.ControllerTests
     public class InstrumentControllerTests
     {
         [Fact]
-        public async Task GetAllInstruments_ReturnsInstrumentsPageFromQueries()
+        public async Task GetAllInstruments_ReturnsInstrumentsPage()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -44,7 +44,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetInstrument_ReturnsCorrectInstrumentFromQueries_WhenInstrumentExists()
+        public async Task GetInstrument_ReturnsCorrectInstrument_WhenInstrumentExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -86,7 +86,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetInstrumentProfit_ReturnsProfitFromQueries_WhenInstrumentExists()
+        public async Task GetInstrumentProfit_ReturnsProfit_WhenInstrumentExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -131,7 +131,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetInstrumentPerformance_ReturnsInstrumentPerformanceFromQueries_WhenInstrumentExists()
+        public async Task GetInstrumentPerformance_ReturnsInstrumentPerformance_WhenInstrumentExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -176,7 +176,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetInstrumentChartedPrices_ReturnsChartedPricesFromQueries_WhenInstrumentExists()
+        public async Task GetInstrumentChartedPrices_ReturnsChartedPrices_WhenInstrumentExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -225,7 +225,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetInstrumentChartedProfit_ReturnsChartedProfitFromQueries_WhenInstrumentExists()
+        public async Task GetInstrumentChartedProfit_ReturnsChartedProfit_WhenInstrumentExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -274,7 +274,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetInstrumentChartedPerformance_ReturnsChartedPerformanceFromQueries_WhenInstrumentExists()
+        public async Task GetInstrumentChartedPerformance_ReturnsChartedPerformance_WhenInstrumentExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -321,7 +321,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetInstrumentAggregatedPerformance_ReturnsAggregatedPerformanceFromQueries_WhenInstrumentExists()
+        public async Task GetInstrumentAggregatedPerformance_ReturnsAggregatedPerformance_WhenInstrumentExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -368,7 +368,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetInstrumentAggregatedProfit_ReturnsAggregatedProfitFromQueries_WhenInstrumentExists()
+        public async Task GetInstrumentAggregatedProfit_ReturnsAggregatedProfit_WhenInstrumentExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -417,7 +417,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task PostInstrument_CreatesInstrumentUsingService()
+        public async Task PostInstrument_CreatesInstrument()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -436,7 +436,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task PutInstrument_UpdatesInstrumentUsingService()
+        public async Task PutInstrument_UpdatesInstrument()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -469,7 +469,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task DeleteInstrument_DeletesInstrumentUsingService()
+        public async Task DeleteInstrument_DeletesInstrument()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());

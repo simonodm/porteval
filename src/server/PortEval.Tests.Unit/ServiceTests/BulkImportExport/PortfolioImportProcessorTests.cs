@@ -5,10 +5,10 @@ using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Services.BulkImportExport;
-using PortEval.Tests.Extensions;
+using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Services.BulkImportExport
+namespace PortEval.Tests.Unit.ServiceTests.BulkImportExport
 {
     public class PortfolioImportProcessorTests
     {

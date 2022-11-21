@@ -20,7 +20,7 @@ namespace PortEval.Tests.Unit.ControllerTests
     public class PortfolioControllerTests
     {
         [Fact]
-        public async Task GetPortfolios_ReturnsPortfoliosFromQueries()
+        public async Task GetPortfolios_ReturnsPortfolios()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -40,7 +40,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPortfolio_ReturnsCorrectPortfolioFromQueries_WhenPortfolioExists()
+        public async Task GetPortfolio_ReturnsCorrectPortfolio_WhenPortfolioExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -82,7 +82,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositions_ReturnsPositionsFromQueries_WhenPortfolioExists()
+        public async Task GetPositions_ReturnsPositions_WhenPortfolioExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -168,7 +168,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPortfolioValue_ReturnsPortfolioValueFromQueries_WhenPortfolioExists()
+        public async Task GetPortfolioValue_ReturnsPortfolioValue_WhenPortfolioExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -234,7 +234,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPortfolioProfit_ReturnsProfitFromQueries_WhenPortfolioExists()
+        public async Task GetPortfolioProfit_ReturnsProfit_WhenPortfolioExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -279,7 +279,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPortfolioPerformance_ReturnsPortfolioPerformanceFromQueries_WhenPortfolioExists()
+        public async Task GetPortfolioPerformance_ReturnsPortfolioPerformance_WhenPortfolioExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -324,7 +324,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPortfolioChartedValue_ReturnsChartedValueFromQueries_WhenPortfolioExists()
+        public async Task GetPortfolioChartedValue_ReturnsChartedValue_WhenPortfolioExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -373,7 +373,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPortfolioChartedProfit_ReturnsChartedProfitFromQueries_WhenPortfolioExists()
+        public async Task GetPortfolioChartedProfit_ReturnsChartedProfit_WhenPortfolioExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -422,7 +422,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPortfolioChartedPerformance_ReturnsChartedPerformanceFromQueries_WhenPortfolioExists()
+        public async Task GetPortfolioChartedPerformance_ReturnsChartedPerformance_WhenPortfolioExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -469,7 +469,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPortfolioAggregatedPerformance_ReturnsAggregatedPerformanceFromQueries_WhenPortfolioExists()
+        public async Task GetPortfolioAggregatedPerformance_ReturnsAggregatedPerformance_WhenPortfolioExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -516,7 +516,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPortfolioAggregatedProfit_ReturnsAggregatedProfitFromQueries_WhenPortfolioExists()
+        public async Task GetPortfolioAggregatedProfit_ReturnsAggregatedProfit_WhenPortfolioExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -565,7 +565,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetAllPortfoliosStatistics_ReturnsStatisticsFromQueries()
+        public async Task GetAllPortfoliosStatistics_ReturnsStatistics()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -586,7 +586,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPortfolioStatistics_ReturnsPortfolioStatisticsFromQueries_WhenPortfolioExists()
+        public async Task GetPortfolioStatistics_ReturnsPortfolioStatistics_WhenPortfolioExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -629,7 +629,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task PostPortfolio_CreatesPortfolioUsingService()
+        public async Task PostPortfolio_CreatesPortfolio()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -648,7 +648,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task PutPortfolio_UpdatesPortfolioUsingService()
+        public async Task PutPortfolio_UpdatesPortfolio()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -681,7 +681,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task DeletePortfolio_DeletesPortfolioUsingService()
+        public async Task DeletePortfolio_DeletesPortfolio()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());

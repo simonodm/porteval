@@ -7,7 +7,7 @@ using AutoFixture.AutoMoq;
 using PortEval.Application.Services;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Services
+namespace PortEval.Tests.Unit.ServiceTests
 {
     internal class CsvConversionTestType
     {

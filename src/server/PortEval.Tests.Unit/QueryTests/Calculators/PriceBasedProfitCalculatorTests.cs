@@ -1,7 +1,7 @@
 ﻿using PortEval.Application.Services.Queries.Calculators;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Queries.Calculators
+namespace PortEval.Tests.Unit.QueryTests.Calculators
 {
     public class PriceBasedProfitCalculatorTests
     {

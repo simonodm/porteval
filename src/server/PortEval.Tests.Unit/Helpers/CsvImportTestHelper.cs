@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using PortEval.Domain.Models.Enums;
 
-namespace PortEval.Tests.Helpers
+namespace PortEval.Tests.Unit.Helpers
 {
     internal static class CsvImportTestHelper
     {

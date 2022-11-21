@@ -6,7 +6,7 @@ using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.Validators;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Models.Validators
+namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class TransactionDtoValidatorTests
     {

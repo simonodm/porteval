@@ -22,7 +22,7 @@ namespace PortEval.Tests.Unit.ControllerTests
     public class PositionControllerTests
     {
         [Fact]
-        public async Task GetPosition_ReturnsCorrectPositionFromQueries_WhenPositionExists()
+        public async Task GetPosition_ReturnsCorrectPosition_WhenPositionExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -64,7 +64,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositionValue_ReturnsPositionValueFromQueries_WhenPositionExists()
+        public async Task GetPositionValue_ReturnsPositionValue_WhenPositionExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -130,7 +130,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositionProfit_ReturnsProfitFromQueries_WhenPositionExists()
+        public async Task GetPositionProfit_ReturnsProfit_WhenPositionExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -175,7 +175,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositionPerformance_ReturnsPositionPerformanceFromQueries_WhenPositionExists()
+        public async Task GetPositionPerformance_ReturnsPositionPerformance_WhenPositionExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -220,7 +220,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositionBreakEvenPoint_ReturnsBreakEvenPointFromQueries_WhenPositionExists()
+        public async Task GetPositionBreakEvenPoint_ReturnsBreakEvenPoint_WhenPositionExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -243,7 +243,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositionBreakEvenPoint_ReturnsCurrentBreakEvenPointFromQueries_WhenTimeQueryParameterIsNotProvided()
+        public async Task GetPositionBreakEvenPoint_ReturnsCurrentBreakEvenPoint_WhenTimeQueryParameterIsNotProvided()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -288,7 +288,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositionChartedValue_ReturnsChartedValueFromQueries_WhenPositionExists()
+        public async Task GetPositionChartedValue_ReturnsChartedValue_WhenPositionExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -337,7 +337,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositionChartedProfit_ReturnsChartedProfitFromQueries_WhenPositionExists()
+        public async Task GetPositionChartedProfit_ReturnsChartedProfit_WhenPositionExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -386,7 +386,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositionChartedPerformance_ReturnsChartedPerformanceFromQueries_WhenPositionExists()
+        public async Task GetPositionChartedPerformance_ReturnsChartedPerformance_WhenPositionExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -433,7 +433,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositionAggregatedPerformance_ReturnsAggregatedPerformanceFromQueries_WhenPositionExists()
+        public async Task GetPositionAggregatedPerformance_ReturnsAggregatedPerformance_WhenPositionExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -480,7 +480,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositionAggregatedProfit_ReturnsAggregatedProfitFromQueries_WhenPositionExists()
+        public async Task GetPositionAggregatedProfit_ReturnsAggregatedProfit_WhenPositionExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -529,7 +529,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetPositionStatistics_ReturnsPositionStatisticsFromQueries_WhenPositionExists()
+        public async Task GetPositionStatistics_ReturnsPositionStatistics_WhenPositionExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -572,7 +572,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task PostPosition_CreatesPositionUsingService()
+        public async Task PostPosition_CreatesPosition()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -591,7 +591,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task PutPosition_UpdatesPositionUsingService()
+        public async Task PutPosition_UpdatesPosition()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -624,7 +624,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task DeletePosition_DeletesPositionUsingService()
+        public async Task DeletePosition_DeletesPosition()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());

@@ -7,7 +7,7 @@ using PortEval.Application.Models.Validators;
 using PortEval.Domain;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Models.Validators
+namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class DateRangeParamsValidatorTests
     {

@@ -19,7 +19,7 @@ namespace PortEval.Tests.Unit.ControllerTests
     public class CurrenciesControllerTests
     {
         [Fact]
-        public async Task GetAllCurrencies_ReturnsCurrenciesFromQueries()
+        public async Task GetAllCurrencies_ReturnsCurrencies()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -39,7 +39,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task GetCurrency_ReturnsCorrectCurrencyFromQueries_WhenCurrencyExists()
+        public async Task GetCurrency_ReturnsCorrectCurrency_WhenCurrencyExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -81,7 +81,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task PutCurrency_UpdatesCurrencyUsingService()
+        public async Task PutCurrency_UpdatesCurrency()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());

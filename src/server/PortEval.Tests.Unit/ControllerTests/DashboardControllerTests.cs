@@ -14,7 +14,7 @@ namespace PortEval.Tests.Unit.ControllerTests
     public class DashboardControllerTests
     {
         [Fact]
-        public async Task GetDashboardLayout_ReturnsDashboardLayoutFromQuery()
+        public async Task GetDashboardLayout_ReturnsDashboardLayout()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -35,7 +35,7 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
-        public async Task UpdateDashboardLayout_UpdatesLayoutUsingService()
+        public async Task UpdateDashboardLayout_UpdatesLayout()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());

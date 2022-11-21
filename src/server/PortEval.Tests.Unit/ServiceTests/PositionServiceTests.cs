@@ -10,10 +10,10 @@ using PortEval.Domain;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
-using PortEval.Tests.Extensions;
+using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Services
+namespace PortEval.Tests.Unit.ServiceTests
 {
     public class PositionServiceTests
     {

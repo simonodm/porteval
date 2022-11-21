@@ -13,7 +13,7 @@ namespace PortEval.Tests.Unit.ControllerTests
     public class ExchangesControllerTests
     {
         [Fact]
-        public async Task GetKnownExchanges_ReturnsExchangesFromQuery()
+        public async Task GetKnownExchanges_ReturnsExchanges()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());

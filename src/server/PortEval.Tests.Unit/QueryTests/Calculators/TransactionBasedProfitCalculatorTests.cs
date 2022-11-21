@@ -1,11 +1,11 @@
-﻿using PortEval.Application.Services.Queries.Calculators;
-using PortEval.Application.Services.Queries.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PortEval.Application.Services.Queries.Calculators;
+using PortEval.Application.Services.Queries.Models;
 using Xunit;
 
-namespace PortEval.Tests.UnitTests.Queries.Calculators
+namespace PortEval.Tests.Unit.QueryTests.Calculators
 {
     public class TransactionBasedProfitCalculatorTests
     {
