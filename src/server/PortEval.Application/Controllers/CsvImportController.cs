@@ -68,7 +68,7 @@ namespace PortEval.Application.Controllers
             var fileStream = _importService.TryGetErrorLog(guid);
             if (fileStream == null)
             {
-                return BadRequest($"No error log found for import {id}.");
+                return NotFound($"No error log found for import {id}.");
             }
 
             return File(fileStream, "text/csv", "error-log.csv");
