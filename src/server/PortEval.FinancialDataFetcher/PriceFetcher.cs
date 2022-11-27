@@ -11,13 +11,14 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
+using PortEval.FinancialDataFetcher.Interfaces;
 
 namespace PortEval.FinancialDataFetcher
 {
     /// <summary>
     /// Aggregates multiple API clients supporting retrieval of instrument prices and currency exchange rates.
     /// </summary>
-    public class PriceFetcher
+    public class PriceFetcher : IPriceFetcher
     {
         private readonly HttpClient _httpClient;
         private readonly List<IFinancialApi> _registeredClients = new List<IFinancialApi>();
@@ -163,14 +164,14 @@ namespace PortEval.FinancialDataFetcher
         }
 
         /// <summary>
-        /// Selects eligible APIs for the supplied request and delegates it to the appropriate request handler.
+        /// Processes the provided request and returns its response.
         /// </summary>
         /// <param name="request">Request to process</param>
         /// <typeparam name="TClient">Target API client type</typeparam>
         /// <typeparam name="TRequest">Request type</typeparam>
         /// <typeparam name="TResult">Response data type</typeparam>
         /// <returns></returns>
-        private async Task<Response<TResult>> ProcessRequest<TClient, TRequest, TResult>(TRequest request)
+        public async Task<Response<TResult>> ProcessRequest<TClient, TRequest, TResult>(TRequest request)
             where TClient : class, IFinancialApi<TRequest, Response<TResult>>
             where TRequest : IRequest
         {

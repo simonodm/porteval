@@ -12,6 +12,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Domain;
+using PortEval.FinancialDataFetcher.Interfaces;
+using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Domain.Exceptions;
 
 namespace PortEval.BackgroundJobs.MissingPricesFetch
 {
@@ -20,13 +23,16 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
     /// </summary>
     public class MissingExchangeRatesFetchJob : IMissingExchangeRatesFetchJob
     {
-        private readonly PortEvalDbContext _context;
-        private readonly PriceFetcher _fetcher;
+        private readonly ICurrencyRepository _currencyRepository;
+        private readonly ICurrencyExchangeRateRepository _exchangeRateRepository;
+        private readonly IPriceFetcher _fetcher;
         private readonly ILogger _logger;
 
-        public MissingExchangeRatesFetchJob(PortEvalDbContext context, PriceFetcher fetcher, ILoggerFactory loggerFactory)
+        public MissingExchangeRatesFetchJob(ICurrencyRepository currencyRepository, ICurrencyExchangeRateRepository exchangeRateRepository,
+            IPriceFetcher fetcher, ILoggerFactory loggerFactory)
         {
-            _context = context;
+            _currencyRepository = currencyRepository;
+            _exchangeRateRepository = exchangeRateRepository;
             _fetcher = fetcher;
             _logger = loggerFactory.CreateLogger(typeof(MissingExchangeRatesFetchJob));
         }
@@ -40,18 +46,17 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             var currentTime = DateTime.UtcNow;
             _logger.LogInformation($"Missing exchange rates job started at {currentTime}.");
 
-            var currencies = await _context.Currencies.AsNoTracking().ToListAsync();
+            var currencies = await _currencyRepository.ListAllAsync();
             var defaultCurrency = currencies.FirstOrDefault(c => c.IsDefault);
 
             if (defaultCurrency == default)
             {
-                throw new ApplicationException("No default currency is set.");
+                throw new OperationNotAllowedException("No default currency is set.");
             }
 
-            var exchangeRateTimes = await _context.CurrencyExchangeRates.AsNoTracking()
-                .Where(er => er.CurrencyFromCode == defaultCurrency.Code)
-                .Select(er => er.Time)
-                .ToListAsync();
+            var exchangeRates = await _exchangeRateRepository.ListExchangeRatesAsync(defaultCurrency.Code);
+
+            var exchangeRateTimes = exchangeRates.Select(r => r.Time);
 
             var initialTime = PortEvalConstants.FinancialDataStartTime;
 
@@ -104,7 +109,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                 // limited to 1000 days per insert to preserve application memory
                 if (i < 1000) continue;
                 
-                await _context.BulkInsertAsync(newExchangeRates);
+                await _exchangeRateRepository.BulkInsertAsync(newExchangeRates);
                 newExchangeRates.Clear();
                 i = 0;
             }
@@ -113,13 +118,13 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             {
                 currency.SetTrackingFrom(minTime);
                 currency.TrackingInfo.Update(startTime);
-                _context.Update(currency);
-                await _context.SaveChangesAsync();
+                _currencyRepository.Update(currency);
+                await _currencyRepository.UnitOfWork.CommitAsync();
             }
 
             if(newExchangeRates.Count > 0)
             {
-                await _context.BulkInsertAsync(newExchangeRates);
+                await _exchangeRateRepository.BulkInsertAsync(newExchangeRates);
                 newExchangeRates.Clear();
             }
         }

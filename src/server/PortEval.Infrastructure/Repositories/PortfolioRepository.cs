@@ -21,13 +21,18 @@ namespace PortEval.Infrastructure.Repositories
         /// <inheritdoc cref="IPortfolioRepository.ListAllAsync"/>
         public async Task<IEnumerable<Portfolio>> ListAllAsync()
         {
-            return await _context.Portfolios.OrderBy(p => p.Name).ToListAsync();
+            return await _context.Portfolios
+                .AsNoTracking()
+                .OrderBy(p => p.Name)
+                .ToListAsync();
         }
 
         /// <inheritdoc cref="IPortfolioRepository.FindAsync"/>
         public async Task<Portfolio> FindAsync(int id)
         {
-            var portfolio = await _context.Portfolios.FirstOrDefaultAsync(p => p.Id == id);
+            var portfolio = await _context.Portfolios
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             return portfolio;
         }

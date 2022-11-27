@@ -12,6 +12,11 @@ namespace PortEval.Domain.Models.Entities
         public Chart Chart { get; private set; }
         public Color Color { get; private set; }
 
+        protected ChartLine(int id, int chartId, int width, LineDashType dash, Color color) : this(chartId, width, dash, color)
+        {
+            Id = id;
+        }
+
         protected ChartLine(int chartId, int width, LineDashType dash, Color color)
         {
             ChartId = chartId;

@@ -1,6 +1,5 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Models.DTOs;
@@ -16,6 +15,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PortEval.BackgroundJobs.DataImport
@@ -98,33 +98,32 @@ namespace PortEval.BackgroundJobs.DataImport
             switch(templateType)
             {
                 case TemplateType.Portfolios:
-                    await ProcessImport<PortfolioDto, PortfolioImportProcessor>(reader, logPath);
+                    await ProcessImport<PortfolioDto>(reader, logPath);
                     break;
                 case TemplateType.Positions:
-                    await ProcessImport<PositionDto, PositionImportProcessor>(reader, logPath);
+                    await ProcessImport<PositionDto>(reader, logPath);
                     break;
                 case TemplateType.Instruments:
-                    await ProcessImport<InstrumentDto, InstrumentImportProcessor>(reader, logPath);
+                    await ProcessImport<InstrumentDto>(reader, logPath);
                     break;
                 case TemplateType.Prices:
-                    await ProcessImport<InstrumentPriceDto, PriceImportProcessor>(reader, logPath);
+                    await ProcessImport<InstrumentPriceDto>(reader, logPath);
                     break;
                 case TemplateType.Transactions:
-                    await ProcessImport<TransactionDto, TransactionImportProcessor>(reader, logPath);
+                    await ProcessImport<TransactionDto>(reader, logPath);
                     break;
                 default:
                     break;
             }
         }
 
-        private async Task ProcessImport<TRow, TProcessor>(CsvReader reader, string logPath)
-            where TProcessor : IImportProcessor<TRow>            
+        private async Task ProcessImport<TRow>(CsvReader reader, string logPath)          
         {
-            var processor = _serviceProvider.GetRequiredService<TProcessor>();
-            var result = await processor.ImportRecords(reader.GetRecords<TRow>());
+            var processor = _serviceProvider.GetRequiredService<IImportProcessor<TRow>>();
+            var result = await processor.ImportRecords(reader.GetRecords<TRow>().ToList());
             SaveErrorLog(result.ErrorLog, _parsingErrors, logPath);
         }
-
+        
         private void SaveErrorLog<T>(IEnumerable<ProcessedRowErrorLogEntry<T>> processedErrorLog, IEnumerable<RawRowErrorLogEntry> parsingErrorLog, string filename)
         {
             using var fs = _fileSystem.FileStream.Create(filename, FileMode.Create);

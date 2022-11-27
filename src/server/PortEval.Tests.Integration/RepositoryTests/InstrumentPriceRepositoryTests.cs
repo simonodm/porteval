@@ -1,8 +1,10 @@
-﻿using PortEval.Application.Services.Interfaces.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -25,6 +27,20 @@ namespace PortEval.Tests.Integration.RepositoryTests
             _instrument = new Instrument("Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
             DbContext.Add(_instrument);
             DbContext.SaveChanges();
+        }
+
+        [Fact]
+        public async Task ListInstrumentPricesAsync_ReturnsInstrumentPrices()
+        {
+            var first = new InstrumentPrice(DateTime.UtcNow, 100m, _instrument.Id);
+            var second = new InstrumentPrice(DateTime.UtcNow.AddMinutes(-5), 99m, _instrument.Id);
+            DbContext.Add(first);
+            DbContext.Add(second);
+            await DbContext.SaveChangesAsync();
+
+            var prices = await _instrumentPriceRepository.ListInstrumentPricesAsync(_instrument.Id);
+
+            Assert.Collection(prices, price => AssertInstrumentPricesAreEqual(second, price), price => AssertInstrumentPricesAreEqual(first, price));
         }
 
         [Fact]

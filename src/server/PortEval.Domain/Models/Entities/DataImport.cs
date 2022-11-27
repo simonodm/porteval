@@ -23,6 +23,16 @@ namespace PortEval.Domain.Models.Entities
             Time = DateTime.UtcNow;
         }
 
+        public DataImport(Guid id, TemplateType templateType, DateTime time, ImportStatus status = ImportStatus.Pending, string statusDetails = "")
+        {
+            Id = id;
+            TemplateType = templateType;
+            Status = status;
+            StatusDetails = statusDetails;
+            ErrorLogAvailable = false;
+            Time = time;
+        }
+
         public void ChangeStatus(ImportStatus status, string statusDetails = "")
         {
             Status = status;

@@ -21,13 +21,17 @@ namespace PortEval.Infrastructure.Repositories
         /// <inheritdoc cref="IInstrumentRepository.ListAllAsync"/>
         public async Task<IEnumerable<Instrument>> ListAllAsync()
         {
-            return await _context.Instruments.OrderBy(i => i.Symbol).ToListAsync();
+            return await _context.Instruments
+                .AsNoTracking()
+                .OrderBy(i => i.Symbol)
+                .ToListAsync();
         }
 
         /// <inheritdoc cref="IInstrumentRepository.FindAsync"/>
         public async Task<Instrument> FindAsync(int id)
         {
             var instrumentEntity = await _context.Instruments
+                .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id == id);
             return instrumentEntity;
         }

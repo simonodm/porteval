@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
+using PortEval.Application.Services.Interfaces.Repositories;
 
 namespace PortEval.BackgroundJobs.DatabaseCleanup
 {
@@ -20,12 +21,14 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
     /// </summary>
     public class InstrumentPriceCleanupJob : IInstrumentPriceCleanupJob
     {
-        private readonly PortEvalDbContext _context;
+        private readonly IInstrumentRepository _instrumentRepository;
+        private readonly IInstrumentPriceRepository _instrumentPriceRepository;
         private readonly ILogger _logger;
 
-        public InstrumentPriceCleanupJob(PortEvalDbContext context, ILoggerFactory loggerFactory)
+        public InstrumentPriceCleanupJob(IInstrumentRepository instrumentRepository, IInstrumentPriceRepository instrumentPriceRepository, ILoggerFactory loggerFactory)
         {
-            _context = context;
+            _instrumentRepository = instrumentRepository;
+            _instrumentPriceRepository = instrumentPriceRepository;
             _logger = loggerFactory.CreateLogger(typeof(InstrumentPriceCleanupJob));
         }
 
@@ -38,13 +41,13 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
             var startTime = DateTime.UtcNow;
             _logger.LogInformation($"Instrument price cleanup started at {startTime}.");
 
-            var instruments = await _context.Instruments.AsNoTracking().ToListAsync();
+            var instruments = await _instrumentRepository.ListAllAsync();
             foreach(var instrument in instruments)
             {
-                var prices = await _context.InstrumentPrices.AsNoTracking().Where(p => p.InstrumentId == instrument.Id).ToListAsync();
+                var prices = await _instrumentPriceRepository.ListInstrumentPricesAsync(instrument.Id);
                 Cleanup(prices, startTime);
             }
-            await _context.SaveChangesAsync();
+            await _instrumentPriceRepository.UnitOfWork.CommitAsync();
 
             _logger.LogInformation($"Instrument price cleanup finished at {DateTime.UtcNow}.");
         }
@@ -54,10 +57,12 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
         /// </summary>
         /// <param name="prices">Prices to clean up.</param>
         /// <param name="startTime">Job start time used as a base for price interval evaluation.</param>
-        private void Cleanup(IEnumerable<InstrumentPrice> prices, DateTime startTime)
+        private async void Cleanup(IEnumerable<InstrumentPrice> prices, DateTime startTime)
         {
             InstrumentPrice currentAnchor = null;
             InstrumentPrice previousPrice = null;
+
+            var removeTasks = new List<Task>();
 
             foreach (var price in prices.OrderBy(p => p.Time))
             {
@@ -71,11 +76,13 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
 
                 if (previousPrice != null && currentAnchor != previousPrice)
                 {
-                    _context.Remove(previousPrice);
+                    removeTasks.Add(_instrumentPriceRepository.DeleteAsync(previousPrice.InstrumentId, previousPrice.Id));
                 }
 
                 previousPrice = price;
             }
+
+            await Task.WhenAll(removeTasks);
         }
     }
 }

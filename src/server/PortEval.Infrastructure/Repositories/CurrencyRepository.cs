@@ -22,6 +22,7 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<IEnumerable<Currency>> ListAllAsync()
         {
             return await _context.Currencies
+                .AsNoTracking()
                 .OrderBy(c => c.Code)
                 .ToListAsync();
         }
@@ -30,6 +31,7 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<Currency> FindAsync(string currencyCode)
         {
             var currencyEntity = await _context.Currencies
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Code == currencyCode);
 
             return currencyEntity;
@@ -39,6 +41,7 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<Currency> GetDefaultCurrencyAsync()
         {
             var defaultCurrency = await _context.Currencies
+                .AsNoTracking()
                 .Where(c => c.IsDefault)
                 .FirstOrDefaultAsync();
 

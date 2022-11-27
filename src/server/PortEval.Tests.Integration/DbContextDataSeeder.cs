@@ -156,7 +156,7 @@ namespace PortEval.Tests.Integration
                 new InstrumentPrice(DateTime.UtcNow, 150, instrumentsList[0].Id),
                 new InstrumentPrice(DateTime.UtcNow.AddDays(-2), 4000, instrumentsList[1].Id),
                 new InstrumentPrice(DateTime.UtcNow.AddDays(-1), 2000, instrumentsList[1].Id),
-                new InstrumentPrice(DateTime.UtcNow.AddHours(-12), 2000, instrumentsList[1].Id),
+                new InstrumentPrice(DateTime.UtcNow.Date, 2000, instrumentsList[1].Id),
                 new InstrumentPrice(DateTime.UtcNow, 1000, instrumentsList[1].Id),
             };
 

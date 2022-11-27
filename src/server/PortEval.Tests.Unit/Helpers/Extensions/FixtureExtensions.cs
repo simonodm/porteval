@@ -1,16 +1,17 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
+using Microsoft.EntityFrameworkCore;
 using Moq;
-using PortEval.Application.Models;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Models.QueryParams;
 using PortEval.Application.Services.Interfaces;
 using PortEval.Application.Services.Interfaces.Repositories;
-using PortEval.Application.Services.Queries;
-using PortEval.Application.Services.Queries.Interfaces;
 using PortEval.Domain.Models.Entities;
-using PortEval.Domain.Models.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using PortEval.FinancialDataFetcher.Interfaces;
+using PortEval.FinancialDataFetcher.Models;
+using PortEval.FinancialDataFetcher.Responses;
 
 namespace PortEval.Tests.Unit.Helpers.Extensions
 {
@@ -155,6 +156,21 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
             return mock;
         }
 
+        public static Mock<ICurrencyExchangeRateRepository> CreateDefaultCurrencyExchangeRateRepositoryMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<ICurrencyExchangeRateRepository>>();
+            mock
+                .Setup(m => m.ListExchangeRatesAsync(It.IsAny<string>()))
+                .ReturnsAsync(fixture.CreateMany<CurrencyExchangeRate>());
+            mock
+                .Setup(m => m.GetExchangeRateAtAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>()))
+                .Returns<string, string, DateTime>((from, to, time) => Task.FromResult(new CurrencyExchangeRate(time, 1, from, to)));
+            mock
+                .Setup(m => m.Add(It.IsAny<CurrencyExchangeRate>()))
+                .Returns<CurrencyExchangeRate>(er => er);
+
+            return mock;
+        }
         public static Mock<IChartRepository> CreateDefaultChartRepositoryMock(this IFixture fixture)
         {
             var mock = fixture.Freeze<Mock<IChartRepository>>();
@@ -282,5 +298,35 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
         }
 
         #endregion
+
+        public static Mock<IPriceFetcher> CreatePriceFetcherMockReturningHistoricalPrices(this IFixture fixture, Instrument instrument,
+            IEnumerable<PricePoint> dailyPrices, IEnumerable<PricePoint> hourlyPrices,
+            IEnumerable<PricePoint> fiveMinPrices)
+        {
+            var priceFetcher = fixture.Freeze<Mock<IPriceFetcher>>();
+            priceFetcher
+                .Setup(m => m.GetHistoricalDailyPrices(instrument, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .ReturnsAsync(new Response<IEnumerable<PricePoint>>
+                {
+                    StatusCode = StatusCode.Ok,
+                    Result = dailyPrices ?? Enumerable.Empty<PricePoint>()
+                });
+            priceFetcher
+                .Setup(m => m.GetIntradayPrices(instrument, It.IsAny<DateTime>(), It.IsAny<DateTime>(), IntradayInterval.OneHour))
+                .ReturnsAsync(new Response<IEnumerable<PricePoint>>
+                {
+                    StatusCode = StatusCode.Ok,
+                    Result = hourlyPrices ?? Enumerable.Empty<PricePoint>()
+                });
+            priceFetcher
+                .Setup(m => m.GetIntradayPrices(instrument, It.IsAny<DateTime>(), It.IsAny<DateTime>(), IntradayInterval.FiveMinutes))
+                .ReturnsAsync(new Response<IEnumerable<PricePoint>>
+                {
+                    StatusCode = StatusCode.Ok,
+                    Result = fiveMinPrices ?? Enumerable.Empty<PricePoint>()
+                });
+
+            return priceFetcher;
+        }
     }
 }

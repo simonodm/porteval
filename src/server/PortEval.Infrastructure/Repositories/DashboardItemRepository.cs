@@ -20,6 +20,7 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<IEnumerable<DashboardItem>> GetDashboardItemsAsync()
         {
             return await _context.DashboardItems
+                .AsNoTracking()
                 .OrderBy(i => i.Position.X)
                 .ThenBy(i => i.Position.Y)
                 .ToListAsync();

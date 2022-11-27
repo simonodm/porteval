@@ -15,6 +15,11 @@ namespace PortEval.Domain.Models.Entities
         public IReadOnlyCollection<Transaction> Transactions => _transactions.AsReadOnly();
         private readonly List<Transaction> _transactions = new List<Transaction>();
 
+        public Position(int id, int portfolioId, int instrumentId, string note) : this(portfolioId, instrumentId, note)
+        {
+            Id = id;
+        }
+
         public Position(int portfolioId, int instrumentId, string note)
         {
             PortfolioId = portfolioId;

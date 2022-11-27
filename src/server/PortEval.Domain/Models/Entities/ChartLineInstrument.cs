@@ -7,6 +7,11 @@ namespace PortEval.Domain.Models.Entities
     {
         public int InstrumentId { get; }
 
+        public ChartLineInstrument(int id, int chartId, int width, LineDashType dash, Color color, int instrumentId) : base(id, chartId, width, dash, color)
+        {
+            InstrumentId = instrumentId;
+        }
+
         public ChartLineInstrument(int chartId, int width, LineDashType dash, Color color, int instrumentId) : base(chartId, width, dash, color)
         {
             InstrumentId = instrumentId;

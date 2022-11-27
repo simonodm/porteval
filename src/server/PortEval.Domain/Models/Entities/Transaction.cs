@@ -13,6 +13,11 @@ namespace PortEval.Domain.Models.Entities
         public int PositionId { get; private set; }
         public Position Position { get; private set; }
 
+        public Transaction(int id, int positionId, DateTime time, decimal amount, decimal price, string note = "") : this(positionId, time, amount, price, note)
+        {
+            Id = id;
+        }
+
         public Transaction(int positionId, DateTime time, decimal amount, decimal price, string note = "")
         {
             if (time < PortEvalConstants.FinancialDataStartTime)

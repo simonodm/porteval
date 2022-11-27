@@ -12,6 +12,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Domain;
+using PortEval.FinancialDataFetcher.Interfaces;
+using PortEval.Application.Services.Interfaces.Repositories;
 
 namespace PortEval.BackgroundJobs.InitialPriceFetch
 {
@@ -25,13 +27,18 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
     /// </summary>
     public class InitialPriceFetchJob : IInitialPriceFetchJob
     {
-        private readonly PortEvalDbContext _context;
-        private readonly PriceFetcher _fetcher;
+        private readonly IInstrumentRepository _instrumentRepository;
+        private readonly IInstrumentPriceRepository _instrumentPriceRepository;
+        private readonly ICurrencyExchangeRateRepository _exchangeRateRepository;
+        private readonly IPriceFetcher _fetcher;
         private readonly ILogger _logger;
 
-        public InitialPriceFetchJob(PortEvalDbContext context, PriceFetcher fetcher, ILoggerFactory loggerFactory)
+        public InitialPriceFetchJob(IInstrumentRepository instrumentRepository, IInstrumentPriceRepository instrumentPriceRepository,
+            ICurrencyExchangeRateRepository exchangeRateRepository, IPriceFetcher fetcher, ILoggerFactory loggerFactory)
         {
-            _context = context;
+            _instrumentRepository = instrumentRepository;
+            _instrumentPriceRepository = instrumentPriceRepository;
+            _exchangeRateRepository = exchangeRateRepository;
             _fetcher = fetcher;
             _logger = loggerFactory.CreateLogger(typeof(InitialPriceFetchJob));
         }
@@ -44,7 +51,7 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
         public async Task Run(int instrumentId)
         {
             _logger.LogInformation($"First price fetch for instrument {instrumentId} at {DateTime.UtcNow}.");
-            var instrument = await _context.Instruments.FirstOrDefaultAsync(i => i.Id == instrumentId);
+            var instrument = await _instrumentRepository.FindAsync(instrumentId);
             if (instrument == null)
             {
                 _logger.LogError($"No instrument with id {instrumentId} found.");
@@ -125,7 +132,7 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
             var minTime = DateTime.UtcNow;
             foreach (var pricePoint in prices)
             {
-                var price = await PriceUtils.GetConvertedPricePointPrice(_context, instrument, pricePoint);
+                var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument, pricePoint);
                 pricesToAdd.Add(new InstrumentPrice(pricePoint.Time, price, instrument.Id));
 
                 if (pricePoint.Time < minTime)
@@ -136,9 +143,9 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
 
             instrument.SetTrackingFrom(minTime);
             instrument.TrackingInfo.Update(DateTime.UtcNow);
-            _context.Update(instrument);
-            await _context.SaveChangesAsync();
-            await _context.BulkInsertAsync(pricesToAdd);
+            _instrumentRepository.Update(instrument);
+            await _instrumentRepository.UnitOfWork.CommitAsync();
+            await _instrumentPriceRepository.BulkInsertAsync(pricesToAdd);
         }
     }
 }

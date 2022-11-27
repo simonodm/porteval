@@ -17,6 +17,12 @@ namespace PortEval.Domain.Models.Entities
             Position = position;
         }
 
+        public DashboardItem(int id, DashboardPosition position)
+        {
+            Id = id;
+            Position = position;
+        }
+
         public void SetPosition(DashboardPosition position)
         {
             Position = position;
