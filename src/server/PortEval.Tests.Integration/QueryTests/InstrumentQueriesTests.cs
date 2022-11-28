@@ -226,7 +226,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task ChartInstrumentPrices_ReturnsChartedInstrumentPricesConvertedToTargetCurrency_WhenTargetCurrencyIsNotInstrumentCurrency()
         {
             var queryResult =
-                await _instrumentQueries.ChartInstrumentPrices(_btcInstrumentId, new DateRangeParams { From = DateTime.UtcNow.AddDays(-2).AddHours(1)},
+                await _instrumentQueries.ChartInstrumentPrices(_btcInstrumentId, new DateRangeParams { From = DateTime.UtcNow.AddDays(-2)},
                     AggregationFrequency.Day, "EUR");
 
             Assert.Equal(QueryStatus.Ok, queryResult.Status);
