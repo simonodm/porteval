@@ -2,6 +2,7 @@
 using PortEval.FinancialDataFetcher.Models;
 using PortEval.FinancialDataFetcher.Responses;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -11,14 +12,14 @@ namespace PortEval.FinancialDataFetcher.APIs
     internal static class HttpClientExtensions
     {
         /// <summary>
-        /// Fetches JSON from the specified endpoint and processes it according to the supplied callback. Takes rate limiting into account.
+        /// Fetches JSON from the specified endpoint. Takes rate limiting into account.
         /// </summary>
         /// <param name="httpClient">HttpClient to use for the fetch</param>
         /// <param name="queryUrl">URL to fetch</param>
         /// <param name="rateLimiter">Request rate limiter</param>
         /// <typeparam name="TResult">Target response type after parsing.</typeparam>
         /// <returns>A Response object containing the operation status and parsed data if the operation was successful.</returns>
-        public static async Task<Response<TResult>> FetchJson<TResult>(this HttpClient httpClient, string queryUrl, RateLimiter rateLimiter = null)
+        public static async Task<Response<TResult>> GetJson<TResult>(this HttpClient httpClient, string queryUrl, RateLimiter rateLimiter = null, Dictionary<string, string> headers = null)
         {
             try
             {
@@ -31,14 +32,24 @@ namespace PortEval.FinancialDataFetcher.APIs
                     };
                 }
 
-                var responseToken = JToken.Parse(await httpClient.GetStringAsync(queryUrl));
-                var response = responseToken.ToObject<TResult>();
-                var isValidResponse = response != null;
+                using var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+                if (headers != null)
+                {
+                    foreach (var (header, value) in headers)
+                    {
+                        request.Headers.Add(header, value);
+                    }
+                }
+
+                var response = await httpClient.SendAsync(request);
+                var responseToken = JToken.Parse(await response.Content.ReadAsStringAsync());
+                var data = responseToken.ToObject<TResult>();
+                var isValidResponse = data != null;
                 return new Response<TResult>
                 {
                     StatusCode = isValidResponse ? StatusCode.Ok : StatusCode.OtherError,
                     ErrorMessage = isValidResponse ? "" : "Invalid data received.",
-                    Result = response
+                    Result = data
                 };
             }
             catch (Exception ex)

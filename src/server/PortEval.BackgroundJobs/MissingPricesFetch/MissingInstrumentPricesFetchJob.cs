@@ -127,6 +127,11 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             {
                 if (!(pricePoint.Time > range.From & pricePoint.Time < range.To)) continue;
 
+                if (pricePoint.Price <= 0m)
+                {
+                    continue;
+                }
+
                 try
                 {
                     var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument, pricePoint);

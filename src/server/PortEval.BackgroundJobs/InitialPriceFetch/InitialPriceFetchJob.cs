@@ -1,4 +1,4 @@
-﻿using EFCore.BulkExtensions;
+using EFCore.BulkExtensions;
 using Microsoft.Extensions.Logging;
 using PortEval.Domain.Models.Entities;
 using PortEval.FinancialDataFetcher;
@@ -132,6 +132,11 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
             var minTime = DateTime.UtcNow;
             foreach (var pricePoint in prices)
             {
+                if (pricePoint.Price <= 0m)
+                {
+                    continue;
+                }
+
                 var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument, pricePoint);
                 pricesToAdd.Add(new InstrumentPrice(pricePoint.Time, price, instrument.Id));
 

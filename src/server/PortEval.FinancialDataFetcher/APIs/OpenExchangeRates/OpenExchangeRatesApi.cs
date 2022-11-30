@@ -29,7 +29,7 @@ namespace PortEval.FinancialDataFetcher.APIs.OpenExchangeRates
         {
             var queryUrl = $"{_baseUrl}/latest.json?app_id={_apiKey}&base={request.CurrencyCode}";
 
-            var response = await _httpClient.FetchJson<LatestExchangeRatesResponseModel>(queryUrl, _rateLimiter);
+            var response = await _httpClient.GetJson<LatestExchangeRatesResponseModel>(queryUrl, _rateLimiter);
 
             return new Response<ExchangeRates>
             {

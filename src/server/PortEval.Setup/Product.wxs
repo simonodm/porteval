@@ -3,12 +3,13 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
 >
 	<?define PortEvalConfigurationRegistry=Software\PortEval\Configuration?>
+    <?define PortEvalMboumKeyRegistryValue=PORTEVAL_RapidAPI_Mboum_Key?>
 	<?define PortEvalTiingoKeyRegistryValue=PORTEVAL_Tiingo_Key?>
 	<?define PortEvalOXRKeyRegistryValue=PORTEVAL_OpenExchangeRates_Key?>
 	<?define PortEvalFileStorageRegistryValue=PORTEVAL_File_Storage?>
 	<?define PortEvalAPIAppPoolName=PortEval App Pool?>
 	
-    <Product Id="*" Name="PortEval" Language="1033" Version="1.0.3.0" Manufacturer="Dmitry Simonov" UpgradeCode="aaeb5c98-d082-4934-bbb3-49553e5a5b48">
+    <Product Id="*" Name="PortEval" Language="1033" Version="1.0.4.0" Manufacturer="Dmitry Simonov" UpgradeCode="aaeb5c98-d082-4934-bbb3-49553e5a5b48">
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -30,7 +31,11 @@
 		
 		<UI>
         <Dialog Id="DataSourcesDlg" Width="370" Height="270" Title="Configure data sources">
-            <Control Type="Edit" Id="TiingoKeyEdit" Width="328" Height="15" X="22" Y="218" Property="TIINGO_KEY">
+			<Control Type="Edit" Id="MboumKeyEdit" Width="328" Height="15" X="22" Y="218" Property="MBOUM_KEY">
+				<Condition Action="show">DataSourcesListBox_Prop = "Mboum"</Condition>
+				<Condition Action="hide">DataSourcesListBox_Prop &lt;&gt; "Mboum"</Condition>
+			</Control>
+			<Control Type="Edit" Id="TiingoKeyEdit" Width="328" Height="15" X="22" Y="218" Property="TIINGO_KEY">
                 <Condition Action="show">DataSourcesListBox_Prop = "Tiingo"</Condition>
 				<Condition Action="hide">DataSourcesListBox_Prop &lt;&gt; "Tiingo"</Condition>
             </Control>
@@ -40,7 +45,8 @@
 			</Control>
             <Control Type="ListBox" Property="DataSourcesListBox_Prop" Id="DataSourcesListBox" Width="322" Height="169" X="22" Y="15">
                 <ListBox Property="DataSourcesListBox_Prop">
-                    <ListItem Text="Tiingo" Value="Tiingo" />
+	                <ListItem Text="Mboum" Value="Mboum" />
+					<ListItem Text="Tiingo" Value="Tiingo" />
 					<ListItem Text="Open Exchange Rates" Value="OpenExchangeRates" />
                 </ListBox>
             </Control>
@@ -115,14 +121,19 @@
 
 		<Property Id="ApplicationPort" Value="5432" />
         <Property Id="DataSourcesListBox_Prop" Value="Tiingo" />
+		<Property Id="MBOUM_KEY_CURRENT">
+			<RegistrySearch Id="MboumKeySearch" Root="HKLM" Key="$(var.PortEvalConfigurationRegistry)" Name="$(var.PortEvalMboumKeyRegistryValue)" Type="raw" Win64="yes"/>
+		</Property>
 		<Property Id="TIINGO_KEY_CURRENT">
 			<RegistrySearch Id="TiingoKeySearch" Root="HKLM" Key="$(var.PortEvalConfigurationRegistry)" Name="$(var.PortEvalTiingoKeyRegistryValue)" Type="raw" Win64="yes"/>
 		</Property>
 		<Property Id="OXR_KEY_CURRENT">
 			<RegistrySearch Id="OXRKeySearch" Root="HKLM" Key="$(var.PortEvalConfigurationRegistry)" Name="$(var.PortEvalOXRKeyRegistryValue)" Type="raw" Win64="yes"/>
 		</Property>
+		<Property Id="MBOUM_KEY" Secure="yes" />
 		<Property Id="TIINGO_KEY" Secure="yes" />
 		<Property Id="OPENEXCHANGERATES_KEY" Secure="yes" />
+        <SetProperty Id="MBOUM_KEY" Value="[MBOUM_KEY_CURRENT]" After="AppSearch" Sequence="ui">MBOUM_KEY_CURRENT</SetProperty>
 		<SetProperty Id="TIINGO_KEY" Value="[TIINGO_KEY_CURRENT]" After="AppSearch" Sequence="ui">TIINGO_KEY_CURRENT</SetProperty>
 		<SetProperty Id="OPENEXCHANGERATES_KEY" Value="[OXR_KEY_CURRENT]" After="AppSearch" Sequence="ui">OXR_KEY_CURRENT</SetProperty>
     </Product>
@@ -153,6 +164,7 @@
  		</Component>
 		<Component Id="RegistryKeys" Guid="*" Directory="APIINSTALLFOLDER" Win64="yes">
 			<RegistryKey Root="HKLM" Key="$(var.PortEvalConfigurationRegistry)" ForceDeleteOnUninstall="yes">
+				<RegistryValue Type="string" Name="$(var.PortEvalMboumKeyRegistryValue)" Value="[MBOUM_KEY]" />
 				<RegistryValue Type="string" Name="$(var.PortEvalTiingoKeyRegistryValue)" Value="[TIINGO_KEY]" />
 				<RegistryValue Type="string" Name="$(var.PortEvalOXRKeyRegistryValue)" Value="[OPENEXCHANGERATES_KEY]" />
 				<RegistryValue Type="string" Name="$(var.PortEvalFileStorageRegistryValue)" Value="[APIINSTALLFOLDER]Files" />

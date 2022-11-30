@@ -162,8 +162,15 @@ namespace PortEval.Application.Extensions
         public static void ConfigurePriceFetcher(this IServiceCollection services, IConfiguration configuration)
         {
             var fetcher = new PriceFetcher();
+            var mboumKey = configuration.GetConfigurationValue("PORTEVAL_RapidAPI_Mboum_Key");
             var tiingoKey = configuration.GetConfigurationValue("PORTEVAL_Tiingo_Key");
             var openExchangeRatesKey = configuration.GetConfigurationValue("PORTEVAL_OpenExchangeRates_Key");
+
+            if (mboumKey != null)
+            {
+                fetcher.AddMboum(mboumKey, new RateLimiter(TimeSpan.FromSeconds(1), 10));
+            }
+
             if (tiingoKey != null)
             {
                 fetcher.AddTiingo(tiingoKey, new RateLimiter(TimeSpan.FromHours(1), 500));

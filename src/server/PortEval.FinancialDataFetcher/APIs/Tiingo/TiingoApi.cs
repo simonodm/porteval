@@ -72,7 +72,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
             urlBuilder.AddQueryParam("startDate", startDate);
             urlBuilder.AddQueryParam("endDate", endDate);
 
-            var result = await _httpClient.FetchJson<IEnumerable<TiingoPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
+            var result = await _httpClient.GetJson<IEnumerable<TiingoPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
 
             return new Response<IEnumerable<PricePoint>>
             {
@@ -108,7 +108,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
             urlBuilder.AddQueryParam("resampleFreq", resampleFreq);
             urlBuilder.AddQueryParam("token", _apiKey);
 
-            var result = await _httpClient.FetchJson<IEnumerable<TiingoPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
+            var result = await _httpClient.GetJson<IEnumerable<TiingoPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
 
             return new Response<IEnumerable<PricePoint>>
             {
@@ -131,7 +131,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
             var urlBuilder = new QueryUrlBuilder($"{TIINGO_IEX_BASE_URL}/{symbol}");
             urlBuilder.AddQueryParam("token", _apiKey);
 
-            var result = await _httpClient.FetchJson<IEnumerable<TiingoIexTopPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
+            var result = await _httpClient.GetJson<IEnumerable<TiingoIexTopPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
 
             return new Response<PricePoint>
             {
@@ -156,7 +156,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
             urlBuilder.AddQueryParam("tickers", GetCryptoTicker(ticker, currency));
             urlBuilder.AddQueryParam("token", _apiKey);
 
-            var result = await _httpClient.FetchJson<IEnumerable<TiingoCryptoTopPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
+            var result = await _httpClient.GetJson<IEnumerable<TiingoCryptoTopPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
 
             return new Response<PricePoint>
             {
@@ -214,7 +214,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                 urlBuilder.AddQueryParam("resampleFreq", resampleFreq);
                 urlBuilder.AddQueryParam("token", _apiKey);
 
-                var result = await _httpClient.FetchJson<IEnumerable<TiingoCryptoPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
+                var result = await _httpClient.GetJson<IEnumerable<TiingoCryptoPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
 
                 if (result.StatusCode == StatusCode.Ok)
                 {
@@ -248,6 +248,10 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                     {
                         lastPriceTime += TimeSpan.FromDays(daysToAddOnFailure);
                     }
+                    else
+                    {
+                        break;
+                    }
                     if (result.StatusCode == StatusCode.OtherError)
                     {
                         anyUnexpectedError = true;
@@ -256,11 +260,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                 }
             }
 
-            var resultStatusCode = StatusCode.Ok;
-            if (!anySuccessful)
-            {
-                resultStatusCode = !anyUnexpectedError ? StatusCode.OtherError : StatusCode.ConnectionError;
-            }
+            var resultStatusCode = anyUnexpectedError ? StatusCode.ConnectionError : StatusCode.Ok;
 
             return new Response<IEnumerable<PricePoint>>
             {
