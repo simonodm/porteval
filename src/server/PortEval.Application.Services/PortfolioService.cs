@@ -22,7 +22,7 @@ namespace PortEval.Application.Services
         /// <inheritdoc cref="IPortfolioService.CreatePortfolioAsync"/>
         public async Task<Portfolio> CreatePortfolioAsync(PortfolioDto options)
         {
-            if (!(await _currencyRepository.Exists(options.CurrencyCode)))
+            if (!(await _currencyRepository.ExistsAsync(options.CurrencyCode)))
             {
                 throw new ItemNotFoundException($"Currency {options.CurrencyCode} does not exist.");
             }
@@ -41,7 +41,7 @@ namespace PortEval.Application.Services
                 throw new ItemNotFoundException($"Update failed: portfolio {options.Id} does not exist.");
             }
 
-            if (!(await _currencyRepository.Exists(options.CurrencyCode)))
+            if (!(await _currencyRepository.ExistsAsync(options.CurrencyCode)))
             {
                 throw new ItemNotFoundException($"Currency {options.CurrencyCode} does not exist.");
             }
@@ -59,12 +59,12 @@ namespace PortEval.Application.Services
         /// <inheritdoc cref="IPortfolioService.DeletePortfolioAsync"/>
         public async Task DeletePortfolioAsync(int id)
         {
-            if (!(await _portfolioRepository.Exists(id)))
+            if (!(await _portfolioRepository.ExistsAsync(id)))
             {
                 throw new ItemNotFoundException($"Delete failed: portfolio {id} does not exist.");
             }
 
-            await _portfolioRepository.Delete(id);
+            await _portfolioRepository.DeleteAsync(id);
             await _portfolioRepository.UnitOfWork.CommitAsync();
         }
     }

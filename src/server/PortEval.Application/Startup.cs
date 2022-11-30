@@ -113,28 +113,11 @@ namespace PortEval.Application
             });
 
             AddTypeConverter<AggregationFrequency, AggregationFrequencyTypeConverter>();
-
-            ScheduleBackgroundJobs();
         }
 
         private void AddTypeConverter<TType, TConverterType>()
         {
             TypeDescriptor.AddAttributes(typeof(TType), new TypeConverterAttribute(typeof(TConverterType)));
-        }
-
-        private void ScheduleBackgroundJobs()
-        {
-            RecurringJob.AddOrUpdate<ILatestPricesFetchJob>("latest_prices", job => job.Run(), "*/5 * * * *");
-            RecurringJob.AddOrUpdate<IMissingInstrumentPricesFetchJob>("fetch_missing_prices", job => job.Run(), Cron.Daily);
-            RecurringJob.AddOrUpdate<IMissingExchangeRatesFetchJob>("fetch_missing_exchange_rates",
-                job => job.Run(), Cron.Daily);
-            RecurringJob.AddOrUpdate<IInstrumentPriceCleanupJob>("db_cleanup", job => job.Run(), Cron.Daily);
-            RecurringJob.AddOrUpdate<IImportCleanupJob>("import_cleanup", job => job.Run(), Cron.Daily);
-
-            RecurringJob.Trigger("db_cleanup");
-            RecurringJob.Trigger("fetch_missing_prices");
-            RecurringJob.Trigger("fetch_missing_exchange_rates");
-            RecurringJob.Trigger("import_cleanup");
         }
     }
 }

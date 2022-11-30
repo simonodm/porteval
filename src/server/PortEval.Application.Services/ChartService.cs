@@ -78,12 +78,12 @@ namespace PortEval.Application.Services
         /// <inheritdoc cref="IChartService.DeleteChartAsync" />
         public async Task DeleteChartAsync(int id)
         {
-            if (!(await _chartRepository.Exists(id)))
+            if (!(await _chartRepository.ExistsAsync(id)))
             {
                 throw new ItemNotFoundException($"Chart {id} does not exist.");
             }
 
-            await _chartRepository.Delete(id);
+            await _chartRepository.DeleteAsync(id);
             await _chartRepository.UnitOfWork.CommitAsync();
         }
 
@@ -98,7 +98,7 @@ namespace PortEval.Application.Services
             if (options.Type == ChartType.Price || options.Type == ChartType.Profit ||
                 options.Type == ChartType.AggregatedProfit)
             {
-                if (!(await _currencyRepository.Exists(options.CurrencyCode)))
+                if (!(await _currencyRepository.ExistsAsync(options.CurrencyCode)))
                 {
                     throw new ItemNotFoundException($"Currency {options.CurrencyCode} not found.");
                 }
@@ -217,7 +217,7 @@ namespace PortEval.Application.Services
 
             int portfolioId = (int)lineDto.PortfolioId;
 
-            if (!(await _portfolioRepository.Exists(portfolioId)))
+            if (!(await _portfolioRepository.ExistsAsync(portfolioId)))
             {
                 throw new ItemNotFoundException($"Portfolio {portfolioId} does not exist.");
             }
@@ -264,7 +264,7 @@ namespace PortEval.Application.Services
 
             int instrumentId = (int)lineDto.InstrumentId;
 
-            if (!(await _instrumentRepository.Exists(instrumentId)))
+            if (!(await _instrumentRepository.ExistsAsync(instrumentId)))
             {
                 throw new ItemNotFoundException($"Instrument {instrumentId} does not exist.");
             }

@@ -26,7 +26,7 @@ namespace PortEval.FinancialDataFetcher
         private readonly TClient _priorityApi;
         private readonly RetryPolicy _retryPolicy;
 
-        public RequestHandler(TRequest request, List<TClient> eligibleApis)
+        public RequestHandler(TRequest request, List<TClient> eligibleApis, RetryPolicy retryPolicy = null)
         {
             _request = request;
 
@@ -36,11 +36,19 @@ namespace PortEval.FinancialDataFetcher
             }
             _eligibleApis = eligibleApis;
 
+            if (retryPolicy != null)
+            {
+                _retryPolicy = retryPolicy;
+            }
+            else
+            {
 #if DEBUG
-            _retryPolicy = RetryPolicy.Fast;
+                _retryPolicy = RetryPolicy.Fast;
 #else
             _retryPolicy = RetryPolicy.Standard;
 #endif
+            }
+
         }
 
         public RequestHandler(TRequest request, List<TClient> eligibleApis, TClient priorityApi) : this(request, eligibleApis)

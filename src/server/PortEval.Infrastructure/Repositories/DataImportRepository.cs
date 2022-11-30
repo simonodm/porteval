@@ -19,7 +19,7 @@ namespace PortEval.Infrastructure.Repositories
 
         public async Task<IEnumerable<DataImport>> ListAllAsync()
         {
-            return await _context.Imports.ToListAsync();
+            return await _context.Imports.AsNoTracking().ToListAsync();
         }
 
         public DataImport Add(DataImport import)
@@ -41,7 +41,7 @@ namespace PortEval.Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> Exists(Guid id)
+        public async Task<bool> ExistsAsync(Guid id)
         {
             return await _context.Imports.AnyAsync(i => i.Id == id);
         }

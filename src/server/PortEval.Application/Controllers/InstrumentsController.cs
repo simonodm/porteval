@@ -33,7 +33,7 @@ namespace PortEval.Application.Controllers
 
         // GET: api/instruments
         [HttpGet]
-        public async Task<PaginatedResponse<InstrumentDto>> GetAllInstruments([FromQuery] PaginationParams pagination)
+        public async Task<ActionResult<PaginatedResponse<InstrumentDto>>> GetAllInstruments([FromQuery] PaginationParams pagination)
         {
             _logger.LogInformation($"Instruments requested (page {pagination.Page}, limit {pagination.Limit}.");
 

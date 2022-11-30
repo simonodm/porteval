@@ -1,4 +1,5 @@
 ﻿using System;
+using PortEval.Domain.Exceptions;
 
 namespace PortEval.Domain.Models.Entities
 {
@@ -12,17 +13,22 @@ namespace PortEval.Domain.Models.Entities
         public int PositionId { get; private set; }
         public Position Position { get; private set; }
 
+        public Transaction(int id, int positionId, DateTime time, decimal amount, decimal price, string note = "") : this(positionId, time, amount, price, note)
+        {
+            Id = id;
+        }
+
         public Transaction(int positionId, DateTime time, decimal amount, decimal price, string note = "")
         {
             if (time < PortEvalConstants.FinancialDataStartTime)
-                throw new InvalidOperationException(
+                throw new OperationNotAllowedException(
                     $"Transaction time must be later than {PortEvalConstants.FinancialDataStartTime}");
 
             if (amount == 0)
-                throw new InvalidOperationException("Transaction amount cannot be zero.");
+                throw new OperationNotAllowedException("Transaction amount cannot be zero.");
 
             if (price <= 0)
-                throw new InvalidOperationException("Transaction price must be above zero.");
+                throw new OperationNotAllowedException("Transaction price must be above zero.");
 
             PositionId = positionId;
             Time = time;

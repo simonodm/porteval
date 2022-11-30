@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using PortEval.Infrastructure;
 using PortEval.Application.Services.Extensions;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
+using PortEval.FinancialDataFetcher.Interfaces;
 
 namespace PortEval.BackgroundJobs.LatestPricesFetch
 {
@@ -18,14 +19,19 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
     /// </summary>
     public class LatestPricesFetchJob : ILatestPricesFetchJob
     {
-        private readonly PriceFetcher _fetcher;
-        private readonly PortEvalDbContext _context;
+        private readonly IPriceFetcher _fetcher;
+        private readonly IInstrumentRepository _instrumentRepository;
+        private readonly IInstrumentPriceRepository _instrumentPriceRepository;
+        private readonly ICurrencyExchangeRateRepository _exchangeRateRepository;
         private readonly ILogger _logger;
 
-        public LatestPricesFetchJob(PriceFetcher fetcher, PortEvalDbContext context, ILoggerFactory loggerFactory)
+        public LatestPricesFetchJob(IPriceFetcher fetcher, IInstrumentRepository instrumentRepository,
+            IInstrumentPriceRepository instrumentPriceRepository, ICurrencyExchangeRateRepository exchangeRateRepository, ILoggerFactory loggerFactory)
         {
             _fetcher = fetcher;
-            _context = context;
+            _instrumentRepository = instrumentRepository;
+            _instrumentPriceRepository = instrumentPriceRepository;
+            _exchangeRateRepository = exchangeRateRepository;
             _logger = loggerFactory.CreateLogger(typeof(LatestPricesFetchJob));
         }
 
@@ -37,7 +43,7 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
         {
             var startTime = DateTime.UtcNow;
             _logger.LogInformation($"Running latest price fetch job at {startTime}.");
-            var instruments = await _context.Instruments.AsNoTracking().ToListAsync();
+            var instruments = await _instrumentRepository.ListAllAsync();
 
             foreach (var instrument in instruments)
             {
@@ -49,12 +55,12 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
                     try
                     {
                         var pricePoint = fetcherResponse.Result;
-                        var price = await PriceUtils.GetConvertedPricePointPrice(_context, instrument,
+                        var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument,
                             pricePoint);
-                        _context.InstrumentPrices.Add(new InstrumentPrice(startTime.RoundDown(TimeSpan.FromMinutes(5)), price, instrument.Id));
+                        _instrumentPriceRepository.Add(new InstrumentPrice(startTime.RoundDown(TimeSpan.FromMinutes(5)), price, instrument.Id));
 
                         instrument.TrackingInfo.Update(startTime);
-                        _context.Instruments.Update(instrument);
+                        _instrumentRepository.Update(instrument);
                     }
                     catch (OperationNotAllowedException ex)
                     {
@@ -64,7 +70,7 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
                 
             }
 
-            await _context.SaveChangesAsync();
+            await _instrumentRepository.UnitOfWork.CommitAsync();
             _logger.LogInformation($"Finished latest price fetch job at {DateTime.UtcNow}.");
         }
     }

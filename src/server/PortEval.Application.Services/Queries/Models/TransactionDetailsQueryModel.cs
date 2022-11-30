@@ -2,7 +2,7 @@
 
 namespace PortEval.Application.Services.Queries.Models
 {
-    internal class TransactionDetailsQueryModel
+    public class TransactionDetailsQueryModel
     {
         public DateTime Time { get; set; }
         public decimal Amount { get; set; }

@@ -63,6 +63,10 @@ namespace PortEval.Application.Services
         public async Task<Position> UpdatePositionAsync(PositionDto options)
         {
             var position = await _positionRepository.FindAsync(options.Id);
+            if (position == null)
+            {
+                throw new ItemNotFoundException($"Position {options.Id} does not exist.");
+            }
 
             position.SetNote(options.Note);
             position.IncreaseVersion();
@@ -75,13 +79,17 @@ namespace PortEval.Application.Services
         /// <inheritdoc cref="IPositionService.RemovePositionAsync"/>
         public async Task RemovePositionAsync(int positionId)
         {
-            await _positionRepository.Delete(positionId);
+            if (!await _positionRepository.ExistsAsync(positionId))
+            {
+                throw new ItemNotFoundException($"Position {positionId} does not exist.");
+            }
+            await _positionRepository.DeleteAsync(positionId);
             await _positionRepository.UnitOfWork.CommitAsync();
         }
 
         private async Task ValidatePortfolioExists(int portfolioId)
         {
-            if (!(await _portfolioRepository.Exists(portfolioId)))
+            if (!(await _portfolioRepository.ExistsAsync(portfolioId)))
             {
                 throw new ItemNotFoundException($"Portfolio {portfolioId} does not exist.");
             }

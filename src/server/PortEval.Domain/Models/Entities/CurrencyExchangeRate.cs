@@ -10,6 +10,11 @@ namespace PortEval.Domain.Models.Entities
         public string CurrencyFromCode { get; private set; }
         public string CurrencyToCode { get; private set; }
 
+        public CurrencyExchangeRate(int id, DateTime time, decimal exchangeRate, string currencyFromCode, string currencyToCode) : this(time, exchangeRate, currencyFromCode, currencyToCode)
+        {
+            Id = id;
+        }
+
         public CurrencyExchangeRate(DateTime time, decimal exchangeRate, string currencyFromCode, string currencyToCode)
         {
             if (time < PortEvalConstants.FinancialDataStartTime)

@@ -15,5 +15,10 @@ namespace PortEval.Domain.Models.Entities
         {
             ChartId = chartId;
         }
+
+        public DashboardChartItem(int id, int chartId, DashboardPosition position) : base(id, position)
+        {
+            ChartId = chartId;
+        }
     }
 }

@@ -41,13 +41,13 @@ namespace PortEval.Application.Services.Interfaces.Repositories
         /// </summary>
         /// <param name="portfolioId">If of portfolio to delete.</param>
         /// <returns>A task representing the asynchronous deletion operation.</returns>
-        public Task Delete(int portfolioId);
+        public Task DeleteAsync(int portfolioId);
 
         /// <summary>
         /// Checks whether a portfolio with the supplied portfolio id exists.
         /// </summary>
         /// <param name="id">Portfolio id.</param>
         /// <returns>true if a portfolio with the supplied portfolio id exists in the database, false otherwise</returns>
-        public Task<bool> Exists(int id);
+        public Task<bool> ExistsAsync(int id);
     }
 }

@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using PortEval.Infrastructure;
 using System;
 using System.Threading.Tasks;
+using Hangfire;
+using PortEval.Application.Services.Interfaces.BackgroundJobs;
 
 namespace PortEval.Application
 {
@@ -36,6 +38,18 @@ namespace PortEval.Application
 
             try
             {
+                ScheduleBackgroundJobs(scope);
+            }
+            catch (Exception ex)
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred while scheduling background jobs.");
+
+                throw;
+            }
+
+            try
+            {
                 host.Run();
             }
             catch
@@ -51,5 +65,22 @@ namespace PortEval.Application
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
+        private static void ScheduleBackgroundJobs(IServiceScope scope)
+        {
+            var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+
+            recurringJobManager.AddOrUpdate<ILatestPricesFetchJob>("latest_prices", job => job.Run(), "*/5 * * * *");
+            recurringJobManager.AddOrUpdate<IMissingInstrumentPricesFetchJob>("fetch_missing_prices", job => job.Run(), Cron.Daily);
+            recurringJobManager.AddOrUpdate<IMissingExchangeRatesFetchJob>("fetch_missing_exchange_rates",
+                job => job.Run(), Cron.Daily);
+            recurringJobManager.AddOrUpdate<IInstrumentPriceCleanupJob>("db_cleanup", job => job.Run(), Cron.Daily);
+            recurringJobManager.AddOrUpdate<IImportCleanupJob>("import_cleanup", job => job.Run(), Cron.Daily);
+
+            recurringJobManager.Trigger("db_cleanup");
+            recurringJobManager.Trigger("fetch_missing_prices");
+            recurringJobManager.Trigger("fetch_missing_exchange_rates");
+            recurringJobManager.Trigger("import_cleanup");
+        }
     }
 }

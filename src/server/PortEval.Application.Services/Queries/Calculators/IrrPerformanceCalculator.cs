@@ -1,82 +1,83 @@
-﻿using PortEval.Application.Models.DTOs;
+﻿using PortEval.Application.Services.Queries.Calculators.Interfaces;
+using PortEval.Application.Services.Queries.Helpers;
 using PortEval.Application.Services.Queries.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PortEval.Application.Services.Queries.Helpers
+namespace PortEval.Application.Services.Queries.Calculators
 {
     /// <summary>
     /// Calculates approximate internal rate of return of a position.
     /// </summary>
-    internal static class InternalRateOfReturnCalculator
+    internal class IrrPerformanceCalculator : ITransactionBasedPerformanceCalculator
     {
         /// <summary>
-        /// Calculates approximate internal rate of return in the given range using modified Newton's method.
+        /// Calculates approximate performance in the given range using Internal Rate of Return.
+        ///
+        /// IRR is approximated using Newton's method.
         /// </summary>
         /// <param name="transactions">All transactions.</param>
         /// <param name="from">Start range.</param>
         /// <param name="to">End range.</param>
-        /// <returns>An <see cref="EntityPerformanceDto">EntityPerformanceDto</see> instance containing the calculation result.</returns>
-        public static EntityPerformanceDto CalculateIrr(IEnumerable<TransactionDetailsQueryModel> transactions, DateTime from, DateTime to)
+        /// <returns>Total performance of the financial entity represented by the provided transactions.</returns>
+        public decimal CalculatePerformance(IEnumerable<TransactionDetailsQueryModel> transactions, DateTime from, DateTime to)
         {
             var transactionsList = transactions.OrderBy(t => t.Time).ToList();
             if (transactionsList.Count == 0)
             {
-                return new EntityPerformanceDto
-                {
-                    From = from,
-                    To = to,
-                    Performance = 0
-                };
+                return 0;
             }
 
             var firstTransactionTime = transactionsList[0].Time;
             var intervalCountBase = firstTransactionTime < from ? from : firstTransactionTime;
             var interval = GetSinglePointIntervalLength(intervalCountBase, to);
             var totalIntervalCount = CalculateIntervalPointCount(intervalCountBase, to, interval);
-            var equation = new PolynomialEquation(0.01);
-            var initialGuess = 0m;
+            var equation = new PolynomialEquation(0.001);
+
+            // helper variables for initial guess calculation
+            var totalSellValue = 0m;
+            var totalPurchaseValue = 0m;
+            var potentiallyUnrealizedValue = 0m;
 
             foreach (var transaction in transactionsList)
             {
                 var transactionTime = transaction.Time < from ? from : transaction.Time;
                 var transactionIntervalCount = CalculateIntervalPointCount(transactionTime, to, interval);
-                var transactionValue =
+                var transactionPrice =
                     transaction.Time < from ? transaction.InstrumentPriceAtRangeStart : transaction.Price;
-                equation.AddCoefficient(transactionIntervalCount, -(double)(transaction.Amount * transactionValue));
+                equation.AddCoefficient(transactionIntervalCount, -(double)(transaction.Amount * transactionPrice));
                 equation.AddCoefficient(0, (double)(transaction.Amount * transaction.InstrumentPriceAtRangeEnd));
-                initialGuess += transaction.Amount *
-                    ((transaction.InstrumentPriceAtRangeEnd - transactionValue)
-                    / Math.Max(1, transactionValue) + 1);
+                if (transaction.Amount < 0)
+                {
+                    totalSellValue += -transaction.Amount * transactionPrice;
+                    potentiallyUnrealizedValue += transaction.Amount * transaction.InstrumentPriceAtRangeEnd;
+                }
+                else
+                {
+                    totalPurchaseValue += transaction.Amount * transactionPrice;
+                    potentiallyUnrealizedValue += transaction.Amount * transaction.InstrumentPriceAtRangeEnd;
+                }
             }
+
+            var initialGuess = 0m;
 
             try
             {
-                initialGuess = Math.Max(0, initialGuess); // fail-safe
+                initialGuess = (totalSellValue + potentiallyUnrealizedValue) / totalPurchaseValue;
 
                 var singlePointPerformance = equation.CalculateRoot(Math.Pow((double)initialGuess, 1.0 / totalIntervalCount));
                 var totalPerformance = Math.Pow(singlePointPerformance, totalIntervalCount);
 
                 if (singlePointPerformance < 0 && totalPerformance > 0) totalPerformance *= -1;
 
-                return new EntityPerformanceDto
-                {
-                    From = from,
-                    To = to,
-                    Performance = (decimal)totalPerformance - 1
-                };
+                return (decimal)totalPerformance - 1;
             }
             catch (OverflowException)
             {
                 var simplifiedPerformance = Math.Pow((double)initialGuess, totalIntervalCount);
-                return new EntityPerformanceDto
-                {
-                    From = from,
-                    To = to,
-                    Performance = (decimal)simplifiedPerformance - 1
-                };
-            }   
+                return (decimal)simplifiedPerformance - 1;
+            }
         }
 
         /// <summary>

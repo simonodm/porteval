@@ -40,6 +40,6 @@ namespace PortEval.Application.Services.Interfaces.Repositories
         /// </summary>
         /// <param name="currencyCode">Currency code.</param>
         /// <returns>true if a currency with the supplied currency code exists in the database, false otherwise</returns>
-        public Task<bool> Exists(string currencyCode);
+        public Task<bool> ExistsAsync(string currencyCode);
     }
 }

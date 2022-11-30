@@ -21,11 +21,21 @@ namespace PortEval.Domain.Models.Entities
         }
         private List<ChartLine> _lines = new List<ChartLine>();
 
+        public Chart(int id, string name, ChartDateRange dateRange, ChartTypeSettings typeConfig) : this(name, dateRange, typeConfig)
+        {
+            Id = id;
+        }
+
         public Chart(string name, ChartDateRange dateRange, ChartTypeSettings typeConfig)
         {
             Name = name;
             DateRange = dateRange;
             TypeConfiguration = typeConfig;
+        }
+
+        public Chart(int id, string name) : this(name)
+        {
+            Id = id;
         }
 
         public Chart(string name)

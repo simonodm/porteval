@@ -2,6 +2,7 @@
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Application.Services.Extensions;
+using PortEval.Application.Services.Queries.Calculators;
 using PortEval.Application.Services.Queries.DataQueries;
 using PortEval.Application.Services.Queries.Helpers;
 using PortEval.Application.Services.Queries.Interfaces;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Services.Queries.Calculators.Interfaces;
 
 namespace PortEval.Application.Services.Queries
 {
@@ -21,14 +23,19 @@ namespace PortEval.Application.Services.Queries
     {
         private readonly IDbConnectionCreator _connectionCreator;
         private readonly ICurrencyExchangeRateQueries _exchangeRateQueries;
-        private readonly IPositionQueries _positionQueries;
 
-        public PortfolioQueries(IDbConnectionCreator connection, ICurrencyExchangeRateQueries exchangeRateQueries,
-            IPositionQueries positionQueries)
+        private readonly ITransactionBasedValueCalculator _valueCalculator;
+        private readonly ITransactionBasedProfitCalculator _profitCalculator;
+        private readonly ITransactionBasedPerformanceCalculator _performanceCalculator;
+
+        public PortfolioQueries(IDbConnectionCreator connection, ICurrencyExchangeRateQueries exchangeRateQueries)
         {
             _connectionCreator = connection;
             _exchangeRateQueries = exchangeRateQueries;
-            _positionQueries = positionQueries;
+
+            _valueCalculator = new TransactionBasedValueCalculator();
+            _profitCalculator = new TransactionBasedProfitCalculator();
+            _performanceCalculator = new IrrPerformanceCalculator();
         }
 
         /// <inheritdoc cref="IPortfolioQueries.GetPortfolios"/>
@@ -73,27 +80,20 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            var positions = await _positionQueries.GetPortfolioPositions(portfolioId);
-
-            decimal value = 0;
-            foreach (var position in positions.Response)
+            using var connection = _connectionCreator.CreateConnection();
+            var dateRange = new DateRangeParams
             {
-                var positionValue = await _positionQueries.GetPositionValue(position.Id, time);
-                if (position.Instrument.CurrencyCode == portfolio.Response.CurrencyCode)
-                {
-                    value += positionValue.Response.Value;
-                    continue;
-                }
+                To = time
+            };
+            var transactions = await GetTransactionsConvertedToPortfolioCurrency(connection, portfolioId, dateRange, dateRange);
 
-                var convertedValue = await _exchangeRateQueries.Convert(position.Instrument.CurrencyCode,
-                    portfolio.Response.CurrencyCode, positionValue.Response.Value, time);
-                value += convertedValue;
-            }
+            var value = _valueCalculator.CalculateValue(transactions, time);
 
             var valueDto = new EntityValueDto
             {
                 Time = time,
-                Value = value
+                Value = value,
+                CurrencyCode = portfolio.Response.CurrencyCode
             };
 
             return new QueryResponse<EntityValueDto>
@@ -122,31 +122,14 @@ namespace PortEval.Application.Services.Queries
                     new DateRangeParams { To = dateRange.To }, dateRange)).ToList();
             }
 
-            var valueAtRangeStart = 0m;
-            var valueAtRangeEnd = 0m;
-            var profitInRange = 0m;
-            foreach (var transaction in transactions)
-            {
-                if (transaction.Time < dateRange.From)
-                {
-                    valueAtRangeStart += transaction.Amount * transaction.InstrumentPriceAtRangeStart;
-                }
-                else
-                {
-                    profitInRange -= transaction.Amount * transaction.Price; // realized gains
-                }
-                valueAtRangeEnd += transaction.Amount * transaction.InstrumentPriceAtRangeEnd;
-            }
-
-            profitInRange += valueAtRangeEnd; // unrealized gains
-            var totalProfit = profitInRange - valueAtRangeStart;
+            var profit = _profitCalculator.CalculateProfit(transactions, dateRange.From, dateRange.To);
 
             var profitDto = new EntityProfitDto
             {
                 CurrencyCode = portfolio.Response.CurrencyCode,
                 From = dateRange.From,
                 To = dateRange.To,
-                Profit = totalProfit
+                Profit = profit
             };
 
             return new QueryResponse<EntityProfitDto>
@@ -171,15 +154,20 @@ namespace PortEval.Application.Services.Queries
             List<PortfolioTransactionDetailsQueryModel> transactions;
             using (var connection = _connectionCreator.CreateConnection())
             {
-                transactions = (await GetTransactionsConvertedToPortfolioCurrency(connection, portfolioId, dateRange.SetFrom(PortEvalConstants.FinancialDataStartTime), dateRange)).ToList();
+                transactions = (await GetTransactionsConvertedToPortfolioCurrency(connection, portfolioId, new DateRangeParams { To = dateRange.To }, dateRange)).ToList();
             }
 
-            var performance = InternalRateOfReturnCalculator.CalculateIrr(transactions, dateRange.From, dateRange.To);
+            var performance = _performanceCalculator.CalculatePerformance(transactions, dateRange.From, dateRange.To);
 
             return new QueryResponse<EntityPerformanceDto>
             {
                 Status = QueryStatus.Ok,
-                Response = performance
+                Response = new EntityPerformanceDto
+                {
+                    From = dateRange.From,
+                    To = dateRange.To,
+                    Performance = performance
+                }
             };
         }
 
@@ -383,8 +371,6 @@ namespace PortEval.Application.Services.Queries
         /// <inheritdoc cref="IPortfolioQueries.GetAllPortfoliosStatistics"/>
         public async Task<QueryResponse<IEnumerable<EntityStatisticsDto>>> GetAllPortfoliosStatistics()
         {
-            var now = DateTime.UtcNow;
-
             var portfolios = await GetPortfolios();
 
             var data = await Task.WhenAll(portfolios.Response.Select(portfolio => GetPortfolioStatistics(portfolio.Id)));
@@ -463,25 +449,14 @@ namespace PortEval.Application.Services.Queries
         /// with prices converted to portfolio's currency.
         /// </returns>
         private async Task<IEnumerable<PortfolioTransactionDetailsQueryModel>> GetTransactionsConvertedToPortfolioCurrency(IDbConnection connection,
-            int portfolioId, DateRangeParams transactionDateRange, DateRangeParams instrumentPricesDateRange = null)
+            int portfolioId, DateRangeParams transactionDateRange, DateRangeParams instrumentPricesDateRange)
         {
-            var firstTransactionTime = await GetFirstTransactionTime(portfolioId);
-
-            if (firstTransactionTime == null)
-            {
-                return Enumerable.Empty<PortfolioTransactionDetailsQueryModel>();
-            }
-
-            var transactionsTimeFrom = transactionDateRange.From;
-            var transactionsTimeTo = transactionDateRange.To;
-            var pricesTimeFrom = instrumentPricesDateRange?.From ?? transactionsTimeFrom;
-            var pricesTimeTo = instrumentPricesDateRange?.To ?? new DateTime(Math.Max(transactionsTimeFrom.Ticks, ((DateTime)firstTransactionTime).Ticks));
             var transactionQuery = PortfolioDataQueries.GetPortfolioDetailedTransactions(
                 portfolioId,
-                transactionsTimeFrom,
-                transactionsTimeTo,
-                pricesTimeFrom,
-                pricesTimeTo 
+                transactionDateRange.From,
+                transactionDateRange.To,
+                instrumentPricesDateRange.From,
+                instrumentPricesDateRange.To
             );
             var transactions =
                 await connection.QueryAsync<PortfolioTransactionDetailsQueryModel>(transactionQuery.Query, transactionQuery.Params);
@@ -499,14 +474,14 @@ namespace PortEval.Application.Services.Queries
                 {
                     instrumentConvertedRangeStartPrices[transaction.InstrumentId] = await _exchangeRateQueries.Convert(
                         transaction.TransactionCurrency, transaction.PortfolioCurrency,
-                        transaction.InstrumentPriceAtRangeStart, pricesTimeFrom);
+                        transaction.InstrumentPriceAtRangeStart, instrumentPricesDateRange.From);
                 }
 
                 if (!instrumentConvertedRangeEndPrices.ContainsKey(transaction.InstrumentId))
                 {
                     instrumentConvertedRangeEndPrices[transaction.InstrumentId] = await _exchangeRateQueries.Convert(
                         transaction.TransactionCurrency, transaction.PortfolioCurrency,
-                        transaction.InstrumentPriceAtRangeEnd, pricesTimeTo);
+                        transaction.InstrumentPriceAtRangeEnd, instrumentPricesDateRange.To);
                 }
 
                 transaction.Price = convertedTransactionPrice;

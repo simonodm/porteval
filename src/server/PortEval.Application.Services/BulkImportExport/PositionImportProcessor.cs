@@ -14,7 +14,7 @@ namespace PortEval.Application.Services.BulkImportExport
             _positionService = positionService;
         }
 
-        public override async Task<ProcessedRowErrorLogEntry<PositionDto>> ProcessItem(PositionDto row)
+        protected override async Task<ProcessedRowErrorLogEntry<PositionDto>> ProcessItem(PositionDto row)
         {
             var logEntry = new ProcessedRowErrorLogEntry<PositionDto>(row);
 

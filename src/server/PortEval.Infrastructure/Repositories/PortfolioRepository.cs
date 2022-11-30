@@ -21,13 +21,18 @@ namespace PortEval.Infrastructure.Repositories
         /// <inheritdoc cref="IPortfolioRepository.ListAllAsync"/>
         public async Task<IEnumerable<Portfolio>> ListAllAsync()
         {
-            return await _context.Portfolios.ToListAsync();
+            return await _context.Portfolios
+                .AsNoTracking()
+                .OrderBy(p => p.Name)
+                .ToListAsync();
         }
 
         /// <inheritdoc cref="IPortfolioRepository.FindAsync"/>
         public async Task<Portfolio> FindAsync(int id)
         {
-            var portfolio = await _context.Portfolios.FirstOrDefaultAsync(p => p.Id == id);
+            var portfolio = await _context.Portfolios
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             return portfolio;
         }
@@ -46,8 +51,8 @@ namespace PortEval.Infrastructure.Repositories
             return updatedPortfolio;
         }
 
-        /// <inheritdoc cref="IPortfolioRepository.Delete"/>
-        public async Task Delete(int portfolioId)
+        /// <inheritdoc cref="IPortfolioRepository.DeleteAsync"/>
+        public async Task DeleteAsync(int portfolioId)
         {
             var foundPortfolioEntity = await _context.Portfolios.FirstOrDefaultAsync(p => p.Id == portfolioId);
             if(foundPortfolioEntity != null)
@@ -64,8 +69,8 @@ namespace PortEval.Infrastructure.Repositories
             }
         }
 
-        /// <inheritdoc cref="IPortfolioRepository.Exists"/>
-        public async Task<bool> Exists(int id)
+        /// <inheritdoc cref="IPortfolioRepository.ExistsAsync"/>
+        public async Task<bool> ExistsAsync(int id)
         {
             return await _context.Portfolios.AnyAsync(i => i.Id == id);
         }

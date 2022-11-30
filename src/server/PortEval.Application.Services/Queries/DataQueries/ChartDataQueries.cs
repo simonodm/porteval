@@ -40,12 +40,12 @@ namespace PortEval.Application.Services.Queries.DataQueries
 	                          SELECT Id, Name AS PortfolioName FROM dbo.Portfolios
                           ) as Portfolios ON Lines.PortfolioId = Portfolios.Id
                           LEFT JOIN (
-	                          SELECT Positions.Id, Symbol AS PositionName FROM dbo.Positions LEFT JOIN dbo.Instruments ON Positions.InstrumentId = Instruments.Id
+	                          SELECT Positions.Id, Name AS PositionName FROM dbo.Positions LEFT JOIN dbo.Instruments ON Positions.InstrumentId = Instruments.Id
                           ) AS Positions ON Lines.PositionId = Positions.Id
                           LEFT JOIN (
-	                          SELECT Id, Symbol AS InstrumentName FROM dbo.Instruments
+	                          SELECT Id, Name AS InstrumentName FROM dbo.Instruments
                           ) AS Instruments ON Lines.InstrumentId = Instruments.Id
-                          ORDER BY Charts.Name"
+                          ORDER BY Charts.Name, PortfolioName, PositionName, InstrumentName"
             };
         }
 

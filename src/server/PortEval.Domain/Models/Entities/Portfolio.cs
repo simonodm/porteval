@@ -7,6 +7,11 @@
         public string Name { get; private set; }
         public string Note { get; private set; }
 
+        public Portfolio(int id, string name, string note, string currencyCode) : this(name, note, currencyCode)
+        {
+            Id = id;
+        }
+
         public Portfolio(string name, string note, string currencyCode)
         {
             Name = name;

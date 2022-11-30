@@ -17,11 +17,13 @@ namespace PortEval.Infrastructure.Repositories
             _context = context;
         }
 
-        /// <inheritdoc cref="IPositionRepository.ListAsync"/>
-        public async Task<IEnumerable<Position>> ListAsync(int portfolioId)
+        /// <inheritdoc cref="IPositionRepository.ListPortfolioPositionsAsync"/>
+        public async Task<IEnumerable<Position>> ListPortfolioPositionsAsync(int portfolioId)
         {
             return await _context.Positions
+                .AsNoTracking()
                 .Where(p => p.PortfolioId == portfolioId)
+                .OrderBy(p => p.InstrumentId)
                 .Include(p => p.Transactions)
                 .ToListAsync();
         }
@@ -30,16 +32,18 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<Position> FindAsync(int positionId)
         {
             var position = await _context.Positions
+                .AsNoTracking()
                 .Include(p => p.Transactions)
                 .FirstOrDefaultAsync(p => p.Id == positionId);
 
             return position;
         }
 
-        /// <inheritdoc cref="IPositionRepository.FindParentPosition"/>
-        public async Task<Position> FindParentPosition(int transactionId)
+        /// <inheritdoc cref="IPositionRepository.FindParentPositionAsync"/>
+        public async Task<Position> FindParentPositionAsync(int transactionId)
         {
             var transaction = await _context.Transactions
+                .AsNoTracking()
                 .Include(t => t.Position)
                 .FirstOrDefaultAsync(t => t.Id == transactionId);
 
@@ -60,8 +64,8 @@ namespace PortEval.Infrastructure.Repositories
             return updatedPosition;
         }
 
-        /// <inheritdoc cref="IPositionRepository.Delete"/>
-        public async Task Delete(int positionId)
+        /// <inheritdoc cref="IPositionRepository.DeleteAsync"/>
+        public async Task DeleteAsync(int positionId)
         {
             var foundPosition = await _context.Positions.FirstOrDefaultAsync(p => p.Id == positionId);
             if(foundPosition != null)
@@ -73,8 +77,8 @@ namespace PortEval.Infrastructure.Repositories
             }
         }
 
-        /// <inheritdoc cref="IPositionRepository.Exists"/>
-        public async Task<bool> Exists(int id)
+        /// <inheritdoc cref="IPositionRepository.ExistsAsync"/>
+        public async Task<bool> ExistsAsync(int id)
         {
             return await _context.Positions.AnyAsync(i => i.Id == id);
         }

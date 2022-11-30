@@ -8,7 +8,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
         {
             return new QueryWrapper<ExchangeDto>
             {
-                Query = @"SELECT * FROM [dbo].[Exchanges]"
+                Query = @"SELECT * FROM [dbo].[Exchanges] ORDER BY [Symbol]"
             };
         }
     }
