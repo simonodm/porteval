@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Services.Extensions;
+using PortEval.Application.Services.Queries.Calculators;
+using PortEval.Application.Services.Queries.Calculators.Interfaces;
 
 namespace PortEval.Application.Services.Queries
 {
@@ -21,10 +23,16 @@ namespace PortEval.Application.Services.Queries
         private readonly IDbConnectionCreator _connectionCreator;
         private readonly ICurrencyExchangeRateQueries _exchangeRateQueries;
 
+        private readonly IPriceBasedProfitCalculator _profitCalculator;
+        private readonly IPriceBasedPerformanceCalculator _performanceCalculator;
+
         public InstrumentQueries(IDbConnectionCreator connection, ICurrencyExchangeRateQueries exchangeRateQueries)
         {
             _connectionCreator = connection;
             _exchangeRateQueries = exchangeRateQueries;
+
+            _profitCalculator = new PriceBasedProfitCalculator();
+            _performanceCalculator = new PriceBasedPerformanceCalculator();
         }
 
         /// <inheritdoc cref="IInstrumentQueries.GetAllInstruments"/>
@@ -173,16 +181,19 @@ namespace PortEval.Application.Services.Queries
             var firstPrice = (await GetInstrumentPrice(instrumentId, dateRange.From)).Response?.Price ?? 0;
             var secondPrice = (await GetInstrumentPrice(instrumentId, dateRange.To)).Response?.Price ?? 0;
 
-            var profit = new EntityProfitDto
+            var profit = _profitCalculator.CalculateProfit(firstPrice, secondPrice);
+
+            var result = new EntityProfitDto
             {
                 From = dateRange.From,
                 To = dateRange.To,
-                Profit = secondPrice - firstPrice
+                Profit = profit,
+                CurrencyCode = instrument.Response.CurrencyCode
             };
             return new QueryResponse<EntityProfitDto>
             {
                 Status = QueryStatus.Ok,
-                Response = profit
+                Response = result
             };
         }
 
@@ -200,31 +211,19 @@ namespace PortEval.Application.Services.Queries
             var firstPrice = (await GetInstrumentPrice(instrumentId, dateRange.From)).Response?.Price ?? 0;
             var secondPrice = (await GetInstrumentPrice(instrumentId, dateRange.To)).Response?.Price ?? 0;
 
-            var calculatedPerformance = 0m;
-            if(firstPrice == 0 && secondPrice > 0)
-            {
-                calculatedPerformance = 1;
-            }
-            else if (firstPrice == 0 && secondPrice == 0)
-            {
-                calculatedPerformance = 0;
-            }
-            else
-            {
-                calculatedPerformance = (secondPrice - firstPrice) / firstPrice;
-            }
+            var performance = _performanceCalculator.CalculatePerformance(firstPrice, secondPrice);
 
-            var performance = new EntityPerformanceDto
+            var result = new EntityPerformanceDto
             {
                 From = dateRange.From,
                 To = dateRange.To,
-                Performance = calculatedPerformance
+                Performance = performance
             };
 
             return new QueryResponse<EntityPerformanceDto>
             {
                 Status = QueryStatus.Ok,
-                Response = performance
+                Response = result
             };
         }
 

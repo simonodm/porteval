@@ -9,6 +9,11 @@ namespace PortEval.Domain.Models.Entities
         public decimal Price { get; private set; }
         public int InstrumentId { get; private set; }
 
+        public InstrumentPrice(int id, DateTime time, decimal price, int instrumentId) : this(time, price, instrumentId)
+        {
+            Id = id;
+        }
+
         public InstrumentPrice(DateTime time, decimal price, int instrumentId)
         {
             if (time < PortEvalConstants.FinancialDataStartTime)

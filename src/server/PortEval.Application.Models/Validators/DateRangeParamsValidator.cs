@@ -9,6 +9,7 @@ namespace PortEval.Application.Models.Validators
         public DateRangeParamsValidator()
         {
             RuleFor(dr => dr.From)
+                .ApplyTimeRangeRule()
                 .LessThan(dr => dr.To);
             RuleFor(dr => dr.To)
                 .ApplyTimeRangeRule();

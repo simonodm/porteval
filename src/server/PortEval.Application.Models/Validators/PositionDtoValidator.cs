@@ -19,7 +19,8 @@ namespace PortEval.Application.Models.Validators
             {
                 RuleFor(p => p.Amount)
                     .NotEmpty()
-                    .ApplyAmountRangeRule();
+                    .ApplyAmountRangeRule()
+                    .GreaterThan(0);
                 RuleFor(p => p.Price)
                     .NotEmpty()
                     .ApplyPriceRangeRule();

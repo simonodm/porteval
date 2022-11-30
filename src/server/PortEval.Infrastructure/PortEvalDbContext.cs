@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using EFCore.BulkExtensions;
 using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Infrastructure.Configurations;
@@ -43,17 +44,17 @@ namespace PortEval.Infrastructure
             await SaveChangesAsync();
         }
 
-        public DbSet<Portfolio> Portfolios { get; set; }
-        public DbSet<Position> Positions { get; set; }
-        public DbSet<Transaction> Transactions { get; set; }
-        public DbSet<Currency> Currencies { get; set; }
-        public DbSet<CurrencyExchangeRate> CurrencyExchangeRates { get; set; }
-        public DbSet<Instrument> Instruments { get; set; }
-        public DbSet<InstrumentPrice> InstrumentPrices { get; set; }
-        public DbSet<Chart> Charts { get; set; }
-        public DbSet<ChartLine> ChartLines { get; set; }
-        public DbSet<DashboardItem> DashboardItems { get; set; }
-        public DbSet<DataImport> Imports { get; set; }
-        public DbSet<Exchange> Exchanges { get; set; }
+        public virtual DbSet<Portfolio> Portfolios { get; set; }
+        public virtual DbSet<Position> Positions { get; set; }
+        public virtual DbSet<Transaction> Transactions { get; set; }
+        public virtual DbSet<Currency> Currencies { get; set; }
+        public virtual DbSet<CurrencyExchangeRate> CurrencyExchangeRates { get; set; }
+        public virtual DbSet<Instrument> Instruments { get; set; }
+        public virtual DbSet<InstrumentPrice> InstrumentPrices { get; set; }
+        public virtual DbSet<Chart> Charts { get; set; }
+        public virtual DbSet<ChartLine> ChartLines { get; set; }
+        public virtual DbSet<DashboardItem> DashboardItems { get; set; }
+        public virtual DbSet<DataImport> Imports { get; set; }
+        public virtual DbSet<Exchange> Exchanges { get; set; }
     }
 }

@@ -21,13 +21,17 @@ namespace PortEval.Infrastructure.Repositories
         /// <inheritdoc cref="IInstrumentRepository.ListAllAsync"/>
         public async Task<IEnumerable<Instrument>> ListAllAsync()
         {
-            return await _context.Instruments.ToListAsync();
+            return await _context.Instruments
+                .AsNoTracking()
+                .OrderBy(i => i.Symbol)
+                .ToListAsync();
         }
 
         /// <inheritdoc cref="IInstrumentRepository.FindAsync"/>
         public async Task<Instrument> FindAsync(int id)
         {
             var instrumentEntity = await _context.Instruments
+                .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id == id);
             return instrumentEntity;
         }
@@ -46,8 +50,8 @@ namespace PortEval.Infrastructure.Repositories
             return updatedInstrument;
         }
 
-        /// <inheritdoc cref="IInstrumentRepository.Delete"/>
-        public async Task Delete(int instrumentId)
+        /// <inheritdoc cref="IInstrumentRepository.DeleteAsync"/>
+        public async Task DeleteAsync(int instrumentId)
         {
             var foundInstrumentEntity = await _context.Instruments.FirstOrDefaultAsync(i => i.Id == instrumentId);
             if(foundInstrumentEntity != null)
@@ -64,8 +68,8 @@ namespace PortEval.Infrastructure.Repositories
             }
         }
 
-        /// <inheritdoc cref="IInstrumentRepository.Exists"/>
-        public async Task<bool> Exists(int id)
+        /// <inheritdoc cref="IInstrumentRepository.ExistsAsync"/>
+        public async Task<bool> ExistsAsync(int id)
         {
             return await _context.Instruments.AnyAsync(i => i.Id == id);
         }

@@ -1,7 +1,9 @@
-﻿using PortEval.FinancialDataFetcher.APIs.ExchangeRateHost;
+﻿using PortEval.Domain.Models.Entities;
+using PortEval.FinancialDataFetcher.APIs.ExchangeRateHost;
 using PortEval.FinancialDataFetcher.APIs.Interfaces;
 using PortEval.FinancialDataFetcher.APIs.OpenExchangeRates;
 using PortEval.FinancialDataFetcher.APIs.Tiingo;
+using PortEval.FinancialDataFetcher.Interfaces;
 using PortEval.FinancialDataFetcher.Models;
 using PortEval.FinancialDataFetcher.Requests;
 using PortEval.FinancialDataFetcher.Responses;
@@ -18,7 +20,7 @@ namespace PortEval.FinancialDataFetcher
     /// <summary>
     /// Aggregates multiple API clients supporting retrieval of instrument prices and currency exchange rates.
     /// </summary>
-    public class PriceFetcher
+    public class PriceFetcher : IPriceFetcher
     {
         private readonly HttpClient _httpClient;
         private readonly List<IFinancialApi> _registeredClients = new List<IFinancialApi>();
@@ -175,14 +177,14 @@ namespace PortEval.FinancialDataFetcher
         }
 
         /// <summary>
-        /// Selects eligible APIs for the supplied request and delegates it to the appropriate request handler.
+        /// Processes the provided request and returns its response.
         /// </summary>
         /// <param name="request">Request to process</param>
         /// <typeparam name="TClient">Target API client type</typeparam>
         /// <typeparam name="TRequest">Request type</typeparam>
         /// <typeparam name="TResult">Response data type</typeparam>
         /// <returns></returns>
-        private async Task<Response<TResult>> ProcessRequest<TClient, TRequest, TResult>(TRequest request)
+        public async Task<Response<TResult>> ProcessRequest<TClient, TRequest, TResult>(TRequest request)
             where TClient : class, IFinancialApi<TRequest, Response<TResult>>
             where TRequest : IRequest
         {

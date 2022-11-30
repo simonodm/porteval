@@ -16,6 +16,11 @@ namespace PortEval.Domain.Models.Entities
         public bool IsTracked { get; private set; }
         public TrackingInformation TrackingInfo { get; private set; }
 
+        public Instrument(int id, string name, string symbol, string exchange, InstrumentType type, string currencyCode, string note) : this(name, symbol, exchange, type, currencyCode, note)
+        {
+            Id = id;
+        }
+
         public Instrument(string name, string symbol, string exchange, InstrumentType type, string currencyCode, string note)
         {
             Name = name;

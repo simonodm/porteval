@@ -13,10 +13,12 @@ namespace PortEval.Application.Services
     public class CurrencyService : ICurrencyService
     {
         private readonly ICurrencyRepository _currencyRepository;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
-        public CurrencyService(ICurrencyRepository currencyRepository)
+        public CurrencyService(ICurrencyRepository currencyRepository, IBackgroundJobClient backgroundJobClient)
         {
             _currencyRepository = currencyRepository;
+            _backgroundJobClient = backgroundJobClient;
         }
 
         /// <inheritdoc cref="ICurrencyService.UpdateAsync" />
@@ -40,7 +42,7 @@ namespace PortEval.Application.Services
                 _currencyRepository.Update(currencyEntity);
 
                 await _currencyRepository.UnitOfWork.CommitAsync();
-                BackgroundJob.Enqueue<IMissingExchangeRatesFetchJob>(job => job.Run());
+                _backgroundJobClient.Enqueue<IMissingExchangeRatesFetchJob>(job => job.Run());
             }
         }
     }

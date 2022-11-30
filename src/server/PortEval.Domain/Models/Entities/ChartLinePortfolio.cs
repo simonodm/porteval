@@ -7,6 +7,11 @@ namespace PortEval.Domain.Models.Entities
     {
         public int PortfolioId { get; }
 
+        public ChartLinePortfolio(int id, int chartId, int width, LineDashType dash, Color color, int portfolioId) : base(id, chartId, width, dash, color)
+        {
+            PortfolioId = portfolioId;
+        }
+
         public ChartLinePortfolio(int chartId, int width, LineDashType dash, Color color, int portfolioId) : base(chartId, width, dash, color)
         {
             PortfolioId = portfolioId;

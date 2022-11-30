@@ -8,10 +8,13 @@ using PortEval.Application.Services.Queries.Models;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Domain;
 using PortEval.Application.Services.Extensions;
+using PortEval.Application.Services.Queries.Calculators;
+using PortEval.Application.Services.Queries.Calculators.Interfaces;
 
 namespace PortEval.Application.Services.Queries
 {
@@ -19,17 +22,23 @@ namespace PortEval.Application.Services.Queries
     public class PositionQueries : IPositionQueries
     {
         private readonly IDbConnectionCreator _connectionCreator;
-        private readonly IInstrumentQueries _instrumentQueries;
         private readonly ICurrencyExchangeRateQueries _exchangeRateQueries;
         private readonly ITransactionQueries _transactionQueries;
 
+        private readonly ITransactionBasedValueCalculator _valueCalculator;
+        private readonly ITransactionBasedProfitCalculator _profitCalculator;
+        private readonly ITransactionBasedPerformanceCalculator _performanceCalculator;
+
         public PositionQueries(IDbConnectionCreator connection,
-            IInstrumentQueries instrumentQueries, ICurrencyExchangeRateQueries exchangeRateQueries, ITransactionQueries transactionQueries)
+            ICurrencyExchangeRateQueries exchangeRateQueries, ITransactionQueries transactionQueries)
         {
             _connectionCreator = connection;
-            _instrumentQueries = instrumentQueries;
             _exchangeRateQueries = exchangeRateQueries;
             _transactionQueries = transactionQueries;
+
+            _valueCalculator = new TransactionBasedValueCalculator();
+            _profitCalculator = new TransactionBasedProfitCalculator();
+            _performanceCalculator = new IrrPerformanceCalculator();
         }
 
         /// <inheritdoc cref="IPositionQueries.GetAllPositions"/>
@@ -114,33 +123,26 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            var transactions = await _transactionQueries.GetTransactions(
-                new TransactionFilters
-                {
-                    PositionId = positionId
-                },
-                new DateRangeParams {
-                    To = time
-                });
-
-            var price = await _instrumentQueries.GetInstrumentPrice(position.Response.InstrumentId, time);
-
-            decimal amountSum = 0;
-            foreach (var transaction in transactions.Response)
+            using var connection = _connectionCreator.CreateConnection();
+            var dateRange = new DateRangeParams
             {
-                amountSum += transaction.Amount;
-            }
+                To = time
+            };
+            var transactions = await GetDetailedTransactionData(connection, positionId, dateRange.SetFrom(PortEvalConstants.FinancialDataStartTime), dateRange);
 
-            var value = new EntityValueDto
+            var value = _valueCalculator.CalculateValue(transactions, time);
+
+            var result = new EntityValueDto
             {
                 Time = time,
-                Value = amountSum * (price.Response?.Price ?? 0)
+                Value = value,
+                CurrencyCode = position.Response.Instrument.CurrencyCode
             };
 
             return new QueryResponse<EntityValueDto>
             {
                 Status = QueryStatus.Ok,
-                Response = value
+                Response = result
             };
         }
 
@@ -156,47 +158,23 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            var transactions =
-                await _transactionQueries.GetTransactions(new TransactionFilters
-                {
-                    PositionId = positionId
-                }, dateRange.SetFrom(PortEvalConstants.FinancialDataStartTime));
+            using var connection = _connectionCreator.CreateConnection();
+            var transactions = await GetDetailedTransactionData(connection, positionId, dateRange.SetFrom(PortEvalConstants.FinancialDataStartTime), dateRange);
 
-            var instrumentPriceAtRangeStart =
-                (await _instrumentQueries.GetInstrumentPrice(position.Response.InstrumentId, dateRange.From)).Response?.Price ?? 0m;
-            var instrumentPriceAtRangeEnd =
-                (await _instrumentQueries.GetInstrumentPrice(position.Response.InstrumentId, dateRange.To)).Response?.Price ?? 0m;
+            var profit = _profitCalculator.CalculateProfit(transactions, dateRange.From, dateRange.To);
 
-            var amountAtRangeStart = 0m;
-            var amountAtRangeEnd = 0m;
-            var profitInRange = 0m;
-            foreach (var transaction in transactions.Response)
-            {
-                if (transaction.Time < dateRange.From)
-                {
-                    amountAtRangeStart += transaction.Amount;
-                }
-                else
-                {
-                    profitInRange -= (transaction.Amount * transaction.Price); // realized profit
-                }
-                amountAtRangeEnd += transaction.Amount;
-            }
-
-            profitInRange += amountAtRangeEnd * instrumentPriceAtRangeEnd; // unrealized profit
-            var totalProfit = profitInRange - amountAtRangeStart * instrumentPriceAtRangeStart; // subtract value at range start
-
-            var profit = new EntityProfitDto
+            var result = new EntityProfitDto
             {
                 From = dateRange.From,
                 To = dateRange.To,
-                Profit = totalProfit
+                Profit = profit,
+                CurrencyCode = position.Response.Instrument.CurrencyCode
             };
 
             return new QueryResponse<EntityProfitDto>
             {
                 Status = QueryStatus.Ok,
-                Response = profit
+                Response = result
             };
         }
 
@@ -212,39 +190,20 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            var firstTransactionTime = await GetFirstTransactionTime(positionId);
+            using var connection = _connectionCreator.CreateConnection();
+            var transactions = await GetDetailedTransactionData(connection, positionId, dateRange.SetFrom(PortEvalConstants.FinancialDataStartTime), dateRange);
 
-            if (firstTransactionTime == null)
-            {
-                var zeroPerformance = new EntityPerformanceDto
-                {
-                    From = dateRange.From,
-                    To = dateRange.To,
-                    Performance = 0
-                };
-                return new QueryResponse<EntityPerformanceDto>
-                {
-                    Status = QueryStatus.Ok,
-                    Response = zeroPerformance
-                };
-            }
+            var performance = _performanceCalculator.CalculatePerformance(transactions, dateRange.From, dateRange.To);
 
-            IEnumerable<TransactionDetailsQueryModel> transactionData;
-            using (var connection = _connectionCreator.CreateConnection())
-            {
-                var timeFrom = new DateTime(Math.Max(dateRange.From.Ticks, ((DateTime)firstTransactionTime).Ticks));
-
-                var transactionDetailsQuery =
-                    PositionDataQueries.GetDetailedTransactionsQuery(positionId, timeFrom, dateRange.To);
-                transactionData = await connection.QueryAsync<TransactionDetailsQueryModel>(transactionDetailsQuery.Query,
-                    transactionDetailsQuery.Params);
-            }
-
-            var performance = InternalRateOfReturnCalculator.CalculateIrr(transactionData, dateRange.From, dateRange.To);
             return new QueryResponse<EntityPerformanceDto>
             {
                 Status = QueryStatus.Ok,
-                Response = performance
+                Response = new EntityPerformanceDto
+                {
+                    From = dateRange.From,
+                    To = dateRange.To,
+                    Performance = performance
+                }
             };
         }
 
@@ -549,6 +508,16 @@ namespace PortEval.Application.Services.Queries
             var time = await connection.QueryFirstOrDefaultAsync<SingleTimeQueryModel>(query.Query, query.Params);
 
             return time.Time;
+        }
+
+        private async Task<IEnumerable<TransactionDetailsQueryModel>> GetDetailedTransactionData(IDbConnection connection, int positionId, DateRangeParams transactionDateRange, DateRangeParams priceDateRange)
+        {
+            var transactionDetailsQuery =
+                PositionDataQueries.GetDetailedTransactionsQuery(positionId, transactionDateRange.From, transactionDateRange.To, priceDateRange.From, priceDateRange.To);
+            var transactionData = await connection.QueryAsync<TransactionDetailsQueryModel>(transactionDetailsQuery.Query,
+                transactionDetailsQuery.Params);
+
+            return transactionData;
         }
     }
 }

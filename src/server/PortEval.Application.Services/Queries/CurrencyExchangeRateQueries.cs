@@ -79,7 +79,7 @@ namespace PortEval.Application.Services.Queries
 
             return new QueryResponse<CurrencyExchangeRateDto>
             {
-                Status = QueryStatus.Ok,
+                Status = rate == default ? QueryStatus.NotFound : QueryStatus.Ok,
                 Response = rate
             };
         }

@@ -43,9 +43,13 @@ namespace PortEval.Application.Services.Queries.Helpers
             var x = initialGuess;
             var previousX = x;
             int i = 0;
-            while (Math.Abs(ConvertToFunction(x)) > _precision && i < IterationLimit)
+            while (i < IterationLimit)
             {
                 x = previousX - ConvertToFunction(previousX) / CalculateDerivative(previousX);
+                if (Math.Abs(x - previousX) <= _precision)
+                {
+                    return x;
+                }
                 previousX = x;
                 i++;
             }
@@ -70,7 +74,17 @@ namespace PortEval.Application.Services.Queries.Helpers
         /// <returns>The derivative's value.</returns>
         private double CalculateDerivative(double x)
         {
-            return _coefficients.Select(t => t.Item1 * t.Item2 * Math.Pow(x, t.Item1 - 1)).Sum();
+            return _coefficients.Select(t => ApplyPowerRule(t.Item1, t.Item2, x)).Sum();
+        }
+
+        private double ApplyPowerRule(double exponent, double coefficient, double x)
+        {
+            if (exponent == 0)
+            {
+                return 0;
+            }
+
+            return exponent * coefficient * Math.Pow(x, exponent - 1);
         }
     }
 }

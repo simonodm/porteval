@@ -41,13 +41,13 @@ namespace PortEval.Application.Services.Interfaces.Repositories
         /// </summary>
         /// <param name="instrumentId">Id of instrument to delete.</param>
         /// <returns>A task representing the asynchronous deletion operation.</returns>
-        public Task Delete(int instrumentId);
+        public Task DeleteAsync(int instrumentId);
 
         /// <summary>
         /// Checks whether an instrument with the supplied id exists.
         /// </summary>
         /// <param name="id">Instrument id.</param>
         /// <returns>true if a instrument with the supplied instrument id exists in the database, false otherwise</returns>
-        public Task<bool> Exists(int id);
+        public Task<bool> ExistsAsync(int id);
     }
 }

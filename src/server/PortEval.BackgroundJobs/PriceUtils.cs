@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.FinancialDataFetcher.Models;
 using PortEval.Infrastructure;
@@ -131,16 +132,12 @@ namespace PortEval.BackgroundJobs
         /// <param name="instrument">Instrument to use currency of.</param>
         /// <param name="pricePoint">Price point to convert.</param>
         /// <returns>A task representing the asynchronous conversion operation. The task result contains the converted price.</returns>
-        public static async Task<decimal> GetConvertedPricePointPrice(PortEvalDbContext context, Instrument instrument, PricePoint pricePoint)
+        public static async Task<decimal> GetConvertedPricePointPrice(ICurrencyExchangeRateRepository exchangeRateRepository, Instrument instrument, PricePoint pricePoint)
         {
             var price = pricePoint.Price;
             if (pricePoint.CurrencyCode == instrument.CurrencyCode) return price;
 
-            var conversionRate = await context.CurrencyExchangeRates
-                .AsNoTracking()
-                .Where(er => er.CurrencyFromCode == pricePoint.CurrencyCode && er.CurrencyToCode == instrument.CurrencyCode)
-                .OrderByDescending(er => er.Time)
-                .FirstOrDefaultAsync(er => er.Time <= pricePoint.Time);
+            var conversionRate = await exchangeRateRepository.GetExchangeRateAtAsync(pricePoint.CurrencyCode, instrument.CurrencyCode, pricePoint.Time);
 
             if(conversionRate == null)
             {

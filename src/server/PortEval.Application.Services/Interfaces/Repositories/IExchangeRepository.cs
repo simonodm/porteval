@@ -48,6 +48,6 @@ namespace PortEval.Application.Services.Interfaces.Repositories
         /// <returns>
         /// A task representing the asynchronous retrieval operation. The task result contains <c>true</c> if an exchange with the specified symbol exists, <c>false</c> otherwise.
         /// </returns>
-        public Task<bool> Exists(string exchangeSymbol);
+        public Task<bool> ExistsAsync(string exchangeSymbol);
     }
 }

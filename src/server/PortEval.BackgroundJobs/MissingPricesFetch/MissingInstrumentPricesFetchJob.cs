@@ -1,18 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
+using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
-using PortEval.FinancialDataFetcher;
+using PortEval.FinancialDataFetcher.Interfaces;
 using PortEval.FinancialDataFetcher.Models;
-using Microsoft.EntityFrameworkCore;
-using EFCore.BulkExtensions;
 using PortEval.FinancialDataFetcher.Responses;
-using PortEval.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Services.Interfaces.BackgroundJobs;
 
 namespace PortEval.BackgroundJobs.MissingPricesFetch
 {
@@ -26,14 +23,19 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
     /// </summary>
     public class MissingInstrumentPricesFetchJob : IMissingInstrumentPricesFetchJob
     {
-        private readonly PortEvalDbContext _context;
-        private readonly PriceFetcher _fetcher;
+        private readonly IInstrumentRepository _instrumentRepository;
+        private readonly IInstrumentPriceRepository _instrumentPriceRepository;
+        private readonly ICurrencyExchangeRateRepository _exchangeRateRepository;
+        private readonly IPriceFetcher _fetcher;
         private readonly ILogger _logger;
 
-        public MissingInstrumentPricesFetchJob(PortEvalDbContext context, PriceFetcher fetcher, ILoggerFactory loggerFactory)
+        public MissingInstrumentPricesFetchJob(IInstrumentRepository instrumentRepository, IInstrumentPriceRepository instrumentPriceRepository,
+            ICurrencyExchangeRateRepository exchangeRateRepository, IPriceFetcher fetcher, ILoggerFactory loggerFactory)
         {
-            _fetcher = fetcher;
-            _context = context;
+            _instrumentRepository = instrumentRepository;
+            _instrumentPriceRepository = instrumentPriceRepository;
+            _exchangeRateRepository = exchangeRateRepository;
+            _fetcher = fetcher;            
             _logger = loggerFactory.CreateLogger(typeof(MissingInstrumentPricesFetchJob));
         }
 
@@ -46,32 +48,34 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             var currentTime = DateTime.UtcNow;
             _logger.LogInformation($"Starting missing prices fetch at {currentTime}.");
 
-            var instruments = await _context.Instruments.AsNoTracking().ToListAsync();
+            var instruments = await _instrumentRepository.ListAllAsync();
 
             foreach (var instrument in instruments)
             {
                 if (!instrument.IsTracked) continue;
 
-                var trackablePrices = await _context.InstrumentPrices
-                    .Where(p => p.InstrumentId == instrument.Id)
+                var prices = await _instrumentPriceRepository.ListInstrumentPricesAsync(instrument.Id);
+                var priceTimes = prices
                     .Where(p => p.Time >= instrument.TrackingInfo.StartTime)
-                    .Select(p => p.Time)
-                    .ToListAsync();
+                    .OrderBy(p => p.Time)                    
+                    .Select(p => p.Time);
 
                 var missingRanges = PriceUtils.GetMissingPriceRanges(
-                    trackablePrices, PriceUtils.GetInstrumentPriceInterval,
+                    priceTimes, PriceUtils.GetInstrumentPriceInterval,
                     instrument.TrackingInfo.StartTime,
                     currentTime);
-                foreach (var range in missingRanges)
+                var splitMissingRanges = SplitRangesAtIntervalChanges(missingRanges, currentTime);
+
+                foreach (var range in splitMissingRanges)
                 {
                     await ProcessInstrumentRange(instrument, currentTime, range);
                 }
 
                 instrument.TrackingInfo.Update(currentTime);
-                _context.Instruments.Update(instrument);
+                _instrumentRepository.Update(instrument);
             }
 
-            await _context.SaveChangesAsync(); // persist tracking info updates
+            await _instrumentRepository.UnitOfWork.CommitAsync();
             _logger.LogInformation($"Missing prices fetch finished at {DateTime.UtcNow}.");
         }
 
@@ -88,9 +92,9 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             Response<IEnumerable<PricePoint>> fetchResult;
 
             var timeDifference = currentTime - range.To;
-            if (timeDifference < TimeSpan.FromDays(5))
+            if (timeDifference < PriceUtils.FiveDays)
             {
-                var intradayInterval = timeDifference <= TimeSpan.FromDays(1)
+                var intradayInterval = timeDifference < PriceUtils.OneDay
                     ? IntradayInterval.FiveMinutes
                     : IntradayInterval.OneHour;
                 fetchResult = await _fetcher.GetIntradayPrices(instrument, range.From, range.To,
@@ -103,12 +107,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
 
             if (fetchResult.StatusCode != StatusCode.Ok) return;
 
-            var priceAtRangeStart = await _context.InstrumentPrices
-                .AsNoTracking()
-                .Where(p => p.InstrumentId == instrument.Id)
-                .Where(p => p.Time <= range.From)
-                .OrderByDescending(p => p.Time)
-                .FirstOrDefaultAsync();
+            var priceAtRangeStart = await _instrumentPriceRepository.FindPriceAtAsync(instrument.Id, range.From);
 
             var rangeStartPricePoint = new PricePoint
             {
@@ -135,7 +134,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
 
                 try
                 {
-                    var price = await PriceUtils.GetConvertedPricePointPrice(_context, instrument, pricePoint);
+                    var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument, pricePoint);
                     pricesToAdd.Add(new InstrumentPrice(pricePoint.Time, price, instrument.Id));
                 }
                 catch (OperationNotAllowedException ex)
@@ -144,7 +143,62 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                 }
             }
 
-            await _context.BulkInsertAsync(pricesToAdd);
+            await _instrumentPriceRepository.BulkInsertAsync(pricesToAdd);
+        }
+
+        private IEnumerable<TimeRange> SplitRangesAtIntervalChanges(IEnumerable<TimeRange> ranges, DateTime baseTime)
+        {
+            var queue = new Queue<TimeRange>();
+            foreach (var range in ranges)
+            {
+                queue.Enqueue(range);
+            }
+
+            var result = new List<TimeRange>();
+            while(queue.Count > 0)
+            {
+                var range = queue.Dequeue();
+
+                if (RangeShouldSplitAtInterval(range, PriceUtils.FiveDays, baseTime))
+                {
+                    queue.Enqueue(new TimeRange
+                    {
+                        From = range.From,
+                        To = baseTime - PriceUtils.FiveDays
+                    });
+                    queue.Enqueue(new TimeRange
+                    {
+                        From = baseTime - PriceUtils.FiveDays,
+                        To = baseTime
+                    });
+                }
+                else if (RangeShouldSplitAtInterval(range, PriceUtils.OneDay, baseTime))
+                {
+                    queue.Enqueue(new TimeRange
+                    {
+                        From = range.From,
+                        To = baseTime - PriceUtils.OneDay
+                    });
+                    queue.Enqueue(new TimeRange
+                    {
+                        From = baseTime - PriceUtils.OneDay,
+                        To = baseTime
+                    });
+                }
+                else
+                {
+                    result.Add(range);
+                }
+            }
+
+            return result;
+        }
+
+        private bool RangeShouldSplitAtInterval(TimeRange range, TimeSpan interval, DateTime baseTime)
+        {
+            var timeDifferentFrom = baseTime - range.From;
+            var timeDifferenceTo = baseTime - range.To;
+            return timeDifferentFrom > interval && timeDifferenceTo < interval;
         }
     }
 }

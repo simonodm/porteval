@@ -55,6 +55,6 @@ namespace PortEval.Application.Services.BulkImportExport
             };
         }
 
-        public abstract Task<ProcessedRowErrorLogEntry<TRecord>> ProcessItem(TRecord row);
+        protected abstract Task<ProcessedRowErrorLogEntry<TRecord>> ProcessItem(TRecord row);
     }
 }

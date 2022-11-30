@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
@@ -10,11 +11,13 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
     public class ImportCleanupJob : IImportCleanupJob
     {
         private readonly IDataImportRepository _importRepository;
+        private readonly IFileSystem _fileSystem;
         private readonly ILogger _logger;
 
-        public ImportCleanupJob(IDataImportRepository importRepository, ILoggerFactory loggerFactory)
+        public ImportCleanupJob(IDataImportRepository importRepository, IFileSystem fileSystem, ILoggerFactory loggerFactory)
         {
             _importRepository = importRepository;
+            _fileSystem = fileSystem;
             _logger = loggerFactory.CreateLogger(typeof(ImportCleanupJob));
         }
 
@@ -25,7 +28,7 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
             var imports = await _importRepository.ListAllAsync();
             foreach (var import in imports)
             {
-                if (import.Time < DateTime.Today - TimeSpan.FromDays(1))
+                if (import.Time < DateTime.UtcNow.AddHours(-24))
                 {
                     await DeleteImport(import);
                 }
@@ -39,9 +42,9 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
         private async Task DeleteImport(Domain.Models.Entities.DataImport import)
         {
             await _importRepository.DeleteAsync(import.Id);
-            if (File.Exists(import.ErrorLogPath))
+            if (_fileSystem.File.Exists(import.ErrorLogPath))
             {
-                File.Delete(import.ErrorLogPath);
+                _fileSystem.File.Delete(import.ErrorLogPath);
             }
         }
     }

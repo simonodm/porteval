@@ -22,11 +22,11 @@ namespace PortEval.Application.Services
 
         public async Task UpdateDashboardLayout(IEnumerable<DashboardItemDto> newItems)
         {
-            var existingItems = await _dashboardItemRepository.GetDashboardItems();
+            var existingItems = await _dashboardItemRepository.GetDashboardItemsAsync();
 
             foreach (var existingItem in existingItems)
             {
-                await _dashboardItemRepository.Remove(existingItem);
+                await _dashboardItemRepository.DeleteAsync(existingItem);
             }
 
             var newItemEntities = await GenerateItemEntities(newItems);
@@ -45,7 +45,7 @@ namespace PortEval.Application.Services
 
         private async Task ValidateChartExists(int chartId)
         {
-            if (!(await _chartRepository.Exists(chartId)))
+            if (!(await _chartRepository.ExistsAsync(chartId)))
             {
                 throw new ItemNotFoundException($"Chart {chartId} does not exist.");
             }

@@ -20,7 +20,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
             return new QueryWrapper<CsvTemplateImportDto>
             {
                 Query = @"SELECT Id AS ImportId, ErrorLogAvailable, TemplateType, Status, StatusDetails, Time FROM dbo.Imports
-                          WHERE ImportId = @ImportId",
+                          WHERE Id = @ImportId",
                 Params = new { ImportId = id }
             };
         }

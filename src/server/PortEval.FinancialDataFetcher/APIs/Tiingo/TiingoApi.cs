@@ -255,6 +255,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                     if (result.StatusCode == StatusCode.OtherError)
                     {
                         anyUnexpectedError = true;
+                        break;
                     }
                 }
             }

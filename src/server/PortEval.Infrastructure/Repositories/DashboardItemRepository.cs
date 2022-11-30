@@ -2,6 +2,7 @@
 using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PortEval.Infrastructure.Repositories
@@ -16,9 +17,13 @@ namespace PortEval.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<DashboardItem>> GetDashboardItems()
+        public async Task<IEnumerable<DashboardItem>> GetDashboardItemsAsync()
         {
-            return await _context.DashboardItems.ToListAsync();
+            return await _context.DashboardItems
+                .AsNoTracking()
+                .OrderBy(i => i.Position.X)
+                .ThenBy(i => i.Position.Y)
+                .ToListAsync();
         }
 
         public DashboardItem Add(DashboardItem item)
@@ -26,13 +31,12 @@ namespace PortEval.Infrastructure.Repositories
             return _context.DashboardItems.Add(item).Entity;
         }
 
-        public async Task<DashboardItem> Update(DashboardItem item)
+        public DashboardItem Update(DashboardItem item)
         {
-            var existingItem = await _context.DashboardItems.FirstOrDefaultAsync(i => i.Id == item.Id);
             return _context.DashboardItems.Update(item).Entity;
         }
 
-        public async Task Remove(DashboardItem item)
+        public async Task DeleteAsync(DashboardItem item)
         {
             var existingItem = await _context.DashboardItems.FirstOrDefaultAsync(i => i.Id == item.Id);
             if (existingItem != null)

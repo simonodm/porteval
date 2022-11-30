@@ -38,7 +38,10 @@ namespace PortEval.Application.Services.Queries
                         chart.Lines = new List<ChartLineDto>();
                     }
 
-                    charts[chart.Id].ToDateRange = new ToDateRange(tdr.ToDateRangeUnit, tdr.ToDateRangeValue);
+                    if (chart.IsToDate != null && (bool)chart.IsToDate)
+                    {
+                        charts[chart.Id].ToDateRange = new ToDateRange(tdr.ToDateRangeUnit, tdr.ToDateRangeValue);
+                    }
                     if (chartLine != null)
                     {
                         charts[chart.Id].Lines.Add(AssignChartLineType(AssignChartLineName(chartLine, lineNames)));

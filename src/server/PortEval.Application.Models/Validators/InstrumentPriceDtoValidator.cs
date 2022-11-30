@@ -8,6 +8,8 @@ namespace PortEval.Application.Models.Validators
     {
         public InstrumentPriceDtoValidator()
         {
+            RuleFor(p => p.InstrumentId)
+                .NotEmpty();
             RuleFor(p => p.Price)
                 .NotEmpty()
                 .ApplyPriceRangeRule();

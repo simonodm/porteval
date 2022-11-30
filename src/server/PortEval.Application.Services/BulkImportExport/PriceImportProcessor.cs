@@ -15,11 +15,14 @@ namespace PortEval.Application.Services.BulkImportExport
             _priceService = priceService;
         }
 
-        public override async Task<ProcessedRowErrorLogEntry<InstrumentPriceDto>> ProcessItem(InstrumentPriceDto row)
+        protected override async Task<ProcessedRowErrorLogEntry<InstrumentPriceDto>> ProcessItem(InstrumentPriceDto row)
         {
             var logEntry = new ProcessedRowErrorLogEntry<InstrumentPriceDto>(row);
-            var price = await _priceService.AddPricePointAsync(row);
-            logEntry.Data.Id = price.Id;
+            if (row.Id == default)
+            {
+                var price = await _priceService.AddPricePointAsync(row);
+                logEntry.Data.Id = price.Id;
+            }
 
             return logEntry;
         }

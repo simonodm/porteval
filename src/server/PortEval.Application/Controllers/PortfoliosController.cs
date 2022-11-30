@@ -81,6 +81,11 @@ namespace PortEval.Application.Controllers
             _logger.LogInformation($"Requesting portfolio {id} positions' statistics");
 
             var result = await _positionQueries.GetPortfolioPositionsStatistics(id);
+            if (result.Status == QueryStatus.NotFound)
+            {
+                return NotFound($"Portfolio {id} not found.");
+            }
+
             return result.Response.ToList();
         }
 

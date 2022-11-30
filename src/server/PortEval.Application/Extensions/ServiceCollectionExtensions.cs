@@ -11,6 +11,7 @@ using PortEval.Infrastructure;
 using PortEval.Infrastructure.Repositories;
 using System;
 using System.Data;
+using System.IO.Abstractions;
 using PortEval.Application.Services.BulkImportExport;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Application.Services.Queries;
@@ -21,8 +22,7 @@ using PortEval.BackgroundJobs.DataImport;
 using PortEval.BackgroundJobs.InitialPriceFetch;
 using PortEval.BackgroundJobs.LatestPricesFetch;
 using PortEval.BackgroundJobs.MissingPricesFetch;
-using System.Runtime.InteropServices;
-using Microsoft.Win32;
+using PortEval.FinancialDataFetcher.Interfaces;
 
 namespace PortEval.Application.Extensions
 {
@@ -47,9 +47,10 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IDashboardService, DashboardService>();
 
             var fileStoragePath = configuration.GetConfigurationValue("PORTEVAL_File_Storage");
+            services.AddScoped<IFileSystem, FileSystem>();
             services.AddScoped<ICsvImportService, CsvImportService>(
                 provider =>
-                    new CsvImportService(provider.GetRequiredService<IDataImportRepository>(), fileStoragePath)
+                    new CsvImportService(provider.GetRequiredService<IDataImportRepository>(), provider.GetRequiredService<IBackgroundJobClient>(), provider.GetRequiredService<IFileSystem>(), fileStoragePath)
             );
             services.AddScoped<ICsvExportService, CsvExportService>();
             services.AddScoped<PortfolioImportProcessor>();
@@ -72,6 +73,7 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IPortfolioRepository, PortfolioRepository>();
             services.AddScoped<IPositionRepository, PositionRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+            services.AddScoped<ICurrencyExchangeRateRepository, CurrencyExchangeRateRepository>();
             services.AddScoped<IChartRepository, ChartRepository>();
             services.AddScoped<IDashboardItemRepository, DashboardItemRepository>();
             services.AddScoped<IDataImportRepository, DataImportRepository>();
@@ -86,7 +88,6 @@ namespace PortEval.Application.Extensions
         {
             services.AddScoped<IInitialPriceFetchJob, InitialPriceFetchJob>();
             services.AddScoped<ILatestPricesFetchJob, LatestPricesFetchJob>();
-            services.AddScoped<ILatestExchangeRatesFetchJob, LatestExchangeRatesFetchJob>();
             services.AddScoped<IMissingExchangeRatesFetchJob, MissingExchangeRatesFetchJob>();
             services.AddScoped<IMissingInstrumentPricesFetchJob, MissingInstrumentPricesFetchJob>();
             services.AddScoped<IInstrumentPriceCleanupJob, InstrumentPriceCleanupJob>();
@@ -182,7 +183,7 @@ namespace PortEval.Application.Extensions
 
             fetcher.AddExchangeRateHost();
 
-            services.AddSingleton(fetcher);
+            services.AddSingleton<IPriceFetcher>(fetcher);
         }
         
     }
