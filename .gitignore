@@ -90,4 +90,4 @@ app/.env.dev
 app/server/PortEval.Setup/ProductInstallFiles.wxs
 
 app/web/build/
-docs/
+app/**/docs/
