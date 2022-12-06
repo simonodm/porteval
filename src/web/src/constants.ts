@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import { ChartConfig, ChartLineBase, InstrumentType, ChartToDateRange } from './types';
 
 /**
@@ -166,4 +167,48 @@ export const INSTRUMENT_TYPE_TO_STRING: Record<InstrumentType, string> = {
     'cryptoCurrency': 'Cryptocurrency',
     'index': 'Index',
     'other': 'Other'
+}
+
+/**
+ * All tags used by RTK invalidation mechanism.
+ * @category Constants
+ */
+export const RTK_API_TAGS = [
+    'Portfolios',
+    'Portfolio',
+    'PortfolioCalculations',
+    'PortfolioTransactions',
+    'Positions',
+    'Position',
+    'PositionInstrument',
+    'PositionCalculations',
+    'PositionTransactions',
+    'Transaction',
+    'Instruments',
+    'Instrument',
+    'InstrumentCalculations',
+    'InstrumentPrices',
+    'InstrumentPrice',
+    'InstrumentTransactions',
+    'Charts',
+    'Chart',
+    'DashboardLayout',
+    'Exchanges',
+    'Currencies',
+    'Imports',
+    'Import'
+];
+
+/**
+ * Default options for toast notifications.
+ * @category Constants
+ */
+export const TOAST_OPTIONS = {
+    position: toast.POSITION.BOTTOM_RIGHT,
+    autoClose: 5000,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
 }

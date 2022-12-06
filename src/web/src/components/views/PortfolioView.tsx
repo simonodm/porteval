@@ -7,7 +7,6 @@ import useUserSettings from '../../hooks/useUserSettings';
 import ModalWrapper from '../modals/ModalWrapper';
 import OpenPositionForm from '../forms/OpenPositionForm';
 import ExpandAllButtons from '../tables/ExpandAllButtons';
-import * as constants from '../../constants';
 
 import { useParams } from 'react-router-dom';
 import { generateDefaultPortfolioChart } from '../../utils/chart';
@@ -35,7 +34,7 @@ function PortfolioView(): JSX.Element {
 
     const [modalIsOpen, setModalIsOpen] = useState(false);
     
-    const value = useGetPortfolioCurrentValueQuery(portfolioId, { pollingInterval: constants.REFRESH_INTERVAL });
+    const value = useGetPortfolioCurrentValueQuery(portfolioId);
     const stats = useGetPortfolioStatisticsQuery(portfolioId);
 
     const [userSettings] = useUserSettings();
