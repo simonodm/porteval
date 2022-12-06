@@ -99,6 +99,21 @@ namespace PortEval.Tests.Integration.RepositoryTests
         }
 
         [Fact]
+        public async Task Delete_DeletesPortfolio()
+        {
+            var portfolio = new Portfolio("Portfolio", "TestNote", "USD");
+            DbContext.Add(portfolio);
+            await DbContext.SaveChangesAsync();
+
+            _portfolioRepository.Delete(portfolio);
+            await _portfolioRepository.UnitOfWork.CommitAsync();
+
+            var portfolioDeleted = !DbContext.Portfolios.Any();
+
+            Assert.True(portfolioDeleted);
+        }
+
+        [Fact]
         public async Task ExistsAsync_ReturnsTrue_WhenPortfolioExists()
         {
             var portfolio = new Portfolio("Portfolio", "TestNote", "USD");

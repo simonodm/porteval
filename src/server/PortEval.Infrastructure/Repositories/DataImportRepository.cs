@@ -37,8 +37,13 @@ namespace PortEval.Infrastructure.Repositories
             var importEntry = await _context.Imports.FirstOrDefaultAsync(i => i.Id == id);
             if (importEntry != null)
             {
-                _context.Imports.Remove(importEntry);
+                Delete(importEntry);
             }
+        }
+
+        public void Delete(DataImport import)
+        {
+            _context.Imports.Remove(import);
         }
 
         public async Task<bool> ExistsAsync(Guid id)

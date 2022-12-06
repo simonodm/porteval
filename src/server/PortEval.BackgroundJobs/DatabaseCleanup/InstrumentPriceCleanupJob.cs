@@ -57,12 +57,10 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
         /// </summary>
         /// <param name="prices">Prices to clean up.</param>
         /// <param name="startTime">Job start time used as a base for price interval evaluation.</param>
-        private async void Cleanup(IEnumerable<InstrumentPrice> prices, DateTime startTime)
+        private void Cleanup(IEnumerable<InstrumentPrice> prices, DateTime startTime)
         {
             InstrumentPrice currentAnchor = null;
             InstrumentPrice previousPrice = null;
-
-            var removeTasks = new List<Task>();
 
             foreach (var price in prices.OrderBy(p => p.Time))
             {
@@ -76,13 +74,11 @@ namespace PortEval.BackgroundJobs.DatabaseCleanup
 
                 if (previousPrice != null && currentAnchor != previousPrice)
                 {
-                    removeTasks.Add(_instrumentPriceRepository.DeleteAsync(previousPrice.InstrumentId, previousPrice.Id));
+                    _instrumentPriceRepository.Delete(previousPrice);
                 }
 
                 previousPrice = price;
             }
-
-            await Task.WhenAll(removeTasks);
         }
     }
 }

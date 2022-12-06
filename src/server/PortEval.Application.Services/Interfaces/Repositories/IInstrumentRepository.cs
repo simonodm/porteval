@@ -16,32 +16,38 @@ namespace PortEval.Application.Services.Interfaces.Repositories
         public Task<IEnumerable<Instrument>> ListAllAsync();
 
         /// <summary>
-        /// Finds a instrument by ID.
+        /// Finds an instrument by ID.
         /// </summary>
         /// <param name="id">Instrument ID.</param>
         /// <returns>A task representing the asynchronous search operation. The task result contains the instrument entity with the supplied ID if it exists, null otherwise.</returns>
         public Task<Instrument> FindAsync(int id);
 
         /// <summary>
-        /// Adds a instrument.
+        /// Adds an instrument.
         /// </summary>
         /// <param name="instrument">Instrument entity to add.</param>
         /// <returns>The added instrument entity with identity set.</returns>
         public Instrument Add(Instrument instrument);
 
         /// <summary>
-        /// Updates a instrument.
+        /// Updates an instrument.
         /// </summary>
         /// <param name="instrument">Updated instrument entity.</param>
         /// <returns>The updated instrument.</returns>
         public Instrument Update(Instrument instrument);
 
         /// <summary>
-        /// Deletes a instrument.
+        /// Deletes an instrument by ID.
         /// </summary>
         /// <param name="instrumentId">Id of instrument to delete.</param>
-        /// <returns>A task representing the asynchronous deletion operation.</returns>
+        /// <returns>A task representing the asynchronous lookup and deletion operations.</returns>
         public Task DeleteAsync(int instrumentId);
+
+        /// <summary>
+        /// Deletes an instrument.
+        /// </summary>
+        /// <param name="instrument">Instrument to delete.</param>
+        public void Delete(Instrument instrument);
 
         /// <summary>
         /// Checks whether an instrument with the supplied id exists.

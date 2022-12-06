@@ -26,7 +26,7 @@ namespace PortEval.Application.Services
 
             foreach (var existingItem in existingItems)
             {
-                await _dashboardItemRepository.DeleteAsync(existingItem);
+                _dashboardItemRepository.Delete(existingItem);
             }
 
             var newItemEntities = await GenerateItemEntities(newItems);

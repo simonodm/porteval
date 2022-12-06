@@ -56,16 +56,22 @@ namespace PortEval.Infrastructure.Repositories
             var foundInstrumentEntity = await _context.Instruments.FirstOrDefaultAsync(i => i.Id == instrumentId);
             if(foundInstrumentEntity != null)
             {
-                var foundInstrumentLines = _context.ChartLines
-                    .Where(line => EF.Property<string>(line, "Line_Type") == "Instrument" && (line as ChartLineInstrument).InstrumentId == instrumentId);
-                var foundPositionLines = _context.ChartLines
-                    .Where(line => EF.Property<string>(line, "Line_Type") == "Position")
-                    .Join(_context.Positions.Where(pos => pos.InstrumentId == instrumentId), line => (line as ChartLinePosition).PositionId, position => position.Id, (line, position) => line);
-
-                _context.ChartLines.RemoveRange(foundInstrumentLines);
-                _context.ChartLines.RemoveRange(foundPositionLines);
-                _context.Instruments.Remove(foundInstrumentEntity);
+                Delete(foundInstrumentEntity);
             }
+        }
+
+        /// <inheritdoc cref="IInstrumentRepository.Delete"/>
+        public void Delete(Instrument instrument)
+        {
+            var foundInstrumentLines = _context.ChartLines
+                .Where(line => EF.Property<string>(line, "Line_Type") == "Instrument" && (line as ChartLineInstrument).InstrumentId == instrument.Id);
+            var foundPositionLines = _context.ChartLines
+                .Where(line => EF.Property<string>(line, "Line_Type") == "Position")
+                .Join(_context.Positions.Where(pos => pos.InstrumentId == instrument.Id), line => (line as ChartLinePosition).PositionId, position => position.Id, (line, position) => line);
+
+            _context.ChartLines.RemoveRange(foundInstrumentLines);
+            _context.ChartLines.RemoveRange(foundPositionLines);
+            _context.Instruments.Remove(instrument);
         }
 
         /// <inheritdoc cref="IInstrumentRepository.ExistsAsync"/>

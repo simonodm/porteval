@@ -106,6 +106,22 @@ namespace PortEval.Tests.Integration.RepositoryTests
         }
 
         [Fact]
+        public async Task Delete_DeletesChart()
+        {
+            var chart = new Chart("TEST1", new ChartDateRange(new ToDateRange(DateRangeUnit.DAY, 1)),
+                ChartTypeSettings.AggregatedPerformanceChart(AggregationFrequency.Day));
+            DbContext.Add(chart);
+            await DbContext.SaveChangesAsync();
+
+            _chartRepository.Delete(chart);
+            await _chartRepository.UnitOfWork.CommitAsync();
+
+            var chartDeleted = !DbContext.Charts.Any();
+
+            Assert.True(chartDeleted);
+        }
+
+        [Fact]
         public async Task ExistsAsync_ReturnsTrue_WhenChartExists()
         {
             var chart = new Chart("TEST1", new ChartDateRange(new ToDateRange(DateRangeUnit.DAY, 1)),

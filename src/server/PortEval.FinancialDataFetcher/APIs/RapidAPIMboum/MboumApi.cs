@@ -63,7 +63,7 @@ namespace PortEval.FinancialDataFetcher.APIs.RapidAPIMboum
             {
                 StatusCode = result.StatusCode,
                 ErrorMessage = result.ErrorMessage,
-                Result = result.Result.Items
+                Result = result.Result.Items?
                     .Where(kv =>
                     {
                         var time = DateTimeOffset.FromUnixTimeSeconds(kv.Value.DateUtc).UtcDateTime;

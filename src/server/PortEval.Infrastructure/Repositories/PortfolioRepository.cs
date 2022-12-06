@@ -57,16 +57,22 @@ namespace PortEval.Infrastructure.Repositories
             var foundPortfolioEntity = await _context.Portfolios.FirstOrDefaultAsync(p => p.Id == portfolioId);
             if(foundPortfolioEntity != null)
             {
-                var foundPortfolioLines = _context.ChartLines
-                    .Where(line => EF.Property<string>(line, "Line_Type") == "Portfolio" && (line as ChartLinePortfolio).PortfolioId == portfolioId);
-                var foundPositionLines = _context.ChartLines
-                    .Where(line => EF.Property<string>(line, "Line_Type") == "Position")
-                    .Join(_context.Positions, line => (line as ChartLinePosition).PositionId, position => position.Id, (line, position) => line);
-
-                _context.ChartLines.RemoveRange(foundPortfolioLines);
-                _context.ChartLines.RemoveRange(foundPositionLines);
-                _context.Portfolios.Remove(foundPortfolioEntity);
+                Delete(foundPortfolioEntity);
             }
+        }
+
+        /// <inheritdoc cref="IPortfolioRepository.Delete"/>
+        public void Delete(Portfolio portfolio)
+        {
+            var foundPortfolioLines = _context.ChartLines
+                .Where(line => EF.Property<string>(line, "Line_Type") == "Portfolio" && (line as ChartLinePortfolio).PortfolioId == portfolio.Id);
+            var foundPositionLines = _context.ChartLines
+                .Where(line => EF.Property<string>(line, "Line_Type") == "Position")
+                .Join(_context.Positions, line => (line as ChartLinePosition).PositionId, position => position.Id, (line, position) => line);
+
+            _context.ChartLines.RemoveRange(foundPortfolioLines);
+            _context.ChartLines.RemoveRange(foundPositionLines);
+            _context.Portfolios.Remove(portfolio);
         }
 
         /// <inheritdoc cref="IPortfolioRepository.ExistsAsync"/>

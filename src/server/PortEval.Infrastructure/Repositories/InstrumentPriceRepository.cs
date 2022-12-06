@@ -60,8 +60,13 @@ namespace PortEval.Infrastructure.Repositories
 
             if (foundPrice != null)
             {
-                _context.InstrumentPrices.Remove(foundPrice);
+                Delete(foundPrice);
             }
+        }
+
+        public void Delete(InstrumentPrice price)
+        {
+            _context.InstrumentPrices.Remove(price);
         }
 
         public async Task<bool> ExistsAsync(int instrumentId, int priceId)

@@ -142,6 +142,21 @@ namespace PortEval.Tests.Integration.RepositoryTests
         }
 
         [Fact]
+        public async Task Delete_DeletesPosition()
+        {
+            var position = new Position(_portfolio.Id, _firstInstrument.Id, "");
+            DbContext.Add(position);
+            await DbContext.SaveChangesAsync();
+
+            _positionRepository.Delete(position);
+            await _positionRepository.UnitOfWork.CommitAsync();
+
+            var positionDeleted = !DbContext.Positions.Any();
+
+            Assert.True(positionDeleted);
+        }
+
+        [Fact]
         public async Task ExistsAsync_ReturnsTrue_WhenPositionExists()
         {
             var position = new Position(_portfolio.Id, _firstInstrument.Id, "");

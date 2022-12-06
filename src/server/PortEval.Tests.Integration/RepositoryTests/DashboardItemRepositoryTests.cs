@@ -70,14 +70,14 @@ namespace PortEval.Tests.Integration.RepositoryTests
         }
 
         [Fact]
-        public async Task DeleteAsync_DeletesDashboardItem()
+        public async Task Delete_DeletesDashboardItem()
         {
             var chart = await CreateTestChart();
             var item = new DashboardChartItem(chart.Id, new DashboardPosition(0, 0, 1, 1));
             DbContext.DashboardItems.Add(item);
             await DbContext.SaveChangesAsync();
 
-            await _dashboardItemRepository.DeleteAsync(item);
+            _dashboardItemRepository.Delete(item);
             await _dashboardItemRepository.UnitOfWork.CommitAsync();
 
             var isEmpty = !DbContext.DashboardItems.Any();

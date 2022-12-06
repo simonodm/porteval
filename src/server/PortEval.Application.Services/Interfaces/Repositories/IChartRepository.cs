@@ -37,11 +37,17 @@ namespace PortEval.Application.Services.Interfaces.Repositories
         public Chart Update(Chart chart);
 
         /// <summary>
-        /// Deletes a chart.
+        /// Deletes a chart by ID.
         /// </summary>
         /// <param name="chartId">Id of chart to delete.</param>
-        /// <returns>A task representing the asynchronous deletion operation.</returns>
+        /// <returns>A task representing the asynchronous lookup and delete operations.</returns>
         public Task DeleteAsync(int chartId);
+
+        /// <summary>
+        /// Deletes a chart.
+        /// </summary>
+        /// <param name="chart">Chart to delete.</param>
+        public void Delete(Chart chart);
 
         /// <summary>
         /// Checks whether a chart with the supplied id exists.

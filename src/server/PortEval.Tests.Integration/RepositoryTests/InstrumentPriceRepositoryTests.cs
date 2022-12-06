@@ -96,6 +96,21 @@ namespace PortEval.Tests.Integration.RepositoryTests
         }
 
         [Fact]
+        public async Task Delete_DeletesInstrumentPrice()
+        {
+            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, 100m, _instrument.Id);
+            DbContext.Add(instrumentPrice);
+            await DbContext.SaveChangesAsync();
+
+            _instrumentPriceRepository.Delete(instrumentPrice);
+            await _instrumentPriceRepository.UnitOfWork.CommitAsync();
+
+            var instrumentPriceDeleted = !DbContext.InstrumentPrices.Any();
+
+            Assert.True(instrumentPriceDeleted);
+        }
+
+        [Fact]
         public async Task ExistsAsync_ReturnsTrue_WhenInstrumentPriceWithSpecifiedIdExists()
         {
             var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, 100m, _instrument.Id);

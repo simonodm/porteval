@@ -35,7 +35,7 @@ namespace PortEval.Tests.Unit.ServiceTests
             await sut.UpdateDashboardLayout(newDashboardItems);
 
             foreach (var item in existingDashboardItems)
-                dashboardItemRepository.Verify(r => r.DeleteAsync(item), Times.Once());
+                dashboardItemRepository.Verify(r => r.Delete(item), Times.Once());
         }
 
         [Fact]

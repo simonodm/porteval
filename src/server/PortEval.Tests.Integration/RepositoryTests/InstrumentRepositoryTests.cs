@@ -102,6 +102,21 @@ namespace PortEval.Tests.Integration.RepositoryTests
         }
 
         [Fact]
+        public async Task Delete_DeletesInstrument()
+        {
+            var instrument = new Instrument("Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
+            DbContext.Add(instrument);
+            await DbContext.SaveChangesAsync();
+
+            _instrumentRepository.Delete(instrument);
+            await _instrumentRepository.UnitOfWork.CommitAsync();
+
+            var instrumentDeleted = !DbContext.Instruments.Any();
+
+            Assert.True(instrumentDeleted);
+        }
+
+        [Fact]
         public async Task ExistsAsync_ReturnsTrue_WhenInstrumentExists()
         {
             var instrument = new Instrument("Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");

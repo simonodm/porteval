@@ -83,6 +83,21 @@ namespace PortEval.Tests.Integration.RepositoryTests
         }
 
         [Fact]
+        public async Task Delete_DeletesDataImport()
+        {
+            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Instruments, ImportStatus.Finished, "errorMessage");
+            DbContext.Add(dataImport);
+            await DbContext.SaveChangesAsync();
+
+            _dataImportRepository.Delete(dataImport);
+            await _dataImportRepository.UnitOfWork.CommitAsync();
+
+            var dataImportDeleted = !DbContext.Imports.Any();
+
+            Assert.True(dataImportDeleted);
+        }
+
+        [Fact]
         public async Task ExistsAsync_ReturnsTrue_WhenDataImportExists()
         {
             var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Instruments, ImportStatus.Finished, "errorMessage");

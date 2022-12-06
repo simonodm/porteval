@@ -53,7 +53,16 @@ namespace PortEval.Infrastructure.Repositories
         public async Task DeleteAsync(int chartId)
         {
             var foundChartEntity = await _context.Charts.FirstOrDefaultAsync(c => c.Id == chartId);
-            _context.Charts.Remove(foundChartEntity);
+            if (foundChartEntity != null)
+            {
+                Delete(foundChartEntity);
+            }
+        }
+
+        /// <inheritdoc cref="IChartRepository.Delete" />
+        public void Delete(Chart chart)
+        {
+            _context.Charts.Remove(chart);
         }
 
         /// <inheritdoc cref="IChartRepository.ExistsAsync"/>

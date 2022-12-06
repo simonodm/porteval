@@ -52,11 +52,11 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run();
 
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 1), Times.Never());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 2), Times.Once());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 3), Times.Never());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 4), Times.Once());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 5), Times.Never());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 1)), Times.Never());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 2)), Times.Once());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 3)), Times.Never());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 4)), Times.Once());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 5)), Times.Never());
         }
 
         [Fact]
@@ -95,12 +95,12 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run();
 
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 1), Times.Never());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 2), Times.Once());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 3), Times.Never());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 4), Times.Never());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 5), Times.Once());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 6), Times.Never());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 1)), Times.Never());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 2)), Times.Once());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 3)), Times.Never());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 4)), Times.Never());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 5)), Times.Once());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 6)), Times.Never());
         }
 
         [Fact]
@@ -140,12 +140,12 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run();
 
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 1), Times.Never());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 2), Times.Never());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 3), Times.Once());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 4), Times.Never());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 5), Times.Never());
-            priceRepository.Verify(c => c.DeleteAsync(instruments[0].Id, 6), Times.Once());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 1)), Times.Never());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 2)), Times.Never());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 3)), Times.Once());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 4)), Times.Never());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 5)), Times.Never());
+            priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 6)), Times.Once());
         }
     }
 }

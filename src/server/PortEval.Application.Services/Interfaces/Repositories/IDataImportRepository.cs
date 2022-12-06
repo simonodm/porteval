@@ -11,6 +11,7 @@ namespace PortEval.Application.Services.Interfaces.Repositories
         DataImport Add(DataImport import);
         DataImport Update(DataImport import);
         Task DeleteAsync(Guid id);
+        void Delete(DataImport import);
         Task<bool> ExistsAsync(Guid id);
     }
 }

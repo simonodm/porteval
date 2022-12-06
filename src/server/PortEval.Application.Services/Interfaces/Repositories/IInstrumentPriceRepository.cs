@@ -13,6 +13,7 @@ namespace PortEval.Application.Services.Interfaces.Repositories
         public InstrumentPrice Add(InstrumentPrice price);
         public Task BulkInsertAsync(IList<InstrumentPrice> prices);
         public Task DeleteAsync(int instrumentId, int priceId);
+        public void Delete(InstrumentPrice price);
         public Task<bool> ExistsAsync(int instrumentId, int priceId);
         public Task<bool> ExistsAsync(int instrumentId, DateTime time);
     }

@@ -36,13 +36,9 @@ namespace PortEval.Infrastructure.Repositories
             return _context.DashboardItems.Update(item).Entity;
         }
 
-        public async Task DeleteAsync(DashboardItem item)
+        public void Delete(DashboardItem item)
         {
-            var existingItem = await _context.DashboardItems.FirstOrDefaultAsync(i => i.Id == item.Id);
-            if (existingItem != null)
-            {
-                _context.DashboardItems.Remove(existingItem);
-            }
+            _context.DashboardItems.Remove(item);
         }
     }
 }

@@ -37,11 +37,17 @@ namespace PortEval.Application.Services.Interfaces.Repositories
         public Portfolio Update(Portfolio portfolio);
 
         /// <summary>
+        /// Deletes a portfolio by ID.
+        /// </summary>
+        /// <param name="portfolioId">ID of portfolio to delete.</param>
+        /// <returns>A task representing the asynchronous lokup and deletion operation.</returns>
+        public Task DeleteAsync(int portfolioId);
+
+        /// <summary>
         /// Deletes a portfolio.
         /// </summary>
-        /// <param name="portfolioId">If of portfolio to delete.</param>
-        /// <returns>A task representing the asynchronous deletion operation.</returns>
-        public Task DeleteAsync(int portfolioId);
+        /// <param name="portfolio">Portfolio to delete.</param>
+        public void Delete(Portfolio portfolio);
 
         /// <summary>
         /// Checks whether a portfolio with the supplied portfolio id exists.

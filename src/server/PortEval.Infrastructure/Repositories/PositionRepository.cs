@@ -70,11 +70,17 @@ namespace PortEval.Infrastructure.Repositories
             var foundPosition = await _context.Positions.FirstOrDefaultAsync(p => p.Id == positionId);
             if(foundPosition != null)
             {
-                var foundPositionLines = _context.ChartLines
-                    .Where(line => EF.Property<string>(line, "Line_Type") == "Position" && (line as ChartLinePosition).PositionId == foundPosition.Id);
-                _context.ChartLines.RemoveRange(foundPositionLines);
-                _context.Positions.Remove(foundPosition);
+                Delete(foundPosition);
             }
+        }
+
+        /// <inheritdoc cref="IPositionRepository.Delete"/>
+        public void Delete(Position position)
+        {
+            var foundPositionLines = _context.ChartLines
+                .Where(line => EF.Property<string>(line, "Line_Type") == "Position" && (line as ChartLinePosition).PositionId == position.Id);
+            _context.ChartLines.RemoveRange(foundPositionLines);
+            _context.Positions.Remove(position);
         }
 
         /// <inheritdoc cref="IPositionRepository.ExistsAsync"/>
