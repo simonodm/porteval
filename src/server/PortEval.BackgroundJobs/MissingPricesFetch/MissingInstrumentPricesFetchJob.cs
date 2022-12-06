@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Models.DTOs.Enums;
+using PortEval.Application.Services.Interfaces;
 
 namespace PortEval.BackgroundJobs.MissingPricesFetch
 {
@@ -26,15 +28,17 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly IInstrumentPriceRepository _instrumentPriceRepository;
         private readonly ICurrencyExchangeRateRepository _exchangeRateRepository;
+        private readonly INotificationService _notificationService;
         private readonly IPriceFetcher _fetcher;
         private readonly ILogger _logger;
 
         public MissingInstrumentPricesFetchJob(IInstrumentRepository instrumentRepository, IInstrumentPriceRepository instrumentPriceRepository,
-            ICurrencyExchangeRateRepository exchangeRateRepository, IPriceFetcher fetcher, ILoggerFactory loggerFactory)
+            ICurrencyExchangeRateRepository exchangeRateRepository, INotificationService notificationService, IPriceFetcher fetcher, ILoggerFactory loggerFactory)
         {
             _instrumentRepository = instrumentRepository;
             _instrumentPriceRepository = instrumentPriceRepository;
             _exchangeRateRepository = exchangeRateRepository;
+            _notificationService = notificationService;
             _fetcher = fetcher;            
             _logger = loggerFactory.CreateLogger(typeof(MissingInstrumentPricesFetchJob));
         }
@@ -77,6 +81,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
 
             await _instrumentRepository.UnitOfWork.CommitAsync();
             _logger.LogInformation($"Missing prices fetch finished at {DateTime.UtcNow}.");
+            await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable);
         }
 
         /// <summary>

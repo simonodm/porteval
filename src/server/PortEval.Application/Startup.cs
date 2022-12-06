@@ -1,4 +1,4 @@
-using System.ComponentModel;
+using System;
 using FluentValidation.AspNetCore;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
@@ -14,9 +14,11 @@ using PortEval.Application.Extensions;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Converters;
 using PortEval.Application.Models.Validators;
-using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure;
+using System.ComponentModel;
+using Microsoft.AspNetCore.SignalR;
+using PortEval.Application.Services.Hubs;
 
 namespace PortEval.Application
 {
@@ -40,6 +42,12 @@ namespace PortEval.Application
                         .AllowAnyMethod();
                 });
             });
+
+            services.AddSignalR()
+                .AddNewtonsoftJsonProtocol(options =>
+                {
+                    options.PayloadSerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy(), false));
+                });
 
             services.AddControllers()
                 .AddNewtonsoftJson(options =>
@@ -110,6 +118,7 @@ namespace PortEval.Application
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/notifications");
             });
 
             AddTypeConverter<AggregationFrequency, AggregationFrequencyTypeConverter>();
