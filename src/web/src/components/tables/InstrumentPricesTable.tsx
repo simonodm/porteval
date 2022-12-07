@@ -6,7 +6,6 @@ import DataTable, { ColumnDefinition } from './DataTable';
 
 import { useDeleteInstrumentPriceMutation, useGetInstrumentPricePageQuery,
     usePrefetch } from '../../redux/api/instrumentApi';
-import { REFRESH_INTERVAL } from '../../constants';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { formatDateTimeString, getPriceString } from '../../utils/string';
 import { AggregationFrequency, InstrumentPrice } from '../../types';
@@ -50,8 +49,7 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
     ]
 
     const prices = useGetInstrumentPricePageQuery(
-        { instrumentId, page, limit: pageLimit, frequency: frequency, compressed: compressPrices },
-        { pollingInterval: REFRESH_INTERVAL }
+        { instrumentId, page, limit: pageLimit, frequency: frequency, compressed: compressPrices }
     );
     const prefetchPrices = usePrefetch('getInstrumentPricePage');
     const [deletePrice, mutationStatus] = useDeleteInstrumentPriceMutation()

@@ -5,16 +5,6 @@ import { isRequestErrorResponse, isValidationErrorResponse } from '../api/apiTyp
 
 import * as constants from '../../constants';
 
-const toastOptions = {
-    position: toast.POSITION.BOTTOM_RIGHT,
-    autoClose: 5000,
-    hideProgressBar: true,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-};
-
 /**
  * An RTK middleware which is invoked whenever an RTK query fails.
  * 
@@ -33,7 +23,7 @@ const rtkQueryErrorDisplay: Middleware = () => (next) => (action) => {
                 }
             );
         } else {
-            toast.error(constants.ERROR_STRING, toastOptions);
+            toast.error(constants.ERROR_STRING, constants.TOAST_OPTIONS);
         }
     }
 

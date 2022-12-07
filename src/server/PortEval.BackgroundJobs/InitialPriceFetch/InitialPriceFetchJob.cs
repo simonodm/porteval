@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Models.DTOs.Enums;
+using PortEval.Application.Services.Interfaces;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Domain;
 using PortEval.FinancialDataFetcher.Interfaces;
@@ -30,15 +32,17 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly IInstrumentPriceRepository _instrumentPriceRepository;
         private readonly ICurrencyExchangeRateRepository _exchangeRateRepository;
+        private readonly INotificationService _notificationService;
         private readonly IPriceFetcher _fetcher;
         private readonly ILogger _logger;
 
         public InitialPriceFetchJob(IInstrumentRepository instrumentRepository, IInstrumentPriceRepository instrumentPriceRepository,
-            ICurrencyExchangeRateRepository exchangeRateRepository, IPriceFetcher fetcher, ILoggerFactory loggerFactory)
+            ICurrencyExchangeRateRepository exchangeRateRepository, INotificationService notificationService, IPriceFetcher fetcher, ILoggerFactory loggerFactory)
         {
             _instrumentRepository = instrumentRepository;
             _instrumentPriceRepository = instrumentPriceRepository;
             _exchangeRateRepository = exchangeRateRepository;
+            _notificationService = notificationService;
             _fetcher = fetcher;
             _logger = loggerFactory.CreateLogger(typeof(InitialPriceFetchJob));
         }
@@ -82,6 +86,15 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
             }
 
             _logger.LogInformation($"First price fetch for instrument {instrumentId} finished at {DateTime.UtcNow}.");
+            if (allFetchedPrices.Count > 0)
+            {
+                await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable, $"Price download finished for {instrument.Symbol}.");
+            }
+            else
+            {
+                await _notificationService.SendNotificationAsync(NotificationType.Info,
+                    $"No prices found for {instrument.Symbol}.");
+            }
         }
 
         /// <summary>

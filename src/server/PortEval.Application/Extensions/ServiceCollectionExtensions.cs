@@ -45,6 +45,7 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IChartService, ChartService>();
             services.AddScoped<IInstrumentPriceService, InstrumentPriceService>();
             services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             var fileStoragePath = configuration.GetConfigurationValue("PORTEVAL_File_Storage");
             services.AddScoped<IFileSystem, FileSystem>();

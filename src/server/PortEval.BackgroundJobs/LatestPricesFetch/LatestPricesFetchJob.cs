@@ -7,8 +7,10 @@ using PortEval.FinancialDataFetcher;
 using PortEval.FinancialDataFetcher.Models;
 using System;
 using System.Threading.Tasks;
+using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Infrastructure;
 using PortEval.Application.Services.Extensions;
+using PortEval.Application.Services.Interfaces;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.FinancialDataFetcher.Interfaces;
 
@@ -23,15 +25,18 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly IInstrumentPriceRepository _instrumentPriceRepository;
         private readonly ICurrencyExchangeRateRepository _exchangeRateRepository;
+        private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
 
         public LatestPricesFetchJob(IPriceFetcher fetcher, IInstrumentRepository instrumentRepository,
-            IInstrumentPriceRepository instrumentPriceRepository, ICurrencyExchangeRateRepository exchangeRateRepository, ILoggerFactory loggerFactory)
+            IInstrumentPriceRepository instrumentPriceRepository, ICurrencyExchangeRateRepository exchangeRateRepository,
+            INotificationService notificationService, ILoggerFactory loggerFactory)
         {
             _fetcher = fetcher;
             _instrumentRepository = instrumentRepository;
             _instrumentPriceRepository = instrumentPriceRepository;
             _exchangeRateRepository = exchangeRateRepository;
+            _notificationService = notificationService;
             _logger = loggerFactory.CreateLogger(typeof(LatestPricesFetchJob));
         }
 
@@ -72,6 +77,7 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
 
             await _instrumentRepository.UnitOfWork.CommitAsync();
             _logger.LogInformation($"Finished latest price fetch job at {DateTime.UtcNow}.");
+            await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable);
         }
     }
 }

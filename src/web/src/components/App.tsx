@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Dashboard from './views/Dashboard';
@@ -18,7 +18,11 @@ import {
     Route,
     Redirect
 } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { RTK_API_TAGS, TOAST_OPTIONS } from '../constants';
+import { useDispatch } from 'react-redux';
+import { portEvalApi } from '../redux/api/portEvalApi';
 
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -29,6 +33,38 @@ import 'react-toastify/dist/ReactToastify.css';
  * @component
  */
 function App(): JSX.Element {
+    const dispatch = useDispatch(); // used to invalidate all API cache on refresh
+    const [signalRConnection, setSignalRConnection] = useState<HubConnection | null>(null);
+
+    // establish SignalR hub connection on first render
+    useEffect(() => {
+        const connection = new HubConnectionBuilder()
+            .withUrl('/api/notifications')
+            .configureLogging(LogLevel.Information)
+            .withAutomaticReconnect()
+            .build();
+
+        setSignalRConnection(connection);
+    }, [])
+
+    // init SignalR callbacks when connection changes
+    useEffect(() => {
+        if(signalRConnection) {
+            signalRConnection.start()
+                .then(_ => {
+                    signalRConnection.on('ReceiveNotification', message => {
+                        if(message.message !== undefined && message.message !== null) {
+                            toast.info(message.message, TOAST_OPTIONS);
+                        }
+                        if(message.type === "newDataAvailable") {
+                            dispatch(portEvalApi.util.invalidateTags(RTK_API_TAGS));
+                        }
+                    })
+                })
+                .catch(e => console.log(`SignalR connection failed: ${e}`));
+        }
+    }, [signalRConnection])
+
     return (
         <div id="app">
             <Router>

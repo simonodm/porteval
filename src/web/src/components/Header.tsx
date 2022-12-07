@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { RTK_API_TAGS } from '../constants';
 import { portEvalApi } from '../redux/api/portEvalApi';
 import './Header.css';
 
@@ -17,7 +18,7 @@ function Header(): JSX.Element {
                 <a className="navbar-brand" href="/">PortEval</a>
             </span>
             <span className="float-right mr-1">
-                <button className="btn btn-primary btn-sm" onClick={() => dispatch(portEvalApi.util.resetApiState())}>
+                <button className="btn btn-primary btn-sm" onClick={() => dispatch(portEvalApi.util.invalidateTags(RTK_API_TAGS))}>
                     <i className="bi bi-arrow-clockwise"></i>
                 </button>
             </span>
