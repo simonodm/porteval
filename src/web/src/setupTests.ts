@@ -1,5 +1,18 @@
-// jest-dom adds custom jest matchers for asserting on DOM nodes.
-// allows you to do things like:
-// expect(element).toHaveTextContent(/react/i)
-// learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
+import ReactModal from 'react-modal';
+import { portEvalApi } from './redux/api/portEvalApi';
+import setupStore from './redux/store';
+import server from './tests/mocks/server';
+
+const store = setupStore({});
+
+beforeAll(() => {
+    server.listen();
+});
+afterEach(() => {
+    server.resetHandlers();
+    store.dispatch(portEvalApi.util.resetApiState());
+});
+afterAll(() => {
+    server.close();
+});

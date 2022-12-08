@@ -81,6 +81,11 @@ type Props<T extends Record<string, unknown>> = {
     idSelector?: (entry: T) => string | number;
 
     /**
+     * Table's aria-label attribute.
+     */
+    ariaLabel?: string;
+
+    /**
      * Determines whether sorting is enabled for this table.
      */
     sortable?: boolean;
@@ -127,7 +132,7 @@ function getExpanderColumn<T extends Record<string, unknown>>(): Column<T> {
         Header: () => null,
         id: 'expander',
         Cell: ({ row }: { row: Row<T> }) => (
-          <span {...row.getToggleRowExpandedProps()}>
+          <span {...row.getToggleRowExpandedProps()} data-testid="expander">
             {
                 row.isExpanded
                     ? <i className="bi bi-arrow-down-short"></i>
@@ -167,7 +172,7 @@ function getColumnCount<T extends Record<string, unknown>>(columns: Array<Column
  * @component
  */
 function DataTable<T extends Record<string, unknown>>(
-    { className, columns, data, idSelector, sortable, expandable, expandElement }: Props<T>
+    { className, columns, data, idSelector, ariaLabel, sortable, expandable, expandElement }: Props<T>
 ) {
     // Column definitions need to be converted, expander column needs to be added and the result needs to be memoized
     // to work correctly with `react-table`.
@@ -214,7 +219,7 @@ function DataTable<T extends Record<string, unknown>>(
     }, [expandable]);
 
     return (
-        <table className={className ?? ''} {...getTableProps()}>
+        <table className={className ?? ''} aria-label={ariaLabel} {...getTableProps()}>
             <thead>
             {headerGroups.map(headerGroup => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
@@ -242,7 +247,7 @@ function DataTable<T extends Record<string, unknown>>(
                         prepareRow(row);
                         return (
                             <>
-                                <tr {...row.getRowProps()}>
+                                <tr {...row.getRowProps()} data-testid="datarow">
                                 {row.cells.map(cell => {
                                     return (
                                         <td {...cell.getCellProps()}>{cell.render('Cell')}</td>

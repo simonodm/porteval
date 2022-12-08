@@ -155,6 +155,7 @@ function PortfoliosTable(): JSX.Element {
                 <NavLink
                     className="btn btn-primary btn-extra-sm mr-1"
                     to={{pathname: '/charts/view', state: {chart: generateDefaultPortfolioChart(data)}}}
+                    role="button"
                 >Chart
                 </NavLink>
                 <button className="btn btn-danger btn-extra-sm"
@@ -180,7 +181,8 @@ function PortfoliosTable(): JSX.Element {
                     data: portfoliosWithStats,
                     isLoading: !isLoaded,
                     isError
-                }} 
+                }}
+                ariaLabel="Portfolios table"
                 idSelector={p => p.id}
                 expandElement={portfolio =>
                     removedPortfolioId !== portfolio.id

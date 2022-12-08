@@ -48,6 +48,7 @@ function ExchangeRatesTable({ sourceCurrencyCode }: Props): JSX.Element {
             sortable
             columns={columns}
             idSelector={r => r.id}
+            ariaLabel="Exchange rates table"
             data={{
                 data: exchangeRates.data ?? [],
                 isLoading: !isLoaded,

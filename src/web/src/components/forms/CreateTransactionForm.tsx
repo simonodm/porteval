@@ -91,7 +91,7 @@ function CreateTransactionForm({ positionId, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-label="Create transaction form">
                 <NumberInput allowFloat allowNegativeValues label='Amount'
                     onChange={handleAmountChange} value={amount}
                 />

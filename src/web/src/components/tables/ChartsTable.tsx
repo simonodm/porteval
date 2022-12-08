@@ -45,6 +45,7 @@ function ChartsTable(): JSX.Element {
                 sortable
                 columns={columns}
                 idSelector={c => c.id}
+                ariaLabel="Charts table"
                 data={{
                     data: charts.data ?? [],
                     isLoading: !isLoaded,

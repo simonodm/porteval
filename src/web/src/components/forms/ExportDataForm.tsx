@@ -56,7 +56,7 @@ function ExportDataForm({ onSuccess }: Props): JSX.Element {
     }
 
     return (
-        <div className="form-group">
+        <form onSubmit={onSubmit} aria-label="Export CSV data form">
             <TemplateTypeDropdown onChange={setTemplateType} />
             <LoadingWrapper isError={isError} isLoaded={isLoaded}>
                 {
@@ -70,8 +70,8 @@ function ExportDataForm({ onSuccess }: Props): JSX.Element {
                         : null
                 }
             </LoadingWrapper>
-            <button className="btn btn-primary" onClick={onSubmit}>Export</button>
-        </div>
+            <input type="submit" className="btn btn-primary">Export</input>
+        </form>
     )
 }
 

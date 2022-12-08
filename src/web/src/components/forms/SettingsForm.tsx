@@ -50,7 +50,7 @@ function SettingsForm({ onSuccess, onFailure }: Props): JSX.Element {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} aria-label="Settings form">
             <TextInput label="Date format" onChange={setDateFormatValue} value={dateFormatValue} />
             <TextInput label="Time format" onChange={setTimeFormatValue} value={timeFormatValue} />
             <TextInput label="Decimal separator" onChange={setDecimalSeparatorValue} value={decimalSeparatorValue} />

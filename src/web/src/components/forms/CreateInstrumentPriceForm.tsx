@@ -48,7 +48,7 @@ function CreateInstrumentPriceForm({ instrumentId, onSuccess }: Props): JSX.Elem
 
     return (
         <LoadingWrapper isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-label="Create instrument price form">
                 <NumberInput allowFloat label='Price'
                     onChange={(newPrice) => setPrice(newPrice)} value={price}
                 />

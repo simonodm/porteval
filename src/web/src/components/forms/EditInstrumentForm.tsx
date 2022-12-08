@@ -61,7 +61,7 @@ function EditInstrumentForm({ instrument, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-label="Edit instrument form">
                 <TextInput label='Name' onChange={(val) => setName(val)} value={name} />
                 <TextInput disabled label='Symbol' onChange={(val) => setSymbol(val)}
                     value={symbol}

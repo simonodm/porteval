@@ -33,7 +33,7 @@ function EditChartMetaForm({ chart, onSave }: Props): JSX.Element {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} aria-label="Edit chart information form">
             <TextInput label='Chart name' onChange={(val) => setName(val)} value={chart.name} />
             <button className="btn btn-primary" role="button">Save</button>
         </form>

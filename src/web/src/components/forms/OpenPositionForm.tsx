@@ -147,7 +147,7 @@ function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-label="Open position form">
                 <InstrumentDropdown
                     creatable
                     instruments={instruments.data ?? []}

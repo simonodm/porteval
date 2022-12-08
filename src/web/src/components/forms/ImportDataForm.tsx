@@ -57,7 +57,7 @@ function ImportDataForm({ onSuccess }: Props): JSX.Element {
     }
     
     return (
-        <form>
+        <form onSubmit={handleUpload} aria-label="Import CSV data form">
             <TemplateTypeDropdown onChange={setTemplateType} />
             <button
                 className="btn btn-primary btn-sm"

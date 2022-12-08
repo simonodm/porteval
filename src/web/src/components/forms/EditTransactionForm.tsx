@@ -53,7 +53,7 @@ function EditTransactionForm({ transaction, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-label="Edit transaction form">
                 <NumberInput allowFloat allowNegativeValues
                     label='Amount' onChange={setAmount} value={amount}
                 />

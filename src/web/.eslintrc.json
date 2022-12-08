@@ -12,7 +12,9 @@
     "plugins": [
         "@typescript-eslint",
         "import",
-        "react"
+        "react",
+        "eslint-plugin-testing-library",
+        "eslint-plugin-jest-dom"
     ],
     "rules": {
         "eqeqeq": "warn",
