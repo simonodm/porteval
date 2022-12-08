@@ -167,14 +167,14 @@ namespace PortEval.Application.Extensions
             var tiingoKey = configuration.GetConfigurationValue("PORTEVAL_Tiingo_Key");
             var openExchangeRatesKey = configuration.GetConfigurationValue("PORTEVAL_OpenExchangeRates_Key");
 
-            if (mboumKey != null)
-            {
-                fetcher.AddMboum(mboumKey, new RateLimiter(TimeSpan.FromSeconds(1), 10));
-            }
-
             if (tiingoKey != null)
             {
                 fetcher.AddTiingo(tiingoKey, new RateLimiter(TimeSpan.FromHours(1), 500));
+            }
+
+            if (mboumKey != null)
+            {
+                fetcher.AddMboum(mboumKey, new RateLimiter(TimeSpan.FromSeconds(1), 10));
             }
 
             if (openExchangeRatesKey != null)

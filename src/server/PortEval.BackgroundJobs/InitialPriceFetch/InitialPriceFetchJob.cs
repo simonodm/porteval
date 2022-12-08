@@ -110,17 +110,17 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
         {
             var fetchedPrices = new List<PricePoint>();
 
-            if (dailyPricesResponse.StatusCode == StatusCode.Ok)
+            if (dailyPricesResponse.StatusCode == StatusCode.Ok && dailyPricesResponse.Result is not null)
             {
                 fetchedPrices.AddRange(dailyPricesResponse.Result);
             }
 
-            if (hourlyPricesResponse.StatusCode == StatusCode.Ok)
+            if (hourlyPricesResponse.StatusCode == StatusCode.Ok && hourlyPricesResponse.Result is not null)
             {
                 fetchedPrices.AddRange(hourlyPricesResponse.Result);
             }
 
-            if (latestPricesResponse.StatusCode == StatusCode.Ok)
+            if (latestPricesResponse.StatusCode == StatusCode.Ok && latestPricesResponse.Result is not null)
             {
                 fetchedPrices.AddRange(latestPricesResponse.Result);
             }

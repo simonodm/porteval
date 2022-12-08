@@ -55,7 +55,7 @@ namespace PortEval.BackgroundJobs.LatestPricesFetch
                 if (instrument.IsTracked)
                 {
                     var fetcherResponse = await _fetcher.GetLatestInstrumentPrice(instrument);
-                    if (fetcherResponse.StatusCode != StatusCode.Ok) continue;
+                    if (fetcherResponse.StatusCode != StatusCode.Ok || fetcherResponse.Result is null) continue;
 
                     try
                     {

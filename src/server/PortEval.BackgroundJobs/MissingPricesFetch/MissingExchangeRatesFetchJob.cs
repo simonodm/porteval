@@ -84,7 +84,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
         private async Task ProcessCurrencyRange(IEnumerable<Currency> currencies, Currency currency, TimeRange range, DateTime startTime)
         {
             var fetchResult = await _fetcher.GetHistoricalDailyExchangeRates(currency.Code, range.From, range.To);
-            if (fetchResult.StatusCode != StatusCode.Ok) return;
+            if (fetchResult.StatusCode != StatusCode.Ok || fetchResult.Result is null) return;
 
             var currenciesList = currencies.ToList();
             int i = 0;

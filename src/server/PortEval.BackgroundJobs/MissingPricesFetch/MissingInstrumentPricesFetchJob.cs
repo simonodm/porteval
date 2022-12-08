@@ -110,7 +110,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                 fetchResult = await _fetcher.GetHistoricalDailyPrices(instrument, range.From, range.To);
             }
 
-            if (fetchResult.StatusCode != StatusCode.Ok) return;
+            if (fetchResult.StatusCode != StatusCode.Ok || fetchResult.Result is null) return;
 
             var priceAtRangeStart = await _instrumentPriceRepository.FindPriceAtAsync(instrument.Id, range.From);
 
