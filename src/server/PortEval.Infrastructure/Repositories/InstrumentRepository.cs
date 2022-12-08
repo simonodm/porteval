@@ -22,7 +22,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<IEnumerable<Instrument>> ListAllAsync()
         {
             return await _context.Instruments
-                .AsNoTracking()
                 .OrderBy(i => i.Symbol)
                 .ToListAsync();
         }
@@ -31,7 +30,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<Instrument> FindAsync(int id)
         {
             var instrumentEntity = await _context.Instruments
-                .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id == id);
             return instrumentEntity;
         }

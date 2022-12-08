@@ -24,7 +24,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<IEnumerable<Exchange>> ListAllAsync()
         {
             return await _context.Exchanges
-                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -32,7 +31,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<Exchange> FindAsync(string exchangeSymbol)
         {
             return await _context.Exchanges
-                .AsNoTracking()
                 .OrderBy(e => e.Symbol)
                 .FirstOrDefaultAsync(e => e.Symbol == exchangeSymbol);
         }

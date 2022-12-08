@@ -21,7 +21,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<IEnumerable<Position>> ListPortfolioPositionsAsync(int portfolioId)
         {
             return await _context.Positions
-                .AsNoTracking()
                 .Where(p => p.PortfolioId == portfolioId)
                 .OrderBy(p => p.InstrumentId)
                 .Include(p => p.Transactions)
@@ -32,7 +31,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<Position> FindAsync(int positionId)
         {
             var position = await _context.Positions
-                .AsNoTracking()
                 .Include(p => p.Transactions)
                 .FirstOrDefaultAsync(p => p.Id == positionId);
 
@@ -43,7 +41,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<Position> FindParentPositionAsync(int transactionId)
         {
             var transaction = await _context.Transactions
-                .AsNoTracking()
                 .Include(t => t.Position)
                 .FirstOrDefaultAsync(t => t.Id == transactionId);
 

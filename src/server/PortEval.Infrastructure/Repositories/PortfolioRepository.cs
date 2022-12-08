@@ -22,7 +22,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<IEnumerable<Portfolio>> ListAllAsync()
         {
             return await _context.Portfolios
-                .AsNoTracking()
                 .OrderBy(p => p.Name)
                 .ToListAsync();
         }
@@ -31,7 +30,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<Portfolio> FindAsync(int id)
         {
             var portfolio = await _context.Portfolios
-                .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             return portfolio;

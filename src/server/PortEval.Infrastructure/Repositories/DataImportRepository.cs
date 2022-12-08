@@ -19,7 +19,7 @@ namespace PortEval.Infrastructure.Repositories
 
         public async Task<IEnumerable<DataImport>> ListAllAsync()
         {
-            return await _context.Imports.AsNoTracking().ToListAsync();
+            return await _context.Imports.ToListAsync();
         }
 
         public DataImport Add(DataImport import)
