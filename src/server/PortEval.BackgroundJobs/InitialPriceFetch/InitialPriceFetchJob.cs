@@ -80,6 +80,7 @@ namespace PortEval.BackgroundJobs.InitialPriceFetch
             {
                 var pricesWithMissingRangesFilled = PriceUtils.FillMissingRangePrices(
                     allFetchedPrices,
+                    time => PriceUtils.GetInstrumentPriceInterval(fetchStart, time),
                     allFetchedPrices[0].Time,
                     fetchStart);
                 await SavePrices(instrument, pricesWithMissingRangesFilled);

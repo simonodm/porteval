@@ -62,7 +62,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
 
             var missingExchangeRates = PriceUtils.GetMissingPriceRanges(
                 exchangeRateTimes,
-                PriceUtils.GetCurrencyExchangeRateInterval,
+                time => PriceUtils.GetCurrencyExchangeRateInterval(currentTime, time),
                 defaultCurrency.TrackingInfo?.StartTime ?? initialTime,
                 currentTime);
 
@@ -118,6 +118,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             {
                 currency.SetTrackingFrom(minTime);
                 currency.TrackingInfo.Update(startTime);
+                currency.IncreaseVersion();
                 _currencyRepository.Update(currency);
                 await _currencyRepository.UnitOfWork.CommitAsync();
             }

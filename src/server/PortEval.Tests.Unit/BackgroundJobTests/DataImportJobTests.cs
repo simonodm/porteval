@@ -33,7 +33,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -61,7 +61,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -93,7 +93,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Positions);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Positions);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -127,7 +127,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Transactions);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Transactions);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -161,7 +161,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Instruments);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Instruments);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -196,7 +196,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Prices);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Prices);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -230,7 +230,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -262,7 +262,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -306,7 +306,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -338,7 +338,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -368,7 +368,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -401,7 +401,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 

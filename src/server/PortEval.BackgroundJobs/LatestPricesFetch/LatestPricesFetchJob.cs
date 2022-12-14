@@ -1,4 +1,4 @@
-﻿using PortEval.Domain.Models.Entities;
+using PortEval.Domain.Models.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using PortEval.Application.Services.Interfaces.Repositories;

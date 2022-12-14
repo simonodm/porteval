@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Models.DTOs.Enums;
+using PortEval.Application.Services.Extensions;
 using PortEval.Application.Services.Interfaces;
 
 namespace PortEval.BackgroundJobs.MissingPricesFetch
@@ -58,21 +59,10 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             {
                 if (!instrument.IsTracked) continue;
 
-                var prices = await _instrumentPriceRepository.ListInstrumentPricesAsync(instrument.Id);
-                var priceTimes = prices
-                    .Where(p => p.Time >= instrument.TrackingInfo.StartTime)
-                    .OrderBy(p => p.Time)                    
-                    .Select(p => p.Time);
-
-                var missingRanges = PriceUtils.GetMissingPriceRanges(
-                    priceTimes, PriceUtils.GetInstrumentPriceInterval,
-                    instrument.TrackingInfo.StartTime,
-                    currentTime);
-                var splitMissingRanges = SplitRangesAtIntervalChanges(missingRanges, currentTime);
-
-                foreach (var range in splitMissingRanges)
+                var missingRanges = await GetMissingRanges(instrument, currentTime);
+                foreach (var range in missingRanges)
                 {
-                    await ProcessInstrumentRange(instrument, currentTime, range);
+                    await ProcessMissingRange(instrument, range, currentTime);
                 }
 
                 instrument.TrackingInfo.Update(currentTime);
@@ -84,34 +74,63 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable);
         }
 
+        private async Task<IEnumerable<TimeRange>> GetMissingRanges(Instrument instrument, DateTime baseTime)
+        {
+            var prices = await _instrumentPriceRepository.ListInstrumentPricesAsync(instrument.Id);
+            var priceTimes = prices
+                .Where(p => p.Time >= instrument.TrackingInfo.StartTime)
+                .OrderBy(p => p.Time)
+                .Select(p => p.Time);
+
+            var missingRanges = PriceUtils.GetMissingPriceRanges(
+                priceTimes,
+                time => PriceUtils.GetInstrumentPriceInterval(baseTime, time),
+                instrument.TrackingInfo.StartTime,
+                baseTime.RoundDown(PriceUtils.FiveMinutes)
+            );
+
+            return missingRanges;
+        }
+
         /// <summary>
         /// Retrieves and saves prices of a single instrument in the given time range. If the retrieved prices currency and instrument currency differ, then
         /// the prices are converted to instrument's currency beforehand.
         /// </summary>
         /// <param name="instrument">Instrument to retrieve prices for.</param>
-        /// <param name="currentTime">Base time to use for interval requirements.</param>
         /// <param name="range">Time range of missing prices.</param>
+        /// <param name="baseTime">Time used to determine the appropriate price intervals.</param>
         /// <returns>A task representing the asynchronous retrieval, conversion and save operations.</returns>
-        private async Task ProcessInstrumentRange(Instrument instrument, DateTime currentTime, TimeRange range)
+        private async Task ProcessMissingRange(Instrument instrument, TimeRange range, DateTime baseTime)
         {
-            Response<IEnumerable<PricePoint>> fetchResult;
-
-            var timeDifference = currentTime - range.To;
-            if (timeDifference < PriceUtils.FiveDays)
+            var fetchResult = await FetchPricesInRange(instrument, range);
+            if (fetchResult.StatusCode != StatusCode.Ok || fetchResult.Result is null)
             {
-                var intradayInterval = timeDifference < PriceUtils.OneDay
+                return;
+            }
+
+            var filledPrices = await FillMissingPrices(fetchResult.Result, instrument, range, baseTime);
+            var pricesToInsert = await ProcessPricePoints(filledPrices, instrument, range);
+
+            await _instrumentPriceRepository.BulkInsertAsync(pricesToInsert);
+        }
+
+        private async Task<Response<IEnumerable<PricePoint>>> FetchPricesInRange(Instrument instrument, TimeRange range)
+        {
+            if (range.Interval < PriceUtils.OneDay)
+            {
+                var intradayInterval = range.Interval <= PriceUtils.FiveMinutes
                     ? IntradayInterval.FiveMinutes
                     : IntradayInterval.OneHour;
-                fetchResult = await _fetcher.GetIntradayPrices(instrument, range.From, range.To,
+                return await _fetcher.GetIntradayPrices(instrument, range.From, range.To,
                     intradayInterval);
             }
-            else
-            {
-                fetchResult = await _fetcher.GetHistoricalDailyPrices(instrument, range.From, range.To);
-            }
 
-            if (fetchResult.StatusCode != StatusCode.Ok || fetchResult.Result is null) return;
+            return await _fetcher.GetHistoricalDailyPrices(instrument, range.From, range.To);
+        }
 
+        private async Task<IEnumerable<PricePoint>> FillMissingPrices(IEnumerable<PricePoint> prices,
+            Instrument instrument, TimeRange range, DateTime baseTime)
+        {
             var priceAtRangeStart = await _instrumentPriceRepository.FindPriceAtAsync(instrument.Id, range.From);
 
             var rangeStartPricePoint = new PricePoint
@@ -123,16 +142,21 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
             };
 
             var newPricePoints = PriceUtils.FillMissingRangePrices(
-                fetchResult.Result.Prepend(rangeStartPricePoint),
+                prices.Prepend(rangeStartPricePoint),
+                time => PriceUtils.GetInstrumentPriceInterval(baseTime, time),
                 range.From,
                 range.To);
 
-            var pricesToAdd = new List<InstrumentPrice>();
-            foreach (var pricePoint in newPricePoints)
-            {
-                if (!(pricePoint.Time > range.From & pricePoint.Time < range.To)) continue;
+            return newPricePoints;
+        }
 
-                if (pricePoint.Price <= 0m)
+        private async Task<List<InstrumentPrice>> ProcessPricePoints(IEnumerable<PricePoint> prices,
+            Instrument instrument, TimeRange range)
+        {
+            var pricesToAdd = new List<InstrumentPrice>();
+            foreach (var pricePoint in prices)
+            {
+                if (!(pricePoint.Time > range.From & pricePoint.Time < range.To) || pricePoint.Price <= 0m)
                 {
                     continue;
                 }
@@ -148,62 +172,7 @@ namespace PortEval.BackgroundJobs.MissingPricesFetch
                 }
             }
 
-            await _instrumentPriceRepository.BulkInsertAsync(pricesToAdd);
-        }
-
-        private IEnumerable<TimeRange> SplitRangesAtIntervalChanges(IEnumerable<TimeRange> ranges, DateTime baseTime)
-        {
-            var queue = new Queue<TimeRange>();
-            foreach (var range in ranges)
-            {
-                queue.Enqueue(range);
-            }
-
-            var result = new List<TimeRange>();
-            while(queue.Count > 0)
-            {
-                var range = queue.Dequeue();
-
-                if (RangeShouldSplitAtInterval(range, PriceUtils.FiveDays, baseTime))
-                {
-                    queue.Enqueue(new TimeRange
-                    {
-                        From = range.From,
-                        To = baseTime - PriceUtils.FiveDays
-                    });
-                    queue.Enqueue(new TimeRange
-                    {
-                        From = baseTime - PriceUtils.FiveDays,
-                        To = baseTime
-                    });
-                }
-                else if (RangeShouldSplitAtInterval(range, PriceUtils.OneDay, baseTime))
-                {
-                    queue.Enqueue(new TimeRange
-                    {
-                        From = range.From,
-                        To = baseTime - PriceUtils.OneDay
-                    });
-                    queue.Enqueue(new TimeRange
-                    {
-                        From = baseTime - PriceUtils.OneDay,
-                        To = baseTime
-                    });
-                }
-                else
-                {
-                    result.Add(range);
-                }
-            }
-
-            return result;
-        }
-
-        private bool RangeShouldSplitAtInterval(TimeRange range, TimeSpan interval, DateTime baseTime)
-        {
-            var timeDifferentFrom = baseTime - range.From;
-            var timeDifferenceTo = baseTime - range.To;
-            return timeDifferentFrom > interval && timeDifferenceTo < interval;
+            return pricesToAdd;
         }
     }
 }

@@ -11,8 +11,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -28,14 +26,14 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var importsToRemove = new List<DataImport>
             {
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-24)),
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-48)),
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-72)),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-24), TemplateType.Portfolios),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-48), TemplateType.Portfolios),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-72), TemplateType.Portfolios),
             };
             var imports = new List<DataImport>()
             {
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-5)),
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-3)),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-5), TemplateType.Portfolios),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-3), TemplateType.Portfolios),
             };
 
             imports.AddRange(importsToRemove);
@@ -67,14 +65,14 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var importsToRemove = new List<DataImport>
             {
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-24)),
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-48)),
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-72)),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-24), TemplateType.Portfolios),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-48), TemplateType.Portfolios),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-72), TemplateType.Portfolios),
             };
             var imports = new List<DataImport>()
             {
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-5)),
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-3)),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-5), TemplateType.Portfolios),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-3), TemplateType.Portfolios),
             };
 
             var fileSystem = fixture.Freeze<MockFileSystem>();
