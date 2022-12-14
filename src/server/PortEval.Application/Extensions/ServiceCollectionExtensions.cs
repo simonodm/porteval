@@ -12,7 +12,9 @@ using PortEval.Infrastructure.Repositories;
 using System;
 using System.Data;
 using System.IO.Abstractions;
+using PortEval.Application.Models.DTOs;
 using PortEval.Application.Services.BulkImportExport;
+using PortEval.Application.Services.BulkImportExport.Interfaces;
 using PortEval.Application.Services.Interfaces.BackgroundJobs;
 using PortEval.Application.Services.Queries;
 using PortEval.Application.Services.Queries.Interfaces;
@@ -54,11 +56,11 @@ namespace PortEval.Application.Extensions
                     new CsvImportService(provider.GetRequiredService<IDataImportRepository>(), provider.GetRequiredService<IBackgroundJobClient>(), provider.GetRequiredService<IFileSystem>(), fileStoragePath)
             );
             services.AddScoped<ICsvExportService, CsvExportService>();
-            services.AddScoped<PortfolioImportProcessor>();
-            services.AddScoped<PositionImportProcessor>();
-            services.AddScoped<InstrumentImportProcessor>();
-            services.AddScoped<TransactionImportProcessor>();
-            services.AddScoped<PriceImportProcessor>();
+            services.AddScoped<IImportProcessor<PortfolioDto>, PortfolioImportProcessor>();
+            services.AddScoped<IImportProcessor<PositionDto>, PositionImportProcessor>();
+            services.AddScoped<IImportProcessor<InstrumentDto>, InstrumentImportProcessor>();
+            services.AddScoped<IImportProcessor<TransactionDto>, TransactionImportProcessor>();
+            services.AddScoped<IImportProcessor<InstrumentPriceDto>, PriceImportProcessor>();
         }
 
         /// <summary>

@@ -233,8 +233,8 @@ namespace PortEval.Tests.Integration
         {
             var dataImports = new List<DataImport>
             {
-                new DataImport(Guid.Parse("974c9b22-8276-4121-96ce-6bf3f0f70152"), TemplateType.Instruments, ImportStatus.Finished),
-                new DataImport(Guid.Parse("4c0019c2-402f-41e8-9ddf-b3c98027e2d5"), TemplateType.Portfolios, ImportStatus.Error, "Internal error.")
+                new DataImport(Guid.Parse("974c9b22-8276-4121-96ce-6bf3f0f70152"), DateTime.UtcNow, TemplateType.Instruments, ImportStatus.Finished),
+                new DataImport(Guid.Parse("4c0019c2-402f-41e8-9ddf-b3c98027e2d5"), DateTime.UtcNow.AddHours(-6), TemplateType.Portfolios, ImportStatus.Error, "Internal error.")
             };
 
             _context.Imports.AddRange(dataImports);
