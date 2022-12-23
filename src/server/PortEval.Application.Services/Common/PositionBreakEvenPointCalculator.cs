@@ -4,8 +4,10 @@ using System.Collections.Generic;
 
 namespace PortEval.Application.Features.Common
 {
+    /// <inheritdoc />
     public class PositionBreakEvenPointCalculator : IPositionBreakEvenPointCalculator
     {
+        /// <inheritdoc />
         public decimal CalculatePositionBreakEvenPoint(IEnumerable<TransactionDto> transactions)
         {
             decimal totalPositionBuyingPrice = 0m;

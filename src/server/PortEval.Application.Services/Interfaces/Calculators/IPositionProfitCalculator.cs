@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace PortEval.Application.Features.Interfaces.Calculators
 {
+    /// <summary>
+    /// Calculates a position's profit.
+    /// </summary>
     public interface IPositionProfitCalculator
     {
         /// <summary>

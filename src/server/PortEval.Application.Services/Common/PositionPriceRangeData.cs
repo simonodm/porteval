@@ -10,7 +10,7 @@ namespace PortEval.Application.Features.Common
     public class PositionPriceRangeData
     {
         /// <summary>
-        /// Position's transactions.
+        /// Position's transactions sorted by ascending time.
         /// </summary>
         public IEnumerable<TransactionDto> Transactions { get; set; }
 

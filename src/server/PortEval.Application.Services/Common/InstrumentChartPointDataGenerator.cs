@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace PortEval.Application.Features.Common
 {
+    /// <inheritdoc />
     public class InstrumentChartPointDataGenerator : IInstrumentChartPointGenerator
     {
         private readonly IEnumerator<InstrumentPriceDto> _priceEnumerator;
@@ -26,6 +27,7 @@ namespace PortEval.Application.Features.Common
             _finished = false;
         }
 
+        /// <inheritdoc />
         public InstrumentPriceChartPointData GetNextChartPointData()
         {
             var currentRange = _rangeEnumerator.Current;
@@ -57,11 +59,13 @@ namespace PortEval.Application.Features.Common
             };
         }
 
+        /// <inheritdoc />
         public bool IsFinished()
         {
             return _finished;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             _priceEnumerator.Dispose();

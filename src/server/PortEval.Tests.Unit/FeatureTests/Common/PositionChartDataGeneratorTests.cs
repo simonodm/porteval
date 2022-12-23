@@ -9,6 +9,7 @@ using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Common
@@ -106,22 +107,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             };
             var frequency = AggregationFrequency.Day;
 
-            var profitCalculator = fixture.Freeze<Mock<IPositionProfitCalculator>>();
-
-            // CalculateProfit is mocked to return the total amount of transactions which occurred before the time at which the profit is calculated,
-            // multiplied by the difference between the end price and start price of the position
-            profitCalculator
-                .Setup(m => m.CalculateProfit(
-                    It.IsAny<IEnumerable<PositionPriceRangeData>>(),
-                    It.IsAny<DateTime>(),
-                    It.IsAny<DateTime>()))
-                .Returns<IEnumerable<PositionPriceRangeData>, DateTime, DateTime>(
-                    (positionsPriceData, from, to) =>
-                        positionsPriceData.Sum(p => p.Transactions
-                            .Where(t => t.Time <= to)
-                            .Sum(t => t.Amount * (p.PriceAtRangeEnd.Price - p.PriceAtRangeStart.Price))
-                    )
-                );
+            fixture.CreatePositionProfitCalculatorMock();
 
             var sut = fixture.Create<PositionChartDataGenerator>();
 
@@ -165,7 +151,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             var expectedChartStartDate = DateTime.Parse("2022-01-01");
             var frequency = AggregationFrequency.Day;
 
-            fixture.Freeze<Mock<IPositionProfitCalculator>>();
+            fixture.CreatePositionProfitCalculatorMock();
 
             var sut = fixture.Create<PositionChartDataGenerator>();
 
@@ -188,19 +174,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             };
             var frequency = AggregationFrequency.Day;
 
-            var performanceCalculator = fixture.Freeze<Mock<IPositionPerformanceCalculator>>();
-
-            // CalculatePerformance is mocked to return the total number of transactions which occurred before the time at which the performance is calculated
-            performanceCalculator
-                .Setup(m => m.CalculatePerformance(
-                    It.IsAny<IEnumerable<PositionPriceRangeData>>(),
-                    It.IsAny<DateTime>(),
-                    It.IsAny<DateTime>()))
-                .Returns<IEnumerable<PositionPriceRangeData>, DateTime, DateTime>(
-                    (positionsPriceData, from, to) =>
-                        positionsPriceData.Sum(p => p.Transactions.Count(t => t.Time <= to)
-                    )
-                );
+            fixture.CreatePositionPerformanceCalculatorMock();
 
             var sut = fixture.Create<PositionChartDataGenerator>();
 
@@ -209,23 +183,23 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             Assert.Collection(result, point =>
             {
                 Assert.Equal(dateRange.From, point.Time);
-                Assert.Equal(1, point.Value);
+                Assert.Equal(0, point.Value);
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(1), point.Time);
-                Assert.Equal(1, point.Value);
+                Assert.Equal(0, point.Value);
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(2), point.Time);
-                Assert.Equal(1, point.Value);
+                Assert.Equal(0, point.Value);
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(3), point.Time);
-                Assert.Equal(2, point.Value);
+                Assert.Equal(350, point.Value);
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(4), point.Time);
-                Assert.Equal(2, point.Value);
+                Assert.Equal(350, point.Value);
             });
         }
 
@@ -244,7 +218,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             var expectedChartStartDate = DateTime.Parse("2022-01-01");
             var frequency = AggregationFrequency.Day;
 
-            fixture.Freeze<Mock<IPositionPerformanceCalculator>>();
+            fixture.CreatePositionPerformanceCalculatorMock();
 
             var sut = fixture.Create<PositionChartDataGenerator>();
 
@@ -267,19 +241,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             };
             var frequency = AggregationFrequency.Day;
 
-            var profitCalculator = fixture.Freeze<Mock<IPositionProfitCalculator>>();
-
-            // CalculateProfit is mocked to return the total number of transactions which occurred in the range in which the profit is calculated
-            profitCalculator
-                .Setup(m => m.CalculateProfit(
-                    It.IsAny<IEnumerable<PositionPriceRangeData>>(),
-                    It.IsAny<DateTime>(),
-                    It.IsAny<DateTime>()))
-                .Returns<IEnumerable<PositionPriceRangeData>, DateTime, DateTime>(
-                    (positionsPriceData, from, to) =>
-                        positionsPriceData.Sum(p => p.Transactions.Count(t => t.Time >= from && t.Time < to)
-                    )
-                );
+            fixture.CreatePositionProfitCalculatorMock();
 
             var sut = fixture.Create<PositionChartDataGenerator>();
 
@@ -288,7 +250,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             Assert.Collection(result, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(1), point.Time);
-                Assert.Equal(1, point.Value);
+                Assert.Equal(0, point.Value);
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(2), point.Time);
@@ -296,11 +258,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(3), point.Time);
-                Assert.Equal(0, point.Value);
+                Assert.Equal(350, point.Value);
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(4), point.Time);
-                Assert.Equal(1, point.Value);
+                Assert.Equal(350, point.Value);
             });
         }
 
@@ -319,7 +281,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             var expectedChartStartDate = DateTime.Parse("2022-01-02");
             var frequency = AggregationFrequency.Day;
 
-            fixture.Freeze<Mock<IPositionProfitCalculator>>();
+            fixture.CreatePositionProfitCalculatorMock();
 
             var sut = fixture.Create<PositionChartDataGenerator>();
 

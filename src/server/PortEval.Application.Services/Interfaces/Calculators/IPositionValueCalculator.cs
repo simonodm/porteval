@@ -1,10 +1,12 @@
-﻿using PortEval.Application.Models.DTOs;
+﻿using PortEval.Application.Features.Common;
 using System;
 using System.Collections.Generic;
-using PortEval.Application.Features.Common;
 
 namespace PortEval.Application.Features.Interfaces.Calculators
 {
+    /// <summary>
+    /// Calculates a position's value.
+    /// </summary>
     public interface IPositionValueCalculator
     {
         /// <summary>

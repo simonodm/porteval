@@ -67,8 +67,7 @@ namespace PortEval.Application.Features.Common
                     Transactions = p.TransactionsToProcess
                 }), adjustedDateRange.From, range.To);
             });
-
-            // prepend initial state
+            
             return result;
         }
 

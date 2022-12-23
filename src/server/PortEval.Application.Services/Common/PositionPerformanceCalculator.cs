@@ -22,7 +22,7 @@ namespace PortEval.Application.Features.Common
         public decimal CalculatePerformance(IEnumerable<PositionPriceRangeData> positionPriceRangeData, DateTime from, DateTime to)
         {
             var firstTransactionTime = positionPriceRangeData
-                .Select(p => p.Transactions.OrderBy(t => t.Time).FirstOrDefault()?.Time)
+                .Select(p => p.Transactions.FirstOrDefault()?.Time)
                 .Where(t => t != null)
                 .Min();
 

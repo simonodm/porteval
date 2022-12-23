@@ -4,8 +4,10 @@ using System.Collections.Generic;
 
 namespace PortEval.Application.Features.Common
 {
+    /// <inheritdoc />
     public class PositionProfitCalculator : IPositionProfitCalculator
     {
+        /// <inheritdoc />
         public decimal CalculateProfit(IEnumerable<PositionPriceRangeData> positionPriceRangeData, DateTime from, DateTime to)
         {
             if (from >= to)

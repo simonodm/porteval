@@ -2,8 +2,10 @@
 
 namespace PortEval.Application.Features.Common
 {
+    /// <inheritdoc />
     public class InstrumentProfitCalculator : IInstrumentProfitCalculator
     {
+        /// <inheritdoc />
         public decimal CalculateProfit(decimal priceAtStart, decimal priceAtEnd)
         {
             return priceAtEnd - priceAtStart;

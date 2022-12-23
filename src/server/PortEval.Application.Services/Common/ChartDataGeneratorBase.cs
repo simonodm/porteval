@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 namespace PortEval.Application.Features.Common
 {
+    /// <summary>
+    /// A base class providing common functionality to chart data generators.
+    /// </summary>
     public abstract class ChartDataGeneratorBase
     {
         /// <summary>

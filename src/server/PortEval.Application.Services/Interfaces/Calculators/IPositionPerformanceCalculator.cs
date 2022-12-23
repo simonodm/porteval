@@ -4,10 +4,13 @@ using System.Collections.Generic;
 
 namespace PortEval.Application.Features.Interfaces.Calculators
 {
+    /// <summary>
+    /// Calculates a position's performance.
+    /// </summary>
     public interface IPositionPerformanceCalculator
     {
         /// <summary>
-        /// Calculates the total performance of provided positions based on their transactions and instruments' prices.
+        /// Calculates the total performance of the provided positions based on their transactions and instruments' prices.
         /// </summary>
         /// <param name="positionPriceRangeData">Transaction and price data for each position.</param>
         /// <param name="from">Date range start.</param>

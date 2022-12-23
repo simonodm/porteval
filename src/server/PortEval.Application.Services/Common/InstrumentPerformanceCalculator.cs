@@ -2,8 +2,10 @@
 
 namespace PortEval.Application.Features.Common
 {
+    /// <inheritdoc />
     public class InstrumentPerformanceCalculator : IInstrumentPerformanceCalculator
     {
+        /// <inheritdoc />
         public decimal CalculatePerformance(decimal priceAtStart, decimal priceAtEnd)
         {
             if (priceAtStart == 0 && priceAtEnd > 0)

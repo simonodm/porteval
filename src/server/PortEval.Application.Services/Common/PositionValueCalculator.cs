@@ -4,8 +4,10 @@ using System.Collections.Generic;
 
 namespace PortEval.Application.Features.Common
 {
+    /// <inheritdoc />
     public class PositionValueCalculator : IPositionValueCalculator
     {
+        /// <inheritdoc />
         public decimal CalculateValue(IEnumerable<PositionPriceData> positionsPriceData, DateTime time)
         {
             var value = 0m;

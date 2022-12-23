@@ -9,12 +9,12 @@ namespace PortEval.Application.Features.Common
     public class PositionPriceListData
     {
         /// <summary>
-        /// Position's transactions.
+        /// Position's transactions sorted by ascending time.
         /// </summary>
         public IEnumerable<TransactionDto> Transactions { get; set; }
 
         /// <summary>
-        /// Available prices of the instrument represented by the position.
+        /// Available prices of the instrument represented by the position, sorted by ascending time.
         /// </summary>
         public IEnumerable<InstrumentPriceDto> Prices { get; set; }
     }
