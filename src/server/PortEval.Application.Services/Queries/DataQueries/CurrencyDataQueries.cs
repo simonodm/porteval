@@ -1,8 +1,10 @@
 ﻿using PortEval.Application.Models.DTOs;
 using System;
 using System.Collections.Generic;
+using PortEval.Application.Features.Queries.Models;
+using PortEval.Application.Models.QueryParams;
 
-namespace PortEval.Application.Services.Queries.DataQueries
+namespace PortEval.Application.Features.Queries.DataQueries
 {
     internal static class CurrencyDataQueries
     {
@@ -55,6 +57,46 @@ namespace PortEval.Application.Services.Queries.DataQueries
                           ON ER.CurrencyToCode = Currencies.Code
                           ORDER BY Code",
                 Params = new { CurrencyCode = baseCurrencyCode, Time = time }
+            };
+        }
+
+        public static QueryWrapper<IEnumerable<CurrencyExchangeRateDto>> GetDirectExchangeRates(string baseCurrencyCode,
+            string targetCurrencyCode, DateRangeParams dateRange)
+        {
+            return new QueryWrapper<IEnumerable<CurrencyExchangeRateDto>>
+            {
+                Query = @$"SELECT * FROM dbo.CurrencyExchangeRates
+                          WHERE CurrencyFromCode = @BaseCurrencyCode
+                          AND CurrencyToCode = @TargetCurrencyCode
+                          AND Time >= @TimeFrom
+                          AND Time <= @TimeTo
+                          ORDER BY Time",
+                Params = new
+                {
+                    BaseCurrencyCode = baseCurrencyCode, TargetCurrencyCode = targetCurrencyCode,
+                    TimeFrom = dateRange.From, TimeTo = dateRange.To
+                }
+            };
+        }
+
+        public static QueryWrapper<IEnumerable<CurrencyExchangeRateDto>> GetInverselyCalculatedExchangeRates(string baseCurrencyCode,
+            string targetCurrencyCode, DateRangeParams dateRange)
+        {
+            return new QueryWrapper<IEnumerable<CurrencyExchangeRateDto>>
+            {
+                Query = @"SELECT CurrencyToCode AS CurrencyFromCode, CurrencyFromCode AS CurrencyToCode, Time, 1/ExchangeRate AS ExchangeRate FROM dbo.CurrencyExchangeRates
+                          WHERE CurrencyFromCode = @TargetCurrencyCode
+                          AND CurrencyToCode = @BaseCurrencyCode
+                          AND Time >= @TimeFrom
+                          AND Time <= @TimeTo
+                          ORDER BY Time",
+                Params = new
+                {
+                    BaseCurrencyCode = baseCurrencyCode,
+                    TargetCurrencyCode = targetCurrencyCode,
+                    TimeFrom = dateRange.From,
+                    TimeTo = dateRange.To
+                }
             };
         }
     }

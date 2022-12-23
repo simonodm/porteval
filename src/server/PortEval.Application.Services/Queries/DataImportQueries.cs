@@ -1,13 +1,13 @@
 ﻿using Dapper;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Queries.DataQueries;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Services.Queries.DataQueries;
-using PortEval.Application.Services.Queries.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PortEval.Application.Services.Queries
+namespace PortEval.Application.Features.Queries
 {
     public class DataImportQueries : IDataImportQueries
     {

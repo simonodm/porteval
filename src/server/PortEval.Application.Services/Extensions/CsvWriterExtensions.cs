@@ -1,9 +1,9 @@
 ﻿using CsvHelper;
-using PortEval.Application.Services.BulkImportExport;
-using PortEval.Application.Services.BulkImportExport.ClassMaps;
-using PortEval.Application.Services.BulkImportExport.Interfaces;
+using PortEval.Application.Features.Services.BulkImportExport;
+using PortEval.Application.Features.Services.BulkImportExport.ClassMaps;
+using PortEval.Application.Features.Services.BulkImportExport.Interfaces;
 
-namespace PortEval.Application.Services.Extensions
+namespace PortEval.Application.Features.Extensions
 {
     public static class CsvWriterExtensions
     {
@@ -41,7 +41,7 @@ namespace PortEval.Application.Services.Extensions
 
         public static void WriteErrorEntry(this CsvWriter csv, RawRowErrorLogEntry entry)
         {
-            foreach(var field in entry.RawRowFields)
+            foreach (var field in entry.RawRowFields)
             {
                 csv.WriteField(field);
             }

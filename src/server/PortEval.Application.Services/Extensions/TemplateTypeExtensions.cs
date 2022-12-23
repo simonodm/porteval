@@ -2,7 +2,7 @@
 using PortEval.Domain.Models.Enums;
 using System;
 
-namespace PortEval.Application.Services.Extensions
+namespace PortEval.Application.Features.Extensions
 {
     internal static class TemplateTypeExtensions
     {

@@ -3,28 +3,27 @@ using Hangfire.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PortEval.Application.Services;
-using PortEval.Application.Services.Interfaces;
-using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.BackgroundJobs;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.Services;
+using PortEval.Application.Features.Queries;
+using PortEval.Application.Features.Queries.TypeHandlers;
+using PortEval.Application.Features.Services;
+using PortEval.Application.Features.Services.BulkImportExport;
+using PortEval.Application.Features.Services.BulkImportExport.Interfaces;
+using PortEval.Application.Models.DTOs;
+using PortEval.BackgroundJobs;
 using PortEval.FinancialDataFetcher;
+using PortEval.FinancialDataFetcher.Interfaces;
 using PortEval.Infrastructure;
 using PortEval.Infrastructure.Repositories;
 using System;
 using System.Data;
 using System.IO.Abstractions;
-using PortEval.Application.Models.DTOs;
-using PortEval.Application.Services.BulkImportExport;
-using PortEval.Application.Services.BulkImportExport.Interfaces;
-using PortEval.Application.Services.Interfaces.BackgroundJobs;
-using PortEval.Application.Services.Queries;
-using PortEval.Application.Services.Queries.Interfaces;
-using PortEval.Application.Services.Queries.TypeHandlers;
-using PortEval.BackgroundJobs.DatabaseCleanup;
-using PortEval.BackgroundJobs.DataImport;
-using PortEval.BackgroundJobs.InitialPriceFetch;
-using PortEval.BackgroundJobs.LatestPricesFetch;
-using PortEval.BackgroundJobs.MissingPricesFetch;
-using PortEval.FinancialDataFetcher.Interfaces;
+using PortEval.Application.Features.Common;
+using PortEval.Application.Features.Interfaces.Calculators;
+using PortEval.Application.Features.Interfaces.ChartDataGenerators;
 
 namespace PortEval.Application.Extensions
 {
@@ -56,11 +55,14 @@ namespace PortEval.Application.Extensions
                     new CsvImportService(provider.GetRequiredService<IDataImportRepository>(), provider.GetRequiredService<IBackgroundJobClient>(), provider.GetRequiredService<IFileSystem>(), fileStoragePath)
             );
             services.AddScoped<ICsvExportService, CsvExportService>();
+
             services.AddScoped<IImportProcessor<PortfolioDto>, PortfolioImportProcessor>();
             services.AddScoped<IImportProcessor<PositionDto>, PositionImportProcessor>();
             services.AddScoped<IImportProcessor<InstrumentDto>, InstrumentImportProcessor>();
             services.AddScoped<IImportProcessor<TransactionDto>, TransactionImportProcessor>();
             services.AddScoped<IImportProcessor<InstrumentPriceDto>, PriceImportProcessor>();
+
+            services.AddScoped<ICurrencyConverter, CurrencyConverter>();
         }
 
         /// <summary>
@@ -114,6 +116,30 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IDashboardLayoutQueries, DashboardLayoutQueries>();
             services.AddScoped<IDataImportQueries, DataImportQueries>();
             services.AddScoped<IExchangeQueries, ExchangeQueries>();
+        }
+
+        /// <summary>
+        /// Configures PortEval's financial data calculators.
+        /// </summary>
+        /// <param name="services">ASP.NET service IoC container.</param>
+        public static void AddCalculators(this IServiceCollection services)
+        {
+            services.AddScoped<IInstrumentProfitCalculator, InstrumentProfitCalculator>();
+            services.AddScoped<IInstrumentPerformanceCalculator, InstrumentPerformanceCalculator>();
+            services.AddScoped<IPositionValueCalculator, PositionValueCalculator>();
+            services.AddScoped<IPositionProfitCalculator, PositionProfitCalculator>();
+            services.AddScoped<IPositionPerformanceCalculator, PositionPerformanceCalculator>();
+            services.AddScoped<IPositionBreakEvenPointCalculator, PositionBreakEvenPointCalculator>();
+        }
+
+        /// <summary>
+        /// Configures PortEval's chart data generators.
+        /// </summary>
+        /// <param name="services">ASP.NET service IoC container.</param>
+        public static void AddChartGenerators(this IServiceCollection services)
+        {
+            services.AddScoped<IInstrumentChartDataGenerator, InstrumentChartDataGenerator>();
+            services.AddScoped<IPositionChartDataGenerator, PositionChartDataGenerator>();
         }
 
         /// <summary>
@@ -188,6 +214,6 @@ namespace PortEval.Application.Extensions
 
             services.AddSingleton<IPriceFetcher>(fetcher);
         }
-        
+
     }
 }

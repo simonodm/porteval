@@ -1,7 +1,6 @@
-﻿using PortEval.FinancialDataFetcher.APIs.Interfaces;
+﻿using PortEval.FinancialDataFetcher.Interfaces;
+using PortEval.FinancialDataFetcher.Interfaces.APIs;
 using PortEval.FinancialDataFetcher.Models;
-using PortEval.FinancialDataFetcher.Requests;
-using PortEval.FinancialDataFetcher.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +44,7 @@ namespace PortEval.FinancialDataFetcher
 #if DEBUG
                 _retryPolicy = RetryPolicy.Fast;
 #else
-            _retryPolicy = RetryPolicy.Standard;
+                _retryPolicy = RetryPolicy.Standard;
 #endif
             }
 
@@ -157,7 +156,7 @@ namespace PortEval.FinancialDataFetcher
                         ErrorMessage = "Operation cancelled."
                     };
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     return new TResponse
                     {

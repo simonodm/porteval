@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace PortEval.Application.Services.Hubs
+namespace PortEval.Application.Features.Hubs
 {
     public class NotificationHub : Hub<INotificationHubClient>
     {

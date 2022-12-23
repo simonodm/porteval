@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using PortEval.Application.Services.Queries;
-using PortEval.Application.Services.Queries.Interfaces;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Queries;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
@@ -31,7 +31,7 @@ namespace PortEval.Tests.Integration.QueryTests
                 i.DashboardWidth == 1 &&
                 i.ChartId != default
             );
-            Assert.Contains(queryResult.Response.Items, i => 
+            Assert.Contains(queryResult.Response.Items, i =>
                 i.DashboardPositionX == 1 &&
                 i.DashboardPositionY == 1 &&
                 i.DashboardHeight == 2 &&

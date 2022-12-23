@@ -1,4 +1,4 @@
-﻿namespace PortEval.Application.Services.Queries.Models
+﻿namespace PortEval.Application.Features.Queries.Models
 {
     internal class PortfolioPositionValueQueryModel
     {

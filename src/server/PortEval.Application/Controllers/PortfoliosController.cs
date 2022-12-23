@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Interfaces.Services;
+using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Services.Queries.Interfaces;
-using PortEval.Application.Services.Interfaces;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Services.Queries;
 
 namespace PortEval.Application.Controllers
 {
@@ -227,7 +227,7 @@ namespace PortEval.Application.Controllers
             _logger.LogInformation($"Portfolio {id} statistics requested.");
             var result = await _portfolioQueries.GetPortfolioStatistics(id);
 
-            if(result.Status == QueryStatus.NotFound)
+            if (result.Status == QueryStatus.NotFound)
             {
                 return NotFound($"Portfolio {id} not found.");
             }

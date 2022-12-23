@@ -1,21 +1,18 @@
 ﻿using Dapper;
+using PortEval.Application.Features.Interfaces.Calculators;
+using PortEval.Application.Features.Interfaces.ChartDataGenerators;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Queries.DataQueries;
 using PortEval.Application.Models;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Services.Queries.DataQueries;
-using PortEval.Application.Services.Queries.Helpers;
-using PortEval.Application.Services.Queries.Interfaces;
-using PortEval.Application.Services.Queries.Models;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Services.Extensions;
-using PortEval.Application.Services.Queries.Calculators;
-using PortEval.Application.Services.Queries.Calculators.Interfaces;
 
-namespace PortEval.Application.Services.Queries
+namespace PortEval.Application.Features.Queries
 {
     /// <inheritdoc cref="IInstrumentQueries"/>
     public class InstrumentQueries : IInstrumentQueries
@@ -23,16 +20,24 @@ namespace PortEval.Application.Services.Queries
         private readonly IDbConnectionCreator _connectionCreator;
         private readonly ICurrencyExchangeRateQueries _exchangeRateQueries;
 
-        private readonly IPriceBasedProfitCalculator _profitCalculator;
-        private readonly IPriceBasedPerformanceCalculator _performanceCalculator;
+        private readonly IInstrumentProfitCalculator _profitCalculator;
+        private readonly IInstrumentPerformanceCalculator _performanceCalculator;
 
-        public InstrumentQueries(IDbConnectionCreator connection, ICurrencyExchangeRateQueries exchangeRateQueries)
+        private readonly ICurrencyConverter _currencyConverter;
+        private readonly IInstrumentChartDataGenerator _chartGenerator;
+
+        public InstrumentQueries(IDbConnectionCreator connection, ICurrencyExchangeRateQueries exchangeRateQueries,
+            IInstrumentProfitCalculator profitCalculator, IInstrumentPerformanceCalculator performanceCalculator, ICurrencyConverter currentConverter,
+            IInstrumentChartDataGenerator chartGenerator)
         {
             _connectionCreator = connection;
             _exchangeRateQueries = exchangeRateQueries;
 
-            _profitCalculator = new PriceBasedProfitCalculator();
-            _performanceCalculator = new PriceBasedPerformanceCalculator();
+            _profitCalculator = profitCalculator;
+            _performanceCalculator = performanceCalculator;
+
+            _currencyConverter = currentConverter;
+            _chartGenerator = chartGenerator;
         }
 
         /// <inheritdoc cref="IInstrumentQueries.GetAllInstruments"/>
@@ -170,7 +175,7 @@ namespace PortEval.Application.Services.Queries
         public async Task<QueryResponse<EntityProfitDto>> GetInstrumentProfit(int instrumentId, DateRangeParams dateRange)
         {
             var instrument = await GetInstrument(instrumentId);
-            if(instrument.Status == QueryStatus.NotFound)
+            if (instrument.Status == QueryStatus.NotFound)
             {
                 return new QueryResponse<EntityProfitDto>
                 {
@@ -231,8 +236,8 @@ namespace PortEval.Application.Services.Queries
         public async Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartInstrumentPrices(int instrumentId,
             DateRangeParams dateRange, AggregationFrequency frequency, string currencyCode = null)
         {
-            var instrument = await GetInstrument(instrumentId);
-            if(instrument.Status == QueryStatus.NotFound)
+            var instrumentResponse = await GetInstrument(instrumentId);
+            if (instrumentResponse.Status == QueryStatus.NotFound)
             {
                 return new QueryResponse<IEnumerable<EntityChartPointDto>>
                 {
@@ -240,45 +245,20 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            var firstPriceTime = await GetFirstPriceTime(instrumentId);
-            if (firstPriceTime == null)
+            var pricesResponse = await GetInstrumentPrices(instrumentId, dateRange.SetFrom(DateTime.MinValue));
+            var result = _chartGenerator.ChartPrices(pricesResponse.Response, dateRange, frequency);
+
+            if (!string.IsNullOrWhiteSpace(currencyCode) && instrumentResponse.Response.CurrencyCode != currencyCode)
             {
-                return new QueryResponse<IEnumerable<EntityChartPointDto>>
-                {
-                    Status = QueryStatus.Ok,
-                    Response = Enumerable.Empty<EntityChartPointDto>()
-                };
-            }
-
-            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
-
-            var process = new Func<DateTime, Task<EntityChartPointDto>>(async time =>
-            {
-                var price = await GetInstrumentPrice(instrumentId, time);
-                if (price?.Response == null || price.Status != QueryStatus.Ok) return new EntityChartPointDto(time, 0m);
-
-                price.Response.Time = time;
-                return await _exchangeRateQueries.ConvertChartPointCurrency(instrument.Response.CurrencyCode, currencyCode,
-                    EntityChartPointDto.FromInstrumentPrice(price.Response));
-            });
-
-            var calculations = await CalculationUtils.AggregateCalculations
-            (
-                dateRange,
-                frequency,
-                async range => await process(range.To)
-            );
-
-            var startPrice = await process(dateRange.From);
-            if(startPrice != null)
-            {
-                calculations = calculations.Prepend(startPrice);
+                var exchangeRatesResponse =
+                    await _exchangeRateQueries.GetExchangeRates(instrumentResponse.Response.CurrencyCode, currencyCode, dateRange.SetFrom(DateTime.MinValue));
+                result = _currencyConverter.ConvertChartPoints(result, exchangeRatesResponse.Response);
             }
 
             return new QueryResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = QueryStatus.Ok,
-                Response = calculations
+                Response = result
             };
         }
 
@@ -286,8 +266,8 @@ namespace PortEval.Application.Services.Queries
         public async Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartInstrumentProfit(int instrumentId,
             DateRangeParams dateRange, AggregationFrequency frequency, string currencyCode = null)
         {
-            var instrument = await GetInstrument(instrumentId);
-            if (instrument.Status == QueryStatus.NotFound)
+            var instrumentResponse = await GetInstrument(instrumentId);
+            if (instrumentResponse.Status == QueryStatus.NotFound)
             {
                 return new QueryResponse<IEnumerable<EntityChartPointDto>>
                 {
@@ -295,32 +275,20 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            var firstPriceTime = await GetFirstPriceTime(instrumentId);
-            if (firstPriceTime == null)
+            var pricesResponse = await GetInstrumentPrices(instrumentId, dateRange.SetFrom(DateTime.MinValue));
+            var result = _chartGenerator.ChartProfit(pricesResponse.Response, dateRange, frequency);
+
+            if (!string.IsNullOrWhiteSpace(currencyCode) && instrumentResponse.Response.CurrencyCode != currencyCode)
             {
-                return new QueryResponse<IEnumerable<EntityChartPointDto>>
-                {
-                    Status = QueryStatus.Ok,
-                    Response = Enumerable.Empty<EntityChartPointDto>()
-                };
+                var exchangeRatesResponse =
+                    await _exchangeRateQueries.GetExchangeRates(instrumentResponse.Response.CurrencyCode, currencyCode, dateRange.SetFrom(DateTime.MinValue));
+                result = _currencyConverter.ConvertChartPoints(result, exchangeRatesResponse.Response);
             }
-
-            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
-
-            var calculations = await CalculationUtils.AggregateCalculations
-            (
-                dateRange,
-                frequency,
-                async range => await _exchangeRateQueries.ConvertChartPointCurrency(instrument.Response.CurrencyCode, currencyCode,
-                    EntityChartPointDto.FromProfit((await GetInstrumentProfit(instrumentId, range.SetFrom(dateRange.From))).Response))
-            );
-
-            calculations = calculations.Prepend(new EntityChartPointDto(dateRange.From, 0));
 
             return new QueryResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = QueryStatus.Ok,
-                Response = calculations
+                Response = result
             };
         }
 
@@ -328,8 +296,8 @@ namespace PortEval.Application.Services.Queries
         public async Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartInstrumentPerformance(int instrumentId, DateRangeParams dateRange,
             AggregationFrequency frequency)
         {
-            var instrument = await GetInstrument(instrumentId);
-            if (instrument.Status == QueryStatus.NotFound)
+            var instrumentResponse = await GetInstrument(instrumentId);
+            if (instrumentResponse.Status == QueryStatus.NotFound)
             {
                 return new QueryResponse<IEnumerable<EntityChartPointDto>>
                 {
@@ -337,31 +305,13 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            var firstPriceTime = await GetFirstPriceTime(instrumentId);
-            if (firstPriceTime == null)
-            {
-                return new QueryResponse<IEnumerable<EntityChartPointDto>>
-                {
-                    Status = QueryStatus.Ok,
-                    Response = Enumerable.Empty<EntityChartPointDto>()
-                };
-            }
-
-            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
-
-            var calculations = await CalculationUtils.AggregateCalculations
-            (
-                dateRange,
-                frequency,
-                async range => EntityChartPointDto.FromPerformance((await GetInstrumentPerformance(instrumentId, range.SetFrom(dateRange.From))).Response)
-            );
-
-            calculations = calculations.Prepend(new EntityChartPointDto(dateRange.From, 0));
+            var pricesResponse = await GetInstrumentPrices(instrumentId, dateRange.SetFrom(DateTime.MinValue));
+            var result = _chartGenerator.ChartPerformance(pricesResponse.Response, dateRange, frequency);
 
             return new QueryResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = QueryStatus.Ok,
-                Response = calculations
+                Response = result
             };
         }
 
@@ -369,8 +319,8 @@ namespace PortEval.Application.Services.Queries
         public async Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartInstrumentProfitAggregated(int instrumentId,
             DateRangeParams dateRange, AggregationFrequency frequency, string currencyCode = null)
         {
-            var instrument = await GetInstrument(instrumentId);
-            if (instrument.Status == QueryStatus.NotFound)
+            var instrumentResponse = await GetInstrument(instrumentId);
+            if (instrumentResponse.Status == QueryStatus.NotFound)
             {
                 return new QueryResponse<IEnumerable<EntityChartPointDto>>
                 {
@@ -378,38 +328,28 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            var firstPriceTime = await GetFirstPriceTime(instrumentId);
-            if (firstPriceTime == null)
+            var pricesResponse = await GetInstrumentPrices(instrumentId, dateRange.SetFrom(DateTime.MinValue));
+            var result = _chartGenerator.ChartAggregatedProfit(pricesResponse.Response, dateRange, frequency);
+
+            if (!string.IsNullOrWhiteSpace(currencyCode) && instrumentResponse.Response.CurrencyCode != currencyCode)
             {
-                return new QueryResponse<IEnumerable<EntityChartPointDto>>
-                {
-                    Status = QueryStatus.Ok,
-                    Response = Enumerable.Empty<EntityChartPointDto>()
-                };
+                var exchangeRatesResponse =
+                    await _exchangeRateQueries.GetExchangeRates(instrumentResponse.Response.CurrencyCode, currencyCode, dateRange.SetFrom(DateTime.MinValue));
+                result = _currencyConverter.ConvertChartPoints(result, exchangeRatesResponse.Response);
             }
-
-            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
-
-            var calculations = await CalculationUtils.AggregateCalculations
-            (
-                dateRange,
-                frequency,
-                async range => await _exchangeRateQueries.ConvertChartPointCurrency(instrument.Response.CurrencyCode, currencyCode,
-                    EntityChartPointDto.FromProfit((await GetInstrumentProfit(instrumentId, range)).Response))
-            );
 
             return new QueryResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = QueryStatus.Ok,
-                Response = calculations
+                Response = result
             };
         }
 
         /// <inheritdoc cref="IInstrumentQueries.ChartInstrumentPerformanceAggregated"/>
         public async Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartInstrumentPerformanceAggregated(int instrumentId, DateRangeParams dateRange, AggregationFrequency frequency)
         {
-            var instrument = await GetInstrument(instrumentId);
-            if (instrument.Status == QueryStatus.NotFound)
+            var instrumentResponse = await GetInstrument(instrumentId);
+            if (instrumentResponse.Status == QueryStatus.NotFound)
             {
                 return new QueryResponse<IEnumerable<EntityChartPointDto>>
                 {
@@ -417,39 +357,14 @@ namespace PortEval.Application.Services.Queries
                 };
             }
 
-            var firstPriceTime = await GetFirstPriceTime(instrumentId);
-            if (firstPriceTime == null)
-            {
-                return new QueryResponse<IEnumerable<EntityChartPointDto>>
-                {
-                    Status = QueryStatus.Ok,
-                    Response = Enumerable.Empty<EntityChartPointDto>()
-                };
-            }
-
-            dateRange = dateRange.SetFrom(dateRange.From.GetMax((DateTime)firstPriceTime));
-
-            var calculations = await CalculationUtils.AggregateCalculations
-            (
-                dateRange,
-                frequency,
-                async range => EntityChartPointDto.FromPerformance((await GetInstrumentPerformance(instrumentId, range)).Response)
-            );
+            var pricesResponse = await GetInstrumentPrices(instrumentId, dateRange.SetFrom(DateTime.MinValue));
+            var result = _chartGenerator.ChartAggregatedPerformance(pricesResponse.Response, dateRange, frequency);
 
             return new QueryResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = QueryStatus.Ok,
-                Response = calculations
+                Response = result
             };
-        }
-
-        private async Task<DateTime?> GetFirstPriceTime(int instrumentId)
-        {
-            var query = InstrumentDataQueries.GetFirstPriceTime(instrumentId);
-            using var connection = _connectionCreator.CreateConnection();
-            var timeModel = await connection.QueryFirstOrDefaultAsync<SingleTimeQueryModel>(query.Query, query.Params);
-
-            return timeModel?.Time;
         }
     }
 }

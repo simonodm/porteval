@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using PortEval.Domain.Models.Enums;
+﻿using PortEval.Domain.Models.Enums;
+using System.Collections.Generic;
 
 namespace PortEval.Tests.Unit.Helpers
 {

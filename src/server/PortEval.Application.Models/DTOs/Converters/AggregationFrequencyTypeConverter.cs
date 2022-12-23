@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using PortEval.Domain.Models.Enums;
+using System;
 using System.ComponentModel;
 using System.Globalization;
-using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Application.Models.DTOs.Converters
 {

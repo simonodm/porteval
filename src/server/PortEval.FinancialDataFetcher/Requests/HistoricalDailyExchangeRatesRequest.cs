@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PortEval.FinancialDataFetcher.Interfaces;
+using System;
 
 namespace PortEval.FinancialDataFetcher.Requests
 {

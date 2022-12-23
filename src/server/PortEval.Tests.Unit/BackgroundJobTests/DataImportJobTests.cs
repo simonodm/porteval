@@ -2,11 +2,11 @@
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
 using Moq;
+using PortEval.Application.Features.Interfaces.Repositories;
+using PortEval.Application.Features.Services.BulkImportExport;
+using PortEval.Application.Features.Services.BulkImportExport.Interfaces;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Services.BulkImportExport;
-using PortEval.Application.Services.BulkImportExport.Interfaces;
-using PortEval.Application.Services.Interfaces.Repositories;
-using PortEval.BackgroundJobs.DataImport;
+using PortEval.BackgroundJobs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using System;

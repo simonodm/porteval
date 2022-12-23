@@ -1,12 +1,12 @@
-﻿using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Services.Extensions;
+﻿using PortEval.Application.Features.Extensions;
+using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PortEval.Application.Services.Queries.Helpers
+namespace PortEval.Application.Features.Queries.Helpers
 {
     /// <summary>
     /// Contains static helper methods for financial entity data calculations.

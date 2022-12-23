@@ -1,7 +1,7 @@
 ﻿using CsvHelper;
-using PortEval.Application.Services.BulkImportExport.ClassMaps;
+using PortEval.Application.Features.Services.BulkImportExport.ClassMaps;
 
-namespace PortEval.Application.Services.Extensions
+namespace PortEval.Application.Features.Extensions
 {
     public static class CsvReaderExtensions
     {

@@ -1,12 +1,14 @@
 ﻿using Dapper;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Queries.DataQueries;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Services.Queries.DataQueries;
-using PortEval.Application.Services.Queries.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using PortEval.Application.Features.Interfaces.ChartDataGenerators;
+using PortEval.Application.Models.QueryParams;
 
-namespace PortEval.Application.Services.Queries
+namespace PortEval.Application.Features.Queries
 {
     /// <inheritdoc cref="ICurrencyExchangeRateQueries"/>
     public class CurrencyExchangeRateQueries : ICurrencyExchangeRateQueries
@@ -14,13 +16,16 @@ namespace PortEval.Application.Services.Queries
         private readonly IDbConnectionCreator _connectionCreator;
         private readonly ICurrencyQueries _currencyQueries;
 
-        public CurrencyExchangeRateQueries(IDbConnectionCreator connection, ICurrencyQueries currencyQueries)
+        private readonly ICurrencyConverter _currencyConverter;
+
+        public CurrencyExchangeRateQueries(IDbConnectionCreator connection, ICurrencyQueries currencyQueries, ICurrencyConverter currencyConverter)
         {
             _connectionCreator = connection;
             _currencyQueries = currencyQueries;
+            _currencyConverter = currencyConverter;
         }
 
-        /// <inheritdoc cref="ICurrencyExchangeRateQueries.GetExchangeRates"/>
+        /// <inheritdoc />
         public async Task<QueryResponse<IEnumerable<CurrencyExchangeRateDto>>> GetExchangeRates(string currencyCode, DateTime time)
         {
             var currency = await _currencyQueries.GetCurrency(currencyCode);
@@ -46,7 +51,7 @@ namespace PortEval.Application.Services.Queries
             foreach (var exchangeableCurrency in exchangeableCurrencies)
             {
                 var exchangeRate = await GetExchangeRateAt(currencyCode, exchangeableCurrency.Code, time);
-                if(exchangeRate.Status == QueryStatus.Ok)
+                if (exchangeRate.Status == QueryStatus.Ok)
                 {
                     exchangeRates.Add(exchangeRate.Response);
                 }
@@ -59,7 +64,53 @@ namespace PortEval.Application.Services.Queries
             };
         }
 
-        /// <inheritdoc cref="ICurrencyExchangeRateQueries.GetExchangeRateAt"/>
+        /// <inheritdoc />
+        public async Task<QueryResponse<IEnumerable<CurrencyExchangeRateDto>>> GetExchangeRates(string baseCurrencyCode,
+            string targetCurrencyCode, DateRangeParams dateRange)
+        {
+            var baseCurrencyQueryResponse = await _currencyQueries.GetCurrency(baseCurrencyCode);
+            if (baseCurrencyQueryResponse.Status != QueryStatus.Ok)
+            {
+                return new QueryResponse<IEnumerable<CurrencyExchangeRateDto>>
+                {
+                    Status = baseCurrencyQueryResponse.Status
+                };
+            }
+
+            var targetCurrencyQueryResponse = await _currencyQueries.GetCurrency(targetCurrencyCode);
+            if (targetCurrencyQueryResponse.Status != QueryStatus.Ok)
+            {
+                return new QueryResponse<IEnumerable<CurrencyExchangeRateDto>>
+                {
+                    Status = targetCurrencyQueryResponse.Status
+                };
+            }
+
+            IEnumerable<CurrencyExchangeRateDto> exchangeRates;
+
+            if (baseCurrencyQueryResponse.Response.IsDefault)
+            {
+                exchangeRates = await GetDirectExchangeRates(baseCurrencyCode, targetCurrencyCode, dateRange);
+            }
+            else if (targetCurrencyQueryResponse.Response.IsDefault)
+            {
+                exchangeRates =
+                    await GetInverselyCalculatedExchangeRates(baseCurrencyCode, targetCurrencyCode, dateRange);
+            }
+            else
+            {
+                exchangeRates =
+                    await GetIndirectlyCalculatedExchangeRates(baseCurrencyCode, targetCurrencyCode, dateRange);
+            }
+
+            return new QueryResponse<IEnumerable<CurrencyExchangeRateDto>>
+            {
+                Status = QueryStatus.Ok,
+                Response = exchangeRates
+            };
+        }
+
+        /// <inheritdoc />
         public async Task<QueryResponse<CurrencyExchangeRateDto>> GetExchangeRateAt(string baseCurrencyCode, string targetCurrencyCode, DateTime time)
         {
             var baseCurrency = await _currencyQueries.GetCurrency(baseCurrencyCode);
@@ -84,51 +135,57 @@ namespace PortEval.Application.Services.Queries
             };
         }
 
-        /// <inheritdoc cref="ICurrencyExchangeRateQueries.ConvertChartPointCurrency"/>
-        public async Task<EntityChartPointDto> ConvertChartPointCurrency(string baseCurrencyCode,
-            string targetCurrencyCode, EntityChartPointDto chartPoint)
+        private async Task<IEnumerable<CurrencyExchangeRateDto>> GetDirectExchangeRates(string baseCurrencyCode,
+            string targetCurrencyCode, DateRangeParams dateRange)
         {
-            if (targetCurrencyCode == null || baseCurrencyCode == targetCurrencyCode) return chartPoint;
-
-            var convertedPrice = await Convert(baseCurrencyCode, targetCurrencyCode,
-                chartPoint.Value, chartPoint.Time);
-
-            return chartPoint.ChangeValue(convertedPrice);
-        }
-
-        /// <inheritdoc cref="ICurrencyExchangeRateQueries.Convert"/>
-        public async Task<decimal> Convert(string baseCurrencyCode, string targetCurrencyCode, decimal price, DateTime time)
-        {
-            if (baseCurrencyCode == targetCurrencyCode || price == 0)
-            {
-                return price;
-            }
-
-            var defaultCurrencyQuery = CurrencyDataQueries.GetDefaultCurrency();
-            var exchangeRateQuery = CurrencyDataQueries.GetCurrencyExchangeRate(baseCurrencyCode, targetCurrencyCode, time);
+            var query = CurrencyDataQueries.GetDirectExchangeRates(baseCurrencyCode, targetCurrencyCode, dateRange);
 
             using var connection = _connectionCreator.CreateConnection();
+            var exchangeRates = await connection.QueryAsync<CurrencyExchangeRateDto>(query.Query, query.Params);
+
+            return exchangeRates;
+        }
+
+        private async Task<IEnumerable<CurrencyExchangeRateDto>> GetInverselyCalculatedExchangeRates(string baseCurrencyCode,
+            string targetCurrencyCode, DateRangeParams dateRange)
+        {
+            var query = CurrencyDataQueries.GetInverselyCalculatedExchangeRates(baseCurrencyCode, targetCurrencyCode, dateRange);
+
+            using var connection = _connectionCreator.CreateConnection();
+            var exchangeRates = await connection.QueryAsync<CurrencyExchangeRateDto>(query.Query, query.Params);
+
+            return exchangeRates;
+        }
+
+        private async Task<IEnumerable<CurrencyExchangeRateDto>> GetIndirectlyCalculatedExchangeRates(string baseCurrencyCode,
+            string targetCurrencyCode, DateRangeParams dateRange)
+        {
+            var defaultCurrencyQuery = CurrencyDataQueries.GetDefaultCurrency();
+
+            using var connection = _connectionCreator.CreateConnection();
+
             var defaultCurrency =
-                await connection.QueryFirstOrDefaultAsync<CurrencyDto>(defaultCurrencyQuery.Query,
-                    defaultCurrencyQuery.Params);
+                await connection.QueryFirstOrDefaultAsync<CurrencyDto>(defaultCurrencyQuery.Query, defaultCurrencyQuery.Params);
 
-            var exchangeRate = await connection.QueryFirstOrDefaultAsync<CurrencyExchangeRateDto>(exchangeRateQuery.Query, exchangeRateQuery.Params);
-            
-            if(exchangeRate != null)
+            if (defaultCurrency == null)
             {
-                return price * exchangeRate.ExchangeRate;
-            }
-            if (targetCurrencyCode == defaultCurrency.Code)
-            {
-                return price * price / await Convert(defaultCurrency.Code, baseCurrencyCode, price, time);
-            }
-            if (baseCurrencyCode != defaultCurrency.Code)
-            {
-                var convertedToDefault = await Convert(baseCurrencyCode, defaultCurrency.Code, price, time);
-                return await Convert(defaultCurrency.Code, targetCurrencyCode, convertedToDefault, time);
+                throw new Exception("No default currency is set.");
             }
 
-            throw new Exception($"No exchange rate available from {baseCurrencyCode} to {targetCurrencyCode} at {time}.");
+            var baseToDefaultQuery =
+                CurrencyDataQueries.GetInverselyCalculatedExchangeRates(baseCurrencyCode, defaultCurrency.Code,
+                    dateRange);
+            var defaultToTargetQuery =
+                CurrencyDataQueries.GetDirectExchangeRates(defaultCurrency.Code, targetCurrencyCode, dateRange);
+
+            var baseToDefaultExchangeRates =
+                await connection.QueryAsync<CurrencyExchangeRateDto>(baseToDefaultQuery.Query,
+                    baseToDefaultQuery.Params);
+            var defaultToTargetExchangeRates =
+                await connection.QueryAsync<CurrencyExchangeRateDto>(defaultToTargetQuery.Query,
+                    defaultToTargetQuery.Params);
+
+            return _currencyConverter.CombineExchangeRates(baseToDefaultExchangeRates, defaultToTargetExchangeRates);
         }
     }
 }

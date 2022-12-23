@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PortEval.Application.Services.Queries.Models
+namespace PortEval.Application.Features.Queries.Models
 {
     public class TransactionDetailsQueryModel
     {

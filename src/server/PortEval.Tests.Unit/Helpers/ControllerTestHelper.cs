@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
+using PortEval.Application.Features.Queries;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using PortEval.Application.Services.Queries;
 using Xunit;
 
 namespace PortEval.Tests.Unit.Helpers

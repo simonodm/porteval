@@ -1,4 +1,4 @@
-﻿using PortEval.FinancialDataFetcher.APIs.Interfaces;
+﻿using PortEval.FinancialDataFetcher.Interfaces.APIs;
 using PortEval.FinancialDataFetcher.Responses;
 
 namespace PortEval.Tests.Unit.FinancialDataFetcherTests.HelperTypes

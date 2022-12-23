@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +53,7 @@ namespace PortEval.Infrastructure.Repositories
         public async Task DeleteAsync(int portfolioId)
         {
             var foundPortfolioEntity = await _context.Portfolios.FirstOrDefaultAsync(p => p.Id == portfolioId);
-            if(foundPortfolioEntity != null)
+            if (foundPortfolioEntity != null)
             {
                 Delete(foundPortfolioEntity);
             }

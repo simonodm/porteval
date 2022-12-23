@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Services.Queries.Interfaces;
-using PortEval.Application.Services.Interfaces;
 using System.Threading.Tasks;
 
 namespace PortEval.Application.Controllers

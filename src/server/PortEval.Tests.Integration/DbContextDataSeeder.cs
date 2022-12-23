@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using PortEval.Infrastructure;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Tests.Integration
 {
@@ -22,7 +22,7 @@ namespace PortEval.Tests.Integration
 
         public async Task SeedDatabase()
         {
-            
+
             var currencies = await SeedCurrencies();
             var exchangeRates = await SeedCurrencyExchangeRates();
             var exchanges = await SeedExchanges();
@@ -195,7 +195,7 @@ namespace PortEval.Tests.Integration
 
             var chart1 = new Chart("Portfolio chart", new ChartDateRange(new ToDateRange(DateRangeUnit.MONTH, 1)),
                 ChartTypeSettings.PriceChart("USD"));
-            chart1.ReplaceLines(new[] { new ChartLinePortfolio(chart1.Id, 1, LineDashType.Solid, Color.Red, portfoliosList[0].Id)});
+            chart1.ReplaceLines(new[] { new ChartLinePortfolio(chart1.Id, 1, LineDashType.Solid, Color.Red, portfoliosList[0].Id) });
 
             var chart2 = new Chart("Position/instrument chart",
                 new ChartDateRange(DateTime.Parse("2022-01-01"), DateTime.Parse("2022-01-15")), ChartTypeSettings.AggregatedPerformanceChart(AggregationFrequency.Day));

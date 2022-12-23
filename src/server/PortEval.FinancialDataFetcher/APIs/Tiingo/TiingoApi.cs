@@ -1,5 +1,6 @@
-﻿using PortEval.FinancialDataFetcher.APIs.Interfaces;
+﻿using PortEval.Domain.Models.Enums;
 using PortEval.FinancialDataFetcher.APIs.Tiingo.Models;
+using PortEval.FinancialDataFetcher.Interfaces.APIs;
 using PortEval.FinancialDataFetcher.Models;
 using PortEval.FinancialDataFetcher.Requests;
 using PortEval.FinancialDataFetcher.Responses;
@@ -8,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using PortEval.Domain.Models.Enums;
 
 namespace PortEval.FinancialDataFetcher.APIs.Tiingo
 {
@@ -138,7 +138,7 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
                 StatusCode = result.StatusCode,
                 ErrorMessage = result.ErrorMessage,
                 Result = result.Result != null && result.Result.Any()
-                ? 
+                ?
                 new PricePoint
                 {
                     CurrencyCode = "USD",

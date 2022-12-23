@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using PortEval.Domain.Models.Enums;
+using System;
 
 namespace PortEval.Application.Models.DTOs.Converters
 {

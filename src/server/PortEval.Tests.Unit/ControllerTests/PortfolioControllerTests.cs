@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PortEval.Application.Controllers;
-using PortEval.Application.Services.Queries.Interfaces;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Services.Interfaces;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Tests.Unit.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests

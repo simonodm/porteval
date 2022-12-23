@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PortEval.FinancialDataFetcher.Models;
+﻿using PortEval.FinancialDataFetcher.Models;
+using System;
 
 namespace PortEval.FinancialDataFetcher.Extensions
 {

@@ -1,7 +1,7 @@
 ﻿using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Models.Enums;
-using System.Drawing;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Drawing;
 
 namespace PortEval.Application.Models.DTOs
 {
@@ -14,7 +14,7 @@ namespace PortEval.Application.Models.DTOs
         [SwaggerSchema("Determines the line's dash, e. g. solid, dashed, dotted.")]
         public LineDashType Dash { get; set; }
 
-        [SwaggerSchema("Determines the line's color.", Format="#RRGGBB")]
+        [SwaggerSchema("Determines the line's color.", Format = "#RRGGBB")]
         public Color Color { get; set; }
 
         [SwaggerSchema("Determines the kind of entity the line displays data for - portfolio, position or instrument.")]

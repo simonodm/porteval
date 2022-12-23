@@ -1,17 +1,16 @@
 ﻿using AutoFixture;
-using Microsoft.EntityFrameworkCore;
 using Moq;
+using PortEval.Application.Features.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Services.Interfaces;
-using PortEval.Application.Services.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
+using PortEval.FinancialDataFetcher.Interfaces;
+using PortEval.FinancialDataFetcher.Models;
+using PortEval.FinancialDataFetcher.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.FinancialDataFetcher.Interfaces;
-using PortEval.FinancialDataFetcher.Models;
-using PortEval.FinancialDataFetcher.Responses;
 
 namespace PortEval.Tests.Unit.Helpers.Extensions
 {

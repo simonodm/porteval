@@ -1,9 +1,9 @@
-﻿using PortEval.Application.Models.DTOs;
-using PortEval.Application.Services.Queries.Models;
+﻿using PortEval.Application.Features.Queries.Models;
+using PortEval.Application.Models.DTOs;
 using System;
 using System.Collections.Generic;
 
-namespace PortEval.Application.Services.Queries.DataQueries
+namespace PortEval.Application.Features.Queries.DataQueries
 {
     internal static class PortfolioDataQueries
     {

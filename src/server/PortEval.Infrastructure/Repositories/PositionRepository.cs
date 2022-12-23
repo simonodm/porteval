@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,7 +65,7 @@ namespace PortEval.Infrastructure.Repositories
         public async Task DeleteAsync(int positionId)
         {
             var foundPosition = await _context.Positions.FirstOrDefaultAsync(p => p.Id == positionId);
-            if(foundPosition != null)
+            if (foundPosition != null)
             {
                 Delete(foundPosition);
             }
