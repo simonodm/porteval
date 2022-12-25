@@ -1,18 +1,17 @@
 ﻿using Dapper;
 using PortEval.Application.Features.Common;
+using PortEval.Application.Features.Extensions;
 using PortEval.Application.Features.Interfaces.Calculators;
 using PortEval.Application.Features.Interfaces.ChartDataGenerators;
 using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Features.Queries.DataQueries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Domain;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Features.Extensions;
 
 namespace PortEval.Application.Features.Queries
 {
@@ -143,7 +142,7 @@ namespace PortEval.Application.Features.Queries
             };
 
             var positionPriceData = await GetPositionPriceRangeData(position.Response, dateRange);
-            var value = _valueCalculator.CalculateValue(new [] { positionPriceData }, time);
+            var value = _valueCalculator.CalculateValue(new[] { positionPriceData }, time);
 
             var result = new EntityValueDto
             {
@@ -203,7 +202,7 @@ namespace PortEval.Application.Features.Queries
             }
 
             var positionPriceRangeData = await GetPositionPriceRangeData(position.Response, dateRange);
-            var performance = _performanceCalculator.CalculatePerformance(new [] { positionPriceRangeData }, dateRange.From, dateRange.To);
+            var performance = _performanceCalculator.CalculatePerformance(new[] { positionPriceRangeData }, dateRange.From, dateRange.To);
 
             return new QueryResponse<EntityPerformanceDto>
             {
@@ -431,7 +430,7 @@ namespace PortEval.Application.Features.Queries
 
             var priceAtStart = await _instrumentQueries.GetInstrumentPrice(position.InstrumentId, adjustedDateRange.From);
             var priceAtEnd = await _instrumentQueries.GetInstrumentPrice(position.InstrumentId, adjustedDateRange.To);
-            
+
             return new PositionPriceRangeData
             {
                 PositionId = position.Id,
@@ -469,6 +468,6 @@ namespace PortEval.Application.Features.Queries
                 Status = QueryStatus.Ok,
                 Response = stats
             };
-        } 
+        }
     }
 }

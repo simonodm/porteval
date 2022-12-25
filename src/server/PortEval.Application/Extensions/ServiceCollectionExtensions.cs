@@ -3,7 +3,12 @@ using Hangfire.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PortEval.Application.Features.Common;
+using PortEval.Application.Features.Common.Calculators;
+using PortEval.Application.Features.Common.ChartDataGenerators;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
+using PortEval.Application.Features.Interfaces.Calculators;
+using PortEval.Application.Features.Interfaces.ChartDataGenerators;
 using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Application.Features.Interfaces.Services;
@@ -21,11 +26,6 @@ using PortEval.Infrastructure.Repositories;
 using System;
 using System.Data;
 using System.IO.Abstractions;
-using PortEval.Application.Features.Common;
-using PortEval.Application.Features.Interfaces.Calculators;
-using PortEval.Application.Features.Interfaces.ChartDataGenerators;
-using PortEval.Application.Features.Common.ChartDataGenerators;
-using PortEval.Application.Features.Common.Calculators;
 
 namespace PortEval.Application.Extensions
 {

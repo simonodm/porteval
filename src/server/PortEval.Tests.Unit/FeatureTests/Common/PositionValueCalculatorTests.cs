@@ -1,10 +1,10 @@
 ﻿using PortEval.Application.Features.Common;
+using PortEval.Application.Features.Common.Calculators;
 using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PortEval.Application.Features.Common.Calculators;
-using PortEval.Application.Models.QueryParams;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Common
@@ -51,7 +51,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 }
             };
 
-            var value = calculator.CalculateValue(new [] { positionPriceData }, valueTime);
+            var value = calculator.CalculateValue(new[] { positionPriceData }, valueTime);
 
             Assert.Equal(priceAtRangeEnd, value);
         }
@@ -89,7 +89,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 DateRange = new DateRangeParams { To = valueTime }
             };
 
-            var value = calculator.CalculateValue(new [] { positionPriceData }, valueTime);
+            var value = calculator.CalculateValue(new[] { positionPriceData }, valueTime);
 
             Assert.Equal(0, value);
         }
@@ -167,7 +167,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             var expectedValue = 188193.5m;
 
-            var value = calculator.CalculateValue(new [] { firstPositionPriceData, secondPositionPriceData }, valueTime);
+            var value = calculator.CalculateValue(new[] { firstPositionPriceData, secondPositionPriceData }, valueTime);
 
             Assert.Equal(expectedValue, value);
         }

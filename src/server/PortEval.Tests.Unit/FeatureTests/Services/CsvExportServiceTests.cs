@@ -1,10 +1,10 @@
-﻿using System;
+﻿using AutoFixture;
+using AutoFixture.AutoMoq;
+using PortEval.Application.Features.Services;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using AutoFixture;
-using AutoFixture.AutoMoq;
-using PortEval.Application.Features.Services;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Services

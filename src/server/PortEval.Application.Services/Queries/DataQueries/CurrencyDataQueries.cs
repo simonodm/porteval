@@ -1,8 +1,7 @@
 ﻿using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.QueryParams;
 using System;
 using System.Collections.Generic;
-using PortEval.Application.Features.Queries.Models;
-using PortEval.Application.Models.QueryParams;
 
 namespace PortEval.Application.Features.Queries.DataQueries
 {
@@ -73,8 +72,10 @@ namespace PortEval.Application.Features.Queries.DataQueries
                           ORDER BY Time",
                 Params = new
                 {
-                    BaseCurrencyCode = baseCurrencyCode, TargetCurrencyCode = targetCurrencyCode,
-                    TimeFrom = dateRange.From, TimeTo = dateRange.To
+                    BaseCurrencyCode = baseCurrencyCode,
+                    TargetCurrencyCode = targetCurrencyCode,
+                    TimeFrom = dateRange.From,
+                    TimeTo = dateRange.To
                 }
             };
         }

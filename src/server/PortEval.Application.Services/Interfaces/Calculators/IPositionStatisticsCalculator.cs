@@ -1,6 +1,6 @@
-﻿using System;
-using PortEval.Application.Features.Common;
+﻿using PortEval.Application.Features.Common;
 using PortEval.Application.Models.DTOs;
+using System;
 
 namespace PortEval.Application.Features.Interfaces.Calculators
 {

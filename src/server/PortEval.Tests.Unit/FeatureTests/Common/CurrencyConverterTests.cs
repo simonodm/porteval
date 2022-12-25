@@ -2,9 +2,9 @@
 using AutoFixture.AutoMoq;
 using PortEval.Application.Features.Common;
 using PortEval.Application.Models.DTOs;
+using PortEval.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
-using PortEval.Domain.Exceptions;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Common

@@ -23,7 +23,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             var positionPriceListData = fixture
                 .Build<PositionPriceListData>()
-                .With(p => p.Prices, new [] { price })
+                .With(p => p.Prices, new[] { price })
                 .With(p => p.Transactions, Enumerable.Empty<TransactionDto>())
                 .Create();
 

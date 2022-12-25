@@ -1,5 +1,7 @@
 ﻿using AutoFixture;
 using Moq;
+using PortEval.Application.Features.Common;
+using PortEval.Application.Features.Interfaces.Calculators;
 using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
@@ -11,8 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Features.Common;
-using PortEval.Application.Features.Interfaces.Calculators;
 
 namespace PortEval.Tests.Unit.Helpers.Extensions
 {

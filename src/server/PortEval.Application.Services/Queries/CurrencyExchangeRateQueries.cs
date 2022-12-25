@@ -1,12 +1,12 @@
 ﻿using Dapper;
+using PortEval.Application.Features.Interfaces.ChartDataGenerators;
 using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Features.Queries.DataQueries;
 using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Features.Interfaces.ChartDataGenerators;
-using PortEval.Application.Models.QueryParams;
 
 namespace PortEval.Application.Features.Queries
 {

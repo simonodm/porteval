@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
 using Hangfire;
@@ -19,6 +11,14 @@ using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Tests.Unit.Helpers;
 using PortEval.Tests.Unit.Helpers.Extensions;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Services

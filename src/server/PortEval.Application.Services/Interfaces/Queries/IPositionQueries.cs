@@ -1,11 +1,11 @@
-﻿using PortEval.Application.Features.Queries;
+﻿using PortEval.Application.Features.Common;
+using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Features.Common;
 
 namespace PortEval.Application.Features.Interfaces.Queries
 {

@@ -1,8 +1,7 @@
-﻿using System;
-using PortEval.Application.Features.Interfaces.ChartDataGenerators;
+﻿using PortEval.Application.Features.Interfaces.ChartDataGenerators;
 using PortEval.Application.Models.DTOs;
-using System.Collections.Generic;
 using PortEval.Domain.Exceptions;
+using System.Collections.Generic;
 
 namespace PortEval.Application.Features.Common
 {

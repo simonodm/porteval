@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Features.Interfaces.Repositories;
@@ -9,6 +7,8 @@ using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers.Extensions;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Services

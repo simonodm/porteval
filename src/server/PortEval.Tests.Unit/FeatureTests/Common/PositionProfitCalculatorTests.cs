@@ -38,7 +38,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             var positionPriceData = new PositionPriceRangeData
             {
-                Transactions = new []
+                Transactions = new[]
                 {
                     new TransactionDto
                     {
@@ -59,7 +59,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 }
             };
 
-            var profit = calculator.CalculateProfit(new [] { positionPriceData }, from, to);
+            var profit = calculator.CalculateProfit(new[] { positionPriceData }, from, to);
 
             Assert.Equal(priceAtRangeEnd - transactionPrice, profit);
         }
@@ -137,7 +137,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             var expectedProfit = 43489.9m;
 
             var calculator = new PositionProfitCalculator();
-            var profit = calculator.CalculateProfit(new [] { firstPositionPriceData, secondPositionPriceData }, from, to);
+            var profit = calculator.CalculateProfit(new[] { firstPositionPriceData, secondPositionPriceData }, from, to);
 
             Assert.Equal(expectedProfit, profit);
         }

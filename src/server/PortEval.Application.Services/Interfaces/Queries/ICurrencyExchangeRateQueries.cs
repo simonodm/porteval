@@ -1,9 +1,9 @@
 ﻿using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Models.QueryParams;
 
 namespace PortEval.Application.Features.Interfaces.Queries
 {

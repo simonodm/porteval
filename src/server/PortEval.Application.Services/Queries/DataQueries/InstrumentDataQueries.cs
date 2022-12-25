@@ -1,5 +1,4 @@
-﻿using PortEval.Application.Features.Queries.Models;
-using PortEval.Application.Models.DTOs;
+﻿using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
 using System;

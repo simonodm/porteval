@@ -18,7 +18,7 @@ namespace PortEval.Application.Features.Interfaces.ChartDataGenerators
         /// of the exchange rate at T from the first collection and the exchange rate at T from the second collection.
         /// </returns>
         public IEnumerable<CurrencyExchangeRateDto> CombineExchangeRates(IEnumerable<CurrencyExchangeRateDto> first, IEnumerable<CurrencyExchangeRateDto> second);
-        
+
         /// <summary>
         /// Converts the provided chart points based on the provided exchange rates.
         /// </summary>

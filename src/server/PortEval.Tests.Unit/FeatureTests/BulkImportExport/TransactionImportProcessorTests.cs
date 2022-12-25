@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Features.Services.BulkImportExport;
 using PortEval.Application.Models.DTOs;
 using PortEval.Tests.Unit.Helpers.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport

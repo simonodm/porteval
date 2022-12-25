@@ -2,16 +2,16 @@
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Features.Common;
+using PortEval.Application.Features.Common.ChartDataGenerators;
 using PortEval.Application.Features.Interfaces.Calculators;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
+using PortEval.Tests.Unit.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
-using PortEval.Application.Features.Common.ChartDataGenerators;
 
 namespace PortEval.Tests.Unit.FeatureTests.Common
 {

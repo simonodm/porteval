@@ -11,13 +11,13 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using PortEval.Application.Extensions;
 using PortEval.Application.Features.Hubs;
+using PortEval.Application.Filters;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Converters;
 using PortEval.Application.Models.Validators;
 using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure;
 using System.ComponentModel;
-using PortEval.Application.Filters;
 
 namespace PortEval.Application
 {

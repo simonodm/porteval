@@ -72,11 +72,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 firstTransaction,
                 secondTransaction
             };
-            
+
 
             var positionPriceListData = fixture
                 .Build<PositionPriceListData>()
-                .With(p => p.Prices, new [] { firstPrice, secondPrice })
+                .With(p => p.Prices, new[] { firstPrice, secondPrice })
                 .With(p => p.Transactions, transactions)
                 .Create();
 

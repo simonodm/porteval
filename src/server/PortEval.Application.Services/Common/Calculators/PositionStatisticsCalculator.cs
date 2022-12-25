@@ -2,9 +2,6 @@
 using PortEval.Application.Models.DTOs;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using PortEval.Application.Features.Extensions;
-using PortEval.Application.Models.QueryParams;
 
 namespace PortEval.Application.Features.Common.Calculators
 {
