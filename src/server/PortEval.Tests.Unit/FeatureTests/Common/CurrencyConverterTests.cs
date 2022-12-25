@@ -4,6 +4,7 @@ using PortEval.Application.Features.Common;
 using PortEval.Application.Models.DTOs;
 using System;
 using System.Collections.Generic;
+using PortEval.Domain.Exceptions;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Common
@@ -111,7 +112,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             var sut = fixture.Create<CurrencyConverter>();
 
-            Assert.Throws<Exception>(() => sut.ConvertChartPoints(chartPoints, exchangeRates));
+            Assert.Throws<ItemNotFoundException>(() => sut.ConvertChartPoints(chartPoints, exchangeRates));
         }
 
         [Fact]
@@ -174,7 +175,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             var sut = fixture.Create<CurrencyConverter>();
 
-            Assert.Throws<Exception>(() => sut.ConvertTransactions(transactions, exchangeRates));
+            Assert.Throws<ItemNotFoundException>(() => sut.ConvertTransactions(transactions, exchangeRates));
         }
 
         [Fact]
@@ -237,7 +238,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             var sut = fixture.Create<CurrencyConverter>();
 
-            Assert.Throws<Exception>(() => sut.ConvertInstrumentPrices(prices, exchangeRates));
+            Assert.Throws<ItemNotFoundException>(() => sut.ConvertInstrumentPrices(prices, exchangeRates));
         }
     }
 }
