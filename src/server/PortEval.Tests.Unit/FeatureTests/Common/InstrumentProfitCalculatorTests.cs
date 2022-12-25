@@ -1,4 +1,4 @@
-﻿using PortEval.Application.Features.Common;
+﻿using PortEval.Application.Features.Common.Calculators;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Common

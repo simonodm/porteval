@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using PortEval.Application.Features.Common;
+﻿using PortEval.Application.Features.Common.Calculators;
+using System.Collections.Generic;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Common

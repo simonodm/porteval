@@ -1,9 +1,9 @@
-﻿using PortEval.Application.Features.Queries.Models;
+﻿using PortEval.Application.Features.Common;
+using PortEval.Application.Features.Common.Calculators;
+using PortEval.Application.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PortEval.Application.Features.Common;
-using PortEval.Application.Models.DTOs;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Common
