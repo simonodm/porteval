@@ -7,58 +7,68 @@ using System.Collections.Generic;
 namespace PortEval.Application.Features.Interfaces.ChartDataGenerators
 {
     /// <summary>
-    /// Generates position chart lines data.
+    /// Generates portfolio chart lines data.
     /// </summary>
-    public interface IPositionChartDataGenerator
+    public interface IPortfolioChartDataGenerator
     {
         /// <summary>
-        /// Generates data for position price charts.
+        /// Generates data for portfolio price charts.
         /// </summary>
-        /// <param name="positionPriceListData">A position's price list data.</param>
+        /// <param name="portfolioPositionsPriceListData">
+        /// A collection of positions' price list data, see <see cref="PortfolioPositionsPriceListData"/>.
+        /// </param>
         /// <param name="dateRange">Date range of the chart.</param>
         /// <param name="frequency">Chart point interval.</param>
         /// <returns>An <see cref="IEnumerable{EntityChartPointDto}"/> containing chart line points.</returns>
-        public IEnumerable<EntityChartPointDto> ChartValue(PositionPriceListData positionPriceListData,
+        public IEnumerable<EntityChartPointDto> ChartValue(PortfolioPositionsPriceListData portfolioPositionsPriceListData,
             DateRangeParams dateRange, AggregationFrequency frequency);
 
         /// <summary>
-        /// Generates data for position profit charts.
+        /// Generates data for portfolio profit charts.
         /// </summary>
-        /// <param name="positionPriceListData">A position's price list data.</param>
+        /// <param name="portfolioPositionsPriceListData">
+        /// A collection of positions' price list data, see <see cref="PortfolioPositionsPriceListData"/>.
+        /// </param>
         /// <param name="dateRange">Date range of the chart.</param>
         /// <param name="frequency">Chart point interval.</param>
         /// <returns>An <see cref="IEnumerable{EntityChartPointDto}"/> containing chart line points.</returns>
-        public IEnumerable<EntityChartPointDto> ChartProfit(PositionPriceListData positionPriceListData,
+        public IEnumerable<EntityChartPointDto> ChartProfit(PortfolioPositionsPriceListData portfolioPositionsPriceListData,
             DateRangeParams dateRange, AggregationFrequency frequency);
 
         /// <summary>
-        /// Generates data for position performance charts.
+        /// Generates data for portfolio performance charts.
         /// </summary>
-        /// <param name="positionPriceListData">A position's price list data.</param>
+        /// <param name="portfolioPositionsPriceListData">
+        /// A collection of positions' price list data, see <see cref="PortfolioPositionsPriceListData"/>.
+        /// </param>
         /// <param name="dateRange">Date range of the chart.</param>
         /// <param name="frequency">Chart point interval.</param>
         /// <returns>An <see cref="IEnumerable{EntityChartPointDto}"/> containing chart line points.</returns>
-        public IEnumerable<EntityChartPointDto> ChartPerformance(PositionPriceListData positionPriceListData,
+        public IEnumerable<EntityChartPointDto> ChartPerformance(PortfolioPositionsPriceListData portfolioPositionsPriceListData,
             DateRangeParams dateRange, AggregationFrequency frequency);
 
         /// <summary>
-        /// Generates data for position aggregated profit charts.
+        /// Generates data for portfolio aggregated profit charts.
         /// </summary>
-        /// <param name="positionPriceListData">A position's price list data.</param>
+        /// <param name="portfolioPositionsPriceListData">
+        /// A collection of positions' price list data, see <see cref="PortfolioPositionsPriceListData"/>.
+        /// </param>
         /// <param name="dateRange">Date range of the chart.</param>
         /// <param name="frequency">Chart point interval.</param>
         /// <returns>An <see cref="IEnumerable{EntityChartPointDto}"/> containing chart line points.</returns>
-        public IEnumerable<EntityChartPointDto> ChartAggregatedProfit(PositionPriceListData positionPriceListData,
+        public IEnumerable<EntityChartPointDto> ChartAggregatedProfit(PortfolioPositionsPriceListData portfolioPositionsPriceListData,
             DateRangeParams dateRange, AggregationFrequency frequency);
 
         /// <summary>
-        /// Generates data for position aggregated performance charts.
+        /// Generates data for portfolio aggregated performance charts.
         /// </summary>
-        /// <param name="positionPriceListData">A position's price list data.</param>
+        /// <param name="portfolioPositionsPriceListData">
+        /// A collection of positions' price list data, see <see cref="PortfolioPositionsPriceListData"/>.
+        /// </param>
         /// <param name="dateRange">Date range of the chart.</param>
         /// <param name="frequency">Chart point interval.</param>
         /// <returns>An <see cref="IEnumerable{EntityChartPointDto}"/> containing chart line points.</returns>
-        public IEnumerable<EntityChartPointDto> ChartAggregatedPerformance(PositionPriceListData positionPriceListData,
+        public IEnumerable<EntityChartPointDto> ChartAggregatedPerformance(PortfolioPositionsPriceListData portfolioPositionsPriceListData,
             DateRangeParams dateRange, AggregationFrequency frequency);
     }
 }

@@ -31,13 +31,16 @@ namespace PortEval.Application.Features.Queries
         private readonly IPositionChartDataGenerator _chartGenerator;
         private readonly IPositionBreakEvenPointCalculator _breakEvenPointCalculator;
 
+        private readonly IPositionStatisticsCalculator _statisticsCalculator;
+
         private readonly ICurrencyConverter _currencyConverter;
 
         public PositionQueries(IDbConnectionCreator connection,
             ICurrencyExchangeRateQueries exchangeRateQueries, ITransactionQueries transactionQueries,
             IInstrumentQueries instrumentQueries, IPositionValueCalculator valueCalculator,
             IPositionProfitCalculator profitCalculator, IPositionPerformanceCalculator performanceCalculator,
-            IPositionBreakEvenPointCalculator breakEvenPointCalculator, IPositionChartDataGenerator chartGenerator, ICurrencyConverter currencyConverter)
+            IPositionBreakEvenPointCalculator breakEvenPointCalculator, IPositionChartDataGenerator chartGenerator, ICurrencyConverter currencyConverter,
+            IPositionStatisticsCalculator statisticsCalculator)
         {
             _connectionCreator = connection;
             _exchangeRateQueries = exchangeRateQueries;
@@ -49,6 +52,7 @@ namespace PortEval.Application.Features.Queries
             _breakEvenPointCalculator = breakEvenPointCalculator;
             _chartGenerator = chartGenerator;
             _currencyConverter = currencyConverter;
+            _statisticsCalculator = statisticsCalculator;
         }
 
         /// <inheritdoc cref="IPositionQueries.GetAllPositions"/>
@@ -138,7 +142,7 @@ namespace PortEval.Application.Features.Queries
                 To = time
             };
 
-            var positionPriceData = await GetPositionPriceData(position.Response, dateRange);
+            var positionPriceData = await GetPositionPriceRangeData(position.Response, dateRange);
             var value = _valueCalculator.CalculateValue(new [] { positionPriceData }, time);
 
             var result = new EntityValueDto
@@ -257,7 +261,7 @@ namespace PortEval.Application.Features.Queries
             }
 
             var positionPriceListData = await GetPositionPriceListData(position.Response, dateRange.SetFrom(DateTime.MinValue));
-            var result = _chartGenerator.ChartValue(new[] { positionPriceListData }, dateRange, frequency);
+            var result = _chartGenerator.ChartValue(positionPriceListData, dateRange, frequency);
 
             if (!string.IsNullOrWhiteSpace(targetCurrencyCode) && position.Response.Instrument.CurrencyCode != targetCurrencyCode)
             {
@@ -288,7 +292,7 @@ namespace PortEval.Application.Features.Queries
 
             var positionPriceListData = await GetPositionPriceListData(position.Response, dateRange.SetFrom(DateTime.MinValue));
 
-            var result = _chartGenerator.ChartProfit(new[] { positionPriceListData }, dateRange, frequency);
+            var result = _chartGenerator.ChartProfit(positionPriceListData, dateRange, frequency);
 
             if (!string.IsNullOrWhiteSpace(targetCurrencyCode) && position.Response.Instrument.CurrencyCode != targetCurrencyCode)
             {
@@ -319,7 +323,7 @@ namespace PortEval.Application.Features.Queries
 
             var positionPriceListData = await GetPositionPriceListData(position.Response, dateRange.SetFrom(DateTime.MinValue));
 
-            var result = _chartGenerator.ChartPerformance(new[] { positionPriceListData }, dateRange, frequency);
+            var result = _chartGenerator.ChartPerformance(positionPriceListData, dateRange, frequency);
 
             return new QueryResponse<IEnumerable<EntityChartPointDto>>
             {
@@ -343,7 +347,7 @@ namespace PortEval.Application.Features.Queries
 
             var positionPriceListData = await GetPositionPriceListData(position.Response, dateRange.SetFrom(DateTime.MinValue));
 
-            var result = _chartGenerator.ChartAggregatedProfit(new[] { positionPriceListData }, dateRange, frequency);
+            var result = _chartGenerator.ChartAggregatedProfit(positionPriceListData, dateRange, frequency);
 
             if (!string.IsNullOrWhiteSpace(targetCurrencyCode) && position.Response.Instrument.CurrencyCode != targetCurrencyCode)
             {
@@ -374,7 +378,7 @@ namespace PortEval.Application.Features.Queries
 
             var positionPriceListData = await GetPositionPriceListData(position.Response, dateRange.SetFrom(DateTime.MinValue));
 
-            var result = _chartGenerator.ChartAggregatedPerformance(new[] { positionPriceListData }, dateRange, frequency);
+            var result = _chartGenerator.ChartAggregatedPerformance(positionPriceListData, dateRange, frequency);
 
             return new QueryResponse<IEnumerable<EntityChartPointDto>>
             {
@@ -412,21 +416,6 @@ namespace PortEval.Application.Features.Queries
         }
 
         /// <inheritdoc />
-        public async Task<PositionPriceData> GetPositionPriceData(PositionDto position, DateRangeParams dateRange)
-        {
-            var price = await _instrumentQueries.GetInstrumentPrice(position.InstrumentId, dateRange.To);
-            var transactions =
-                await _transactionQueries.GetTransactions(TransactionFilters.FromPositionId(position.Id), dateRange.SetFrom(DateTime.MinValue));
-
-            return new PositionPriceData
-            {
-                Price = price.Response,
-                Time = dateRange.To,
-                Transactions = transactions.Response
-            };
-        }
-
-        /// <inheritdoc />
         public async Task<PositionPriceRangeData> GetPositionPriceRangeData(PositionDto position,
             DateRangeParams dateRange)
         {
@@ -445,9 +434,11 @@ namespace PortEval.Application.Features.Queries
             
             return new PositionPriceRangeData
             {
+                PositionId = position.Id,
                 PriceAtRangeStart = priceAtStart.Response,
                 PriceAtRangeEnd = priceAtEnd.Response,
-                Transactions = transactions.Response
+                Transactions = transactions.Response,
+                DateRange = dateRange
             };
         }
 
@@ -460,6 +451,7 @@ namespace PortEval.Application.Features.Queries
 
             return new PositionPriceListData
             {
+                PositionId = position.Id,
                 Prices = prices.Response,
                 Transactions = transactions.Response
             };
@@ -469,40 +461,13 @@ namespace PortEval.Application.Features.Queries
         {
             var now = DateTime.UtcNow;
 
-            var positionTotalPriceRangeData = await GetPositionPriceRangeData(position, new DateRangeParams { To = now });
-            var positionLastDayPriceRangeData = await GetPositionPriceRangeData(position, new DateRangeParams { From = now.AddDays(-1), To = now });
-            var positionLastWeekPriceRangeData = await GetPositionPriceRangeData(position, new DateRangeParams { From = now.AddDays(-7), To = now });
-            var positionLastMonthPriceRangeData = await GetPositionPriceRangeData(position, new DateRangeParams { From = now.AddMonths(-1), To = now });
-
-            var performanceTotal =
-                _performanceCalculator.CalculatePerformance(new[] { positionTotalPriceRangeData }, DateTime.MinValue, now);
-            var performanceLastDay = _performanceCalculator.CalculatePerformance(new[] { positionLastDayPriceRangeData }, now.AddDays(-1), now);
-            var performanceLastWeek = _performanceCalculator.CalculatePerformance(new[] { positionLastWeekPriceRangeData }, now.AddDays(-7), now);
-            var performanceLastMonth = _performanceCalculator.CalculatePerformance(new[] { positionLastMonthPriceRangeData }, now.AddMonths(-1), now);
-
-            var profitTotal = _profitCalculator.CalculateProfit(new[] { positionTotalPriceRangeData }, DateTime.MinValue, now);
-            var profitLastDay = _profitCalculator.CalculateProfit(new[] { positionLastDayPriceRangeData }, now.AddDays(-1), now);
-            var profitLastWeek = _profitCalculator.CalculateProfit(new[] { positionLastWeekPriceRangeData }, now.AddDays(-7), now);
-            var profitLastMonth = _profitCalculator.CalculateProfit(new[] { positionLastMonthPriceRangeData }, now.AddMonths(-1), now);
-
-            var bep = _breakEvenPointCalculator.CalculatePositionBreakEvenPoint(positionTotalPriceRangeData.Transactions);
+            var priceData = await GetPositionPriceListData(position, new DateRangeParams { To = now });
+            var stats = _statisticsCalculator.CalculateStatistics(priceData, now);
 
             return new QueryResponse<PositionStatisticsDto>
             {
                 Status = QueryStatus.Ok,
-                Response = new PositionStatisticsDto
-                {
-                    Id = position.Id,
-                    TotalPerformance = performanceTotal,
-                    LastDayPerformance = performanceLastDay,
-                    LastWeekPerformance = performanceLastWeek,
-                    LastMonthPerformance = performanceLastMonth,
-                    TotalProfit = profitTotal,
-                    LastDayProfit = profitLastDay,
-                    LastWeekProfit = profitLastWeek,
-                    LastMonthProfit = profitLastMonth,
-                    BreakEvenPoint = bep
-                }
+                Response = stats
             };
         } 
     }

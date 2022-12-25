@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
-using PortEval.Application.Features.Common;
+using PortEval.Application.Features.Common.ChartDataGenerators;
 using PortEval.Application.Features.Interfaces.Calculators;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
@@ -645,15 +645,15 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             }, point =>
             {
                 Assert.Equal(prices[0].Time.AddDays(2), point.Time);
-                Assert.Equal(1m, point.Value);
+                Assert.Equal(prices[1].Price / prices[1].Price, point.Value);
             }, point =>
             {
                 Assert.Equal(prices[0].Time.AddDays(3), point.Time);
-                Assert.Equal(1m, point.Value);
+                Assert.Equal(prices[1].Price / prices[1].Price, point.Value);
             }, point =>
             {
                 Assert.Equal(prices[0].Time.AddDays(4), point.Time);
-                Assert.Equal(1m, point.Value);
+                Assert.Equal(prices[1].Price / prices[1].Price, point.Value);
             });
         }
 
@@ -686,11 +686,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             Assert.Collection(result, point =>
             {
                 Assert.Equal(prices[0].Time.AddDays(1), point.Time);
-                Assert.Equal(1m, point.Value);
+                Assert.Equal(prices[0].Price / prices[0].Price, point.Value);
             }, point =>
             {
                 Assert.Equal(prices[0].Time.AddDays(2), point.Time);
-                Assert.Equal(1m, point.Value);
+                Assert.Equal(prices[0].Price / prices[0].Price, point.Value);
             });
         }
     }

@@ -1,9 +1,9 @@
-﻿using PortEval.Application.Features.Queries.Models;
+﻿using PortEval.Application.Features.Common;
+using PortEval.Application.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PortEval.Application.Features.Common;
-using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.QueryParams;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Common
@@ -15,7 +15,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         {
             var calculator = new PositionValueCalculator();
 
-            var positionsPriceData = Enumerable.Empty<PositionPriceData>();
+            var positionsPriceData = Enumerable.Empty<PositionPriceRangeData>();
             var valueTime = DateTime.Parse("2022-05-01");
 
             var value = calculator.CalculateValue(positionsPriceData, valueTime);
@@ -31,14 +31,14 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             var priceAtRangeEnd = 150m;
             var valueTime = DateTime.Parse("2022-05-01");
 
-            var positionPriceData = new PositionPriceData
+            var positionPriceData = new PositionPriceRangeData()
             {
-                Price = new InstrumentPriceDto
+                PriceAtRangeEnd = new InstrumentPriceDto
                 {
                     Time = valueTime.AddDays(-1),
                     Price = priceAtRangeEnd
                 },
-                Time = valueTime,
+                DateRange = new DateRangeParams { To = valueTime },
                 Transactions = new List<TransactionDto>
                 {
                     new TransactionDto
@@ -63,7 +63,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             var valueTime = DateTime.Parse("2022-05-01");
             var priceAtValueTime = 150m;
 
-            var positionPriceData = new PositionPriceData
+            var positionPriceData = new PositionPriceRangeData
             {
                 Transactions = new List<TransactionDto>
                 {
@@ -80,12 +80,12 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                         Time = DateTime.Parse("2022-05-01")
                     }
                 },
-                Price = new InstrumentPriceDto
+                PriceAtRangeEnd = new InstrumentPriceDto
                 {
                     Price = priceAtValueTime,
                     Time = valueTime.AddDays(-1)
                 },
-                Time = valueTime
+                DateRange = new DateRangeParams { To = valueTime }
             };
 
             var value = calculator.CalculateValue(new [] { positionPriceData }, valueTime);
@@ -100,7 +100,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             var valueTime = DateTime.Parse("2022-01-01");
 
-            var firstPositionPriceData = new PositionPriceData
+            var firstPositionPriceData = new PositionPriceRangeData
             {
                 Transactions = new List<TransactionDto>
                 {
@@ -118,15 +118,15 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                     },
 
                 },
-                Price = new InstrumentPriceDto
+                PriceAtRangeEnd = new InstrumentPriceDto
                 {
                     Price = 314.59m,
                     Time = valueTime
                 },
-                Time = valueTime
+                DateRange = new DateRangeParams { To = valueTime }
             };
 
-            var secondPositionPriceData = new PositionPriceData
+            var secondPositionPriceData = new PositionPriceRangeData
             {
                 Transactions = new List<TransactionDto>
                 {
@@ -156,12 +156,12 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                         Time = DateTime.Parse("2021-10-04")
                     }
                 },
-                Price = new InstrumentPriceDto
+                PriceAtRangeEnd = new InstrumentPriceDto
                 {
                     Price = 241.13m,
                     Time = valueTime
                 },
-                Time = valueTime
+                DateRange = new DateRangeParams { To = valueTime }
             };
 
             var expectedValue = 188193.5m;

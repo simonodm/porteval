@@ -24,6 +24,8 @@ using System.IO.Abstractions;
 using PortEval.Application.Features.Common;
 using PortEval.Application.Features.Interfaces.Calculators;
 using PortEval.Application.Features.Interfaces.ChartDataGenerators;
+using PortEval.Application.Features.Common.ChartDataGenerators;
+using PortEval.Application.Features.Common.Calculators;
 
 namespace PortEval.Application.Extensions
 {
@@ -130,6 +132,8 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IPositionProfitCalculator, PositionProfitCalculator>();
             services.AddScoped<IPositionPerformanceCalculator, PositionPerformanceCalculator>();
             services.AddScoped<IPositionBreakEvenPointCalculator, PositionBreakEvenPointCalculator>();
+            services.AddScoped<IPositionStatisticsCalculator, PositionStatisticsCalculator>();
+            services.AddScoped<IPortfolioStatisticsCalculator, PortfolioStatisticsCalculator>();
         }
 
         /// <summary>
@@ -140,6 +144,7 @@ namespace PortEval.Application.Extensions
         {
             services.AddScoped<IInstrumentChartDataGenerator, InstrumentChartDataGenerator>();
             services.AddScoped<IPositionChartDataGenerator, PositionChartDataGenerator>();
+            services.AddScoped<IPortfolioChartDataGenerator, PortfolioChartDataGenerator>();
         }
 
         /// <summary>

@@ -176,19 +176,7 @@ namespace PortEval.Application.Features.Interfaces.Queries
 
         /// <summary>
         /// Retrieves position's price data, which contains the position's transactions until the end of <paramref name="dateRange"/> and the position's
-        /// instrument price at the end of <paramref name="dateRange" />
-        /// </summary>
-        /// <param name="position">Position to retrieve price data for.</param>
-        /// <param name="dateRange">Time range in which to retrieve the data.</param>
-        /// <returns>
-        /// A task representing the asynchronous database query.
-        /// Task result contains a <see cref="PositionPriceData" /> containing the position's transactions and price.
-        /// </returns>
-        Task<PositionPriceData> GetPositionPriceData(PositionDto position, DateRangeParams dateRange);
-
-        /// <summary>
-        /// Retrieves position's price data, which contains the position's transactions until the end of <paramref name="dateRange"/> and the position's
-        /// instrument prices at the start and at the end of <paramref name="dateRange" />
+        /// instrument prices at the start and at the end of <paramref name="dateRange" />.
         /// </summary>
         /// <param name="position">Position to retrieve price data for.</param>
         /// <param name="dateRange">Time range in which to retrieve the data.</param>
@@ -200,13 +188,13 @@ namespace PortEval.Application.Features.Interfaces.Queries
 
         /// <summary>
         /// Retrieves position's price data, which contains the position's transactions until the end of <paramref name="dateRange"/> and the position's
-        /// instrument prices until the end of <paramref name="dateRange" />
+        /// instrument prices until the end of <paramref name="dateRange" />.
         /// </summary>
         /// <param name="position">Position to retrieve price data for.</param>
         /// <param name="dateRange">Time range in which to retrieve the data.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains a <see cref="PositionPriceData" /> containing the position's transactions and prices.
+        /// Task result contains a <see cref="PositionPriceListData" /> containing the position's transactions and prices.
         /// </returns>
         Task<PositionPriceListData> GetPositionPriceListData(PositionDto position, DateRangeParams dateRange);
     }

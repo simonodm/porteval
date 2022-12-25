@@ -2,6 +2,7 @@
 using PortEval.Application.Features.Interfaces.ChartDataGenerators;
 using PortEval.Application.Models.DTOs;
 using System.Collections.Generic;
+using PortEval.Domain.Exceptions;
 
 namespace PortEval.Application.Features.Common
 {
@@ -28,7 +29,7 @@ namespace PortEval.Application.Features.Common
 
                 if (previousExchangeRate == null)
                 {
-                    throw new Exception($"No exchange rate available at {exchangeRate.Time}.");
+                    throw new ItemNotFoundException($"No exchange rate available at {exchangeRate.Time}.");
                 }
 
                 result.Add(new CurrencyExchangeRateDto
@@ -64,7 +65,7 @@ namespace PortEval.Application.Features.Common
 
                 if (previousExchangeRate == null)
                 {
-                    throw new Exception($"No exchange rate available at {point.Time}.");
+                    throw new ItemNotFoundException($"No exchange rate available at {point.Time}.");
                 }
 
                 result.Add(point.ChangeValue(point.Value * previousExchangeRate.ExchangeRate));
@@ -94,7 +95,7 @@ namespace PortEval.Application.Features.Common
 
                 if (previousExchangeRate == null)
                 {
-                    throw new Exception($"No exchange rate available at {transaction.Time}.");
+                    throw new ItemNotFoundException($"No exchange rate available at {transaction.Time}.");
                 }
 
                 result.Add(new TransactionDto
@@ -134,7 +135,7 @@ namespace PortEval.Application.Features.Common
 
                 if (previousExchangeRate == null)
                 {
-                    throw new Exception($"No exchange rate available at {instrumentPrice.Time}.");
+                    throw new ItemNotFoundException($"No exchange rate available at {instrumentPrice.Time}.");
                 }
 
                 result.Add(new InstrumentPriceDto

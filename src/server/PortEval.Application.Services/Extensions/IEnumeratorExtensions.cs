@@ -15,16 +15,26 @@ namespace PortEval.Application.Features.Extensions
         /// <returns>The next element which fulfills the predicate if such exists, <c>default</c> otherwise.</returns>
         public static T FindNextElementInEnumerator<T>(this IEnumerator<T> enumerator, Predicate<T> predicate, Action<T> callback = null)
         {
-            T previousElement = default;
-
-            while (enumerator.Current != null && predicate(enumerator.Current))
+            try
             {
-                previousElement = enumerator.Current;
-                callback?.Invoke(previousElement);
-                enumerator.MoveNext();
-            }
+                T previousElement = default;
 
-            return previousElement;
+                while (enumerator.Current != null && predicate(enumerator.Current))
+                {
+                    previousElement = enumerator.Current;
+                    callback?.Invoke(previousElement);
+                    if (!enumerator.MoveNext())
+                    {
+                        return previousElement;
+                    }
+                }
+
+                return previousElement;
+            }
+            catch (InvalidOperationException)
+            {
+                return default;
+            }
         }
     }
 }
