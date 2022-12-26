@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PortEval.Application.Features.Services.BulkImportExport.Interfaces
+namespace PortEval.Application.Features.Interfaces
 {
     public interface IErrorLogEntry
     {

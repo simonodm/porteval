@@ -1,7 +1,7 @@
 ﻿using CsvHelper;
+using PortEval.Application.Features.Interfaces;
 using PortEval.Application.Features.Services.BulkImportExport;
 using PortEval.Application.Features.Services.BulkImportExport.ClassMaps;
-using PortEval.Application.Features.Services.BulkImportExport.Interfaces;
 
 namespace PortEval.Application.Features.Extensions
 {
