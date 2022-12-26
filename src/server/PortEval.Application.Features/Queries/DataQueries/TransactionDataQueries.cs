@@ -12,7 +12,7 @@ namespace PortEval.Application.Features.Queries.DataQueries
         {
             var baseQuery = @"SELECT Transactions.Id, PositionId, Positions.PortfolioId, Time, Amount, Price, Transactions.Note, Instruments.Id,
                               Instruments.Name, Instruments.Symbol, Instruments.Exchange, Instruments.Type, Instruments.CurrencyCode, Instruments.Note,
-                              Instruments.IsTracked, Instruments.TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Transactions
+                              Instruments.TrackingStatus, Instruments.TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Transactions
                               INNER JOIN dbo.Positions ON Transactions.PositionId = Positions.Id
                               INNER JOIN dbo.Instruments ON Positions.InstrumentId = Instruments.Id
                               WHERE Time >= @TimeFrom
@@ -58,7 +58,7 @@ namespace PortEval.Application.Features.Queries.DataQueries
                 Query =
                     @"SELECT Transactions.Id, PositionId, Positions.PortfolioId, Time, Amount, Price, Transactions.Note, Instruments.Id,
                       Instruments.Name, Instruments.Symbol, Instruments.Exchange, Instruments.Type, Instruments.CurrencyCode, Instruments.Note,
-                      Instruments.IsTracked, Instruments.TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Transactions
+                      Instruments.TrackingStatus, Instruments.TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Transactions
                       INNER JOIN dbo.Positions ON Transactions.PositionId = Positions.Id
                       INNER JOIN dbo.Instruments ON Positions.InstrumentId = Instruments.Id
                       WHERE Transactions.Id = @TransactionId",

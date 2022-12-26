@@ -11,6 +11,7 @@ using PortEval.FinancialDataFetcher.Interfaces;
 using PortEval.FinancialDataFetcher.Models;
 using System;
 using System.Threading.Tasks;
+using PortEval.Domain.Models.Enums;
 
 namespace PortEval.BackgroundJobs
 {
@@ -50,25 +51,27 @@ namespace PortEval.BackgroundJobs
 
             foreach (var instrument in instruments)
             {
-                if (instrument.IsTracked)
+                if (instrument.TrackingStatus != InstrumentTrackingStatus.Tracked)
                 {
-                    var fetcherResponse = await _fetcher.GetLatestInstrumentPrice(instrument);
-                    if (fetcherResponse.StatusCode != StatusCode.Ok || fetcherResponse.Result is null) continue;
+                    continue;
+                }
 
-                    try
-                    {
-                        var pricePoint = fetcherResponse.Result;
-                        var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument,
-                            pricePoint);
+                var fetcherResponse = await _fetcher.GetLatestInstrumentPrice(instrument);
+                if (fetcherResponse.StatusCode != StatusCode.Ok || fetcherResponse.Result is null) continue;
+
+                try
+                {
+                    var pricePoint = fetcherResponse.Result;
+                    var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument,
+                        pricePoint);
                     _instrumentPriceRepository.Add(InstrumentPrice.Create(startTime.RoundDown(TimeSpan.FromMinutes(5)), price, instrument.Id));
 
-                        instrument.TrackingInfo.Update(startTime);
-                        _instrumentRepository.Update(instrument);
-                    }
-                    catch (OperationNotAllowedException ex)
-                    {
-                        _logger.LogError(ex.Message);
-                    }
+                    instrument.TrackingInfo.Update(startTime);
+                    _instrumentRepository.Update(instrument);
+                }
+                catch (OperationNotAllowedException ex)
+                {
+                    _logger.LogError(ex.Message);
                 }
 
             }

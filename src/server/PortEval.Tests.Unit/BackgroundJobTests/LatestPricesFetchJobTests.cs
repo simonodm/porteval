@@ -95,7 +95,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         }
 
         [Fact]
-        public async Task Run_DoesNotUpdateTrackingInfo_WhenNoPricesIsRetrieved()
+        public async Task Run_DoesNotUpdateTrackingInfo_WhenNoPricesAreRetrieved()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());

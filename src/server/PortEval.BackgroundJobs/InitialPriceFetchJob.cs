@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Domain.Models.Enums;
 
 namespace PortEval.BackgroundJobs
 {
@@ -136,6 +137,9 @@ namespace PortEval.BackgroundJobs
         {
             if (!prices.Any())
             {
+                instrument.SetTrackingStatus(InstrumentTrackingStatus.Untracked);
+                _instrumentRepository.Update(instrument);
+                await _instrumentRepository.UnitOfWork.CommitAsync();
                 return;
             }
 
@@ -159,6 +163,7 @@ namespace PortEval.BackgroundJobs
 
             instrument.SetTrackingFrom(minTime);
             instrument.TrackingInfo.Update(DateTime.UtcNow);
+            instrument.SetTrackingStatus(InstrumentTrackingStatus.Tracked);
             _instrumentRepository.Update(instrument);
             await _instrumentRepository.UnitOfWork.CommitAsync();
             await _instrumentPriceRepository.BulkInsertAsync(pricesToAdd);

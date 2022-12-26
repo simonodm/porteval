@@ -1,4 +1,4 @@
-using PortEval.Domain.Models.Enums;
+﻿using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using System;
 using PortEval.Domain.Events;
@@ -14,7 +14,7 @@ namespace PortEval.Domain.Models.Entities
         public InstrumentType Type { get; private set; }
         public string CurrencyCode { get; private set; }
         public string Note { get; private set; }
-        public bool IsTracked { get; private set; }
+        public InstrumentTrackingStatus TrackingStatus { get; private set; }
         public TrackingInformation TrackingInfo { get; private set; }
 
         internal Instrument(int id, string name, string symbol, string exchange, InstrumentType type, string currencyCode, string note) : this(name, symbol, exchange, type, currencyCode, note)
@@ -30,8 +30,9 @@ namespace PortEval.Domain.Models.Entities
             Type = type;
             CurrencyCode = currencyCode;
             Note = note;
-            IsTracked = false;
+            TrackingStatus = InstrumentTrackingStatus.Created;
         }
+
         public static Instrument Create(string name, string symbol, string exchange, InstrumentType type,
             string currencyCode, string note)
         {
@@ -58,8 +59,13 @@ namespace PortEval.Domain.Models.Entities
 
         public void SetTrackingFrom(DateTime startTime)
         {
-            IsTracked = true;
+            TrackingStatus = InstrumentTrackingStatus.Tracked;
             TrackingInfo = new TrackingInformation(startTime);
+        }
+
+        public void SetTrackingStatus(InstrumentTrackingStatus trackingStatus)
+        {
+            TrackingStatus = trackingStatus;
         }
     }
 }

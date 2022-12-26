@@ -13,7 +13,7 @@ namespace PortEval.Application.Features.Queries.DataQueries
             return new QueryWrapper<IEnumerable<InstrumentDto>>
             {
                 Query =
-                    @"SELECT dbo.Instruments.Id, Name, Symbol, Exchange, Type, CurrencyCode, Price as CurrentPrice, Note, IsTracked, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Instruments
+                    @"SELECT dbo.Instruments.Id, Name, Symbol, Exchange, Type, CurrencyCode, Price as CurrentPrice, Note, TrackingStatus, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Instruments
                       LEFT JOIN (SELECT ROW_NUMBER() OVER (PARTITION BY InstrumentId ORDER BY Time DESC) row_num, * FROM dbo.InstrumentPrices) AS p
                       ON p.InstrumentId = dbo.Instruments.Id
                       WHERE p.row_num = 1
@@ -34,7 +34,7 @@ namespace PortEval.Application.Features.Queries.DataQueries
         {
             return new QueryWrapper<IEnumerable<InstrumentDto>>
             {
-                Query = @"SELECT dbo.Instruments.Id, Name, Symbol, Exchange, Type, CurrencyCode, Price as CurrentPrice, Note, IsTracked, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Instruments
+                Query = @"SELECT dbo.Instruments.Id, Name, Symbol, Exchange, Type, CurrencyCode, Price as CurrentPrice, Note, TrackingStatus, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Instruments
                           LEFT JOIN (SELECT ROW_NUMBER() OVER (PARTITION BY InstrumentId ORDER BY Time DESC) row_num, * FROM dbo.InstrumentPrices) AS p
                           ON p.InstrumentId = dbo.Instruments.Id
                           WHERE (p.row_num = 1
@@ -50,7 +50,7 @@ namespace PortEval.Application.Features.Queries.DataQueries
         {
             return new QueryWrapper<InstrumentDto>
             {
-                Query = @"SELECT dbo.Instruments.Id, Name, Symbol, Exchange, Type, CurrencyCode, Price as CurrentPrice, Note, IsTracked, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Instruments
+                Query = @"SELECT dbo.Instruments.Id, Name, Symbol, Exchange, Type, CurrencyCode, Price as CurrentPrice, Note, TrackingStatus, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Instruments
                           LEFT JOIN (SELECT ROW_NUMBER() OVER (PARTITION BY InstrumentId ORDER BY Time DESC) row_num, * FROM dbo.InstrumentPrices) AS p
                           ON p.InstrumentId = dbo.Instruments.Id
                           WHERE (p.row_num = 1

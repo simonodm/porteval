@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PortEval.Application.Features.Extensions;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Application.Features.Interfaces.Repositories;
@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Domain.Models.Enums;
 
 namespace PortEval.BackgroundJobs
 {
@@ -58,7 +59,7 @@ namespace PortEval.BackgroundJobs
 
             foreach (var instrument in instruments)
             {
-                if (!instrument.IsTracked) continue;
+                if (instrument.TrackingStatus != InstrumentTrackingStatus.Tracked) continue;
 
                 var missingRanges = await GetMissingRanges(instrument, currentTime);
                 foreach (var range in missingRanges)
