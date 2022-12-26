@@ -1,4 +1,9 @@
-﻿using AutoFixture;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Features.Common;
@@ -8,14 +13,11 @@ using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
 using PortEval.Tests.Unit.Helpers.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Common
 {
-    public class PortfolioChartDataGeneratorTests
+    public class PositionChartDataGeneratorTests
     {
         [Fact]
         public void ChartValue_ChartsValueCorrectly()
@@ -43,7 +45,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                     )
                 );
 
-            var sut = fixture.Create<PortfolioChartDataGenerator>();
+            var sut = fixture.Create<PositionChartDataGenerator>();
 
             var result = sut.ChartValue(data, dateRange, frequency);
 
@@ -62,11 +64,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(3), point.Time);
-                Assert.Equal(1050, point.Value);
+                Assert.Equal(450, point.Value);
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(4), point.Time);
-                Assert.Equal(1050, point.Value);
+                Assert.Equal(450, point.Value);
             });
         }
 
@@ -87,7 +89,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             fixture.Freeze<Mock<IPositionValueCalculator>>();
 
-            var sut = fixture.Create<PortfolioChartDataGenerator>();
+            var sut = fixture.Create<PositionChartDataGenerator>();
 
             var result = sut.ChartValue(data, dateRange, frequency);
 
@@ -110,7 +112,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             fixture.CreatePositionProfitCalculatorMock();
 
-            var sut = fixture.Create<PortfolioChartDataGenerator>();
+            var sut = fixture.Create<PositionChartDataGenerator>();
 
             var result = sut.ChartProfit(data, dateRange, frequency);
 
@@ -129,11 +131,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(3), point.Time);
-                Assert.Equal(350, point.Value);
+                Assert.Equal(150, point.Value);
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(4), point.Time);
-                Assert.Equal(350, point.Value);
+                Assert.Equal(150, point.Value);
             });
         }
 
@@ -154,7 +156,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             fixture.CreatePositionProfitCalculatorMock();
 
-            var sut = fixture.Create<PortfolioChartDataGenerator>();
+            var sut = fixture.Create<PositionChartDataGenerator>();
 
             var result = sut.ChartProfit(data, dateRange, frequency);
 
@@ -177,7 +179,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             fixture.CreatePositionPerformanceCalculatorMock();
 
-            var sut = fixture.Create<PortfolioChartDataGenerator>();
+            var sut = fixture.Create<PositionChartDataGenerator>();
 
             var result = sut.ChartPerformance(data, dateRange, frequency);
 
@@ -196,11 +198,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(3), point.Time);
-                Assert.Equal(350, point.Value);
+                Assert.Equal(150, point.Value);
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(4), point.Time);
-                Assert.Equal(350, point.Value);
+                Assert.Equal(150, point.Value);
             });
         }
 
@@ -221,7 +223,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             fixture.CreatePositionPerformanceCalculatorMock();
 
-            var sut = fixture.Create<PortfolioChartDataGenerator>();
+            var sut = fixture.Create<PositionChartDataGenerator>();
 
             var result = sut.ChartPerformance(data, dateRange, frequency);
 
@@ -244,7 +246,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             fixture.CreatePositionProfitCalculatorMock();
 
-            var sut = fixture.Create<PortfolioChartDataGenerator>();
+            var sut = fixture.Create<PositionChartDataGenerator>();
 
             var result = sut.ChartAggregatedProfit(data, dateRange, frequency);
 
@@ -259,7 +261,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(3), point.Time);
-                Assert.Equal(350, point.Value);
+                Assert.Equal(150, point.Value);
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(4), point.Time);
@@ -284,7 +286,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             fixture.CreatePositionProfitCalculatorMock();
 
-            var sut = fixture.Create<PortfolioChartDataGenerator>();
+            var sut = fixture.Create<PositionChartDataGenerator>();
 
             var result = sut.ChartAggregatedProfit(data, dateRange, frequency);
 
@@ -292,7 +294,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         }
 
         [Fact]
-        public void ChartAggregatedPerformance_ChartsAggregatedProfitCorrectly()
+        public void ChartAggregatedPerformance_ChartsAggregatedPerformanceCorrectly()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -307,7 +309,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             fixture.CreatePositionPerformanceCalculatorMock();
 
-            var sut = fixture.Create<PortfolioChartDataGenerator>();
+            var sut = fixture.Create<PositionChartDataGenerator>();
 
             var result = sut.ChartAggregatedPerformance(data, dateRange, frequency);
 
@@ -322,7 +324,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(3), point.Time);
-                Assert.Equal(350, point.Value);
+                Assert.Equal(150, point.Value);
             }, point =>
             {
                 Assert.Equal(dateRange.From.AddDays(4), point.Time);
@@ -347,16 +349,16 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
 
             fixture.CreatePositionPerformanceCalculatorMock();
 
-            var sut = fixture.Create<PortfolioChartDataGenerator>();
+            var sut = fixture.Create<PositionChartDataGenerator>();
 
             var result = sut.ChartAggregatedPerformance(data, dateRange, frequency);
 
             Assert.Equal(expectedChartStartDate, result.First().Time);
         }
 
-        private PortfolioPositionsPriceListData GenerateTestData(IFixture fixture)
+        private PositionPriceListData GenerateTestData(IFixture fixture)
         {
-            var firstTestTransactions = new List<TransactionDto>
+            var transactions = new List<TransactionDto>
             {
                 fixture
                     .Build<TransactionDto>()
@@ -365,57 +367,24 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                     .Create()
             };
 
-            var secondTestTransactions = new List<TransactionDto>
-            {
-                fixture
-                    .Build<TransactionDto>()
-                    .With(t => t.Time, DateTime.Parse("2022-01-04"))
-                    .With(t => t.Amount, 2)
-                    .Create()
-            };
-
-            var firstInstrumentTestPrices = new List<InstrumentPriceDto>
+            var instrumentPrices = new List<InstrumentPriceDto>
             {
                 fixture.Build<InstrumentPriceDto>()
-                    .With(p => p.InstrumentId, firstTestTransactions[0].Instrument.Id)
+                    .With(p => p.InstrumentId, transactions[0].Instrument.Id)
                     .With(p => p.Time, DateTime.Parse("2022-01-01"))
                     .With(p => p.Price, 100m)
                     .Create(),
                 fixture.Build<InstrumentPriceDto>()
-                    .With(p => p.InstrumentId, firstTestTransactions[0].Instrument.Id)
+                    .With(p => p.InstrumentId, transactions[0].Instrument.Id)
                     .With(p => p.Time, DateTime.Parse("2022-01-04"))
                     .With(p => p.Price, 150m)
                     .Create()
             };
 
-            var secondInstrumentTestPrices = new List<InstrumentPriceDto>
-            {
-                fixture.Build<InstrumentPriceDto>()
-                    .With(p => p.InstrumentId, secondTestTransactions[0].Instrument.Id)
-                    .With(p => p.Time, DateTime.Parse("2022-01-01"))
-                    .With(p => p.Price, 200m)
-                    .Create(),
-                fixture.Build<InstrumentPriceDto>()
-                    .With(p => p.InstrumentId, secondTestTransactions[0].Instrument.Id)
-                    .With(p => p.Time, DateTime.Parse("2022-01-04"))
-                    .With(p => p.Price, 300m)
-                    .Create()
-            };
-
-            var positionsPriceListData = new[]
-            {
-                fixture.Build<PositionPriceListData>()
-                    .With(p => p.Transactions, firstTestTransactions)
-                    .With(p => p.Prices, firstInstrumentTestPrices)
-                    .Create(),
-                fixture.Build<PositionPriceListData>()
-                    .With(p => p.Transactions, secondTestTransactions)
-                    .With(p => p.Prices, secondInstrumentTestPrices)
-                    .Create(),
-            };
-
-            return fixture.Build<PortfolioPositionsPriceListData>()
-                .With(p => p.PositionsPriceListData, positionsPriceListData)
+            return fixture.Build<PositionPriceListData>()
+                .With(p => p.Transactions, transactions)
+                .With(p => p.Prices, instrumentPrices)
+                .With(p => p.PositionId, transactions[0].PositionId)
                 .Create();
         }
     }

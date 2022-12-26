@@ -14,6 +14,21 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
     public class PositionStatisticsCalculatorTests
     {
         [Fact]
+        public void CalculateStatistics_AssignsPositionIdFromSourceDataToResult()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+
+            var data = fixture.Create<PositionPriceListData>();
+
+            var sut = fixture.Create<PositionStatisticsCalculator>();
+
+            var stats = sut.CalculateStatistics(data, DateTime.UtcNow);
+
+            Assert.Equal(data.PositionId, stats.Id);
+        }
+
+        [Fact]
         public void CalculateStatistics_ReturnsZeroForEachMetric_WhenNoTransactionsAreAvailable()
         {
             var fixture = new Fixture()

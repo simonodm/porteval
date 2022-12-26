@@ -14,6 +14,21 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
     public class PortfolioStatisticsCalculatorTests
     {
         [Fact]
+        public void CalculateStatistics_AssignsPortfolioIdFromSourceDataToResult()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+
+            var data = fixture.Create<PortfolioPositionsPriceListData>();
+
+            var sut = fixture.Create<PortfolioStatisticsCalculator>();
+
+            var stats = sut.CalculateStatistics(data, DateTime.UtcNow);
+
+            Assert.Equal(data.PortfolioId, stats.Id);
+        }
+
+        [Fact]
         public void CalculateStatistics_ReturnsZeroForEachMetric_WhenNoTransactionsAreAvailable()
         {
             var fixture = new Fixture()
