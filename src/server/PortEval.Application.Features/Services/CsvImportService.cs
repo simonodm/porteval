@@ -98,7 +98,7 @@ namespace PortEval.Application.Features.Services
 
         private async Task<DataImport> SaveNewImportEntry(Guid guid, TemplateType templateType)
         {
-            var importEntry = new DataImport(guid, DateTime.UtcNow, templateType, ImportStatus.Pending);
+            var importEntry = DataImport.Create(guid, DateTime.UtcNow, templateType, ImportStatus.Pending);
             _importRepository.Add(importEntry);
             await _importRepository.UnitOfWork.CommitAsync();
 

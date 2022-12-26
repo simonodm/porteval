@@ -1,5 +1,6 @@
 ﻿using PortEval.Domain.Models.ValueObjects;
 using System;
+using PortEval.Domain.Events;
 
 namespace PortEval.Domain.Models.Entities
 {
@@ -11,7 +12,7 @@ namespace PortEval.Domain.Models.Entities
         public bool IsDefault { get; private set; }
         public TrackingInformation TrackingInfo { get; private set; }
 
-        public Currency(string code, string name, string symbol, bool isDefault = false)
+        internal Currency(string code, string name, string symbol, bool isDefault = false)
         {
             Code = code;
             Name = name;
@@ -19,12 +20,18 @@ namespace PortEval.Domain.Models.Entities
             IsDefault = isDefault;
         }
 
-        public void SetAsDefault()
+        public static Currency Create(string code, string name, string symbol, bool isDefault = false)
         {
-            IsDefault = true;
+            return new Currency(code, name, symbol, isDefault);
         }
 
-        public void UnsetDefault()
+        internal void SetAsDefault()
+        {
+            IsDefault = true;
+            AddDomainEvent(new DefaultCurrencyChangedDomainEvent(this));
+        }
+
+        internal void UnsetDefault()
         {
             IsDefault = false;
         }

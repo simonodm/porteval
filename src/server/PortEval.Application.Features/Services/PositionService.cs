@@ -48,7 +48,7 @@ namespace PortEval.Application.Features.Services
                 throw new OperationNotAllowedException("Cannot create a position for an index.");
             }
 
-            var createdPosition = new Position(options.PortfolioId, options.InstrumentId, options.Note);
+            var createdPosition = Position.Create(options.PortfolioId, options.InstrumentId, options.Note);
             createdPosition.AddTransaction(initialTransactionAmount, initialTransactionPrice,
                 initialTransactionTime);
             _positionRepository.Add(createdPosition);

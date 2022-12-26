@@ -222,7 +222,7 @@ namespace PortEval.Application.Features.Services
                 throw new ItemNotFoundException($"Portfolio {portfolioId} does not exist.");
             }
 
-            return new ChartLinePortfolio(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, portfolioId);
+            return ChartLinePortfolio.Create(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, portfolioId);
         }
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace PortEval.Application.Features.Services
                 throw new ItemNotFoundException($"Position {positionId} does not exist.");
             }
 
-            return new ChartLinePosition(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, positionId);
+            return ChartLinePosition.Create(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, positionId);
         }
 
         /// <summary>
@@ -269,7 +269,7 @@ namespace PortEval.Application.Features.Services
                 throw new ItemNotFoundException($"Instrument {instrumentId} does not exist.");
             }
 
-            return new ChartLineInstrument(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, instrumentId);
+            return ChartLineInstrument.Create(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, instrumentId);
         }
     }
 }

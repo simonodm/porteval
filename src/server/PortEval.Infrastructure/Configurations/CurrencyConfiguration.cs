@@ -67,11 +67,9 @@ namespace PortEval.Infrastructure.Configurations
                 var name = (string)currency["name"];
                 var symbol = (string)currency["symbol"];
 
-                var createdCurrency = new Currency(code, name, symbol);
-                if (createdCurrency.Code == "USD")
-                {
-                    createdCurrency.SetAsDefault();
-                }
+                var isDefault = code == "USD";
+
+                var createdCurrency = Currency.Create(code, name, symbol, isDefault);
 
                 result.Add(createdCurrency);
             }

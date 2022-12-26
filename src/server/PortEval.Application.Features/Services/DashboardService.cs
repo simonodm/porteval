@@ -58,7 +58,7 @@ namespace PortEval.Application.Features.Services
             {
                 await ValidateChartExists(item.ChartId);
                 var position = new DashboardPosition(item.DashboardPositionX, item.DashboardPositionY, item.DashboardWidth, item.DashboardHeight);
-                result.Add(new DashboardChartItem(item.ChartId, position));
+                result.Add(DashboardChartItem.Create(item.ChartId, position));
             }
 
             return result;

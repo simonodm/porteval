@@ -3,14 +3,17 @@ using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Infrastructure.Configurations;
 using System.Threading.Tasks;
+using MediatR;
 
 namespace PortEval.Infrastructure
 {
     public class PortEvalDbContext : DbContext, IUnitOfWork
     {
-        public PortEvalDbContext(DbContextOptions<PortEvalDbContext> options) : base(options)
-        {
+        private readonly IMediator _mediator;
 
+        public PortEvalDbContext(DbContextOptions<PortEvalDbContext> options, IMediator mediator) : base(options)
+        {
+            _mediator = mediator;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -36,11 +39,13 @@ namespace PortEval.Infrastructure
         public void Commit()
         {
             SaveChanges();
+            _mediator.DispatchDomainEventsAsync(this).Wait();
         }
 
         public async Task CommitAsync()
         {
             await SaveChangesAsync();
+            await _mediator.DispatchDomainEventsAsync(this);
         }
 
         public virtual DbSet<Portfolio> Portfolios { get; set; }

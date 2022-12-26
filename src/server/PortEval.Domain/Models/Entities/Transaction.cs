@@ -13,12 +13,12 @@ namespace PortEval.Domain.Models.Entities
         public int PositionId { get; private set; }
         public Position Position { get; private set; }
 
-        public Transaction(int id, int positionId, DateTime time, decimal amount, decimal price, string note = "") : this(positionId, time, amount, price, note)
+        internal Transaction(int id, int positionId, DateTime time, decimal amount, decimal price, string note = "") : this(positionId, time, amount, price, note)
         {
             Id = id;
         }
 
-        public Transaction(int positionId, DateTime time, decimal amount, decimal price, string note = "")
+        internal Transaction(int positionId, DateTime time, decimal amount, decimal price, string note = "")
         {
             if (time < PortEvalConstants.FinancialDataStartTime)
                 throw new OperationNotAllowedException(
@@ -35,6 +35,11 @@ namespace PortEval.Domain.Models.Entities
             Amount = amount;
             Price = price;
             Note = note;
+        }
+
+        public static Transaction Create(int positionId, DateTime time, decimal amount, decimal price, string note = "")
+        {
+            return new Transaction(positionId, time, amount, price, note);
         }
 
         public void SetTime(DateTime time)

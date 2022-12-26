@@ -149,7 +149,7 @@ namespace PortEval.BackgroundJobs
                 }
 
                 var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument, pricePoint);
-                pricesToAdd.Add(new InstrumentPrice(pricePoint.Time, price, instrument.Id));
+                pricesToAdd.Add(InstrumentPrice.Create(pricePoint.Time, price, instrument.Id));
 
                 if (pricePoint.Time < minTime)
                 {

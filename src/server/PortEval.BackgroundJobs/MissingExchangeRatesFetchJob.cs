@@ -94,7 +94,7 @@ namespace PortEval.BackgroundJobs
                 {
                     if (currenciesList.FirstOrDefault(c => c.Code == targetCurrency) == null || currency.Code == targetCurrency) continue;
 
-                    newExchangeRates.Add(new CurrencyExchangeRate(exchangeRateData.Time, exchangeRate, currency.Code, targetCurrency));
+                    newExchangeRates.Add(CurrencyExchangeRate.Create(exchangeRateData.Time, exchangeRate, currency.Code, targetCurrency));
                     if (exchangeRateData.Time < minTime)
                     {
                         minTime = exchangeRateData.Time;

@@ -64,6 +64,10 @@ namespace PortEval.Application
 
             services.AddLogging();
 
+            services.AddDomainServices();
+
+            services.AddDomainEventHandlers();
+
             services.ConfigureDbContext(Configuration);
 
             services.ConfigurePriceFetcher(Configuration);

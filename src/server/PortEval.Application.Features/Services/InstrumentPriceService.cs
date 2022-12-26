@@ -26,7 +26,7 @@ namespace PortEval.Application.Features.Services
         {
             await ValidateInstrumentExists(options.InstrumentId);
 
-            var pricePoint = new InstrumentPrice(options.Time.RoundDown(TimeSpan.FromMinutes(1)), options.Price,
+            var pricePoint = InstrumentPrice.Create(options.Time.RoundDown(TimeSpan.FromMinutes(1)), options.Price,
                 options.InstrumentId);
             _instrumentPriceRepository.Add(pricePoint);
             await _instrumentPriceRepository.UnitOfWork.CommitAsync();
@@ -44,7 +44,7 @@ namespace PortEval.Application.Features.Services
                 return existingPrice;
             }
 
-            var pricePoint = new InstrumentPrice(time.RoundDown(TimeSpan.FromMinutes(1)), price, instrumentId);
+            var pricePoint = InstrumentPrice.Create(time.RoundDown(TimeSpan.FromMinutes(1)), price, instrumentId);
             _instrumentPriceRepository.Add(pricePoint);
             await _instrumentPriceRepository.UnitOfWork.CommitAsync();
             return pricePoint;

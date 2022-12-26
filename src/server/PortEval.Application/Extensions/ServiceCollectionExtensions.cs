@@ -26,6 +26,8 @@ using PortEval.Infrastructure.Repositories;
 using System;
 using System.Data;
 using System.IO.Abstractions;
+using MediatR;
+using PortEval.Domain.Services;
 
 namespace PortEval.Application.Extensions
 {
@@ -35,7 +37,7 @@ namespace PortEval.Application.Extensions
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Configures PortEval's application services.
+        /// Injects PortEval's application services.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
         public static void AddServices(this IServiceCollection services, IConfiguration configuration)
@@ -68,7 +70,7 @@ namespace PortEval.Application.Extensions
         }
 
         /// <summary>
-        /// Configures PortEval's repositories.
+        /// Injects PortEval's repositories.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
         public static void AddRepositories(this IServiceCollection services)
@@ -88,7 +90,7 @@ namespace PortEval.Application.Extensions
         }
 
         /// <summary>
-        /// Configures PortEval's background jobs.
+        /// Injects PortEval's background jobs.
         /// </summary>
         /// <param name="services">ASP.NET services IoC container.</param>
         public static void AddBackgroundJobs(this IServiceCollection services)
@@ -103,7 +105,7 @@ namespace PortEval.Application.Extensions
         }
 
         /// <summary>
-        /// Configures PortEval's read queries.
+        /// Injects PortEval's read queries.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
         public static void AddQueries(this IServiceCollection services)
@@ -121,7 +123,7 @@ namespace PortEval.Application.Extensions
         }
 
         /// <summary>
-        /// Configures PortEval's financial data calculators.
+        /// Injects PortEval's financial data calculators.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
         public static void AddCalculators(this IServiceCollection services)
@@ -137,7 +139,7 @@ namespace PortEval.Application.Extensions
         }
 
         /// <summary>
-        /// Configures PortEval's chart data generators.
+        /// Injects PortEval's chart data generators.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
         public static void AddChartGenerators(this IServiceCollection services)
@@ -148,7 +150,25 @@ namespace PortEval.Application.Extensions
         }
 
         /// <summary>
-        /// Configures EF Core database context.
+        /// Injects PortEval's domain services.
+        /// </summary>
+        /// <param name="services">ASP.NET service IoC container.</param>
+        public static void AddDomainServices(this IServiceCollection services)
+        {
+            services.AddScoped<ICurrencyDomainService, CurrencyDomainService>();
+        }
+
+        /// <summary>
+        /// Injects PortEval's domain event handlers.
+        /// </summary>
+        /// <param name="services">ASP.NET service IoC container.</param>
+        public static void AddDomainEventHandlers(this IServiceCollection services)
+        {
+            services.AddMediatR(typeof(IDomainEventHandler<>));
+        }
+
+        /// <summary>
+        /// Configures and injects EF Core database context.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
         /// <param name="configuration">ASP.NET application configuration.</param>
@@ -159,7 +179,7 @@ namespace PortEval.Application.Extensions
         }
 
         /// <summary>
-        /// Configures Dapper.
+        /// Configures and injects Dapper.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
         public static void ConfigureDapper(this IServiceCollection services)
@@ -170,7 +190,7 @@ namespace PortEval.Application.Extensions
         }
 
         /// <summary>
-        /// Configures Hangfire.
+        /// Configures and injects Hangfire.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
         /// <param name="configuration">ASP.NET application configuration.</param>
@@ -189,7 +209,7 @@ namespace PortEval.Application.Extensions
         }
 
         /// <summary>
-        /// Configures internal instrument price and exchange rate fetching library.
+        /// Configures and injects internal instrument price and exchange rate fetching library.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
         /// <param name="configuration">ASP.NET application configuration.</param>

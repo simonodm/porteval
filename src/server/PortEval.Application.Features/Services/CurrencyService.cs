@@ -5,6 +5,7 @@ using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Exceptions;
 using System.Threading.Tasks;
+using PortEval.Domain.Services;
 
 namespace PortEval.Application.Features.Services
 {
@@ -12,12 +13,12 @@ namespace PortEval.Application.Features.Services
     public class CurrencyService : ICurrencyService
     {
         private readonly ICurrencyRepository _currencyRepository;
-        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly ICurrencyDomainService _currencyDomainService;
 
-        public CurrencyService(ICurrencyRepository currencyRepository, IBackgroundJobClient backgroundJobClient)
+        public CurrencyService(ICurrencyRepository currencyRepository, ICurrencyDomainService currencyDomainService)
         {
             _currencyRepository = currencyRepository;
-            _backgroundJobClient = backgroundJobClient;
+            _currencyDomainService = currencyDomainService;
         }
 
         /// <inheritdoc cref="ICurrencyService.UpdateAsync" />
@@ -29,20 +30,12 @@ namespace PortEval.Application.Features.Services
                 throw new ItemNotFoundException($"Currency {options.Code} does not exist.");
             }
 
-            if (options.IsDefault && !currencyEntity.IsDefault)
-            {
-                var defaultCurrency = await _currencyRepository.GetDefaultCurrencyAsync();
-                defaultCurrency.UnsetDefault();
-                defaultCurrency.IncreaseVersion();
-                _currencyRepository.Update(defaultCurrency);
+            var defaultCurrency = await _currencyRepository.GetDefaultCurrencyAsync();
 
-                currencyEntity.SetAsDefault();
-                currencyEntity.IncreaseVersion();
-                _currencyRepository.Update(currencyEntity);
-
-                await _currencyRepository.UnitOfWork.CommitAsync();
-                _backgroundJobClient.Enqueue<IMissingExchangeRatesFetchJob>(job => job.Run());
-            }
+            _currencyDomainService.ChangeDefaultCurrency(defaultCurrency, currencyEntity);
+            _currencyRepository.Update(defaultCurrency);
+            _currencyRepository.Update(currencyEntity);
+            await _currencyRepository.UnitOfWork.CommitAsync();
         }
     }
 }

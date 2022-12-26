@@ -1,6 +1,7 @@
-﻿using PortEval.Domain.Models.Enums;
+using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using System;
+using PortEval.Domain.Events;
 
 namespace PortEval.Domain.Models.Entities
 {
@@ -16,12 +17,12 @@ namespace PortEval.Domain.Models.Entities
         public bool IsTracked { get; private set; }
         public TrackingInformation TrackingInfo { get; private set; }
 
-        public Instrument(int id, string name, string symbol, string exchange, InstrumentType type, string currencyCode, string note) : this(name, symbol, exchange, type, currencyCode, note)
+        internal Instrument(int id, string name, string symbol, string exchange, InstrumentType type, string currencyCode, string note) : this(name, symbol, exchange, type, currencyCode, note)
         {
             Id = id;
         }
 
-        public Instrument(string name, string symbol, string exchange, InstrumentType type, string currencyCode, string note)
+        internal Instrument(string name, string symbol, string exchange, InstrumentType type, string currencyCode, string note)
         {
             Name = name;
             Symbol = symbol;
@@ -30,6 +31,14 @@ namespace PortEval.Domain.Models.Entities
             CurrencyCode = currencyCode;
             Note = note;
             IsTracked = false;
+        }
+        public static Instrument Create(string name, string symbol, string exchange, InstrumentType type,
+            string currencyCode, string note)
+        {
+            var instrument = new Instrument(name, symbol, exchange, type, currencyCode, note);
+            instrument.AddDomainEvent(new InstrumentCreatedDomainEvent(instrument));
+
+            return instrument;
         }
 
         public void Rename(string name)

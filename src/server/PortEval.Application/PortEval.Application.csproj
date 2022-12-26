@@ -22,6 +22,7 @@
     <PackageReference Include="Hangfire.AspNetCore" Version="1.7.28" />
     <PackageReference Include="Hangfire.Core" Version="1.7.28" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.7.28" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="5.0.17" />

@@ -2,19 +2,19 @@
 
 namespace PortEval.Domain.Models.Entities
 {
-    public class InstrumentPrice : IAggregateRoot
+    public class InstrumentPrice : Entity, IAggregateRoot
     {
         public int Id { get; private set; }
         public DateTime Time { get; private set; }
         public decimal Price { get; private set; }
         public int InstrumentId { get; private set; }
 
-        public InstrumentPrice(int id, DateTime time, decimal price, int instrumentId) : this(time, price, instrumentId)
+        internal InstrumentPrice(int id, DateTime time, decimal price, int instrumentId) : this(time, price, instrumentId)
         {
             Id = id;
         }
 
-        public InstrumentPrice(DateTime time, decimal price, int instrumentId)
+        internal InstrumentPrice(DateTime time, decimal price, int instrumentId)
         {
             if (time < PortEvalConstants.FinancialDataStartTime)
                 throw new InvalidOperationException(
@@ -26,6 +26,11 @@ namespace PortEval.Domain.Models.Entities
             Time = time;
             Price = price;
             InstrumentId = instrumentId;
+        }
+
+        public static InstrumentPrice Create(DateTime time, decimal price, int instrumentId)
+        {
+            return new InstrumentPrice(time, price, instrumentId);
         }
     }
 }

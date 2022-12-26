@@ -15,16 +15,21 @@ namespace PortEval.Domain.Models.Entities
         public IReadOnlyCollection<Transaction> Transactions => _transactions.AsReadOnly();
         private readonly List<Transaction> _transactions = new List<Transaction>();
 
-        public Position(int id, int portfolioId, int instrumentId, string note) : this(portfolioId, instrumentId, note)
+        internal Position(int id, int portfolioId, int instrumentId, string note) : this(portfolioId, instrumentId, note)
         {
             Id = id;
         }
 
-        public Position(int portfolioId, int instrumentId, string note)
+        internal Position(int portfolioId, int instrumentId, string note)
         {
             PortfolioId = portfolioId;
             InstrumentId = instrumentId;
             Note = note;
+        }
+
+        public static Position Create(int portfolioId, int instrumentId, string note)
+        {
+            return new Position(portfolioId, instrumentId, note);
         }
 
         public Transaction FindTransaction(int transactionId)
@@ -34,7 +39,7 @@ namespace PortEval.Domain.Models.Entities
 
         public Transaction AddTransaction(decimal amount, decimal price, DateTime time, string note = "")
         {
-            var transaction = new Transaction(Id, time, amount, price, note);
+            var transaction = Transaction.Create(Id, time, amount, price, note);
 
             if (GetAmountAt(time) + transaction.Amount < 0)
             {

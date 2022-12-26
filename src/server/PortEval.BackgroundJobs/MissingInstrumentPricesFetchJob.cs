@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using PortEval.Application.Features.Extensions;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Application.Features.Interfaces.Repositories;
@@ -165,7 +165,7 @@ namespace PortEval.BackgroundJobs
                 try
                 {
                     var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument, pricePoint);
-                    pricesToAdd.Add(new InstrumentPrice(pricePoint.Time, price, instrument.Id));
+                    pricesToAdd.Add(InstrumentPrice.Create(pricePoint.Time, price, instrument.Id));
                 }
                 catch (OperationNotAllowedException ex)
                 {

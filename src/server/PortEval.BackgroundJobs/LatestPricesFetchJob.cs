@@ -60,7 +60,7 @@ namespace PortEval.BackgroundJobs
                         var pricePoint = fetcherResponse.Result;
                         var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument,
                             pricePoint);
-                        _instrumentPriceRepository.Add(new InstrumentPrice(startTime.RoundDown(TimeSpan.FromMinutes(5)), price, instrument.Id));
+                    _instrumentPriceRepository.Add(InstrumentPrice.Create(startTime.RoundDown(TimeSpan.FromMinutes(5)), price, instrument.Id));
 
                         instrument.TrackingInfo.Update(startTime);
                         _instrumentRepository.Update(instrument);

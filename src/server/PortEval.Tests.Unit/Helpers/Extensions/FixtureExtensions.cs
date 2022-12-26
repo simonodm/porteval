@@ -39,8 +39,8 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
                 .Setup(m => m.GetDefaultCurrencyAsync())
                 .Returns(() =>
                 {
-                    var currency = fixture.Create<Currency>();
-                    currency.SetAsDefault();
+                    var currency = new Currency(fixture.Create<string>(), fixture.Create<string>(),
+                        fixture.Create<string>(), true);
                     return Task.FromResult(currency);
                 });
 

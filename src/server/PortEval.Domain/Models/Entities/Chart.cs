@@ -43,6 +43,16 @@ namespace PortEval.Domain.Models.Entities
             TypeConfiguration = ChartTypeSettings.PerformanceChart();
         }
 
+        public static Chart Create(string name, ChartDateRange dateRange, ChartTypeSettings typeConfig)
+        {
+            return new Chart(name, dateRange, typeConfig);
+        }
+
+        public static Chart Create(string name)
+        {
+            return new Chart(name);
+        }
+
         public ChartLine FindChartLineById(int id)
         {
             var line = _lines.FirstOrDefault(chartLine => chartLine.Id == id);

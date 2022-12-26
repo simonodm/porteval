@@ -3,7 +3,7 @@ using System;
 
 namespace PortEval.Domain.Models.Entities
 {
-    public class DataImport : IAggregateRoot
+    public class DataImport : Entity, IAggregateRoot
     {
         public Guid Id { get; private set; }
         public DateTime Time { get; private set; }
@@ -13,7 +13,7 @@ namespace PortEval.Domain.Models.Entities
         public bool ErrorLogAvailable { get; private set; }
         public string ErrorLogPath { get; private set; }
 
-        public DataImport(Guid id, DateTime time, TemplateType templateType, ImportStatus status = ImportStatus.Pending, string statusDetails = "")
+        internal DataImport(Guid id, DateTime time, TemplateType templateType, ImportStatus status = ImportStatus.Pending, string statusDetails = "")
         {
             Id = id;
             TemplateType = templateType;
@@ -21,6 +21,12 @@ namespace PortEval.Domain.Models.Entities
             StatusDetails = statusDetails;
             ErrorLogAvailable = false;
             Time = time;
+        }
+
+        public static DataImport Create(Guid id, DateTime time, TemplateType templateType,
+            ImportStatus status = ImportStatus.Pending, string statusDetails = "")
+        {
+            return new DataImport(id, time, templateType, status, statusDetails);
         }
 
         public void ChangeStatus(ImportStatus status, string statusDetails = "")

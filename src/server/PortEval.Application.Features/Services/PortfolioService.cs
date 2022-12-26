@@ -27,7 +27,7 @@ namespace PortEval.Application.Features.Services
                 throw new ItemNotFoundException($"Currency {options.CurrencyCode} does not exist.");
             }
 
-            var portfolio = _portfolioRepository.Add(new Portfolio(options.Name, options.Note, options.CurrencyCode));
+            var portfolio = _portfolioRepository.Add(Portfolio.Create(options.Name, options.Note, options.CurrencyCode));
             await _portfolioRepository.UnitOfWork.CommitAsync();
             return portfolio;
         }
