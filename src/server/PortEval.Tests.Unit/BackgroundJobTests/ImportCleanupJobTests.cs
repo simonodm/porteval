@@ -2,8 +2,8 @@
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
 using Moq;
-using PortEval.Application.Services.Interfaces.Repositories;
-using PortEval.BackgroundJobs.DatabaseCleanup;
+using PortEval.Application.Features.Interfaces.Repositories;
+using PortEval.BackgroundJobs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using System;
@@ -47,7 +47,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run();
 
-            foreach(var import in importsToRemove)
+            foreach (var import in importsToRemove)
             {
                 dataImportRepository.Verify(m => m.DeleteAsync(import.Id), Times.Once());
             }
@@ -79,7 +79,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             fileSystem.AddDirectory(storagePath);
 
             imports.AddRange(importsToRemove);
-            foreach(var import in imports)
+            foreach (var import in imports)
             {
                 import.AddErrorLog(Path.Combine(storagePath, $"{import.Id}_log.csv"));
                 fileSystem.AddFile(import.ErrorLogPath, import.Id.ToString());
@@ -94,7 +94,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run();
 
-            foreach(var import in importsToRemove)
+            foreach (var import in importsToRemove)
             {
                 Assert.False(fileSystem.FileExists(import.ErrorLogPath));
             }

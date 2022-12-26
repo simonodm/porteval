@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PortEval.Application.Services.Extensions
+namespace PortEval.Application.Features.Extensions
 {
     public static class DateTimeExtensions
     {
@@ -24,7 +24,12 @@ namespace PortEval.Application.Services.Extensions
         /// <returns>A rounded up <c>DateTime</c>.</returns>
         public static DateTime RoundUp(this DateTime time, TimeSpan timeSpan)
         {
-            var ticks = time.Ticks - time.Ticks % timeSpan.Ticks + timeSpan.Ticks;
+            if (time.Ticks % timeSpan.Ticks == 0)
+            {
+                return time;
+            }
+
+            var ticks = time.Ticks + (timeSpan.Ticks - time.Ticks % timeSpan.Ticks);
             return new DateTime(ticks);
         }
 

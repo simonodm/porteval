@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using PortEval.Application.Features.Interfaces.Queries;
 using System.Data;
-using PortEval.Application.Services.Queries.Interfaces;
 
 namespace PortEval.Infrastructure
 {

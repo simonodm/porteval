@@ -1,9 +1,10 @@
 ﻿using PortEval.Domain.Models.Entities;
 using PortEval.FinancialDataFetcher.APIs.ExchangeRateHost;
-using PortEval.FinancialDataFetcher.APIs.Interfaces;
 using PortEval.FinancialDataFetcher.APIs.OpenExchangeRates;
+using PortEval.FinancialDataFetcher.APIs.RapidAPIMboum;
 using PortEval.FinancialDataFetcher.APIs.Tiingo;
 using PortEval.FinancialDataFetcher.Interfaces;
+using PortEval.FinancialDataFetcher.Interfaces.APIs;
 using PortEval.FinancialDataFetcher.Models;
 using PortEval.FinancialDataFetcher.Requests;
 using PortEval.FinancialDataFetcher.Responses;
@@ -11,9 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using PortEval.Domain.Models.Entities;
-using PortEval.Domain.Models.Enums;
-using PortEval.FinancialDataFetcher.APIs.RapidAPIMboum;
 
 namespace PortEval.FinancialDataFetcher
 {

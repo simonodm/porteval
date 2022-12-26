@@ -1,14 +1,14 @@
 ﻿using Dapper;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Queries.DataQueries;
+using PortEval.Application.Features.Queries.Models;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Enums;
-using PortEval.Application.Services.Queries.DataQueries;
-using PortEval.Application.Services.Queries.Interfaces;
+using PortEval.Domain.Models.ValueObjects;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Services.Queries.Models;
-using PortEval.Domain.Models.ValueObjects;
 
-namespace PortEval.Application.Services.Queries
+namespace PortEval.Application.Features.Queries
 {
     /// <inheritdoc cref="IChartQueries"/>
     public class ChartQueries : IChartQueries

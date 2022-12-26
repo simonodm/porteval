@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Services.Queries;
-using PortEval.Application.Services.Queries.Interfaces;
+using PortEval.Domain;
 using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Domain;
 using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
@@ -219,19 +219,19 @@ namespace PortEval.Tests.Integration.QueryTests
             Assert.Equal(QueryStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
-                Assert.Equal(0m, p.Value);
+                Assert.Equal(0m, p.Value, 2);
                 Assert.Equal(DateTime.UtcNow.AddDays(-2), p.Time, TimeSpan.FromHours(1));
             }, p =>
             {
-                Assert.Equal(0.3m, p.Value);
+                Assert.Equal(0.3m, p.Value, 2);
                 Assert.Equal(DateTime.UtcNow.Date.AddDays(-1), p.Time, TimeSpan.FromHours(1));
             }, p =>
             {
-                Assert.Equal(0.4m, p.Value);
+                Assert.Equal(0.4m, p.Value, 2);
                 Assert.Equal(DateTime.UtcNow.Date, p.Time, TimeSpan.FromHours(1));
             }, p =>
             {
-                Assert.Equal(0.5m, p.Value);
+                Assert.Equal(0.5m, p.Value, 2);
                 Assert.Equal(DateTime.UtcNow, p.Time, TimeSpan.FromHours(1));
             });
         }
@@ -251,7 +251,7 @@ namespace PortEval.Tests.Integration.QueryTests
                 AggregationFrequency.Day);
 
             Assert.Equal(QueryStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response,  p =>
+            Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(30m, p.Value);
                 Assert.Equal(DateTime.UtcNow.Date.AddDays(-1), p.Time, TimeSpan.FromHours(1));

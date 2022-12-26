@@ -1,6 +1,6 @@
-﻿using System;
-using PortEval.Domain.Models.Enums;
+﻿using PortEval.Domain.Models.Enums;
 using Swashbuckle.AspNetCore.Annotations;
+using System;
 
 namespace PortEval.Application.Models.DTOs
 {

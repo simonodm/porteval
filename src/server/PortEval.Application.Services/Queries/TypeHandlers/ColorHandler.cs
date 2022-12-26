@@ -3,7 +3,7 @@ using System;
 using System.Data;
 using System.Drawing;
 
-namespace PortEval.Application.Services.Queries.TypeHandlers
+namespace PortEval.Application.Features.Queries.TypeHandlers
 {
     /// <summary>
     /// Handles conversion of <see cref="Color">Color</see> values to an SQL database.

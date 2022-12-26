@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using EFCore.BulkExtensions;
-using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Infrastructure.Configurations;
 using System.Threading.Tasks;

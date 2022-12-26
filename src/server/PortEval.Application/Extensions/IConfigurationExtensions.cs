@@ -14,7 +14,7 @@ namespace PortEval.Application.Extensions
             {
                 return envVarValue;
             }
-            
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 var registryValue = Registry.GetValue(GetConfigurationRegistryKey(), key, null);

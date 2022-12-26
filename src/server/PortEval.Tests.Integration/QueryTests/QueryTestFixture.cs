@@ -1,8 +1,8 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PortEval.Application;
 using PortEval.Infrastructure;
+using System;
 
 namespace PortEval.Tests.Integration.QueryTests
 {

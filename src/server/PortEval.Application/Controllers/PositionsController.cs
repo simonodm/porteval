@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Interfaces.Services;
+using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Services.Queries.Interfaces;
-using PortEval.Application.Services.Interfaces;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Services.Queries;
 
 namespace PortEval.Application.Controllers
 {
@@ -101,7 +101,7 @@ namespace PortEval.Application.Controllers
             _logger.LogInformation($"Position {positionId} break-even point at {time} requested.");
 
             var breakEvenPoint = await _positionQueries.GetPositionBreakEvenPoint(positionId, time);
-            if(breakEvenPoint.Status == QueryStatus.NotFound)
+            if (breakEvenPoint.Status == QueryStatus.NotFound)
             {
                 return NotFound($"Position {positionId} not found.");
             }
@@ -195,7 +195,7 @@ namespace PortEval.Application.Controllers
             _logger.LogInformation($"Position {positionId} statistics requested.");
 
             var result = await _positionQueries.GetPositionStatistics(positionId);
-            if(result.Status == QueryStatus.NotFound)
+            if (result.Status == QueryStatus.NotFound)
             {
                 return NotFound($"Position {positionId} not found");
             }

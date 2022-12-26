@@ -1,9 +1,8 @@
 ﻿using FluentValidation;
 using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.Validators.Extensions;
 using PortEval.Domain;
 using PortEval.Domain.Models.Enums;
-using PortEval.Application.Models.Validators.Extensions;
-using System;
 
 namespace PortEval.Application.Models.Validators
 {

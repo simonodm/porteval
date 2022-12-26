@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PortEval.FinancialDataFetcher.APIs.ExchangeRateHost;
+﻿using PortEval.FinancialDataFetcher.APIs.ExchangeRateHost;
 using PortEval.FinancialDataFetcher.APIs.ExchangeRateHost.Models;
 using PortEval.FinancialDataFetcher.Models;
 using PortEval.FinancialDataFetcher.Requests;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Integration.FinancialDataFetcherTests

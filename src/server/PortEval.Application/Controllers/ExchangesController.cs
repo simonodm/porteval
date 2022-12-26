@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PortEval.Application.Services.Queries.Interfaces;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Models.DTOs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Models.DTOs;
 
 namespace PortEval.Application.Controllers
 {

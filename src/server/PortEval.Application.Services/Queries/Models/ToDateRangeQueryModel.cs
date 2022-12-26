@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using PortEval.Domain.Models.Enums;
+﻿using PortEval.Domain.Models.Enums;
 
-namespace PortEval.Application.Services.Queries.Models
+namespace PortEval.Application.Features.Queries.Models
 {
     internal class ToDateRangeQueryModel
     {

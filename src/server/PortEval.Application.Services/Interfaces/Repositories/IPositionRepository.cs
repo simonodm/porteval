@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PortEval.Application.Services.Interfaces.Repositories
+namespace PortEval.Application.Features.Interfaces.Repositories
 {
     public interface IPositionRepository : IRepository
     {

@@ -1,5 +1,5 @@
-﻿using System;
-using PortEval.Domain.Exceptions;
+﻿using PortEval.Domain.Exceptions;
+using System;
 
 namespace PortEval.Domain.Models.Entities
 {

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Swashbuckle.AspNetCore.Annotations;
+﻿using Swashbuckle.AspNetCore.Annotations;
+using System.Collections.Generic;
 
 namespace PortEval.Application.Models
 {

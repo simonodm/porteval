@@ -1,7 +1,7 @@
 ﻿using PortEval.Domain.Models.Entities;
 using System.Threading.Tasks;
 
-namespace PortEval.Application.Services.Interfaces.BackgroundJobs
+namespace PortEval.Application.Features.Interfaces.BackgroundJobs
 {
     public interface IDataImportJob
     {

@@ -1,15 +1,12 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
-using PortEval.Application.Services.Interfaces.Repositories;
-using PortEval.BackgroundJobs.DatabaseCleanup;
+using PortEval.Application.Features.Interfaces.Repositories;
+using PortEval.BackgroundJobs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
-using PortEval.Infrastructure;
-using PortEval.Tests.Unit.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 

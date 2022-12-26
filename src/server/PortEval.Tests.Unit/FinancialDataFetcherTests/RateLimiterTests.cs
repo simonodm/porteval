@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PortEval.FinancialDataFetcher;
+﻿using PortEval.FinancialDataFetcher;
+using System;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FinancialDataFetcherTests

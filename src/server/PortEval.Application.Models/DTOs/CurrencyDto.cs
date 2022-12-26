@@ -7,7 +7,7 @@ namespace PortEval.Application.Models.DTOs
     {
         [SwaggerSchema("Currency three-letter code.")]
         public string Code { get; set; }
-        
+
         [SwaggerSchema("Currency name.", ReadOnly = true)]
         public string Name { get; set; }
 

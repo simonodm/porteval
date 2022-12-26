@@ -1,5 +1,5 @@
-﻿using PortEval.FinancialDataFetcher.APIs.Interfaces;
-using PortEval.FinancialDataFetcher.APIs.OpenExchangeRates.Models;
+﻿using PortEval.FinancialDataFetcher.APIs.OpenExchangeRates.Models;
+using PortEval.FinancialDataFetcher.Interfaces.APIs;
 using PortEval.FinancialDataFetcher.Models;
 using PortEval.FinancialDataFetcher.Requests;
 using PortEval.FinancialDataFetcher.Responses;

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace PortEval.Application.Services.Interfaces.Repositories
+namespace PortEval.Application.Features.Interfaces.Repositories
 {
     /// <summary>
     /// Represents a single unit of work, wrapping a single persistence layer transaction.

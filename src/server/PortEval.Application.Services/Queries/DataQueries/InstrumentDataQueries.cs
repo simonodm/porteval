@@ -1,11 +1,10 @@
 ﻿using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Services.Queries.Models;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace PortEval.Application.Services.Queries.DataQueries
+namespace PortEval.Application.Features.Queries.DataQueries
 {
     internal static class InstrumentDataQueries
     {
@@ -19,7 +18,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
                       ON p.InstrumentId = dbo.Instruments.Id
                       WHERE p.row_num = 1
                       OR p.row_num IS NULL
-                      ORDER BY Symbol;"
+                      ORDER BY Name"
             };
         }
 
@@ -40,7 +39,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
                           ON p.InstrumentId = dbo.Instruments.Id
                           WHERE (p.row_num = 1
                           OR p.row_num IS NULL)
-                          ORDER BY Symbol
+                          ORDER BY Name
                           OFFSET @Offset ROWS
                           FETCH NEXT @Rows ROWS ONLY",
                 Params = new { Offset = (pagination.Page - 1) * pagination.Limit, Rows = pagination.Limit }
@@ -69,7 +68,7 @@ namespace PortEval.Application.Services.Queries.DataQueries
                           WHERE InstrumentId = @InstrumentId
                           AND Time >= @TimeFrom
                           AND Time <= @TimeTo
-                          ORDER BY Time DESC",
+                          ORDER BY Time",
                 Params = new { InstrumentId = instrumentId, TimeFrom = from, TimeTo = to }
             };
         }
@@ -211,16 +210,6 @@ namespace PortEval.Application.Services.Queries.DataQueries
                           AND InstrumentId = @InstrumentId
                           ORDER BY Time DESC",
                 Params = new { InstrumentId = instrumentId, Time = time }
-            };
-        }
-
-        public static QueryWrapper<SingleTimeQueryModel> GetFirstPriceTime(int instrumentId)
-        {
-            return new QueryWrapper<SingleTimeQueryModel>
-            {
-                Query = @"SELECT MIN(Time) AS Time FROM dbo.InstrumentPrices
-                          WHERE InstrumentId = @InstrumentId",
-                Params = new { InstrumentId = instrumentId }
             };
         }
 

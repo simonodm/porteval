@@ -1,8 +1,7 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
-using PortEval.Application.Services.Interfaces.Repositories;
-using PortEval.BackgroundJobs.MissingPricesFetch;
+using PortEval.BackgroundJobs;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.FinancialDataFetcher.Interfaces;
@@ -12,7 +11,6 @@ using PortEval.Tests.Unit.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 

@@ -1,4 +1,4 @@
-﻿namespace PortEval.Application.Services.Interfaces.Repositories
+﻿namespace PortEval.Application.Features.Interfaces.Repositories
 {
     /// <summary>
     /// Represents a persistently stored collection of aggregate roots.

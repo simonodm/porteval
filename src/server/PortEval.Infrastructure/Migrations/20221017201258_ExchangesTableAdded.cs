@@ -138,7 +138,7 @@ namespace PortEval.Infrastructure.Migrations
 
             // Adjust existing instruments by removing exchanges which would violate the FK.
             var exchangeSymbols = new List<string>();
-            for(int i = 0; i < exchangesDataFirstBatch.GetLength(0); i++)
+            for (int i = 0; i < exchangesDataFirstBatch.GetLength(0); i++)
             {
                 exchangeSymbols.Add(exchangesDataFirstBatch[i, 0] as string);
             }

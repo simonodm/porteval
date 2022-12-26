@@ -1,18 +1,18 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
-using Moq;
-using PortEval.Application.Controllers;
-using PortEval.Application.Models.DTOs;
-using PortEval.Application.Services.Queries.Interfaces;
-using PortEval.Tests.Unit.Helpers;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PortEval.Application.Services.Interfaces;
+using Moq;
+using PortEval.Application.Controllers;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Interfaces.Services;
+using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Models.Enums;
+using PortEval.Tests.Unit.Helpers;
+using System;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests
@@ -169,7 +169,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var sut = fixture.Build<CsvImportController>().OmitAutoProperties().Create();
 
             var result = sut.GetImportErrorLog(importId);
-            
+
             importService.Verify(m => m.TryGetErrorLog(It.IsAny<Guid>()), Times.Never());
             Assert.IsAssignableFrom<BadRequestObjectResult>(result);
         }

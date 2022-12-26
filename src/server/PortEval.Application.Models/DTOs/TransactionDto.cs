@@ -1,5 +1,5 @@
-﻿using System;
-using Swashbuckle.AspNetCore.Annotations;
+﻿using Swashbuckle.AspNetCore.Annotations;
+using System;
 
 namespace PortEval.Application.Models.DTOs
 {

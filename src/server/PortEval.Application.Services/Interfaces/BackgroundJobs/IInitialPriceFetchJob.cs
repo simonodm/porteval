@@ -1,7 +1,7 @@
 ﻿using Hangfire;
 using System.Threading.Tasks;
 
-namespace PortEval.Application.Services.Interfaces.BackgroundJobs
+namespace PortEval.Application.Features.Interfaces.BackgroundJobs
 {
     public interface IInitialPriceFetchJob
     {

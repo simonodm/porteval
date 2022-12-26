@@ -1,7 +1,7 @@
 ﻿using PortEval.Application.Models.DTOs;
 using System.Collections.Generic;
 
-namespace PortEval.Application.Services.Queries.DataQueries
+namespace PortEval.Application.Features.Queries.DataQueries
 {
     internal static class ChartDataQueries
     {

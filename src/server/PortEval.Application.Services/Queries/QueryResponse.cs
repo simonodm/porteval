@@ -1,4 +1,4 @@
-﻿namespace PortEval.Application.Services.Queries
+﻿namespace PortEval.Application.Features.Queries
 {
     public class QueryResponse<T>
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Services.Interfaces;
-using PortEval.Application.Services.Queries.Interfaces;
 using System;
 using System.Threading.Tasks;
 
@@ -31,7 +31,7 @@ namespace PortEval.Application.Controllers
         public async Task<IActionResult> GetPortfoliosExport()
         {
             var portfolios = await _portfolioQueries.GetPortfolios();
-            
+
             var data = _exportService.ConvertToCsv(portfolios.Response);
             return File(data, "text/csv", GenerateCsvFileName("portfolios"));
         }

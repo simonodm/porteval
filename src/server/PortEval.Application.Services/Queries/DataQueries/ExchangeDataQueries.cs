@@ -1,6 +1,6 @@
 ﻿using PortEval.Application.Models.DTOs;
 
-namespace PortEval.Application.Services.Queries.DataQueries
+namespace PortEval.Application.Features.Queries.DataQueries
 {
     internal static class ExchangeDataQueries
     {

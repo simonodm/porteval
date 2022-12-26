@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
-using PortEval.BackgroundJobs.MissingPricesFetch;
+using PortEval.BackgroundJobs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.FinancialDataFetcher.Models;
@@ -92,7 +92,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 It.Is<Instrument>(i => i.Id == instrument.Id),
                 It.IsInRange(baseTime.AddDays(-5).AddMinutes(-5), baseTime.AddDays(-5).AddMinutes(5), Range.Inclusive),
                 It.IsInRange(baseTime.AddDays(-1).AddMinutes(-5), baseTime.AddDays(-1).AddMinutes(5), Range.Inclusive),
-                IntradayInterval.OneHour    
+                IntradayInterval.OneHour
             ));
             priceRepository.Verify(m => m.BulkInsertAsync(It.Is<IList<InstrumentPrice>>(list =>
                 list.Any(price => price.Time == prices[0].Time && price.Price == prices[0].Price && price.InstrumentId == instrument.Id)

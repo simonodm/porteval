@@ -2,8 +2,8 @@
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Controllers;
+using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Services.Queries.Interfaces;
 using PortEval.Tests.Unit.Helpers;
 using System.Threading.Tasks;
 using Xunit;
@@ -19,7 +19,7 @@ namespace PortEval.Tests.Unit.ControllerTests
                 .Customize(new AutoMoqCustomization());
 
             var exchanges = fixture.CreateMany<ExchangeDto>();
-            
+
             var exchangeQueries = fixture.Freeze<Mock<IExchangeQueries>>();
             exchangeQueries
                 .Setup(m => m.GetKnownExchanges())
