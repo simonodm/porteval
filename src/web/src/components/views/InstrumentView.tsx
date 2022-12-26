@@ -14,6 +14,7 @@ import { getPriceString } from '../../utils/string';
 import { useParams } from 'react-router-dom';
 
 import './InstrumentView.css';
+import LoadingBubbles from '../ui/LoadingBubbles';
 
 type Params = {
     /**
@@ -46,7 +47,7 @@ function InstrumentView(): JSX.Element {
     return (
         <LoadingWrapper isError={instrumentError} isLoaded={instrumentLoaded}>
             <PageHeading heading={instrument.data?.name ?? 'Instrument'}>
-                { instrument.data?.isTracked  && instrument.data.lastPriceUpdate &&
+                { instrument.data?.trackingStatus === 'tracked'  && instrument.data.lastPriceUpdate &&
                     <span className="float-right last-updated">
                         Prices updated: {
                             new Date(instrument.data.lastPriceUpdate).toLocaleString()
@@ -78,11 +79,13 @@ function InstrumentView(): JSX.Element {
                             <tr>
                                 <td>Current price:</td>
                                 <td>
-                                    { 
-                                        getPriceString(
-                                            instrument.data?.currentPrice,
-                                            instrument.data?.currencyCode,
-                                            userSettings
+                                    {
+                                        instrument.data?.trackingStatus === 'searchingForPrices' || instrument.data?.trackingStatus === 'created'
+                                            ? <LoadingBubbles />
+                                            : getPriceString(
+                                                instrument.data?.currentPrice,
+                                                instrument.data?.currencyCode,
+                                                userSettings                                        
                                         )
                                     }
                                 </td>

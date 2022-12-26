@@ -12,6 +12,7 @@ import { INSTRUMENT_TYPE_TO_STRING } from '../../constants';
 import { getPriceString } from '../../utils/string';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useDeleteInstrumentMutation, useGetInstrumentPageQuery, usePrefetch } from '../../redux/api/instrumentApi';
+import LoadingBubbles from '../ui/LoadingBubbles';
 
 /**
  * Loads instruments and renders a paginated instruments table.
@@ -62,7 +63,11 @@ function InstrumentsTable(): JSX.Element {
         {
             id: 'currentPrice',
             header: 'Current price',
-            accessor: i => getPriceString(i.currentPrice, i.currencyCode, userSettings)
+            accessor: i => i.currentPrice ?? 0,
+            render: i =>
+                i.trackingStatus === 'searchingForPrices' || i.trackingStatus === 'created'
+                    ? <LoadingBubbles />
+                    : getPriceString(i.currentPrice, i.currencyCode, userSettings)
         },
         {
             id: 'note',

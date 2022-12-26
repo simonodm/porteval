@@ -1,7 +1,5 @@
 import React from 'react';
-import ReactLoading from 'react-loading';
-
-import * as constants from '../../constants';
+import LoadingSpinner from './LoadingSpinner';
 import './LoadingWrapper.css';
 
 type Props = {
@@ -31,9 +29,7 @@ function LoadingWrapper({ children, isLoaded, isError = false}: Props): JSX.Elem
     if(!isLoaded) {
         return (
             <div className="loading-wrapper">
-                <ReactLoading color={constants.MAIN_COLOR} height="32px" type="spin"
-                    width="32px"
-                />
+                <LoadingSpinner />
             </div>
         );
     }
