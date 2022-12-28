@@ -21,14 +21,14 @@ namespace PortEval.Domain.Models.Entities
             ChartId = chartId;
         }
 
-        public static DashboardChartItem Create(int chartId)
+        public static DashboardChartItem Create(Chart chart)
         {
-            return new DashboardChartItem(chartId);
+            return new DashboardChartItem(chart.Id);
         }
 
-        public static DashboardChartItem Create(int chartId, DashboardPosition position)
+        public static DashboardChartItem Create(Chart chart, DashboardPosition position)
         {
-            return new DashboardChartItem(chartId, position);
+            return new DashboardChartItem(chart.Id, position);
         }
     }
 }

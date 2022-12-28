@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PortEval.Domain.Events;
+using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Domain.Models.Entities
 {
@@ -27,9 +29,14 @@ namespace PortEval.Domain.Models.Entities
             Note = note;
         }
 
-        public static Position Create(int portfolioId, int instrumentId, string note)
+        public static Position Create(Portfolio portfolio, Instrument instrument, string note)
         {
-            return new Position(portfolioId, instrumentId, note);
+            if (instrument.Type == InstrumentType.Index)
+            {
+                throw new OperationNotAllowedException("Cannot open a position for an index.");
+            }
+
+            return new Position(portfolio.Id, instrument.Id, note);
         }
 
         public Transaction FindTransaction(int transactionId)
@@ -47,6 +54,7 @@ namespace PortEval.Domain.Models.Entities
             }
 
             _transactions.Add(transaction);
+            AddDomainEvent(new TransactionAddedToPositionDomainEvent(transaction, this));
             return transaction;
         }
 
@@ -69,6 +77,7 @@ namespace PortEval.Domain.Models.Entities
             transaction.SetPrice(price);
             transaction.SetNote(note);
 
+            AddDomainEvent(new TransactionChangedDomainEvent(transaction, this));
             return transaction;
         }
 

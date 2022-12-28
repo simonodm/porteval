@@ -68,33 +68,6 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         }
 
         [Fact]
-        public async Task Run_ConvertsRetrievedPriceToInstrumentCurrency_WhenCurrenciesAreDifferent()
-        {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var instrument = new Instrument(1, "Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "EUR", "");
-            instrument.SetTrackingFrom(DateTime.Parse("2022-01-01"));
-            var price = fixture.Build<PricePoint>()
-                .With(p => p.CurrencyCode, "USD")
-                .With(p => p.Time, DateTime.UtcNow.AddMinutes(-10)).Create();
-
-            var priceFetcher = CreatePriceFetcherMockReturningLatestPriceData(fixture, instrument, price);
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
-                .Setup(m => m.ListAllAsync())
-                .ReturnsAsync(new List<Instrument> { instrument });
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
-            var instrumentPriceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
-
-            var sut = fixture.Create<LatestPricesFetchJob>();
-
-            await sut.Run();
-
-            exchangeRateRepository.Verify(m => m.GetExchangeRateAtAsync(price.CurrencyCode, instrument.CurrencyCode, price.Time));
-        }
-
-        [Fact]
         public async Task Run_DoesNotUpdateTrackingInfo_WhenNoPricesAreRetrieved()
         {
             var fixture = new Fixture()
@@ -122,7 +95,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         {
             var priceFetcher = fixture.Freeze<Mock<IPriceFetcher>>();
             priceFetcher
-                .Setup(m => m.GetLatestInstrumentPrice(instrument))
+                .Setup(m => m.GetLatestInstrumentPrice(instrument.Symbol, instrument.CurrencyCode))
                 .ReturnsAsync(new Response<PricePoint>
                 {
                     StatusCode = price == null ? StatusCode.ConnectionError : StatusCode.Ok,

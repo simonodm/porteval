@@ -26,7 +26,7 @@ namespace PortEval.Application.Features.Interfaces.Repositories
         /// Adds a chart.
         /// </summary>
         /// <param name="chart">Chart entity to add.</param>
-        /// <returns>The added chart entity with identity set.</returns>
+        /// <returns>The added chart entity.</returns>
         public Chart Add(Chart chart);
 
         /// <summary>

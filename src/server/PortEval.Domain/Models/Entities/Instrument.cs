@@ -1,7 +1,7 @@
-﻿using PortEval.Domain.Models.Enums;
+﻿using PortEval.Domain.Events;
+using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using System;
-using PortEval.Domain.Events;
 
 namespace PortEval.Domain.Models.Entities
 {
@@ -57,10 +57,10 @@ namespace PortEval.Domain.Models.Entities
             Note = note;
         }
 
-        public void SetTrackingFrom(DateTime startTime)
+        public void SetTrackingFrom(DateTime startTime, DateTime? trackedSince = null)
         {
             TrackingStatus = InstrumentTrackingStatus.Tracked;
-            TrackingInfo = new TrackingInformation(startTime);
+            TrackingInfo = new TrackingInformation(startTime, trackedSince ?? DateTime.UtcNow);
         }
 
         public void SetTrackingStatus(InstrumentTrackingStatus trackingStatus)

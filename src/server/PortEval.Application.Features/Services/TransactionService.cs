@@ -12,12 +12,9 @@ namespace PortEval.Application.Features.Services
     {
         private readonly IPositionRepository _positionRepository;
 
-        private readonly IInstrumentPriceService _instrumentPriceService;
-
-        public TransactionService(IPositionRepository positionRepository, IInstrumentPriceService instrumentPriceService)
+        public TransactionService(IPositionRepository positionRepository)
         {
             _positionRepository = positionRepository;
-            _instrumentPriceService = instrumentPriceService;
         }
 
         /// <inheritdoc cref="ITransactionService.AddTransactionAsync"/>
@@ -29,8 +26,6 @@ namespace PortEval.Application.Features.Services
 
             _positionRepository.Update(position);
             await _positionRepository.UnitOfWork.CommitAsync();
-
-            await _instrumentPriceService.AddPriceIfNotExistsAsync(position.InstrumentId, options.Time, options.Price);
 
             return createdTransaction;
         }
@@ -44,8 +39,6 @@ namespace PortEval.Application.Features.Services
             position.IncreaseVersion();
             _positionRepository.Update(position);
             await _positionRepository.UnitOfWork.CommitAsync();
-
-            await _instrumentPriceService.AddPriceIfNotExistsAsync(position.InstrumentId, options.Time, options.Price);
 
             return transaction;
         }
@@ -80,25 +73,6 @@ namespace PortEval.Application.Features.Services
             }
 
             return position;
-        }
-
-        /// <summary>
-        /// Retrieves a transaction by its ID and its parent position's ID.
-        /// </summary>
-        /// <param name="positionId">Parent position ID.</param>
-        /// <param name="transactionId">Transaction ID.</param>
-        /// <exception cref="ItemNotFoundException">Thrown if no portfolio, position or transaction were found with the supplied IDs.</exception>
-        /// <returns>A task representing the asynchronous search operation. The task result contains the found transaction entity.</returns>
-        private async Task<Transaction> FindTransaction(int positionId, int transactionId)
-        {
-            var position = await FindPosition(positionId);
-            var transaction = position.FindTransaction(transactionId);
-            if (transaction == null)
-            {
-                throw new ItemNotFoundException($"Transaction {transactionId} not found in position {positionId}.");
-            }
-
-            return transaction;
         }
     }
 }

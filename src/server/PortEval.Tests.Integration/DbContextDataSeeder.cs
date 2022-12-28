@@ -34,6 +34,7 @@ namespace PortEval.Tests.Integration
             var charts = await SeedCharts(portfolios, positions, instruments);
             var dashboardItems = await SeedDashboardItems(charts);
             var dataImports = await SeedDataImports();
+            var splits = await SeedInstrumentSplits(instruments);
         }
 
         private async Task<List<Currency>> SeedCurrencies()
@@ -241,6 +242,22 @@ namespace PortEval.Tests.Integration
             await _context.CommitAsync();
 
             return dataImports;
+        }
+
+        private async Task<List<InstrumentSplit>> SeedInstrumentSplits(IEnumerable<Instrument> instruments)
+        {
+            var instrumentsList = instruments.ToList();
+
+            var splits = new List<InstrumentSplit>
+            {
+                new InstrumentSplit(instrumentsList[0].Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(1, 3)),
+                new InstrumentSplit(instrumentsList[1].Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(1, 5))
+            };
+
+            _context.InstrumentSplits.AddRange(splits);
+            await _context.CommitAsync();
+
+            return splits;
         }
     }
 }

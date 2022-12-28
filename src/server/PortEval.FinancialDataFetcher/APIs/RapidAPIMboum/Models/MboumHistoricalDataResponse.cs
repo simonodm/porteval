@@ -9,6 +9,9 @@ namespace PortEval.FinancialDataFetcher.APIs.RapidAPIMboum.Models
         [JsonProperty("items")]
         public Dictionary<long, MboumHistoricalDataItem> Items { get; set; }
 
+        [JsonProperty("events")]
+        public MboumEvents Events { get; set; }
+
         [JsonProperty("error")]
         public string Error { get; set; }
     }
@@ -26,5 +29,23 @@ namespace PortEval.FinancialDataFetcher.APIs.RapidAPIMboum.Models
 
         [JsonProperty("close")]
         public decimal Close { get; set; }
+    }
+
+    internal class MboumEvents
+    {
+        [JsonProperty("splits")]
+        public Dictionary<long, MboumSplit> Splits { get; set; }
+    }
+
+    internal class MboumSplit
+    {
+        [JsonProperty("date")]
+        public long Date { get; set; }
+
+        [JsonProperty("numerator")]
+        public int Numerator { get; set; }
+
+        [JsonProperty("denominator")]
+        public int Denominator { get; set; }
     }
 }

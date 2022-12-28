@@ -11,6 +11,7 @@ namespace PortEval.Application.Features.Interfaces.Repositories
         public Task<InstrumentPrice> FindPriceByIdAsync(int instrumentId, int priceId);
         public Task<InstrumentPrice> FindPriceAtAsync(int instrumentId, DateTime time);
         public InstrumentPrice Add(InstrumentPrice price);
+        public InstrumentPrice Update(InstrumentPrice price);
         public Task BulkInsertAsync(IList<InstrumentPrice> prices);
         public Task DeleteAsync(int instrumentId, int priceId);
         public void Delete(InstrumentPrice price);

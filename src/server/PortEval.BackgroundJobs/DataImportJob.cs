@@ -60,6 +60,7 @@ namespace PortEval.BackgroundJobs
                 csv.RegisterImportClassMaps();
 
                 importEntry.ChangeStatus(ImportStatus.InProgress);
+                importEntry.IncreaseVersion();
                 _importRepository.Update(importEntry);
                 await _importRepository.UnitOfWork.CommitAsync();
 
@@ -67,8 +68,6 @@ namespace PortEval.BackgroundJobs
 
                 importEntry.ChangeStatus(ImportStatus.Finished);
                 importEntry.AddErrorLog(logPath);
-                _importRepository.Update(importEntry);
-                await _importRepository.UnitOfWork.CommitAsync();
             }
             catch (CsvHelperException ex)
             {
@@ -87,6 +86,7 @@ namespace PortEval.BackgroundJobs
             }
             finally
             {
+                importEntry.IncreaseVersion();
                 _importRepository.Update(importEntry);
                 await _importRepository.UnitOfWork.CommitAsync();
                 DeleteFile(inputFileName);

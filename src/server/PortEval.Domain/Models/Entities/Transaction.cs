@@ -3,7 +3,7 @@ using System;
 
 namespace PortEval.Domain.Models.Entities
 {
-    public class Transaction : VersionedEntity
+    public class Transaction : Entity
     {
         public int Id { get; private set; }
         public DateTime Time { get; private set; }

@@ -43,12 +43,15 @@ namespace PortEval.Application.Features.Services
             await _dashboardItemRepository.UnitOfWork.CommitAsync();
         }
 
-        private async Task ValidateChartExists(int chartId)
+        private async Task<Chart> FetchChart(int chartId)
         {
-            if (!await _chartRepository.ExistsAsync(chartId))
+            var chart = await _chartRepository.FindAsync(chartId);
+            if (chart == null)
             {
                 throw new ItemNotFoundException($"Chart {chartId} does not exist.");
             }
+
+            return chart;
         }
 
         private async Task<List<DashboardItem>> GenerateItemEntities(IEnumerable<DashboardItemDto> items)
@@ -56,9 +59,9 @@ namespace PortEval.Application.Features.Services
             var result = new List<DashboardItem>();
             foreach (var item in items)
             {
-                await ValidateChartExists(item.ChartId);
+                var chart = await FetchChart(item.ChartId);
                 var position = new DashboardPosition(item.DashboardPositionX, item.DashboardPositionY, item.DashboardWidth, item.DashboardHeight);
-                result.Add(DashboardChartItem.Create(item.ChartId, position));
+                result.Add(DashboardChartItem.Create(chart, position));
             }
 
             return result;

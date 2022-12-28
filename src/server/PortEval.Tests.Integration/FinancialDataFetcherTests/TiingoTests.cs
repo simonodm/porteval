@@ -17,7 +17,6 @@ namespace PortEval.Tests.Integration.FinancialDataFetcherTests
         {
             var priceTime = DateTime.Parse("2022-01-01T12:00:00Z").ToUniversalTime();
             var instrumentSymbol = "AAPL";
-            var instrumentType = InstrumentType.Stock;
 
             var expectedRequestUri = @"https://api.tiingo.com/tiingo/daily/AAPL/prices";
             var apiMockResponse = new List<TiingoPriceResponseModel>
@@ -33,11 +32,9 @@ namespace PortEval.Tests.Integration.FinancialDataFetcherTests
 
             var request = new HistoricalDailyInstrumentPricesRequest
             {
-                CurrencyCode = "USD",
                 From = DateTime.Parse("2022-01-01"),
                 To = DateTime.Parse("2022-01-03"),
-                Symbol = instrumentSymbol,
-                Type = instrumentType
+                Symbol = instrumentSymbol
             };
 
             var sut = new TiingoApi(httpClient, "");
@@ -55,11 +52,10 @@ namespace PortEval.Tests.Integration.FinancialDataFetcherTests
         }
 
         [Fact]
-        public async Task ProcessHistoricalDailyInstrumentPricesRequest_ReturnsDataFromTiingoCryptoHistoricalEndpoint_WhenInstrumentTypeIsCrypto()
+        public async Task ProcessHistoricalDailyCryptoPricesRequest_ReturnsDataFromTiingoCryptoHistoricalEndpoint()
         {
             var priceTime = DateTime.Parse("2022-01-02T12:00:00Z").ToUniversalTime();
             var instrumentSymbol = "BTC";
-            var instrumentType = InstrumentType.CryptoCurrency;
 
             var expectedRequestUri = @"https://api.tiingo.com/tiingo/crypto/prices";
             var apiMockResponse = new List<TiingoCryptoPriceResponseModel>
@@ -82,13 +78,12 @@ namespace PortEval.Tests.Integration.FinancialDataFetcherTests
 
             var httpClient = Helpers.SetupMockHttpClientReturningResponse(expectedRequestUri, apiMockResponse);
 
-            var request = new HistoricalDailyInstrumentPricesRequest
+            var request = new HistoricalDailyCryptoPricesRequest
             {
                 CurrencyCode = "USD",
                 From = DateTime.Parse("2022-01-01"),
                 To = DateTime.Parse("2022-01-03"),
-                Symbol = instrumentSymbol,
-                Type = instrumentType
+                Symbol = instrumentSymbol
             };
 
             var sut = new TiingoApi(httpClient, "");
@@ -106,55 +101,10 @@ namespace PortEval.Tests.Integration.FinancialDataFetcherTests
         }
 
         [Fact]
-        public async Task ProcessIntradayPricesRequest_ReturnsDataFromTiingoIEXEndpoint()
-        {
-            var priceTime = DateTime.Parse("2022-01-01T12:00:00Z").ToUniversalTime();
-
-            var instrumentSymbol = "AAPL";
-            var instrumentType = InstrumentType.Stock;
-
-            var expectedRequestUri = @"https://api.tiingo.com/iex/AAPL/prices";
-            var apiMockResponse = new List<TiingoPriceResponseModel>
-            {
-                new TiingoPriceResponseModel
-                {
-                    Time = priceTime,
-                    Price = 100m
-                }
-            };
-
-            var httpClient = Helpers.SetupMockHttpClientReturningResponse(expectedRequestUri, apiMockResponse);
-
-            var request = new IntradayPricesRequest
-            {
-                CurrencyCode = "USD",
-                From = DateTime.Parse("2022-01-01"),
-                To = DateTime.Parse("2022-01-03"),
-                Symbol = instrumentSymbol,
-                Interval = IntradayInterval.OneHour,
-                Type = instrumentType
-            };
-
-            var sut = new TiingoApi(httpClient, "");
-
-            var response = await sut.Process(request);
-
-            Assert.Equal(StatusCode.Ok, response.StatusCode);
-            Assert.Collection(response.Result, pricePoint =>
-            {
-                Assert.Equal(apiMockResponse[0].Time, pricePoint.Time);
-                Assert.Equal(apiMockResponse[0].Price, pricePoint.Price);
-                Assert.Equal("USD", pricePoint.CurrencyCode);
-                Assert.Equal(instrumentSymbol, pricePoint.Symbol);
-            });
-        }
-
-        [Fact]
-        public async Task ProcessIntradayPricesRequest_ReturnsDataFromTiingoCryptoHistoricalEndpoint_WhenInstrumentTypeIsCrypto()
+        public async Task ProcessIntradayCryptoPricesRequest_ReturnsDataFromTiingoCryptoHistoricalEndpoint()
         {
             var priceTime = DateTime.Parse("2022-01-02T12:00:00Z").ToUniversalTime();
             var instrumentSymbol = "BTC";
-            var instrumentType = InstrumentType.CryptoCurrency;
 
             var expectedRequestUri = @"https://api.tiingo.com/tiingo/crypto/prices";
             var apiMockResponse = new List<TiingoCryptoPriceResponseModel>
@@ -177,13 +127,12 @@ namespace PortEval.Tests.Integration.FinancialDataFetcherTests
 
             var httpClient = Helpers.SetupMockHttpClientReturningResponse(expectedRequestUri, apiMockResponse);
 
-            var request = new IntradayPricesRequest
+            var request = new IntradayCryptoPricesRequest
             {
                 CurrencyCode = "USD",
                 From = DateTime.Parse("2022-01-01"),
                 To = DateTime.Parse("2022-01-03"),
                 Symbol = instrumentSymbol,
-                Type = instrumentType,
                 Interval = IntradayInterval.OneHour
             };
 
@@ -214,15 +163,12 @@ namespace PortEval.Tests.Integration.FinancialDataFetcherTests
             };
 
             var instrumentSymbol = "AAPL";
-            var instrumentType = InstrumentType.Stock;
 
             var client = Helpers.SetupMockHttpClientReturningResponse(expectedRequestUri, apiMockResponse);
 
             var request = new LatestInstrumentPriceRequest
             {
-                CurrencyCode = "USD",
-                Symbol = instrumentSymbol,
-                Type = instrumentType
+                Symbol = instrumentSymbol
             };
 
             var sut = new TiingoApi(client, "");
@@ -236,11 +182,10 @@ namespace PortEval.Tests.Integration.FinancialDataFetcherTests
         }
 
         [Fact]
-        public async Task ProcessLatestInstrumentPriceRequest_ReturnsDataFromTiingoCryptoTopOfBookEndpoint_WhenInstrumentTypeIsCrypto()
+        public async Task ProcessLatestCryptoPriceRequest_ReturnsDataFromTiingoCryptoTopOfBookEndpoint()
         {
             var priceTime = DateTime.Parse("2022-01-02T12:00:00Z").ToUniversalTime();
             var instrumentSymbol = "BTC";
-            var instrumentType = InstrumentType.CryptoCurrency;
 
             var expectedRequestUri = @"https://api.tiingo.com/tiingo/crypto/top";
             var apiMockResponse = new List<TiingoCryptoTopPriceResponseModel>
@@ -264,11 +209,10 @@ namespace PortEval.Tests.Integration.FinancialDataFetcherTests
 
             var httpClient = Helpers.SetupMockHttpClientReturningResponse(expectedRequestUri, apiMockResponse);
 
-            var request = new LatestInstrumentPriceRequest
+            var request = new LatestCryptoPriceRequest
             {
                 CurrencyCode = "USD",
-                Symbol = instrumentSymbol,
-                Type = instrumentType,
+                Symbol = instrumentSymbol
             };
 
             var sut = new TiingoApi(httpClient, "");

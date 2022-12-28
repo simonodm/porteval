@@ -17,9 +17,9 @@ namespace PortEval.Domain.Models.Entities
             PortfolioId = portfolioId;
         }
 
-        public static ChartLinePortfolio Create(int chartId, int width, LineDashType dash, Color color, int portfolioId)
+        public static ChartLinePortfolio Create(int chartId, int width, LineDashType dash, Color color, Portfolio portfolio)
         {
-            return new ChartLinePortfolio(chartId, width, dash, color, portfolioId);
+            return new ChartLinePortfolio(chartId, width, dash, color, portfolio.Id);
         }
     }
 }

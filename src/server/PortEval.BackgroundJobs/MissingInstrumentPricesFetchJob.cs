@@ -7,14 +7,13 @@ using PortEval.Application.Models.DTOs.Enums;
 using PortEval.BackgroundJobs.Helpers;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
+using PortEval.Domain.Models.Enums;
 using PortEval.FinancialDataFetcher.Interfaces;
 using PortEval.FinancialDataFetcher.Models;
-using PortEval.FinancialDataFetcher.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Domain.Models.Enums;
 
 namespace PortEval.BackgroundJobs
 {
@@ -26,23 +25,20 @@ namespace PortEval.BackgroundJobs
     ///     <item>5 minutes for prices in the last 24 hours.</item>
     /// </list>
     /// </summary>
-    public class MissingInstrumentPricesFetchJob : IMissingInstrumentPricesFetchJob
+    public class MissingInstrumentPricesFetchJob : InstrumentPriceFetchJobBase, IMissingInstrumentPricesFetchJob
     {
         private readonly IInstrumentRepository _instrumentRepository;
-        private readonly IInstrumentPriceRepository _instrumentPriceRepository;
-        private readonly ICurrencyExchangeRateRepository _exchangeRateRepository;
+        private readonly IInstrumentPriceRepository _priceRepository;
         private readonly INotificationService _notificationService;
-        private readonly IPriceFetcher _fetcher;
         private readonly ILogger _logger;
 
         public MissingInstrumentPricesFetchJob(IInstrumentRepository instrumentRepository, IInstrumentPriceRepository instrumentPriceRepository,
-            ICurrencyExchangeRateRepository exchangeRateRepository, INotificationService notificationService, IPriceFetcher fetcher, ILoggerFactory loggerFactory)
+            INotificationService notificationService, IPriceFetcher fetcher, ILoggerFactory loggerFactory)
+            : base(fetcher)
         {
             _instrumentRepository = instrumentRepository;
-            _instrumentPriceRepository = instrumentPriceRepository;
-            _exchangeRateRepository = exchangeRateRepository;
+            _priceRepository = instrumentPriceRepository;
             _notificationService = notificationService;
-            _fetcher = fetcher;
             _logger = loggerFactory.CreateLogger(typeof(MissingInstrumentPricesFetchJob));
         }
 
@@ -68,6 +64,7 @@ namespace PortEval.BackgroundJobs
                 }
 
                 instrument.TrackingInfo.Update(currentTime);
+                instrument.IncreaseVersion();
                 _instrumentRepository.Update(instrument);
             }
 
@@ -78,7 +75,7 @@ namespace PortEval.BackgroundJobs
 
         private async Task<IEnumerable<TimeRange>> GetMissingRanges(Instrument instrument, DateTime baseTime)
         {
-            var prices = await _instrumentPriceRepository.ListInstrumentPricesAsync(instrument.Id);
+            var prices = await _priceRepository.ListInstrumentPricesAsync(instrument.Id);
             var priceTimes = prices
                 .Where(p => p.Time >= instrument.TrackingInfo.StartTime)
                 .OrderBy(p => p.Time)
@@ -95,45 +92,40 @@ namespace PortEval.BackgroundJobs
         }
 
         /// <summary>
-        /// Retrieves and saves prices of a single instrument in the given time range. If the retrieved prices currency and instrument currency differ, then
-        /// the prices are converted to instrument's currency beforehand.
+        /// Retrieves and saves prices of a single instrument in the given time range.
         /// </summary>
         /// <param name="instrument">Instrument to retrieve prices for.</param>
         /// <param name="range">Time range of missing prices.</param>
         /// <param name="baseTime">Time used to determine the appropriate price intervals.</param>
-        /// <returns>A task representing the asynchronous retrieval, conversion and save operations.</returns>
+        /// <returns>A task representing the asynchronous retrieval and save operations.</returns>
         private async Task ProcessMissingRange(Instrument instrument, TimeRange range, DateTime baseTime)
         {
             var fetchResult = await FetchPricesInRange(instrument, range);
-            if (fetchResult.StatusCode != StatusCode.Ok || fetchResult.Result is null)
-            {
-                return;
-            }
 
-            var filledPrices = await FillMissingPrices(fetchResult.Result, instrument, range, baseTime);
-            var pricesToInsert = await ProcessPricePoints(filledPrices, instrument, range);
+            var filledPrices = await FillMissingPrices(fetchResult, instrument, range, baseTime);
+            var pricesToInsert = ProcessPricePoints(filledPrices, instrument, range);
 
-            await _instrumentPriceRepository.BulkInsertAsync(pricesToInsert);
+            await _priceRepository.BulkInsertAsync(pricesToInsert);
         }
 
-        private async Task<Response<IEnumerable<PricePoint>>> FetchPricesInRange(Instrument instrument, TimeRange range)
+        private async Task<IEnumerable<PricePoint>> FetchPricesInRange(Instrument instrument, TimeRange range)
         {
             if (range.Interval < PriceUtils.OneDay)
             {
                 var intradayInterval = range.Interval <= PriceUtils.FiveMinutes
                     ? IntradayInterval.FiveMinutes
                     : IntradayInterval.OneHour;
-                return await _fetcher.GetIntradayPrices(instrument, range.From, range.To,
+                return await FetchIntradayPrices(instrument, range.From, range.To,
                     intradayInterval);
             }
 
-            return await _fetcher.GetHistoricalDailyPrices(instrument, range.From, range.To);
+            return await FetchHistoricalDailyPrices(instrument, range.From, range.To);
         }
 
         private async Task<IEnumerable<PricePoint>> FillMissingPrices(IEnumerable<PricePoint> prices,
             Instrument instrument, TimeRange range, DateTime baseTime)
         {
-            var priceAtRangeStart = await _instrumentPriceRepository.FindPriceAtAsync(instrument.Id, range.From);
+            var priceAtRangeStart = await _priceRepository.FindPriceAtAsync(instrument.Id, range.From);
 
             var rangeStartPricePoint = new PricePoint
             {
@@ -152,7 +144,7 @@ namespace PortEval.BackgroundJobs
             return newPricePoints;
         }
 
-        private async Task<List<InstrumentPrice>> ProcessPricePoints(IEnumerable<PricePoint> prices,
+        private List<InstrumentPrice> ProcessPricePoints(IEnumerable<PricePoint> prices,
             Instrument instrument, TimeRange range)
         {
             var pricesToAdd = new List<InstrumentPrice>();
@@ -163,15 +155,7 @@ namespace PortEval.BackgroundJobs
                     continue;
                 }
 
-                try
-                {
-                    var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument, pricePoint);
-                    pricesToAdd.Add(InstrumentPrice.Create(pricePoint.Time, price, instrument.Id));
-                }
-                catch (OperationNotAllowedException ex)
-                {
-                    _logger.LogError(ex.Message);
-                }
+                pricesToAdd.Add(InstrumentPrice.Create(pricePoint.Time, pricePoint.Price, instrument));
             }
 
             return pricesToAdd;

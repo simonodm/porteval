@@ -6,9 +6,9 @@ using System.Collections.Generic;
 namespace PortEval.FinancialDataFetcher.Interfaces.APIs
 {
     /// <summary>
-    /// Represents an API client which can retrieve historical daily instrument prices.
+    /// Represents an API client which can retrieve historical daily cryptocurrency prices.
     /// </summary>
-    public interface IHistoricalDailyFinancialApi : IFinancialApi<HistoricalDailyInstrumentPricesRequest, Response<IEnumerable<PricePoint>>>
+    public interface IHistoricalDailyCryptoFinancialApi : IFinancialApi<HistoricalDailyCryptoPricesRequest, Response<IEnumerable<PricePoint>>>
     {
     }
 }

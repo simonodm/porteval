@@ -8,7 +8,7 @@ namespace PortEval.FinancialDataFetcher.Interfaces.APIs
     /// <summary>
     /// Represents an API which can retrieve instruments' intraday prices.
     /// </summary>
-    public interface IIntradayFinancialApi : IFinancialApi<IntradayPricesRequest, Response<IEnumerable<PricePoint>>>
+    public interface IIntradayFinancialApi : IFinancialApi<IntradayInstrumentPricesRequest, Response<IEnumerable<PricePoint>>>
     {
     }
 }

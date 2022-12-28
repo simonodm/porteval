@@ -156,6 +156,15 @@ namespace PortEval.Tests.Integration.QueryTests
         }
 
         [Fact]
+        public async Task GetInstrumentSplits_ReturnsInstrumentSplits()
+        {
+            var queryResult = await _instrumentQueries.GetInstrumentSplits(_appleInstrumentId);
+
+            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Collection(queryResult.Response, AssertIsAAPLYesterdaysSplit);
+        }
+
+        [Fact]
         public async Task GetInstrumentPrice_ReturnsLatestPriceAtTime_WhenPriceExists()
         {
             var queryResult = await _instrumentQueries.GetInstrumentPrice(_btcInstrumentId, DateTime.UtcNow.AddDays(-1));
@@ -407,6 +416,14 @@ namespace PortEval.Tests.Integration.QueryTests
             Assert.Equal(_btcInstrumentId, p.InstrumentId);
             Assert.Equal(4000m, p.Price);
             Assert.Equal(DateTime.UtcNow.AddDays(-2), p.Time, TimeSpan.FromHours(1));
+        }
+
+        private void AssertIsAAPLYesterdaysSplit(InstrumentSplitDto split)
+        {
+            Assert.Equal(_appleInstrumentId, split.InstrumentId);
+            Assert.Equal(3, split.SplitRatioNumerator);
+            Assert.Equal(1, split.SplitRatioDenominator);
+            Assert.Equal(DateTime.UtcNow.AddDays(-1), split.Time, TimeSpan.FromHours(1));
         }
     }
 }

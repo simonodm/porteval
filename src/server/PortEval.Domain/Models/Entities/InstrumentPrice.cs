@@ -2,7 +2,7 @@
 
 namespace PortEval.Domain.Models.Entities
 {
-    public class InstrumentPrice : Entity, IAggregateRoot
+    public class InstrumentPrice : VersionedEntity, IAggregateRoot
     {
         public int Id { get; private set; }
         public DateTime Time { get; private set; }
@@ -28,9 +28,14 @@ namespace PortEval.Domain.Models.Entities
             InstrumentId = instrumentId;
         }
 
-        public static InstrumentPrice Create(DateTime time, decimal price, int instrumentId)
+        public static InstrumentPrice Create(DateTime time, decimal price, Instrument instrument)
         {
-            return new InstrumentPrice(time, price, instrumentId);
+            return new InstrumentPrice(time, price, instrument.Id);
+        }
+
+        public void ChangePrice(decimal newPrice)
+        {
+            Price = newPrice;
         }
     }
 }

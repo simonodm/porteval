@@ -1,5 +1,4 @@
-﻿using PortEval.Domain.Models.Enums;
-using PortEval.FinancialDataFetcher.APIs.Tiingo.Models;
+﻿using PortEval.FinancialDataFetcher.APIs.Tiingo.Models;
 using PortEval.FinancialDataFetcher.Interfaces.APIs;
 using PortEval.FinancialDataFetcher.Models;
 using PortEval.FinancialDataFetcher.Requests;
@@ -15,7 +14,8 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
     /// <summary>
     /// Tiingo API client supporting historical, intraday and latest instrument prices.
     /// </summary>
-    internal class TiingoApi : IHistoricalDailyFinancialApi, IIntradayFinancialApi, ILatestPriceFinancialApi
+    internal class TiingoApi : IHistoricalDailyInstrumentPricesFinancialApi, ILatestInstrumentPriceFinancialApi,
+        IHistoricalDailyCryptoFinancialApi, IIntradayCryptoFinancialApi, ILatestCryptoPriceFinancialApi
     {
         private readonly string _apiKey;
         private readonly HttpClient _httpClient;
@@ -32,97 +32,76 @@ namespace PortEval.FinancialDataFetcher.APIs.Tiingo
             _rateLimiter = rateLimiter;
         }
 
-        public async Task<Response<IEnumerable<PricePoint>>> Process(HistoricalDailyInstrumentPricesRequest request)
+        public Task<Response<IEnumerable<PricePoint>>> Process(HistoricalDailyInstrumentPricesRequest request)
         {
-            if (request.Type == InstrumentType.CryptoCurrency)
-            {
-                return await GetTiingoCryptoHistoricalPrices(request.Symbol, request.CurrencyCode, request.From, request.To);
-            }
-
-            return await GetTiingoEndOfDayPrices(request.Symbol, request.From, request.To);
+            return GetTiingoEndOfDayPrices(request.Symbol, request.From, request.To);
         }
 
-        public async Task<Response<IEnumerable<PricePoint>>> Process(IntradayPricesRequest request)
+        public Task<Response<PricePoint>> Process(LatestInstrumentPriceRequest request)
         {
-            if (request.Type == InstrumentType.CryptoCurrency)
-            {
-                return await GetTiingoCryptoHistoricalPrices(request.Symbol, request.CurrencyCode, request.From, request.To, request.Interval);
-            }
-
-            return await GetTiingoIexHistoricalPrices(request.Symbol, request.From, request.To, request.Interval);
+            return GetTiingoIexTopOfBook(request.Symbol);
         }
 
-        public async Task<Response<PricePoint>> Process(LatestInstrumentPriceRequest request)
+        public Task<Response<IEnumerable<PricePoint>>> Process(HistoricalDailyCryptoPricesRequest request)
         {
-            if (request.Type == InstrumentType.CryptoCurrency)
-            {
-                return await GetTiingoCryptoTopOfBook(request.Symbol, request.CurrencyCode);
-            }
+            return GetTiingoCryptoHistoricalPrices(request.Symbol, request.CurrencyCode, request.From,
+                request.To);
+        }
 
-            return await GetTiingoIexTopOfBook(request.Symbol);
+        public Task<Response<IEnumerable<PricePoint>>> Process(IntradayCryptoPricesRequest request)
+        {
+            return GetTiingoCryptoHistoricalPrices(request.Symbol, request.CurrencyCode, request.From,
+                request.To, request.Interval);
+        }
+
+        public Task<Response<PricePoint>> Process(LatestCryptoPriceRequest request)
+        {
+            return GetTiingoCryptoTopOfBook(request.Symbol, request.CurrencyCode);
         }
 
         private async Task<Response<IEnumerable<PricePoint>>> GetTiingoEndOfDayPrices(string symbol, DateTime from, DateTime to)
         {
             var startDate = from.ToString("yyyy-M-d");
-            var endDate = to.ToString("yyyy-M-d");
 
             var urlBuilder = new QueryUrlBuilder($"{TIINGO_DAILY_BASE_URL}/{symbol}/prices");
             urlBuilder.AddQueryParam("token", _apiKey);
             urlBuilder.AddQueryParam("startDate", startDate);
-            urlBuilder.AddQueryParam("endDate", endDate);
 
             var result = await _httpClient.GetJson<IEnumerable<TiingoPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
 
-            return new Response<IEnumerable<PricePoint>>
+            var sortedPrices = result.Result?.OrderByDescending(price => price.Time) ??
+                               Enumerable.Empty<TiingoPriceResponseModel>();
+
+            var currentSplitFactor = 1m;
+
+            var responseResult = new List<PricePoint>();
+
+            foreach (var price in sortedPrices)
             {
-                StatusCode = result.StatusCode,
-                ErrorMessage = result.ErrorMessage,
-                Result = result.Result?
-                    .Where(price => price.Time >= from && price.Time <= to)
-                    .Select(price => new PricePoint
+                if (price.Time < from)
+                {
+                    break;
+                }
+
+                if (price.Time <= to)
+                {
+                    responseResult.Add(new PricePoint
                     {
                         CurrencyCode = "USD",
-                        Price = price.Price,
+                        Price = price.Price / currentSplitFactor,
                         Symbol = symbol,
                         Time = price.Time.ToUniversalTime()
-                    })
-            };
-        }
+                    });
+                }
 
-        private async Task<Response<IEnumerable<PricePoint>>> GetTiingoIexHistoricalPrices(string symbol, DateTime from,
-            DateTime to, IntradayInterval? interval = null)
-        {
-            var startDate = from.Date.AddDays(1).ToString("yyyy-M-d");
-            var endDate = to.Date.AddDays(1).ToString("yyyy-M-d");
-            string resampleFreq = "1day";
-            if (interval != null)
-            {
-                resampleFreq = interval == IntradayInterval.FiveMinutes ? "5min" : "60min";
+                currentSplitFactor *= price.SplitFactor;
             }
 
-            var urlBuilder = new QueryUrlBuilder($"{TIINGO_IEX_BASE_URL}/{symbol}/prices");
-            urlBuilder.AddQueryParam("token", _apiKey);
-            urlBuilder.AddQueryParam("startDate", startDate);
-            urlBuilder.AddQueryParam("endDate", endDate);
-            urlBuilder.AddQueryParam("resampleFreq", resampleFreq);
-            urlBuilder.AddQueryParam("token", _apiKey);
-
-            var result = await _httpClient.GetJson<IEnumerable<TiingoPriceResponseModel>>(urlBuilder.ToString(), _rateLimiter);
-
             return new Response<IEnumerable<PricePoint>>
             {
                 StatusCode = result.StatusCode,
                 ErrorMessage = result.ErrorMessage,
-                Result = result.Result?
-                    .Where(price => price.Time >= from && price.Time <= to)
-                    .Select(price => new PricePoint
-                    {
-                        CurrencyCode = "USD",
-                        Price = price.Price,
-                        Symbol = symbol,
-                        Time = price.Time.ToUniversalTime()
-                    })
+                Result = responseResult
             };
         }
 

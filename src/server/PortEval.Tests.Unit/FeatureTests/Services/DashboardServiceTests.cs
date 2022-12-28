@@ -120,6 +120,9 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
             var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
+                .Setup(r => r.FindAsync(It.IsAny<int>()))
+                .ReturnsAsync((Chart)null);
+            chartRepository
                 .Setup(r => r.ExistsAsync(It.IsAny<int>()))
                 .ReturnsAsync(false);
             var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();

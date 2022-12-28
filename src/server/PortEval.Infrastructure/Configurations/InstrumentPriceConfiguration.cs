@@ -23,6 +23,9 @@ namespace PortEval.Infrastructure.Configurations
                 .Property(p => p.Price)
                 .IsRequired()
                 .HasPrecision(19, 4);
+            builder
+                .Property(p => p.Version)
+                .IsConcurrencyToken();
         }
     }
 }

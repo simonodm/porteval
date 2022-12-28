@@ -17,9 +17,9 @@ namespace PortEval.Domain.Models.Entities
             InstrumentId = instrumentId;
         }
 
-        public static ChartLineInstrument Create(int chartId, int width, LineDashType dash, Color color, int instrumentId)
+        public static ChartLineInstrument Create(int chartId, int width, LineDashType dash, Color color, Instrument instrument)
         {
-            return new ChartLineInstrument(chartId, width, dash, color, instrumentId);
+            return new ChartLineInstrument(chartId, width, dash, color, instrument.Id);
         }
     }
 }

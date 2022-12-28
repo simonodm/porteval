@@ -30,9 +30,6 @@ namespace PortEval.Infrastructure.Configurations
             builder
                 .Property(t => t.Note)
                 .HasMaxLength(255);
-            builder
-                .Property(c => c.Version)
-                .IsConcurrencyToken();
         }
     }
 }

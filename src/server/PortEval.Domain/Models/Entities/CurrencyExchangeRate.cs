@@ -27,10 +27,9 @@ namespace PortEval.Domain.Models.Entities
             CurrencyToCode = currencyToCode;
         }
 
-        public static CurrencyExchangeRate Create(DateTime time, decimal exchangeRate, string currencyFromCode,
-            string currencyToCode)
+        public static CurrencyExchangeRate Create(DateTime time, decimal exchangeRate, Currency currencyFrom, Currency currencyTo)
         {
-            return new CurrencyExchangeRate(time, exchangeRate, currencyFromCode, currencyToCode);
+            return new CurrencyExchangeRate(time, exchangeRate, currencyFrom.Code, currencyTo.Code);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace PortEval.FinancialDataFetcher.Interfaces.APIs
     /// <summary>
     /// Represents an API which can retrieve latest instrument prices.
     /// </summary>
-    public interface ILatestPriceFinancialApi : IFinancialApi<LatestInstrumentPriceRequest, Response<PricePoint>>
+    public interface ILatestInstrumentPriceFinancialApi : IFinancialApi<LatestInstrumentPriceRequest, Response<PricePoint>>
     {
     }
 }

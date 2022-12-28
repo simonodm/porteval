@@ -38,7 +38,7 @@ namespace PortEval.Domain.Models.Entities
 
         public void SetTrackingFrom(DateTime time)
         {
-            TrackingInfo = new TrackingInformation(time);
+            TrackingInfo = new TrackingInformation(time, DateTime.UtcNow);
         }
     }
 }

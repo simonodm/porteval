@@ -16,22 +16,17 @@ namespace PortEval.Application.Features.Services
         private readonly IPositionRepository _positionRepository;
         private readonly IInstrumentRepository _instrumentRepository;
 
-        private readonly IInstrumentPriceService _instrumentPriceService;
-
         public PositionService(IPortfolioRepository portfolioRepository,
-            IPositionRepository positionRepository, IInstrumentRepository instrumentRepository, IInstrumentPriceService instrumentPriceService)
+            IPositionRepository positionRepository, IInstrumentRepository instrumentRepository)
         {
             _instrumentRepository = instrumentRepository;
             _positionRepository = positionRepository;
             _portfolioRepository = portfolioRepository;
-            _instrumentPriceService = instrumentPriceService;
         }
 
         /// <inheritdoc cref="IPositionService.OpenPositionAsync"/>
         public async Task<Position> OpenPositionAsync(PositionDto options)
         {
-            await ValidatePortfolioExists(options.PortfolioId);
-
             if (options.Amount == null || options.Price == null || options.Time == null)
             {
                 throw new OperationNotAllowedException(
@@ -42,19 +37,13 @@ namespace PortEval.Application.Features.Services
             var initialTransactionPrice = (decimal)options.Price;
             var initialTransactionAmount = (decimal)options.Amount;
 
+            var portfolio = await FetchPortfolio(options.PortfolioId);
             var instrument = await FetchInstrument(options.InstrumentId);
-            if (instrument.Type == InstrumentType.Index)
-            {
-                throw new OperationNotAllowedException("Cannot create a position for an index.");
-            }
-
-            var createdPosition = Position.Create(options.PortfolioId, options.InstrumentId, options.Note);
+            var createdPosition = Position.Create(portfolio, instrument, options.Note);
             createdPosition.AddTransaction(initialTransactionAmount, initialTransactionPrice,
                 initialTransactionTime);
             _positionRepository.Add(createdPosition);
             await _positionRepository.UnitOfWork.CommitAsync();
-
-            await _instrumentPriceService.AddPriceIfNotExistsAsync(options.InstrumentId, initialTransactionTime, initialTransactionPrice);
 
             return createdPosition;
         }
@@ -87,12 +76,15 @@ namespace PortEval.Application.Features.Services
             await _positionRepository.UnitOfWork.CommitAsync();
         }
 
-        private async Task ValidatePortfolioExists(int portfolioId)
+        private async Task<Portfolio> FetchPortfolio(int portfolioId)
         {
-            if (!await _portfolioRepository.ExistsAsync(portfolioId))
+            var portfolio = await _portfolioRepository.FindAsync(portfolioId);
+            if (portfolio == null)
             {
                 throw new ItemNotFoundException($"Portfolio {portfolioId} does not exist.");
             }
+
+            return portfolio;
         }
 
         private async Task<Instrument> FetchInstrument(int instrumentId)

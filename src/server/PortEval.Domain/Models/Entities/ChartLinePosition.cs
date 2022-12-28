@@ -17,9 +17,9 @@ namespace PortEval.Domain.Models.Entities
             PositionId = positionId;
         }
 
-        public static ChartLinePosition Create(int chartId, int width, LineDashType dash, Color color, int positionId)
+        public static ChartLinePosition Create(int chartId, int width, LineDashType dash, Color color, Position position)
         {
-            return new ChartLinePosition(chartId, width, dash, color, positionId);
+            return new ChartLinePosition(chartId, width, dash, color, position.Id);
         }
     }
 }

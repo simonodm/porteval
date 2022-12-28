@@ -49,6 +49,7 @@ namespace PortEval.Application.Extensions
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IChartService, ChartService>();
             services.AddScoped<IInstrumentPriceService, InstrumentPriceService>();
+            services.AddScoped<IInstrumentSplitService, InstrumentSplitService>();
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<INotificationService, NotificationService>();
 
@@ -79,6 +80,7 @@ namespace PortEval.Application.Extensions
 
             services.AddScoped<IInstrumentRepository, InstrumentRepository>();
             services.AddScoped<IInstrumentPriceRepository, InstrumentPriceRepository>();
+            services.AddScoped<IInstrumentSplitRepository, InstrumentSplitRepository>();
             services.AddScoped<IPortfolioRepository, PortfolioRepository>();
             services.AddScoped<IPositionRepository, PositionRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
@@ -102,6 +104,8 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IInstrumentPriceCleanupJob, InstrumentPriceCleanupJob>();
             services.AddScoped<IDataImportJob, DataImportJob>();
             services.AddScoped<IImportCleanupJob, ImportCleanupJob>();
+            services.AddScoped<ISplitPriceAndTransactionAdjustmentJob, SplitPriceAndTransactionAdjustmentJob>();
+            services.AddScoped<ISplitFetchJob, SplitFetchJob>();
         }
 
         /// <summary>

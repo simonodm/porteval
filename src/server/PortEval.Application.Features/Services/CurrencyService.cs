@@ -33,6 +33,8 @@ namespace PortEval.Application.Features.Services
             var defaultCurrency = await _currencyRepository.GetDefaultCurrencyAsync();
 
             _currencyDomainService.ChangeDefaultCurrency(defaultCurrency, currencyEntity);
+            defaultCurrency.IncreaseVersion();
+            currencyEntity.IncreaseVersion();
             _currencyRepository.Update(defaultCurrency);
             _currencyRepository.Update(currencyEntity);
             await _currencyRepository.UnitOfWork.CommitAsync();
