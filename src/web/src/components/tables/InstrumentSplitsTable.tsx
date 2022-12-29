@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { INSTRUMENT_SPLIT_STATUS_TO_STRING } from '../../constants';
 import useUserSettings from '../../hooks/useUserSettings';
 import { useGetInstrumentSplitsQuery, useUpdateInstrumentSplitMutation } from '../../redux/api/instrumentApi';
 import { InstrumentSplit } from '../../types';
@@ -46,7 +47,7 @@ function InstrumentSplitsTable({ instrumentId }: Props): JSX.Element {
         {
             id: 'status',
             header: 'Status',
-            accessor: s => s.status
+            accessor: s => INSTRUMENT_SPLIT_STATUS_TO_STRING[s.status]
         },
         {
             id: 'actions',

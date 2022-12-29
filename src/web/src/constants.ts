@@ -1,5 +1,5 @@
 import { toast } from 'react-toastify';
-import { ChartConfig, ChartLineBase, InstrumentType, ChartToDateRange } from './types';
+import { ChartConfig, ChartLineBase, InstrumentType, ChartToDateRange, InstrumentSplitProcessingStatus } from './types';
 
 /**
  * Default date format setting.
@@ -167,6 +167,17 @@ export const INSTRUMENT_TYPE_TO_STRING: Record<InstrumentType, string> = {
     'cryptoCurrency': 'Cryptocurrency',
     'index': 'Index',
     'other': 'Other'
+}
+
+/**
+ * Map between {@link InstrumentSplitProcessingStatus} and its string representation in the UI.
+ * @category Constants
+ */
+export const INSTRUMENT_SPLIT_STATUS_TO_STRING: Record<InstrumentSplitProcessingStatus, string> = {
+    "notProcessed": "Not processed",
+    "processed": "Processed",
+    "rollbackRequested": "Rollback requested",
+    "rolledBack": "Rolled back"
 }
 
 /**
