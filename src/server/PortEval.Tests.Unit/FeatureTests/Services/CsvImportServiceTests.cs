@@ -121,7 +121,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
             jobClient.Verify(c => c.Create(
                 It.Is<Job>(job =>
-                    job.Method.Name == "Run" && ((DataImport)job.Args[0]).Id == importEntry.Id &&
+                    job.Method.Name == "Run" && (Guid)job.Args[0] == importEntry.Id &&
                     job.Type.IsAssignableTo(typeof(IDataImportJob))),
                 It.IsAny<EnqueuedState>()));
         }
