@@ -1,9 +1,12 @@
 ﻿using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Features.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.Services;
+using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
@@ -16,13 +19,16 @@ namespace PortEval.BackgroundJobs
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly IInstrumentSplitRepository _splitRepository;
         private readonly IPriceFetcher _priceFetcher;
+        private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
 
-        public SplitFetchJob(IInstrumentRepository instrumentRepository, IInstrumentSplitRepository splitRepository, IPriceFetcher priceFetcher, ILoggerFactory loggerFactory)
+        public SplitFetchJob(IInstrumentRepository instrumentRepository, IInstrumentSplitRepository splitRepository,
+            IPriceFetcher priceFetcher, ILoggerFactory loggerFactory, INotificationService notificationService)
         {
             _instrumentRepository = instrumentRepository;
             _splitRepository = splitRepository;
             _priceFetcher = priceFetcher;
+            _notificationService = notificationService;
             _logger = loggerFactory.CreateLogger<SplitFetchJob>();
         }
 
@@ -53,6 +59,10 @@ namespace PortEval.BackgroundJobs
                     var newSplit = InstrumentSplit.Create(instrument, split.Time, splitRatio);
                     _splitRepository.Add(newSplit);
                     await _splitRepository.UnitOfWork.CommitAsync();
+                    await _notificationService.SendNotificationAsync(
+                        NotificationType.Info,
+                        $"{instrument.Symbol} {splitRatio.Numerator}-for-{splitRatio.Denominator} split detected on {newSplit.Time.Date}."
+                    );
                 }
             }
 
