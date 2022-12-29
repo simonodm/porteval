@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import './LoadingWrapper.css';
 
@@ -26,7 +26,15 @@ type Props = {
  * @component
  */
 function LoadingWrapper({ children, isLoaded, isError = false}: Props): JSX.Element {   
-    if(!isLoaded) {
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
+
+    useEffect(() => {
+        if(isLoaded && isFirstLoad) {
+            setIsFirstLoad(false);
+        }
+    }, [isLoaded])
+
+    if(!isLoaded && isFirstLoad) {
         return (
             <div className="loading-wrapper">
                 <LoadingSpinner />
