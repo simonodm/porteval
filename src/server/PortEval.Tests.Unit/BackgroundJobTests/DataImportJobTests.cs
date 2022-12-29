@@ -42,12 +42,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             dataImportRepository.Verify(m => m.Update(It.Is<DataImport>(i => i.Id == dataImport.Id && i.Status == ImportStatus.Finished)));
         }
@@ -70,6 +73,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -77,7 +83,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             portfolioImportProcessor.Verify(p => p.ImportRecords(
                 It.Is<IEnumerable<PortfolioDto>>(e => e.Count() == 1 && e.Any(p => p.Name == "ABC" && p.CurrencyCode == "USD" && p.Note == "TestNote"))
@@ -102,6 +108,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -109,7 +118,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             positionImportProcessor.Verify(p => p.ImportRecords(
                 It.Is<IEnumerable<PositionDto>>(e =>
@@ -136,6 +145,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -143,7 +155,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             transactionImportProcessor.Verify(p => p.ImportRecords(
                 It.Is<IEnumerable<TransactionDto>>(e =>
@@ -170,6 +182,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -177,7 +192,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             instrumentImportProcessor.Verify(p => p.ImportRecords(
                 It.Is<IEnumerable<InstrumentDto>>(e =>
@@ -205,6 +220,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -212,7 +230,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             priceImportProcessor.Verify(p => p.ImportRecords(
                 It.Is<IEnumerable<InstrumentPriceDto>>(e =>
@@ -239,6 +257,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -246,7 +267,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             portfolioImportProcessor.Verify(p => p.ImportRecords(
                 It.Is<IEnumerable<PortfolioDto>>(e => !e.Any())
@@ -278,6 +299,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -288,7 +312,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             var logFileLines = fileSystem.File.ReadAllLines(logPath);
             var errorMessage = logFileLines[0].Split(',')[4];
@@ -315,12 +339,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             var logFileLines = fileSystem.File.ReadAllLines(logPath);
             var errorMessage = logFileLines[0].Split(',')[4];
@@ -347,6 +374,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -354,7 +384,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             dataImportRepository.Verify(r => r.Update(It.Is<DataImport>(d => d.Status == ImportStatus.Error && !string.IsNullOrEmpty(d.StatusDetails))));
         }
@@ -377,6 +407,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -387,7 +420,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             dataImportRepository.Verify(r => r.Update(It.Is<DataImport>(d => d.Status == ImportStatus.Error && !string.IsNullOrEmpty(d.StatusDetails))));
         }
@@ -410,12 +443,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             Assert.False(fileSystem.FileExists(inputPath));
         }

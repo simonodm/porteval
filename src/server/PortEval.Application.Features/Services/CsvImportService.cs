@@ -41,7 +41,7 @@ namespace PortEval.Application.Features.Services
             fs.Close();
 
             var importEntry = await SaveNewImportEntry(guid, templateType);
-            _jobClient.Enqueue<IDataImportJob>(job => job.Run(importEntry, tempFilePath, logFilePath));
+            _jobClient.Enqueue<IDataImportJob>(job => job.Run(guid, tempFilePath, logFilePath));
 
             return importEntry;
         }

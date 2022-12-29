@@ -17,6 +17,8 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Features.Interfaces.Services;
+using PortEval.Application.Models.DTOs.Enums;
 
 namespace PortEval.BackgroundJobs
 {
@@ -26,16 +28,18 @@ namespace PortEval.BackgroundJobs
 
         private readonly IServiceProvider _serviceProvider;
         private readonly IDataImportRepository _importRepository;
+        private readonly INotificationService _notificationService;
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _logger;
         private readonly CsvConfiguration _csvConfig;
         private readonly List<RawRowErrorLogEntry> _parsingErrors;
 
-        public DataImportJob(IServiceProvider serviceProvider, IDataImportRepository importRepository, IFileSystem fileSystem, ILoggerFactory loggerFactory)
+        public DataImportJob(IServiceProvider serviceProvider, IDataImportRepository importRepository, IFileSystem fileSystem, ILoggerFactory loggerFactory, INotificationService notificationService)
         {
             _serviceProvider = serviceProvider;
             _importRepository = importRepository;
             _fileSystem = fileSystem;
+            _notificationService = notificationService;
             _logger = loggerFactory.CreateLogger(typeof(DataImportJob));
             _parsingErrors = new List<RawRowErrorLogEntry>();
             _csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -50,8 +54,14 @@ namespace PortEval.BackgroundJobs
             };
         }
 
-        public async Task Run(Domain.Models.Entities.DataImport importEntry, string inputFileName, string logPath)
+        public async Task Run(Guid importId, string inputFileName, string logPath)
         {
+            var importEntry = await _importRepository.FindAsync(importId);
+            if (importEntry == null)
+            {
+                return;
+            }
+
             try
             {
                 using var fs = _fileSystem.FileStream.Create(inputFileName, FileMode.Open);
@@ -68,6 +78,8 @@ namespace PortEval.BackgroundJobs
 
                 importEntry.ChangeStatus(ImportStatus.Finished);
                 importEntry.AddErrorLog(logPath);
+                await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable,
+                    "Data import has been processed.");
             }
             catch (CsvHelperException ex)
             {

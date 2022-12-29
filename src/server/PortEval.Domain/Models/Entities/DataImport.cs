@@ -13,13 +13,15 @@ namespace PortEval.Domain.Models.Entities
         public bool ErrorLogAvailable { get; private set; }
         public string ErrorLogPath { get; private set; }
 
-        internal DataImport(Guid id, DateTime time, TemplateType templateType, ImportStatus status = ImportStatus.Pending, string statusDetails = "")
+        internal DataImport(Guid id, DateTime time, TemplateType templateType, ImportStatus status = ImportStatus.Pending, string statusDetails = "",
+            bool errorLogAvailable = false, string errorLogPath = "")
         {
             Id = id;
             TemplateType = templateType;
             Status = status;
             StatusDetails = statusDetails;
-            ErrorLogAvailable = false;
+            ErrorLogAvailable = errorLogAvailable;
+            ErrorLogPath = errorLogPath;
             Time = time;
         }
 

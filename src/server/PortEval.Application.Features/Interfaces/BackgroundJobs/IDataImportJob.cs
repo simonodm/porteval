@@ -1,10 +1,10 @@
-﻿using PortEval.Domain.Models.Entities;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace PortEval.Application.Features.Interfaces.BackgroundJobs
 {
     public interface IDataImportJob
     {
-        public Task Run(DataImport importEntry, string inputFileName, string logPath);
+        public Task Run(Guid importId, string inputFileName, string logPath);
     }
 }
