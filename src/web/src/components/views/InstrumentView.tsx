@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PortEvalChart from '../charts/PortEvalChart';
-import ModalWrapper from '../modals/ModalWrapper';
 import PageHeading from '../ui/PageHeading';
-import CreateInstrumentPriceForm from '../forms/CreateInstrumentPriceForm';
 import useUserSettings from '../../hooks/useUserSettings';
-import InstrumentPricesTable from '../tables/InstrumentPricesTable';
 
 import { useGetInstrumentByIdQuery } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
@@ -15,6 +12,9 @@ import { useParams } from 'react-router-dom';
 
 import './InstrumentView.css';
 import LoadingBubbles from '../ui/LoadingBubbles';
+import InstrumentSplitsTable from '../tables/InstrumentSplitsTable';
+import InstrumentPriceHistory from '../ui/InstrumentPriceHistory';
+import InstrumentSplitHistory from '../ui/InstrumentSplitHistory';
 
 type Params = {
     /**
@@ -39,8 +39,6 @@ function InstrumentView(): JSX.Element {
 
     const instrumentLoaded = checkIsLoaded(instrument);
     const instrumentError = checkIsError(instrument);
-
-    const [modalIsOpen, setModalIsOpen] = useState(false);
 
     const chart = instrument.data ? generateDefaultInstrumentChart(instrument.data) : undefined;
 
@@ -101,34 +99,8 @@ function InstrumentView(): JSX.Element {
                     { chart && <PortEvalChart chart={chart} /> }
                 </div>
             </div>
-            <div className="action-buttons">
-                <button
-                    className="btn btn-success btn-sm float-right"
-                    onClick={() => setModalIsOpen(true)} role="button"
-                >
-                    Add price
-                </button>
-            </div>
-            <div className="row">
-                <div className="col-xs-12 container-fluid">
-                    <div className="content-heading">
-                        <h5>Price history</h5>
-                    </div>
-                    {instrument.data && 
-                        <InstrumentPricesTable currencyCode={instrument.data.currencyCode}
-                            instrumentId={instrument.data.id}
-                        />
-                    }
-                </div>
-            </div>
-            <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Add new price" isOpen={modalIsOpen}>
-                { instrument.data &&
-                    <CreateInstrumentPriceForm
-                        instrumentId={instrument.data.id}
-                        onSuccess={() => setModalIsOpen(false)}
-                    />
-                }
-            </ModalWrapper>
+            <InstrumentSplitHistory instrument={instrument.data} />
+            <InstrumentPriceHistory instrument={instrument.data} />
         </LoadingWrapper>
     )
 }

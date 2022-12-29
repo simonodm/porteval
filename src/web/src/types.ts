@@ -89,6 +89,23 @@ export type InstrumentPrice = InstrumentPriceConfig & {
 }
 
 /**
+ * Represents the processing status of an instrument split.
+ */
+export type InstrumentSplitProcessingStatus = 'notProcessed' | 'processed' | 'rollbackRequested' | 'rolledBack';
+
+/**
+ * Represents an instrument's split.
+ */
+export type InstrumentSplit = {
+    id: number;
+    instrumentId: number;
+    time: string;
+    status: InstrumentSplitProcessingStatus;
+    splitRatioDenominator: number;
+    splitRatioNumerator: number;
+}
+
+/**
  * Represents a currency.
  */
 export type Currency = {

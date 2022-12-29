@@ -190,6 +190,7 @@ export const RTK_API_TAGS = [
     'InstrumentPrices',
     'InstrumentPrice',
     'InstrumentTransactions',
+    'InstrumentSplits',
     'Charts',
     'Chart',
     'DashboardLayout',

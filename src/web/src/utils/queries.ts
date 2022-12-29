@@ -69,6 +69,11 @@ export function invalidateFinancialData(): { payload: TagDescription<string>[], 
         'InstrumentPrices',
         'InstrumentPrice',
         'Instrument',
-        'Instruments'
+        'Instruments',
+        'InstrumentSplits',
+        'PortfolioTransactions',
+        'PositionTransactions',
+        'InstrumentTransactions',
+        'Transaction'
     ]);
 }
