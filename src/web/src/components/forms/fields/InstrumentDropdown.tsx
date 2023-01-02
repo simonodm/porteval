@@ -102,12 +102,12 @@ function InstrumentDropdown(
             </select>
             {
                 creatable &&
-                <>
+                <div className="form-check">
                     <input checked={creatingNew} id="instrument-create-new" onChange={handleCreateNewInstrumentCheck}
-                        type="checkbox"
+                        type="checkbox" className="form-check-input"
                     />
-                    <label htmlFor="instrument-create-new">Create new instrument</label>
-                </>
+                    <label htmlFor="instrument-create-new" className="form-check-label">Create new instrument</label>
+                </div>
             }
             
         </div>

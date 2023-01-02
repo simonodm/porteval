@@ -111,9 +111,9 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
                     onChange={(newValue) => newValue && setFrequency(newValue.value)}
                     options={frequencyOptions}
                 />
-                <div className="form-group float-left">
-                    <input id="compress-prices" type="checkbox" checked={compressPrices} onClick={() => setCompressPrices(!compressPrices)} />
-                    <label htmlFor="compress-prices">Only display price changes</label>
+                <div className="form-check float-left">
+                    <input id="compress-prices" className="form-check-input" type="checkbox" checked={compressPrices} onClick={() => setCompressPrices(!compressPrices)} />
+                    <label htmlFor="compress-prices" className="form-check-label">Only display price changes</label>
                 </div>
             </div>
             
