@@ -56,7 +56,7 @@ function InstrumentSplitsTable({ instrumentId }: Props): JSX.Element {
                 <>
                     {s.status === 'processed'
                         && <button
-                            className="btn btn-primary btn-extra-sm mr-1"
+                            className="btn btn-danger btn-extra-sm mr-1"
                             onClick={() => {
                                 handleSplitRollback(s)
                             }}
