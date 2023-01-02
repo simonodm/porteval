@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PageHeading from '../ui/PageHeading';
-import useUserSettings from '../../hooks/useUserSettings';
+import InstrumentPriceHistory from '../ui/InstrumentPriceHistory';
+import InstrumentSplitHistory from '../ui/InstrumentSplitHistory';
+import InstrumentCurrentPriceText from '../ui/InstrumentCurrentPriceText';
 import ChartPreview from '../charts/ChartPreview';
 
 import { useGetInstrumentByIdQuery } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { generateDefaultInstrumentChart } from '../../utils/chart';
-import { getPriceString } from '../../utils/string';
 import { useParams } from 'react-router-dom';
 
 import './InstrumentView.css';
-import LoadingBubbles from '../ui/LoadingBubbles';
-import InstrumentSplitsTable from '../tables/InstrumentSplitsTable';
-import InstrumentPriceHistory from '../ui/InstrumentPriceHistory';
-import InstrumentSplitHistory from '../ui/InstrumentSplitHistory';
+
 
 type Params = {
     /**
@@ -34,8 +32,6 @@ function InstrumentView(): JSX.Element {
     const instrumentId = params.instrumentId ? parseInt(params.instrumentId) : 0;
 
     const instrument = useGetInstrumentByIdQuery(instrumentId);
-
-    const [userSettings] = useUserSettings();
 
     const instrumentLoaded = checkIsLoaded(instrument);
     const instrumentError = checkIsError(instrument);
@@ -76,17 +72,7 @@ function InstrumentView(): JSX.Element {
                             </tr>
                             <tr>
                                 <td>Current price:</td>
-                                <td>
-                                    {
-                                        instrument.data?.trackingStatus === 'searchingForPrices' || instrument.data?.trackingStatus === 'created'
-                                            ? <LoadingBubbles />
-                                            : getPriceString(
-                                                instrument.data?.currentPrice,
-                                                instrument.data?.currencyCode,
-                                                userSettings                                        
-                                        )
-                                    }
-                                </td>
+                                <td>{ instrument.data && <InstrumentCurrentPriceText instrument={instrument.data} /> }</td>
                             </tr>
                             <tr>
                                 <td>Note:</td>
