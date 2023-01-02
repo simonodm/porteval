@@ -70,7 +70,7 @@ function PortEvalChart({ chart }: Props): JSX.Element {
     const isError = checkIsError(chartData, transactionData, currency);
 
     return (
-        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded} displayLoadingOnQueryRefresh>
             <LineChart config={chartRenderConfig} lines={lines} />
         </LoadingWrapper>
     )

@@ -17,6 +17,11 @@ type Props = {
      * Determines whether loading failed.
      */
     isError?: boolean;
+
+    /**
+     * Determines whether the loading animation should be displayed when the wrapper gets reloaded.
+     */
+    displayLoadingOnQueryRefresh?: boolean;
 }
 
 /**
@@ -25,7 +30,7 @@ type Props = {
  * @category UI
  * @component
  */
-function LoadingWrapper({ children, isLoaded, isError = false}: Props): JSX.Element {   
+function LoadingWrapper({ children, isLoaded, isError = false, displayLoadingOnQueryRefresh = false}: Props): JSX.Element {   
     const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     useEffect(() => {
@@ -34,7 +39,7 @@ function LoadingWrapper({ children, isLoaded, isError = false}: Props): JSX.Elem
         }
     }, [isLoaded])
 
-    if(!isLoaded && isFirstLoad) {
+    if(!isLoaded && (isFirstLoad || displayLoadingOnQueryRefresh)) {
         return (
             <div className="loading-wrapper">
                 <LoadingSpinner />
