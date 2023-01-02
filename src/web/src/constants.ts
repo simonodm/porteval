@@ -224,3 +224,18 @@ export const TOAST_OPTIONS = {
     draggable: true,
     progress: undefined,
 }
+
+/**
+ * Default chart line colors for the first 8 lines added to the chart.
+ * @category Constants
+ */
+export const CHART_LINE_COLOR_CODE_PROGRESSION = [
+    "#00ff00",
+    "#ff0000",
+    "#e3ae00",
+    "#00bac7",
+    "#b500a0",
+    "#0082b5",
+    "#eb5470",
+    "#0000ff",
+];

@@ -38,6 +38,10 @@ function ChartView(): JSX.Element {
     const [chartId, setChartId] = useState(useParams<Params>().chartId);
     const [chart, setChart] = useState(useGetRouteState<ChartConfig>('chart'));
 
+    // track automated color fill for chart lines when they are first configured
+    // color fill progresses through a constant set of default colors (see constants.CHART_LINE_COLOR_CODE_PROGRESSION), and resets to the first one when running through them
+    const [lastUsedColorCodeIndex, setLastUsedColorCodeIndex] = useState(-1);
+
     const chartFromState = useRef(chartId === undefined && chart !== undefined);
     const chartQuery = useGetChartQuery(!chartFromState.current ? parseInt(chartId) : skipToken);
     const [createChart] = useCreateChartMutation();
@@ -59,45 +63,64 @@ function ChartView(): JSX.Element {
     }, [chartQuery?.data])
 
     const addInstrumentLine = (instrument: Instrument) => {
+        const colorIndex = (lastUsedColorCodeIndex + 1) % constants.CHART_LINE_COLOR_CODE_PROGRESSION.length;
+
         setModalLine({
             ...constants.DEFAULT_CHART_LINE,
             type: 'instrument',
             instrumentId: instrument.id,
-            name: instrument.name
+            name: instrument.name,
+            color: constants.CHART_LINE_COLOR_CODE_PROGRESSION[colorIndex]
         } as ChartLine);
 
+        setLastUsedColorCodeIndex(colorIndex);
         setLineModalIsOpen(true);
     }
 
     const addPortfolioLine = (portfolio: Portfolio) => {
+        const colorIndex = (lastUsedColorCodeIndex + 1) % constants.CHART_LINE_COLOR_CODE_PROGRESSION.length;
+
         setModalLine({
             ...constants.DEFAULT_CHART_LINE,
             type: 'portfolio',
             portfolioId: portfolio.id,
-            name: portfolio.name
+            name: portfolio.name,
+            color: constants.CHART_LINE_COLOR_CODE_PROGRESSION[colorIndex]
         } as ChartLine);
 
+        setLastUsedColorCodeIndex(colorIndex);
         setLineModalIsOpen(true);
     }
 
     const addPositionLine = (position: Position) => {
+        const colorIndex = (lastUsedColorCodeIndex + 1) % constants.CHART_LINE_COLOR_CODE_PROGRESSION.length;
+
         setModalLine({
             ...constants.DEFAULT_CHART_LINE,
             type: 'position',
             positionId: position.id,
-            name: position.instrument.name
+            name: position.instrument.name,
+            color: constants.CHART_LINE_COLOR_CODE_PROGRESSION[colorIndex]
         } as ChartLine);
 
+        setLastUsedColorCodeIndex(colorIndex);
         setLineModalIsOpen(true);
     }
 
     const addPortfolioPositionLines = (positions: Array<Position>) => {
-        const newLines = positions.map(position => ({
-            ...constants.DEFAULT_CHART_LINE,
-            type: 'position',
-            positionId: position.id,
-            name: position.instrument.name
-        } as ChartLine));
+        const newLines: Array<ChartLine> = positions.map((position, idx) => {
+            const colorIndex = (lastUsedColorCodeIndex + 1 + idx) % constants.CHART_LINE_COLOR_CODE_PROGRESSION.length;
+
+            return {
+                ...constants.DEFAULT_CHART_LINE,
+                type: 'position',
+                positionId: position.id,
+                name: position.instrument.name,
+                color: constants.CHART_LINE_COLOR_CODE_PROGRESSION[colorIndex]
+            }
+        });
+
+        setLastUsedColorCodeIndex((lastUsedColorCodeIndex + positions.length) % constants.CHART_LINE_COLOR_CODE_PROGRESSION.length);
 
         chart && setChart({
             ...chart,
