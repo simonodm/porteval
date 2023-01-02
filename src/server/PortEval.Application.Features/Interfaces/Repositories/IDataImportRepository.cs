@@ -8,6 +8,7 @@ namespace PortEval.Application.Features.Interfaces.Repositories
     public interface IDataImportRepository : IRepository
     {
         Task<IEnumerable<DataImport>> ListAllAsync();
+        Task<DataImport> FindAsync(Guid id);
         DataImport Add(DataImport import);
         DataImport Update(DataImport import);
         Task DeleteAsync(Guid id);

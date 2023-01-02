@@ -22,6 +22,11 @@ namespace PortEval.Infrastructure.Repositories
             return await _context.Imports.ToListAsync();
         }
 
+        public async Task<DataImport> FindAsync(Guid id)
+        {
+            return await _context.Imports.FirstOrDefaultAsync(import => import.Id == id);
+        }
+
         public DataImport Add(DataImport import)
         {
             return _context.Imports.Add(import).Entity;

@@ -8,6 +8,7 @@ using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers.Extensions;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Domain.Events;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Services
@@ -66,7 +67,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
         }
 
         [Fact]
-        public async Task AddingTransaction_AddsInstrumentPrice_WhenPriceDoesNotExist()
+        public async Task AddingTransaction_EmitsTransactionAddedToPositionDomainEvent()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -86,9 +87,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<TransactionService>();
 
             await sut.AddTransactionAsync(transaction);
-
-            priceService.Verify(s =>
-                s.AddPriceIfNotExistsAsync(position.InstrumentId, transaction.Time, transaction.Price));
+            
+            Assert.Collection(position.DomainEvents, evt =>
+            {
+                Assert.IsAssignableFrom<TransactionAddedToPositionDomainEvent>(evt);
+            });
         }
     }
 }

@@ -62,6 +62,13 @@ namespace PortEval.Application.Features.Interfaces.Queries
             DateRangeParams dateRange, bool compressed = false, AggregationFrequency? frequency = null);
 
         /// <summary>
+        /// Retrieves splits of an instrument ordered by their time descending.
+        /// </summary>
+        /// <param name="instrumentId">ID of the instrument to retrieve splits of.</param>
+        /// <returns>A task representing the asynchronous database query. Task result contains an <c>IEnumerable</c> of instrument split DTOs.</returns>
+        Task<QueryResponse<IEnumerable<InstrumentSplitDto>>> GetInstrumentSplits(int instrumentId);
+
+        /// <summary>
         /// Retrieves the last available price of the instrument before or equal to the specified time.
         /// </summary>
         /// <param name="instrumentId">ID of the instrument to retrieve price of.</param>

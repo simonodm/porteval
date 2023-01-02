@@ -3,14 +3,17 @@ using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Infrastructure.Configurations;
 using System.Threading.Tasks;
+using MediatR;
 
 namespace PortEval.Infrastructure
 {
     public class PortEvalDbContext : DbContext, IUnitOfWork
     {
-        public PortEvalDbContext(DbContextOptions<PortEvalDbContext> options) : base(options)
-        {
+        private readonly IMediator _mediator;
 
+        public PortEvalDbContext(DbContextOptions<PortEvalDbContext> options, IMediator mediator) : base(options)
+        {
+            _mediator = mediator;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -19,6 +22,7 @@ namespace PortEval.Infrastructure
             new CurrencyExchangeRateConfiguration().Configure(modelBuilder.Entity<CurrencyExchangeRate>());
             new InstrumentConfiguration().Configure(modelBuilder.Entity<Instrument>());
             new InstrumentPriceConfiguration().Configure(modelBuilder.Entity<InstrumentPrice>());
+            new InstrumentSplitConfiguration().Configure(modelBuilder.Entity<InstrumentSplit>());
             new PortfolioConfiguration().Configure(modelBuilder.Entity<Portfolio>());
             new PositionConfiguration().Configure(modelBuilder.Entity<Position>());
             new TransactionConfiguration().Configure(modelBuilder.Entity<Transaction>());
@@ -36,11 +40,13 @@ namespace PortEval.Infrastructure
         public void Commit()
         {
             SaveChanges();
+            _mediator.DispatchDomainEventsAsync(this).Wait();
         }
 
         public async Task CommitAsync()
         {
             await SaveChangesAsync();
+            await _mediator.DispatchDomainEventsAsync(this);
         }
 
         public virtual DbSet<Portfolio> Portfolios { get; set; }
@@ -50,6 +56,7 @@ namespace PortEval.Infrastructure
         public virtual DbSet<CurrencyExchangeRate> CurrencyExchangeRates { get; set; }
         public virtual DbSet<Instrument> Instruments { get; set; }
         public virtual DbSet<InstrumentPrice> InstrumentPrices { get; set; }
+        public virtual DbSet<InstrumentSplit> InstrumentSplits { get; set; }
         public virtual DbSet<Chart> Charts { get; set; }
         public virtual DbSet<ChartLine> ChartLines { get; set; }
         public virtual DbSet<DashboardItem> DashboardItems { get; set; }

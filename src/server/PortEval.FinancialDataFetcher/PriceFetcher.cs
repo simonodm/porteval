@@ -1,5 +1,4 @@
-﻿using PortEval.Domain.Models.Entities;
-using PortEval.FinancialDataFetcher.APIs.ExchangeRateHost;
+﻿using PortEval.FinancialDataFetcher.APIs.ExchangeRateHost;
 using PortEval.FinancialDataFetcher.APIs.OpenExchangeRates;
 using PortEval.FinancialDataFetcher.APIs.RapidAPIMboum;
 using PortEval.FinancialDataFetcher.APIs.Tiingo;
@@ -15,9 +14,7 @@ using System.Threading.Tasks;
 
 namespace PortEval.FinancialDataFetcher
 {
-    /// <summary>
-    /// Aggregates multiple API clients supporting retrieval of instrument prices and currency exchange rates.
-    /// </summary>
+    /// <inheritdoc cref="IPriceFetcher"/>
     public class PriceFetcher : IPriceFetcher
     {
         private readonly HttpClient _httpClient;
@@ -74,75 +71,92 @@ namespace PortEval.FinancialDataFetcher
             _registeredClients.Add(client);
         }
 
-        /// <summary>
-        /// Retrieves historical daily prices of the supplied symbol in the supplied range.
-        /// </summary>
-        /// <param name="instrument">Instrument to retrieve prices for.</param>
-        /// <param name="from">Date range start</param>
-        /// <param name="to">Date range end</param>
-        /// <returns>A Response object containing operation status and historical prices if the operation was successful.</returns>
-        public async Task<Response<IEnumerable<PricePoint>>> GetHistoricalDailyPrices(Instrument instrument, DateTime from,
+        /// <inheritdoc />
+        public async Task<Response<IEnumerable<PricePoint>>> GetHistoricalDailyPrices(string symbol, string currencyCode, DateTime from,
             DateTime to)
         {
             var request = new HistoricalDailyInstrumentPricesRequest
             {
-                Symbol = instrument.Symbol,
-                Type = instrument.Type,
-                CurrencyCode = instrument.CurrencyCode,
-                From = TimeZoneInfo.ConvertTimeToUtc(from),
-                To = TimeZoneInfo.ConvertTimeToUtc(to)
+                Symbol = symbol,
+                From = from,
+                To = to
             };
 
-            return await ProcessRequest<IHistoricalDailyFinancialApi, HistoricalDailyInstrumentPricesRequest,
+            return await ProcessRequest<IHistoricalDailyInstrumentPricesFinancialApi, HistoricalDailyInstrumentPricesRequest,
                 IEnumerable<PricePoint>>(request);
         }
 
-        /// <summary>
-        /// Retrieves intraday prices of the supplied symbol in the supplied range.
-        /// </summary>
-        /// <param name="instrument">Instrument to retrieve prices for.</param>
-        /// <param name="from">Range start</param>
-        /// <param name="to">Range end</param>
-        /// <param name="interval">Interval between individual price points</param>
-        /// <returns>A Response object containing operation status and intraday prices if the operation was successful.</returns>
-        public async Task<Response<IEnumerable<PricePoint>>> GetIntradayPrices(Instrument instrument, DateTime from, DateTime to,
+        /// <inheritdoc />
+        public async Task<Response<IEnumerable<PricePoint>>> GetIntradayPrices(string symbol, string currencyCode, DateTime from, DateTime to,
             IntradayInterval interval = IntradayInterval.OneHour)
         {
-            var request = new IntradayPricesRequest
+            var request = new IntradayInstrumentPricesRequest
             {
-                Symbol = instrument.Symbol,
-                Type = instrument.Type,
-                CurrencyCode = instrument.CurrencyCode,
-                From = TimeZoneInfo.ConvertTimeToUtc(from),
-                To = TimeZoneInfo.ConvertTimeToUtc(to),
+                Symbol = symbol,
+                From = from,
+                To = to,
                 Interval = interval
             };
 
-            return await ProcessRequest<IIntradayFinancialApi, IntradayPricesRequest, IEnumerable<PricePoint>>(request);
+            return await ProcessRequest<IIntradayFinancialApi, IntradayInstrumentPricesRequest, IEnumerable<PricePoint>>(request);
         }
 
-        /// <summary>
-        /// Retrieves the latest price of the supplied symbol.
-        /// </summary>
-        /// <param name="instrument">Instrument to retrieve prices for.</param>
-        /// <returns>A Response object containing operation status and latest price point if the operation was successful.</returns>
-        public async Task<Response<PricePoint>> GetLatestInstrumentPrice(Instrument instrument)
+        /// <inheritdoc />
+        public async Task<Response<PricePoint>> GetLatestInstrumentPrice(string symbol, string currencyCode)
         {
             var request = new LatestInstrumentPriceRequest
             {
-                Symbol = instrument.Symbol,
-                Type = instrument.Type,
-                CurrencyCode = instrument.CurrencyCode
+                Symbol = symbol
             };
 
-            return await ProcessRequest<ILatestPriceFinancialApi, LatestInstrumentPriceRequest, PricePoint>(request);
+            return await ProcessRequest<ILatestInstrumentPriceFinancialApi, LatestInstrumentPriceRequest, PricePoint>(request);
+        }
+        
+        /// <inheritdoc />
+        public async Task<Response<IEnumerable<PricePoint>>> GetHistoricalDailyCryptoPrices(string symbol, string targetCurrency,
+            DateTime from, DateTime to)
+        {
+            var request = new HistoricalDailyCryptoPricesRequest
+            {
+                Symbol = symbol,
+                CurrencyCode = targetCurrency,
+                From = from,
+                To = to
+            };
+
+            return await ProcessRequest<IHistoricalDailyCryptoFinancialApi, HistoricalDailyCryptoPricesRequest,
+                IEnumerable<PricePoint>>(request);
         }
 
-        /// <summary>
-        /// Retrieves the latest exchange rates of the supplied currency.
-        /// </summary>
-        /// <param name="baseCurrency">Base currency code</param>
-        /// <returns>A Response object containing operation status and the latest exchange rates if the operation was successful.</returns>
+        /// <inheritdoc />
+        public async Task<Response<IEnumerable<PricePoint>>> GetIntradayCryptoPrices(string symbol, string targetCurrency,
+            DateTime from, DateTime to, IntradayInterval interval = IntradayInterval.OneHour)
+        {
+            var request = new IntradayCryptoPricesRequest
+            {
+                Symbol = symbol,
+                CurrencyCode = targetCurrency,
+                From = from,
+                To = to,
+                Interval = interval
+            };
+
+            return await ProcessRequest<IIntradayCryptoFinancialApi, IntradayCryptoPricesRequest, IEnumerable<PricePoint>>(request);
+        }
+
+        /// <inheritdoc />
+        public async Task<Response<PricePoint>> GetLatestCryptoPrice(string symbol, string targetCurrency)
+        {
+            var request = new LatestCryptoPriceRequest
+            {
+                Symbol = symbol,
+                CurrencyCode = targetCurrency
+            };
+
+            return await ProcessRequest<ILatestCryptoPriceFinancialApi, LatestCryptoPriceRequest, PricePoint>(request);
+        }
+
+        /// <inheritdoc />
         public async Task<Response<ExchangeRates>> GetLatestExchangeRates(string baseCurrency)
         {
             var request = new LatestExchangeRatesRequest
@@ -154,34 +168,36 @@ namespace PortEval.FinancialDataFetcher
                 ExchangeRates>(request);
         }
 
-        /// <summary>
-        /// Retrieves historical daily exchange rates of the supplied currency in the supplied range.
-        /// </summary>
-        /// <param name="baseCurrency">Base currency code</param>
-        /// <param name="from">Date range start</param>
-        /// <param name="to">Date range end</param>
-        /// <returns>A Response object containing operation status and the retrieved exchange rates if the operation was successful.</returns>
+        /// <inheritdoc />
         public async Task<Response<IEnumerable<ExchangeRates>>> GetHistoricalDailyExchangeRates(string baseCurrency, DateTime from, DateTime to)
         {
             var request = new HistoricalDailyExchangeRatesRequest
             {
                 CurrencyCode = baseCurrency,
-                From = TimeZoneInfo.ConvertTimeToUtc(from),
-                To = TimeZoneInfo.ConvertTimeToUtc(to)
+                From = from,
+                To = to
             };
 
             return await ProcessRequest<IHistoricalDailyExchangeRatesFinancialApi,
                 HistoricalDailyExchangeRatesRequest, IEnumerable<ExchangeRates>>(request);
         }
 
-        /// <summary>
-        /// Processes the provided request and returns its response.
-        /// </summary>
-        /// <param name="request">Request to process</param>
-        /// <typeparam name="TClient">Target API client type</typeparam>
-        /// <typeparam name="TRequest">Request type</typeparam>
-        /// <typeparam name="TResult">Response data type</typeparam>
-        /// <returns></returns>
+        /// <inheritdoc />
+        public async Task<Response<IEnumerable<InstrumentSplitData>>> GetInstrumentSplits(string symbol, DateTime from,
+            DateTime to)
+        {
+            var request = new InstrumentSplitsRequest
+            {
+                Symbol = symbol,
+                From = from,
+                To = to
+            };
+
+            return await ProcessRequest<IInstrumentSplitFinancialApi, InstrumentSplitsRequest,
+                IEnumerable<InstrumentSplitData>>(request);
+        }
+
+        /// <inheritdoc />
         public async Task<Response<TResult>> ProcessRequest<TClient, TRequest, TResult>(TRequest request)
             where TClient : class, IFinancialApi<TRequest, Response<TResult>>
             where TRequest : IRequest

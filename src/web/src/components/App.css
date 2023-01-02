@@ -70,6 +70,7 @@ table.entity-data td {
 
 table.entity-data td:nth-child(2) {
     text-align: right;
+    float: right;
 }
 
 .btn-extra-sm {

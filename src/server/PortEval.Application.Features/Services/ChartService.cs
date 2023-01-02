@@ -216,13 +216,13 @@ namespace PortEval.Application.Features.Services
             }
 
             int portfolioId = (int)lineDto.PortfolioId;
-
-            if (!await _portfolioRepository.ExistsAsync(portfolioId))
+            var portfolio = await _portfolioRepository.FindAsync(portfolioId);
+            if (portfolio == null)
             {
                 throw new ItemNotFoundException($"Portfolio {portfolioId} does not exist.");
             }
 
-            return new ChartLinePortfolio(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, portfolioId);
+            return ChartLinePortfolio.Create(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, portfolio);
         }
 
         /// <summary>
@@ -239,14 +239,13 @@ namespace PortEval.Application.Features.Services
             }
 
             int positionId = (int)lineDto.PositionId;
-
             var position = await _positionRepository.FindAsync(positionId);
             if (position == null)
             {
                 throw new ItemNotFoundException($"Position {positionId} does not exist.");
             }
 
-            return new ChartLinePosition(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, positionId);
+            return ChartLinePosition.Create(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, position);
         }
 
         /// <summary>
@@ -264,12 +263,13 @@ namespace PortEval.Application.Features.Services
 
             int instrumentId = (int)lineDto.InstrumentId;
 
-            if (!await _instrumentRepository.ExistsAsync(instrumentId))
+            var instrument = await _instrumentRepository.FindAsync(instrumentId);
+            if (instrument == null)
             {
                 throw new ItemNotFoundException($"Instrument {instrumentId} does not exist.");
             }
 
-            return new ChartLineInstrument(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, instrumentId);
+            return ChartLineInstrument.Create(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, instrument);
         }
     }
 }

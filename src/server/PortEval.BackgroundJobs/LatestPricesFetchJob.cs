@@ -11,15 +11,15 @@ using PortEval.FinancialDataFetcher.Interfaces;
 using PortEval.FinancialDataFetcher.Models;
 using System;
 using System.Threading.Tasks;
+using PortEval.Domain.Models.Enums;
 
 namespace PortEval.BackgroundJobs
 {
     /// <summary>
     /// Retrieves the latest available prices of all existing instruments. Each price gets rounded down to the nearest 5 minutes.
     /// </summary>
-    public class LatestPricesFetchJob : ILatestPricesFetchJob
+    public class LatestPricesFetchJob : InstrumentPriceFetchJobBase, ILatestPricesFetchJob
     {
-        private readonly IPriceFetcher _fetcher;
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly IInstrumentPriceRepository _instrumentPriceRepository;
         private readonly ICurrencyExchangeRateRepository _exchangeRateRepository;
@@ -28,9 +28,8 @@ namespace PortEval.BackgroundJobs
 
         public LatestPricesFetchJob(IPriceFetcher fetcher, IInstrumentRepository instrumentRepository,
             IInstrumentPriceRepository instrumentPriceRepository, ICurrencyExchangeRateRepository exchangeRateRepository,
-            INotificationService notificationService, ILoggerFactory loggerFactory)
+            INotificationService notificationService, ILoggerFactory loggerFactory) : base(fetcher)
         {
-            _fetcher = fetcher;
             _instrumentRepository = instrumentRepository;
             _instrumentPriceRepository = instrumentPriceRepository;
             _exchangeRateRepository = exchangeRateRepository;
@@ -50,25 +49,30 @@ namespace PortEval.BackgroundJobs
 
             foreach (var instrument in instruments)
             {
-                if (instrument.IsTracked)
+                if (instrument.TrackingStatus != InstrumentTrackingStatus.Tracked)
                 {
-                    var fetcherResponse = await _fetcher.GetLatestInstrumentPrice(instrument);
-                    if (fetcherResponse.StatusCode != StatusCode.Ok || fetcherResponse.Result is null) continue;
+                    continue;
+                }
 
-                    try
-                    {
-                        var pricePoint = fetcherResponse.Result;
-                        var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument,
-                            pricePoint);
-                        _instrumentPriceRepository.Add(new InstrumentPrice(startTime.RoundDown(TimeSpan.FromMinutes(5)), price, instrument.Id));
+                var fetcherResponse = await FetchLatestPrice(instrument);
+                if (fetcherResponse == null)
+                {
+                    continue;
+                }
 
-                        instrument.TrackingInfo.Update(startTime);
-                        _instrumentRepository.Update(instrument);
-                    }
-                    catch (OperationNotAllowedException ex)
-                    {
-                        _logger.LogError(ex.Message);
-                    }
+                try
+                {
+                    var price = InstrumentPrice.Create(startTime.RoundDown(TimeSpan.FromMinutes(5)),
+                        fetcherResponse.Price, instrument);
+                    _instrumentPriceRepository.Add(price);
+
+                    instrument.TrackingInfo.Update(startTime);
+                    instrument.IncreaseVersion();
+                    _instrumentRepository.Update(instrument);
+                }
+                catch (OperationNotAllowedException ex)
+                {
+                    _logger.LogError(ex.Message);
                 }
 
             }

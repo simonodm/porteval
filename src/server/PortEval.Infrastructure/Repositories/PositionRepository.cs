@@ -27,6 +27,15 @@ namespace PortEval.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        /// <inheritdoc cref="IPositionRepository.ListAllInstrumentPositionsAsync"/>
+        public async Task<IEnumerable<Position>> ListAllInstrumentPositionsAsync(int instrumentId)
+        {
+            return await _context.Positions
+                .Where(p => p.InstrumentId == instrumentId)
+                .Include(p => p.Transactions)
+                .ToListAsync();
+        }
+
         /// <inheritdoc cref="IPositionRepository.FindAsync"/>
         public async Task<Position> FindAsync(int positionId)
         {

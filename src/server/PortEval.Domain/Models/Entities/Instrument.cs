@@ -1,4 +1,5 @@
-﻿using PortEval.Domain.Models.Enums;
+﻿using PortEval.Domain.Events;
+using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using System;
 
@@ -13,15 +14,15 @@ namespace PortEval.Domain.Models.Entities
         public InstrumentType Type { get; private set; }
         public string CurrencyCode { get; private set; }
         public string Note { get; private set; }
-        public bool IsTracked { get; private set; }
+        public InstrumentTrackingStatus TrackingStatus { get; private set; }
         public TrackingInformation TrackingInfo { get; private set; }
 
-        public Instrument(int id, string name, string symbol, string exchange, InstrumentType type, string currencyCode, string note) : this(name, symbol, exchange, type, currencyCode, note)
+        internal Instrument(int id, string name, string symbol, string exchange, InstrumentType type, string currencyCode, string note) : this(name, symbol, exchange, type, currencyCode, note)
         {
             Id = id;
         }
 
-        public Instrument(string name, string symbol, string exchange, InstrumentType type, string currencyCode, string note)
+        internal Instrument(string name, string symbol, string exchange, InstrumentType type, string currencyCode, string note)
         {
             Name = name;
             Symbol = symbol;
@@ -29,7 +30,16 @@ namespace PortEval.Domain.Models.Entities
             Type = type;
             CurrencyCode = currencyCode;
             Note = note;
-            IsTracked = false;
+            TrackingStatus = InstrumentTrackingStatus.Created;
+        }
+
+        public static Instrument Create(string name, string symbol, string exchange, InstrumentType type,
+            string currencyCode, string note)
+        {
+            var instrument = new Instrument(name, symbol, exchange, type, currencyCode, note);
+            instrument.AddDomainEvent(new InstrumentCreatedDomainEvent(instrument));
+
+            return instrument;
         }
 
         public void Rename(string name)
@@ -47,10 +57,15 @@ namespace PortEval.Domain.Models.Entities
             Note = note;
         }
 
-        public void SetTrackingFrom(DateTime startTime)
+        public void SetTrackingFrom(DateTime startTime, DateTime? trackedSince = null)
         {
-            IsTracked = true;
-            TrackingInfo = new TrackingInformation(startTime);
+            TrackingStatus = InstrumentTrackingStatus.Tracked;
+            TrackingInfo = new TrackingInformation(startTime, trackedSince ?? DateTime.UtcNow);
+        }
+
+        public void SetTrackingStatus(InstrumentTrackingStatus trackingStatus)
+        {
+            TrackingStatus = trackingStatus;
         }
     }
 }

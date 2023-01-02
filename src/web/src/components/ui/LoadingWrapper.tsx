@@ -1,7 +1,5 @@
-import React from 'react';
-import ReactLoading from 'react-loading';
-
-import * as constants from '../../constants';
+import React, { useEffect, useState } from 'react';
+import LoadingSpinner from './LoadingSpinner';
 import './LoadingWrapper.css';
 
 type Props = {
@@ -28,12 +26,18 @@ type Props = {
  * @component
  */
 function LoadingWrapper({ children, isLoaded, isError = false}: Props): JSX.Element {   
-    if(!isLoaded) {
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
+
+    useEffect(() => {
+        if(isLoaded && isFirstLoad) {
+            setIsFirstLoad(false);
+        }
+    }, [isLoaded])
+
+    if(!isLoaded && isFirstLoad) {
         return (
             <div className="loading-wrapper">
-                <ReactLoading color={constants.MAIN_COLOR} height="32px" type="spin"
-                    width="32px"
-                />
+                <LoadingSpinner />
             </div>
         );
     }

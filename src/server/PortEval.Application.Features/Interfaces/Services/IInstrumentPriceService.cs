@@ -30,7 +30,7 @@ namespace PortEval.Application.Features.Interfaces.Services
         public Task<InstrumentPrice> AddPriceIfNotExistsAsync(int instrumentId, DateTime time, decimal price);
 
         /// <summary>
-        /// Deletes an insturment price.
+        /// Deletes an instrument price.
         /// </summary>
         /// <param name="instrumentId">Parent instrument ID.</param>
         /// <param name="priceId">Instrument price ID.</param>

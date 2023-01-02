@@ -15,14 +15,12 @@ namespace PortEval.Application.Features.Services
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly ICurrencyRepository _currencyRepository;
         private readonly IExchangeRepository _exchangeRepository;
-        private readonly IBackgroundJobClient _backgroundJobClient;
 
-        public InstrumentService(IInstrumentRepository instrumentRepository, ICurrencyRepository currencyRepository, IExchangeRepository exchangeRepository, IBackgroundJobClient backgroundJobClient)
+        public InstrumentService(IInstrumentRepository instrumentRepository, ICurrencyRepository currencyRepository, IExchangeRepository exchangeRepository)
         {
             _instrumentRepository = instrumentRepository;
             _currencyRepository = currencyRepository;
             _exchangeRepository = exchangeRepository;
-            _backgroundJobClient = backgroundJobClient;
         }
 
         /// <inheritdoc cref="IInstrumentService.CreateInstrumentAsync"/>
@@ -35,11 +33,10 @@ namespace PortEval.Application.Features.Services
 
             await CreateExchangeIfDoesNotExist(options.Exchange);
 
-            var instrument = new Instrument(options.Name, options.Symbol, string.IsNullOrEmpty(options.Exchange) ? null : options.Exchange,
+            var instrument = Instrument.Create(options.Name, options.Symbol, string.IsNullOrEmpty(options.Exchange) ? null : options.Exchange,
                 options.Type, options.CurrencyCode, options.Note);
             var createdInstrument = _instrumentRepository.Add(instrument);
             await _instrumentRepository.UnitOfWork.CommitAsync();
-            _backgroundJobClient.Enqueue<IInitialPriceFetchJob>(job => job.Run(createdInstrument.Id));
             return createdInstrument;
         }
 
@@ -79,7 +76,7 @@ namespace PortEval.Application.Features.Services
         {
             if (!string.IsNullOrEmpty(exchange) && !await _exchangeRepository.ExistsAsync(exchange))
             {
-                var newExchange = new Exchange(exchange);
+                var newExchange = Exchange.Create(exchange);
                 _exchangeRepository.Add(newExchange);
             }
         }

@@ -133,37 +133,6 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
         }
 
         [Fact]
-        public async Task
-            CreatingInstrument_CreatesInitialPriceFetchJobForInstrument_WhenInstrumentIsCreatedSuccessfully()
-        {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var instrument = fixture.Create<InstrumentDto>();
-
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
-            instrumentRepository
-                .Setup(i => i.Add(It.IsAny<Instrument>()))
-                .Returns<Instrument>(i => fixture.Create<Instrument>());
-
-            fixture.CreateDefaultCurrencyRepositoryMock();
-            fixture.CreateDefaultExchangeRepositoryMock();
-
-            var backgroundJobClient = fixture.Freeze<Mock<IBackgroundJobClient>>();
-
-            var sut = fixture.Create<InstrumentService>();
-
-            var createdInstrument = await sut.CreateInstrumentAsync(instrument);
-
-            backgroundJobClient.Verify(c => c.Create(
-                It.Is<Job>(job =>
-                    job.Method.Name == "Run" && (int)job.Args[0] == createdInstrument.Id &&
-                    job.Type.IsAssignableTo(typeof(IInitialPriceFetchJob))),
-                It.IsAny<EnqueuedState>()
-            ));
-        }
-
-        [Fact]
         public async Task UpdatingInstrument_UpdatesInstrumentInRepository_WhenInstrumentExists()
         {
             var fixture = new Fixture()

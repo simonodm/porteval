@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace PortEval.Domain.Models.Entities
 {
-    public abstract class ChartLine
+    public abstract class ChartLine : Entity
     {
         public int Id { get; private set; }
         public int Width { get; private set; }

@@ -6,9 +6,9 @@ using PortEval.Application.Models.DTOs.Enums;
 using PortEval.BackgroundJobs.Helpers;
 using PortEval.Domain;
 using PortEval.Domain.Models.Entities;
+using PortEval.Domain.Models.Enums;
 using PortEval.FinancialDataFetcher.Interfaces;
 using PortEval.FinancialDataFetcher.Models;
-using PortEval.FinancialDataFetcher.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,23 +24,20 @@ namespace PortEval.BackgroundJobs
     ///     <item>5 minutes for prices in the last 24 hours.</item>
     /// </list>
     /// </summary>
-    public class InitialPriceFetchJob : IInitialPriceFetchJob
+    public class InitialPriceFetchJob : InstrumentPriceFetchJobBase, IInitialPriceFetchJob
     {
         private readonly IInstrumentRepository _instrumentRepository;
-        private readonly IInstrumentPriceRepository _instrumentPriceRepository;
-        private readonly ICurrencyExchangeRateRepository _exchangeRateRepository;
+        private readonly IInstrumentPriceRepository _priceRepository;
         private readonly INotificationService _notificationService;
-        private readonly IPriceFetcher _fetcher;
         private readonly ILogger _logger;
 
         public InitialPriceFetchJob(IInstrumentRepository instrumentRepository, IInstrumentPriceRepository instrumentPriceRepository,
-            ICurrencyExchangeRateRepository exchangeRateRepository, INotificationService notificationService, IPriceFetcher fetcher, ILoggerFactory loggerFactory)
+            INotificationService notificationService, IPriceFetcher fetcher, ILoggerFactory loggerFactory)
+            : base(fetcher)
         {
             _instrumentRepository = instrumentRepository;
-            _instrumentPriceRepository = instrumentPriceRepository;
-            _exchangeRateRepository = exchangeRateRepository;
+            _priceRepository = instrumentPriceRepository;
             _notificationService = notificationService;
-            _fetcher = fetcher;
             _logger = loggerFactory.CreateLogger(typeof(InitialPriceFetchJob));
         }
 
@@ -60,31 +57,20 @@ namespace PortEval.BackgroundJobs
             }
             var fetchStart = DateTime.UtcNow;
 
-            var fiveDaysCutoffDate = fetchStart - PriceUtils.FiveDays;
-            var oneDayCutoffDate = fetchStart - PriceUtils.OneDay;
+            var prices = await FetchInstrumentPrices(instrument, fetchStart);
 
-            var dailyPricesResponse = await _fetcher.GetHistoricalDailyPrices(instrument, PortEvalConstants.FinancialDataStartTime,
-                fiveDaysCutoffDate);
-            var hourlyPricesResponse = await _fetcher.GetIntradayPrices(instrument, fiveDaysCutoffDate, oneDayCutoffDate,
-                IntradayInterval.OneHour);
-            var latestPricesResponse = await _fetcher.GetIntradayPrices(instrument, oneDayCutoffDate, fetchStart,
-                IntradayInterval.FiveMinutes);
-
-            var allFetchedPrices = ConcatFetchedPrices(dailyPricesResponse, hourlyPricesResponse,
-                latestPricesResponse);
-
-            if (allFetchedPrices.Count != 0)
+            if (prices.Count != 0)
             {
                 var pricesWithMissingRangesFilled = PriceUtils.FillMissingRangePrices(
-                    allFetchedPrices,
+                    prices,
                     time => PriceUtils.GetInstrumentPriceInterval(fetchStart, time),
-                    allFetchedPrices[0].Time,
+                    prices[0].Time,
                     fetchStart);
                 await SavePrices(instrument, pricesWithMissingRangesFilled);
             }
 
             _logger.LogInformation($"First price fetch for instrument {instrumentId} finished at {DateTime.UtcNow}.");
-            if (allFetchedPrices.Count > 0)
+            if (prices.Count > 0)
             {
                 await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable, $"Price download finished for {instrument.Symbol}.");
             }
@@ -102,40 +88,33 @@ namespace PortEval.BackgroundJobs
         /// <param name="hourlyPricesResponse">Hourly prices Response object.</param>
         /// <param name="latestPricesResponse">Last day prices Response object.</param>
         /// <returns>A list of all retrieved prices.</returns>
-        private List<PricePoint> ConcatFetchedPrices(Response<IEnumerable<PricePoint>> dailyPricesResponse,
-            Response<IEnumerable<PricePoint>> hourlyPricesResponse,
-            Response<IEnumerable<PricePoint>> latestPricesResponse)
+        private List<PricePoint> ConcatFetchedPrices(IEnumerable<PricePoint> dailyPricesResponse,
+            IEnumerable<PricePoint> hourlyPricesResponse,
+            IEnumerable<PricePoint> latestPricesResponse)
         {
             var fetchedPrices = new List<PricePoint>();
 
-            if (dailyPricesResponse.StatusCode == StatusCode.Ok && dailyPricesResponse.Result is not null)
-            {
-                fetchedPrices.AddRange(dailyPricesResponse.Result);
-            }
-
-            if (hourlyPricesResponse.StatusCode == StatusCode.Ok && hourlyPricesResponse.Result is not null)
-            {
-                fetchedPrices.AddRange(hourlyPricesResponse.Result);
-            }
-
-            if (latestPricesResponse.StatusCode == StatusCode.Ok && latestPricesResponse.Result is not null)
-            {
-                fetchedPrices.AddRange(latestPricesResponse.Result);
-            }
+            fetchedPrices.AddRange(dailyPricesResponse);
+            fetchedPrices.AddRange(hourlyPricesResponse);
+            fetchedPrices.AddRange(latestPricesResponse);
 
             return fetchedPrices;
         }
 
         /// <summary>
-        /// Saves price points in the database. If the price point currency and instrument currency differ, then the prices get converted beforehand.
+        /// Saves price points in the database.
         /// </summary>
         /// <param name="instrument">Instrument to save prices of.</param>
         /// <param name="prices">Prices to save.</param>
-        /// <returns>A Task representing the asynchronous price save operation.</returns>
+        /// <returns>A task representing the asynchronous price save operation.</returns>
         private async Task SavePrices(Instrument instrument, IEnumerable<PricePoint> prices)
         {
             if (!prices.Any())
             {
+                instrument.SetTrackingStatus(InstrumentTrackingStatus.Untracked);
+                instrument.IncreaseVersion();
+                _instrumentRepository.Update(instrument);
+                await _instrumentRepository.UnitOfWork.CommitAsync();
                 return;
             }
 
@@ -147,9 +126,8 @@ namespace PortEval.BackgroundJobs
                 {
                     continue;
                 }
-
-                var price = await PriceUtils.GetConvertedPricePointPrice(_exchangeRateRepository, instrument, pricePoint);
-                pricesToAdd.Add(new InstrumentPrice(pricePoint.Time, price, instrument.Id));
+                
+                pricesToAdd.Add(InstrumentPrice.Create(pricePoint.Time, pricePoint.Price, instrument));
 
                 if (pricePoint.Time < minTime)
                 {
@@ -159,9 +137,29 @@ namespace PortEval.BackgroundJobs
 
             instrument.SetTrackingFrom(minTime);
             instrument.TrackingInfo.Update(DateTime.UtcNow);
+            instrument.SetTrackingStatus(InstrumentTrackingStatus.Tracked);
+            instrument.IncreaseVersion();
             _instrumentRepository.Update(instrument);
             await _instrumentRepository.UnitOfWork.CommitAsync();
-            await _instrumentPriceRepository.BulkInsertAsync(pricesToAdd);
+            await _priceRepository.BulkInsertAsync(pricesToAdd);
+        }
+
+        private async Task<List<PricePoint>> FetchInstrumentPrices(Instrument instrument, DateTime endTime)
+        {
+            var fiveDaysCutoffDate = endTime - PriceUtils.FiveDays;
+            var oneDayCutoffDate = endTime - PriceUtils.OneDay;
+
+            var dailyPricesResponse = await FetchHistoricalDailyPrices(instrument, PortEvalConstants.FinancialDataStartTime,
+                fiveDaysCutoffDate);
+            var hourlyPricesResponse = await FetchIntradayPrices(instrument, fiveDaysCutoffDate, oneDayCutoffDate,
+                IntradayInterval.OneHour);
+            var latestPricesResponse = await FetchIntradayPrices(instrument, oneDayCutoffDate, endTime,
+                IntradayInterval.FiveMinutes);
+
+            var allFetchedPrices = ConcatFetchedPrices(dailyPricesResponse, hourlyPricesResponse,
+                latestPricesResponse);
+
+            return allFetchedPrices;
         }
     }
 }

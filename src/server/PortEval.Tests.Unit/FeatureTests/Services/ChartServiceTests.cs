@@ -681,12 +681,12 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
         private bool IsAggregatedType(ChartType type)
         {
-            return type == ChartType.AggregatedProfit || type == ChartType.AggregatedPerformance;
+            return type is ChartType.AggregatedProfit or ChartType.AggregatedPerformance;
         }
 
         private bool IsCurrencyType(ChartType type)
         {
-            return type == ChartType.Price || type == ChartType.Profit || type == ChartType.AggregatedProfit;
+            return type is ChartType.Price or ChartType.Profit or ChartType.AggregatedProfit;
         }
     }
 }

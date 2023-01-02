@@ -2,7 +2,7 @@
 
 namespace PortEval.Domain.Models.Entities
 {
-    public class CurrencyExchangeRate : IAggregateRoot
+    public class CurrencyExchangeRate : Entity, IAggregateRoot
     {
         public int Id { get; private set; }
         public DateTime Time { get; private set; }
@@ -10,12 +10,12 @@ namespace PortEval.Domain.Models.Entities
         public string CurrencyFromCode { get; private set; }
         public string CurrencyToCode { get; private set; }
 
-        public CurrencyExchangeRate(int id, DateTime time, decimal exchangeRate, string currencyFromCode, string currencyToCode) : this(time, exchangeRate, currencyFromCode, currencyToCode)
+        internal CurrencyExchangeRate(int id, DateTime time, decimal exchangeRate, string currencyFromCode, string currencyToCode) : this(time, exchangeRate, currencyFromCode, currencyToCode)
         {
             Id = id;
         }
 
-        public CurrencyExchangeRate(DateTime time, decimal exchangeRate, string currencyFromCode, string currencyToCode)
+        internal CurrencyExchangeRate(DateTime time, decimal exchangeRate, string currencyFromCode, string currencyToCode)
         {
             if (time < PortEvalConstants.FinancialDataStartTime)
                 throw new InvalidOperationException(
@@ -25,6 +25,11 @@ namespace PortEval.Domain.Models.Entities
             ExchangeRate = exchangeRate;
             CurrencyFromCode = currencyFromCode;
             CurrencyToCode = currencyToCode;
+        }
+
+        public static CurrencyExchangeRate Create(DateTime time, decimal exchangeRate, Currency currencyFrom, Currency currencyTo)
+        {
+            return new CurrencyExchangeRate(time, exchangeRate, currencyFrom.Code, currencyTo.Code);
         }
     }
 }

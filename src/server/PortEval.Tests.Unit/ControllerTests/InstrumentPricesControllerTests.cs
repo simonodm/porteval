@@ -109,7 +109,9 @@ namespace PortEval.Tests.Unit.ControllerTests
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var price = fixture.Create<InstrumentPriceDto>();
+            var price = fixture.Build<InstrumentPriceDto>()
+                .With(p => p.Time, DateTime.UtcNow)
+                .Create();
 
             var instrumentPriceService = fixture.Freeze<Mock<IInstrumentPriceService>>();
             instrumentPriceService

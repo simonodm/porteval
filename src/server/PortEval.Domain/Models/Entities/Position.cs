@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PortEval.Domain.Events;
+using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Domain.Models.Entities
 {
@@ -15,16 +17,26 @@ namespace PortEval.Domain.Models.Entities
         public IReadOnlyCollection<Transaction> Transactions => _transactions.AsReadOnly();
         private readonly List<Transaction> _transactions = new List<Transaction>();
 
-        public Position(int id, int portfolioId, int instrumentId, string note) : this(portfolioId, instrumentId, note)
+        internal Position(int id, int portfolioId, int instrumentId, string note) : this(portfolioId, instrumentId, note)
         {
             Id = id;
         }
 
-        public Position(int portfolioId, int instrumentId, string note)
+        internal Position(int portfolioId, int instrumentId, string note)
         {
             PortfolioId = portfolioId;
             InstrumentId = instrumentId;
             Note = note;
+        }
+
+        public static Position Create(Portfolio portfolio, Instrument instrument, string note)
+        {
+            if (instrument.Type == InstrumentType.Index)
+            {
+                throw new OperationNotAllowedException("Cannot open a position for an index.");
+            }
+
+            return new Position(portfolio.Id, instrument.Id, note);
         }
 
         public Transaction FindTransaction(int transactionId)
@@ -34,7 +46,7 @@ namespace PortEval.Domain.Models.Entities
 
         public Transaction AddTransaction(decimal amount, decimal price, DateTime time, string note = "")
         {
-            var transaction = new Transaction(Id, time, amount, price, note);
+            var transaction = Transaction.Create(Id, time, amount, price, note);
 
             if (GetAmountAt(time) + transaction.Amount < 0)
             {
@@ -42,6 +54,7 @@ namespace PortEval.Domain.Models.Entities
             }
 
             _transactions.Add(transaction);
+            AddDomainEvent(new TransactionAddedToPositionDomainEvent(transaction, this));
             return transaction;
         }
 
@@ -64,6 +77,7 @@ namespace PortEval.Domain.Models.Entities
             transaction.SetPrice(price);
             transaction.SetNote(note);
 
+            AddDomainEvent(new TransactionChangedDomainEvent(transaction, this));
             return transaction;
         }
 

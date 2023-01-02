@@ -22,7 +22,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<IEnumerable<InstrumentPrice>> ListInstrumentPricesAsync(int instrumentId)
         {
             return await _context.InstrumentPrices
-                .AsNoTracking()
                 .Where(price => price.InstrumentId == instrumentId)
                 .ToListAsync();
         }
@@ -30,7 +29,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<InstrumentPrice> FindPriceByIdAsync(int instrumentId, int priceId)
         {
             return await _context.InstrumentPrices
-                .AsNoTracking()
                 .Where(price => price.InstrumentId == instrumentId && price.Id == priceId)
                 .FirstOrDefaultAsync();
         }
@@ -38,7 +36,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<InstrumentPrice> FindPriceAtAsync(int instrumentId, DateTime time)
         {
             return await _context.InstrumentPrices
-                .AsNoTracking()
                 .OrderByDescending(price => price.Time)
                 .FirstOrDefaultAsync(price => price.InstrumentId == instrumentId && price.Time <= time);
         }
@@ -46,6 +43,11 @@ namespace PortEval.Infrastructure.Repositories
         public InstrumentPrice Add(InstrumentPrice price)
         {
             return _context.InstrumentPrices.Add(price).Entity;
+        }
+
+        public InstrumentPrice Update(InstrumentPrice price)
+        {
+            return _context.InstrumentPrices.Update(price).Entity;
         }
 
         public async Task BulkInsertAsync(IList<InstrumentPrice> prices)

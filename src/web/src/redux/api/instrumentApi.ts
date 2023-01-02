@@ -1,7 +1,7 @@
 import { Instrument, InstrumentPrice, PaginatedResponse,
-    EntityProfit, EntityPerformance, InstrumentPriceConfig, AggregationFrequency } from '../../types';
+    EntityProfit, EntityPerformance, InstrumentPriceConfig, AggregationFrequency, InstrumentSplit } from '../../types';
 import { portEvalApi } from './portEvalApi';
-import { CreateInstrumentParameters, DateRangeParameters, PaginationParameters } from './apiTypes';
+import { CreateInstrumentParameters, CreateInstrumentSplitParameters, DateRangeParameters, PaginationParameters } from './apiTypes';
 import { getAllPaginated, truncateEntityName, truncateEntityNote } from './apiUtils';
 
 /**
@@ -133,6 +133,15 @@ const instrumentApi = portEvalApi.injectEndpoints({
                     ? [{ type: 'InstrumentPrice', id: result.id }]
                     : []
         }),
+        getInstrumentSplits: build.query<Array<InstrumentSplit>, number>({
+            query: (instrumentId) => ({
+                url: `instruments/${instrumentId}/splits`
+            }),
+            providesTags: (result, error, arg) =>
+                result
+                    ? [{ type: 'InstrumentSplits', id: arg }]
+                    : []
+        }),
         addInstrumentPrice: build.mutation<InstrumentPrice, InstrumentPriceConfig>({
             query: (data) => ({
                 url: `instruments/${data.instrumentId}/prices`,
@@ -161,6 +170,32 @@ const instrumentApi = portEvalApi.injectEndpoints({
                         'PositionCalculations',
                         { type: 'InstrumentPrices', id: arg.instrumentId },
                         { type: 'InstrumentCalculations', id: arg.instrumentId }
+                    ]
+                    : []
+        }),
+        createInstrumentSplit: build.mutation<void, CreateInstrumentSplitParameters>({
+            query: (data) => ({
+                url: `instruments/${data.instrumentId}/splits`,
+                method: 'POST',
+                body: data
+            }),
+            invalidatesTags: (result, error, arg) =>
+                !error
+                    ? [
+                        { type: 'InstrumentSplits', id: arg.instrumentId }
+                    ]
+                    : []
+        }),
+        updateInstrumentSplit: build.mutation<void, InstrumentSplit>({
+            query: (data) => ({
+                url: `instruments/${data.instrumentId}/splits/${data.id}`,
+                method: 'PUT',
+                body: data
+            }),
+            invalidatesTags: (result, error, arg) =>
+                !error
+                    ? [
+                        { type: 'InstrumentSplits', id: arg.instrumentId }
                     ]
                     : []
         }),
@@ -195,6 +230,9 @@ export const {
     useUpdateInstrumentMutation,
     useDeleteInstrumentMutation,
     useGetAllInstrumentPricesQuery,
+    useGetInstrumentSplitsQuery,
+    useCreateInstrumentSplitMutation,
+    useUpdateInstrumentSplitMutation,
     useGetInstrumentPricePageQuery,
     useGetInstrumentPriceAtQuery,
     useGetInstrumentCurrentPriceQuery,

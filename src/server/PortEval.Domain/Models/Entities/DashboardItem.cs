@@ -2,22 +2,22 @@
 
 namespace PortEval.Domain.Models.Entities
 {
-    public abstract class DashboardItem
+    public abstract class DashboardItem : Entity, IAggregateRoot
     {
         public int Id { get; private set; }
         public DashboardPosition Position { get; private set; }
 
-        public DashboardItem()
+        protected DashboardItem()
         {
             Position = new DashboardPosition(0, 0, 1, 1);
         }
 
-        public DashboardItem(DashboardPosition position)
+        protected DashboardItem(DashboardPosition position)
         {
             Position = position;
         }
 
-        public DashboardItem(int id, DashboardPosition position)
+        protected DashboardItem(int id, DashboardPosition position)
         {
             Id = id;
             Position = position;

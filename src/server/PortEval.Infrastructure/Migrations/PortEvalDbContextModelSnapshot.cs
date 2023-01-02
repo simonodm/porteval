@@ -1422,6 +1422,10 @@ namespace PortEval.Infrastructure.Migrations
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Imports");
@@ -1580,7 +1584,7 @@ namespace PortEval.Infrastructure.Migrations
                         new
                         {
                             Symbol = "FRA",
-                            Name = "Deutsche B�rse Frankfurt Stock Exchange",
+                            Name = "Deutsche Börse Frankfurt Stock Exchange",
                             Version = 0
                         },
                         new
@@ -1953,9 +1957,6 @@ namespace PortEval.Infrastructure.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
-                    b.Property<bool>("IsTracked")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -1969,6 +1970,9 @@ namespace PortEval.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
+
+                    b.Property<int>("TrackingStatus")
+                        .HasColumnType("int");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -1993,6 +1997,9 @@ namespace PortEval.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("InstrumentId")
                         .HasColumnType("int");
 
@@ -2003,11 +2010,42 @@ namespace PortEval.Infrastructure.Migrations
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("InstrumentId", "Time");
 
                     b.ToTable("InstrumentPrices");
+                });
+
+            modelBuilder.Entity("PortEval.Domain.Models.Entities.InstrumentSplit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("InstrumentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProcessingStatus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstrumentId");
+
+                    b.ToTable("InstrumentSplits");
                 });
 
             modelBuilder.Entity("PortEval.Domain.Models.Entities.Portfolio", b =>
@@ -2080,6 +2118,9 @@ namespace PortEval.Infrastructure.Migrations
                         .HasPrecision(19, 10)
                         .HasColumnType("decimal(19,10)");
 
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Note")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -2093,10 +2134,6 @@ namespace PortEval.Infrastructure.Migrations
 
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Version")
-                        .IsConcurrencyToken()
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -2269,6 +2306,9 @@ namespace PortEval.Infrastructure.Migrations
                             b1.Property<DateTime>("StartTime")
                                 .HasColumnType("datetime2");
 
+                            b1.Property<DateTime>("TrackedSince")
+                                .HasColumnType("datetime2");
+
                             b1.HasKey("CurrencyCode");
 
                             b1.ToTable("Currencies");
@@ -2352,6 +2392,9 @@ namespace PortEval.Infrastructure.Migrations
                             b1.Property<DateTime>("StartTime")
                                 .HasColumnType("datetime2");
 
+                            b1.Property<DateTime>("TrackedSince")
+                                .HasColumnType("datetime2");
+
                             b1.HasKey("InstrumentId");
 
                             b1.ToTable("Instruments");
@@ -2369,6 +2412,41 @@ namespace PortEval.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("InstrumentId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PortEval.Domain.Models.Entities.InstrumentSplit", b =>
+                {
+                    b.HasOne("PortEval.Domain.Models.Entities.Instrument", null)
+                        .WithMany()
+                        .HasForeignKey("InstrumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("PortEval.Domain.Models.ValueObjects.SplitRatio", "SplitRatio", b1 =>
+                        {
+                            b1.Property<int>("InstrumentSplitId")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<int>("Denominator")
+                                .HasColumnType("int")
+                                .HasColumnName("SplitRatioDenominator");
+
+                            b1.Property<int>("Numerator")
+                                .HasColumnType("int")
+                                .HasColumnName("SplitRatioNumerator");
+
+                            b1.HasKey("InstrumentSplitId");
+
+                            b1.ToTable("InstrumentSplits");
+
+                            b1.WithOwner()
+                                .HasForeignKey("InstrumentSplitId");
+                        });
+
+                    b.Navigation("SplitRatio")
                         .IsRequired();
                 });
 

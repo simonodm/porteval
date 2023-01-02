@@ -1,5 +1,4 @@
-﻿using PortEval.Domain.Models.Enums;
-using PortEval.FinancialDataFetcher.Interfaces;
+﻿using PortEval.FinancialDataFetcher.Interfaces;
 
 namespace PortEval.FinancialDataFetcher.Requests
 {
@@ -7,6 +6,5 @@ namespace PortEval.FinancialDataFetcher.Requests
     {
         public string Symbol { get; set; }
         public string CurrencyCode { get; set; }
-        public InstrumentType Type { get; set; }
     }
 }

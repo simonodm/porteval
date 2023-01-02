@@ -52,6 +52,11 @@ export type InstrumentType = 'stock' | 'bond' | 'mutualFund' | 'etf' |
     'commodity' | 'cryptoCurrency' | 'index' | 'other';
 
 /**
+ * Represents instrument's automated tracking status.
+ */
+export type InstrumentTrackingStatus = 'created' | 'searchingForPrices' | 'tracked' | 'untracked'
+
+/**
  * Represents an investment instrument.
  */
 export type Instrument = {
@@ -63,7 +68,7 @@ export type Instrument = {
     currencyCode: string;
     currentPrice?: number;
     note: string;
-    isTracked?: boolean;
+    trackingStatus?: InstrumentTrackingStatus;
     lastPriceUpdate?: string;
 }
 
@@ -81,6 +86,23 @@ export type InstrumentPriceConfig = {
  */
 export type InstrumentPrice = InstrumentPriceConfig & {
     id: number;
+}
+
+/**
+ * Represents the processing status of an instrument split.
+ */
+export type InstrumentSplitProcessingStatus = 'notProcessed' | 'processed' | 'rollbackRequested' | 'rolledBack';
+
+/**
+ * Represents an instrument's split.
+ */
+export type InstrumentSplit = {
+    id: number;
+    instrumentId: number;
+    time: string;
+    status: InstrumentSplitProcessingStatus;
+    splitRatioDenominator: number;
+    splitRatioNumerator: number;
 }
 
 /**

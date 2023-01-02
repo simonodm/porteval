@@ -55,7 +55,7 @@ namespace PortEval.Infrastructure.Configurations
                 var symbol = (string)exchange["symbol"];
                 var name = (string)exchange["name"];
 
-                var createdExchange = new Exchange(symbol, name);
+                var createdExchange = Exchange.Create(symbol, name);
                 result.Add(createdExchange);
             }
 

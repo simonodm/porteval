@@ -30,8 +30,8 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task ListInstrumentPricesAsync_ReturnsInstrumentPrices()
         {
-            var first = new InstrumentPrice(DateTime.UtcNow, 100m, _instrument.Id);
-            var second = new InstrumentPrice(DateTime.UtcNow.AddMinutes(-5), 99m, _instrument.Id);
+            var first = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
+            var second = new InstrumentPrice(DateTime.UtcNow.AddMinutes(-5), DateTime.UtcNow, 99m, _instrument.Id);
             DbContext.Add(first);
             DbContext.Add(second);
             await DbContext.SaveChangesAsync();
@@ -44,7 +44,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task FindPriceAtAsync_ReturnsCorrectInstrumentPrice()
         {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, 100m, _instrument.Id);
+            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
             DbContext.Add(instrumentPrice);
             await DbContext.SaveChangesAsync();
 
@@ -56,7 +56,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task FindPriceByIdAsync_ReturnsCorrectInstrumentPrice()
         {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, 100m, _instrument.Id);
+            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
             DbContext.Add(instrumentPrice);
             await DbContext.SaveChangesAsync();
 
@@ -68,7 +68,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task Add_CreatesNewInstrumentPrice()
         {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, 100m, _instrument.Id);
+            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
 
             _instrumentPriceRepository.Add(instrumentPrice);
             await _instrumentPriceRepository.UnitOfWork.CommitAsync();
@@ -81,7 +81,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task DeleteAsync_DeletesInstrumentPrice()
         {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, 100m, _instrument.Id);
+            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
             DbContext.Add(instrumentPrice);
             await DbContext.SaveChangesAsync();
 
@@ -96,7 +96,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task Delete_DeletesInstrumentPrice()
         {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, 100m, _instrument.Id);
+            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
             DbContext.Add(instrumentPrice);
             await DbContext.SaveChangesAsync();
 
@@ -111,7 +111,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task ExistsAsync_ReturnsTrue_WhenInstrumentPriceWithSpecifiedIdExists()
         {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, 100m, _instrument.Id);
+            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
             DbContext.InstrumentPrices.Add(instrumentPrice);
             await DbContext.SaveChangesAsync();
 
@@ -123,7 +123,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task ExistsAsync_ReturnsTrue_WhenInstrumentPriceAtSpecifiedTimeExists()
         {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, 100m, _instrument.Id);
+            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
             DbContext.InstrumentPrices.Add(instrumentPrice);
             await DbContext.SaveChangesAsync();
 

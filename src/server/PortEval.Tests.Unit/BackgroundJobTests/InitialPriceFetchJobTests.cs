@@ -265,7 +265,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 i.Id == instrument.Id &&
                 i.TrackingInfo.StartTime == now.AddMinutes(-30) &&
                 i.TrackingInfo.LastUpdate >= now &&
-                i.IsTracked
+                i.TrackingStatus == InstrumentTrackingStatus.Tracked
             )));
         }
 

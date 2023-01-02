@@ -90,11 +90,12 @@ namespace PortEval.BackgroundJobs
             {
                 if (exchangeRateData.Time < range.From || exchangeRateData.Time > range.To) continue;
 
-                foreach (var (targetCurrency, exchangeRate) in exchangeRateData.Rates)
+                foreach (var (targetCurrencyCode, exchangeRate) in exchangeRateData.Rates)
                 {
-                    if (currenciesList.FirstOrDefault(c => c.Code == targetCurrency) == null || currency.Code == targetCurrency) continue;
+                    var targetCurrency = currenciesList.FirstOrDefault(c => c.Code == targetCurrencyCode);
+                    if (targetCurrency == null || currency.Code == targetCurrency.Code) continue;
 
-                    newExchangeRates.Add(new CurrencyExchangeRate(exchangeRateData.Time, exchangeRate, currency.Code, targetCurrency));
+                    newExchangeRates.Add(CurrencyExchangeRate.Create(exchangeRateData.Time, exchangeRate, currency, targetCurrency));
                     if (exchangeRateData.Time < minTime)
                     {
                         minTime = exchangeRateData.Time;

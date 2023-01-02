@@ -28,11 +28,11 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var prices = new List<InstrumentPrice>
             {
-                new InstrumentPrice(1, baseTime.AddDays(-5), 100, 1),
-                new InstrumentPrice(2, baseTime.AddDays(-5).AddHours(-12), 100, 1),
-                new InstrumentPrice(3, baseTime.AddDays(-6), 100, 1),
-                new InstrumentPrice(4, baseTime.AddDays(-6).AddHours(-12), 100, 1),
-                new InstrumentPrice(5, baseTime.AddDays(-7), 100, 1)
+                new InstrumentPrice(1, baseTime.AddDays(-5), baseTime, 100, 1),
+                new InstrumentPrice(2, baseTime.AddDays(-5).AddHours(-12), baseTime, 100, 1),
+                new InstrumentPrice(3, baseTime.AddDays(-6), baseTime, 100, 1),
+                new InstrumentPrice(4, baseTime.AddDays(-6).AddHours(-12), baseTime, 100, 1),
+                new InstrumentPrice(5, baseTime.AddDays(-7), baseTime, 100, 1)
             };
 
             var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
@@ -70,12 +70,12 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var prices = new List<InstrumentPrice>
             {
-                new InstrumentPrice(1, baseTime.AddDays(-1), 100, 1),
-                new InstrumentPrice(2, baseTime.AddDays(-1).AddMinutes(-30), 100, 1),
-                new InstrumentPrice(3, baseTime.AddDays(-1).AddHours(-1), 100, 1),
-                new InstrumentPrice(4, baseTime.AddDays(-4).AddHours(-23), 100, 1),
-                new InstrumentPrice(5, baseTime.AddDays(-4).AddHours(-23).AddMinutes(-30), 100, 1),
-                new InstrumentPrice(6, baseTime.AddDays(-5), 100, 1)
+                new InstrumentPrice(1, baseTime.AddDays(-1), baseTime, 100, 1),
+                new InstrumentPrice(2, baseTime.AddDays(-1).AddMinutes(-30), baseTime, 100, 1),
+                new InstrumentPrice(3, baseTime.AddDays(-1).AddHours(-1), baseTime, 100, 1),
+                new InstrumentPrice(4, baseTime.AddDays(-4).AddHours(-23), baseTime, 100, 1),
+                new InstrumentPrice(5, baseTime.AddDays(-4).AddHours(-23).AddMinutes(-30), baseTime, 100, 1),
+                new InstrumentPrice(6, baseTime.AddDays(-5), baseTime, 100, 1)
             };
 
             var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
@@ -114,13 +114,13 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var prices = new List<InstrumentPrice>
             {
-                new InstrumentPrice(1, baseTime, 100, 1),
-                new InstrumentPrice(2, baseTime.AddMinutes(-5), 100, 1),
-                new InstrumentPrice(3, baseTime.AddMinutes(-6), 100, 1),
-                new InstrumentPrice(4, baseTime.AddMinutes(-10), 100, 1),
-                new InstrumentPrice(5, baseTime.AddHours(-23), 100, 1),
-                new InstrumentPrice(6, baseTime.AddHours(-23).AddMinutes(-3), 100, 1),
-                new InstrumentPrice(7, baseTime.AddHours(-23).AddMinutes(-5), 100, 1)
+                new InstrumentPrice(1, baseTime, baseTime,  100, 1),
+                new InstrumentPrice(2, baseTime.AddMinutes(-5), baseTime, 100, 1),
+                new InstrumentPrice(3, baseTime.AddMinutes(-6), baseTime, 100, 1),
+                new InstrumentPrice(4, baseTime.AddMinutes(-10), baseTime, 100, 1),
+                new InstrumentPrice(5, baseTime.AddHours(-23), baseTime, 100, 1),
+                new InstrumentPrice(6, baseTime.AddHours(-23).AddMinutes(-3), baseTime, 100, 1),
+                new InstrumentPrice(7, baseTime.AddHours(-23).AddMinutes(-5), baseTime, 100, 1)
             };
 
             var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
