@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import PortEvalChart from '../charts/PortEvalChart';
 import PageHeading from '../ui/PageHeading';
 import useUserSettings from '../../hooks/useUserSettings';
+import ChartPreview from '../charts/ChartPreview';
 
 import { useGetInstrumentByIdQuery } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
@@ -96,7 +96,7 @@ function InstrumentView(): JSX.Element {
                     </table>
                 </div>
                 <div className="col-xs-12 col-md-6">
-                    { chart && <PortEvalChart chart={chart} /> }
+                    { chart && <ChartPreview chart={chart} /> }
                 </div>
             </div>
             <InstrumentSplitHistory instrument={instrument.data} />
