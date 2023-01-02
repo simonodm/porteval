@@ -6,6 +6,7 @@ using PortEval.Application.Models.DTOs.Enums;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Domain.Models.Entities;
 
 namespace PortEval.BackgroundJobs
 {
@@ -36,20 +37,12 @@ namespace PortEval.BackgroundJobs
 
             foreach (var split in nonProcessedSplits)
             {
-                await AdjustPreSplitPrices(split.InstrumentId, split.Time, split.SplitRatio.Denominator, split.SplitRatio.Numerator);
-                await AdjustPreSplitTransactions(split.InstrumentId, split.Time, split.SplitRatio.Denominator, split.SplitRatio.Numerator);
-                split.MarkAsProcessed();
-                split.IncreaseVersion();
-                _splitRepository.Update(split);
+                await ProcessSplit(split);
             }
 
             foreach (var split in rolledBackSplits)
             {
-                await AdjustPreSplitPrices(split.InstrumentId, split.Time, split.SplitRatio.Numerator, split.SplitRatio.Denominator);
-                await AdjustPreSplitTransactions(split.InstrumentId, split.Time, split.SplitRatio.Numerator, split.SplitRatio.Denominator);
-                split.MarkAsRolledBack();
-                split.IncreaseVersion();
-                _splitRepository.Update(split);
+                await ProcessSplitRollback(split);
             }
 
             await _splitRepository.UnitOfWork.CommitAsync();
@@ -73,36 +66,56 @@ namespace PortEval.BackgroundJobs
             _logger.LogInformation("Split price and transaction adjustment job finished.");
         }
 
-        private async Task AdjustPreSplitPrices(int instrumentId, DateTime time, int before, int after)
+        private async Task ProcessSplit(InstrumentSplit split)
         {
-            var prices = await _priceRepository.ListInstrumentPricesAsync(instrumentId);
+            var prices = await _priceRepository.ListInstrumentPricesAsync(split.InstrumentId);
+            var positions = await _positionRepository.ListAllInstrumentPositionsAsync(split.InstrumentId);
 
-            var multiplier = (decimal)before / after;
-            foreach (var price in prices.Where(p => p.Time <= time))
+            foreach (var price in prices)
             {
-                price.ChangePrice(price.Price * multiplier);
-                price.IncreaseVersion();
+                price.AdjustForSplit(split);
                 _priceRepository.Update(price);
             }
-        }
 
-        private async Task AdjustPreSplitTransactions(int instrumentId, DateTime time, int before, int after)
-        {
-            var positions = await _positionRepository.ListAllInstrumentPositionsAsync(instrumentId);
-
-            var priceMultiplier = (decimal)before / after;
-            var amountMultiplier = 1m / priceMultiplier;
             foreach (var position in positions)
             {
-                foreach (var transaction in position.Transactions.Where(t => t.Time <= time))
+                foreach (var transaction in position.Transactions)
                 {
-                    transaction.SetAmount(transaction.Amount * amountMultiplier);
-                    transaction.SetPrice(transaction.Price * priceMultiplier);
+                    transaction.AdjustForSplit(split);
                 }
 
-                position.IncreaseVersion();
                 _positionRepository.Update(position);
             }
+
+            split.MarkAsProcessed();
+            split.IncreaseVersion();
+            _splitRepository.Update(split);
+        }
+
+        private async Task ProcessSplitRollback(InstrumentSplit split)
+        {
+            var prices = await _priceRepository.ListInstrumentPricesAsync(split.InstrumentId);
+            var positions = await _positionRepository.ListAllInstrumentPositionsAsync(split.InstrumentId);
+
+            foreach (var price in prices)
+            {
+                price.AdjustForSplitRollback(split);
+                _priceRepository.Update(price);
+            }
+
+            foreach (var position in positions)
+            {
+                foreach (var transaction in position.Transactions)
+                {
+                    transaction.AdjustForSplitRollback(split);
+                }
+
+                _positionRepository.Update(position);
+            }
+
+            split.MarkAsRolledBack();
+            split.IncreaseVersion();
+            _splitRepository.Update(split);
         }
     }
 }

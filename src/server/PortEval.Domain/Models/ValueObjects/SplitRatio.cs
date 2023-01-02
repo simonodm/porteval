@@ -14,6 +14,11 @@
         /// </summary>
         public int Numerator { get; private set; }
 
+        /// <summary>
+        /// Represents the result factor by which the number of shares in circulation is multiplied after a split.
+        /// </summary>
+        public decimal Factor => (decimal)Numerator / Denominator;
+
         public SplitRatio(int denominator, int numerator)
         {
             Denominator = denominator;

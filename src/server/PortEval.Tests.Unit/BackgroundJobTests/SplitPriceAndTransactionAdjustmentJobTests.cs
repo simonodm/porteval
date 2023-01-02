@@ -25,8 +25,8 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var prices = new[]
             {
-                new InstrumentPrice(1, DateTime.Parse("2022-01-01"), firstPrice, 1),
-                new InstrumentPrice(2, DateTime.Parse("2022-02-01"), secondPrice, 1),
+                new InstrumentPrice(1, DateTime.Parse("2022-01-01"), DateTime.Parse("2022-01-01"), firstPrice, 1),
+                new InstrumentPrice(2, DateTime.Parse("2022-02-01"), DateTime.Parse("2022-02-01"), secondPrice, 1),
             };
 
             var splits = new[]
@@ -149,8 +149,8 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var prices = new[]
             {
-                new InstrumentPrice(1, DateTime.Parse("2022-01-01"), firstPrice, 1),
-                new InstrumentPrice(2, DateTime.Parse("2022-02-01"), secondPrice, 1),
+                new InstrumentPrice(1, DateTime.Parse("2022-01-01"), DateTime.Parse("2022-01-01"), firstPrice, 1),
+                new InstrumentPrice(2, DateTime.Parse("2022-02-01"), DateTime.Parse("2022-02-01"), secondPrice, 1),
             };
 
             var split = new InstrumentSplit(1, 1, DateTime.UtcNow, new SplitRatio(1, 5));

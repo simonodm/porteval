@@ -153,12 +153,12 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
             mock
                 .Setup(m => m.FindPriceByIdAsync(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns<int, int>((instrumentId, priceId) => Task.FromResult(
-                    new InstrumentPrice(priceId, fixture.Create<DateTime>(), fixture.Create<decimal>(), instrumentId)
+                    new InstrumentPrice(priceId, fixture.Create<DateTime>(), fixture.Create<DateTime>(), fixture.Create<decimal>(), instrumentId)
                 ));
             mock
                 .Setup(m => m.FindPriceAtAsync(It.IsAny<int>(), It.IsAny<DateTime>()))
                 .Returns<int, DateTime>((instrumentId, dt) => Task.FromResult(
-                    new InstrumentPrice(fixture.Create<int>(), dt, fixture.Create<decimal>(), instrumentId)    
+                    new InstrumentPrice(fixture.Create<int>(), dt, dt, fixture.Create<decimal>(), instrumentId)    
                 ));
             mock
                 .Setup(m => m.ExistsAsync(It.IsAny<int>(), It.IsAny<int>()))

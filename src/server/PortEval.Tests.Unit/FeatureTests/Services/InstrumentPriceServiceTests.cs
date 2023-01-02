@@ -115,7 +115,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             priceRepository
                 .Setup(r => r.FindPriceAtAsync(priceDto.InstrumentId, It.Is<DateTime>(dt => dt <= priceDto.Time)))
                 .ReturnsAsync<int, DateTime, IInstrumentPriceRepository, InstrumentPrice>((id, dt) =>
-                    new InstrumentPrice(dt, priceDto.Price + 1m, priceDto.InstrumentId));
+                    new InstrumentPrice(dt, dt, priceDto.Price + 1m, priceDto.InstrumentId));
 
             var sut = fixture.Create<InstrumentPriceService>();
 
@@ -150,7 +150,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             priceRepository
                 .Setup(r => r.FindPriceAtAsync(priceDto.InstrumentId, It.Is<DateTime>(dt => dt <= priceDto.Time)))
                 .ReturnsAsync<int, DateTime, IInstrumentPriceRepository, InstrumentPrice>((id, dt) =>
-                    new InstrumentPrice(dt.AddSeconds(-1), priceDto.Price, priceDto.InstrumentId));
+                    new InstrumentPrice(dt.AddSeconds(-1), dt, priceDto.Price, priceDto.InstrumentId));
 
             var sut = fixture.Create<InstrumentPriceService>();
 

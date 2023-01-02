@@ -115,8 +115,8 @@ namespace PortEval.Tests.Integration
 
             var transactions = new List<Transaction>
             {
-                new Transaction(positionsList[0].Id, DateTime.UtcNow.AddDays(-2), 1m, 100m, ""),
-                new Transaction(positionsList[1].Id, DateTime.UtcNow.AddDays(-1), 5m, 5000m, "bitcoin")
+                new Transaction(positionsList[0].Id, DateTime.UtcNow.AddDays(-2), DateTime.UtcNow, 1m, 100m, ""),
+                new Transaction(positionsList[1].Id, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow, 5m, 5000m, "bitcoin")
             };
 
             _context.Transactions.AddRange(transactions);
@@ -152,13 +152,13 @@ namespace PortEval.Tests.Integration
 
             var prices = new List<InstrumentPrice>
             {
-                new InstrumentPrice(DateTime.UtcNow.AddDays(-2), 130, instrumentsList[0].Id),
-                new InstrumentPrice(DateTime.UtcNow.AddDays(-1), 140, instrumentsList[0].Id),
-                new InstrumentPrice(DateTime.UtcNow, 150, instrumentsList[0].Id),
-                new InstrumentPrice(DateTime.UtcNow.AddDays(-2), 4000, instrumentsList[1].Id),
-                new InstrumentPrice(DateTime.UtcNow.AddDays(-1), 2000, instrumentsList[1].Id),
-                new InstrumentPrice(DateTime.UtcNow.Date, 2000, instrumentsList[1].Id),
-                new InstrumentPrice(DateTime.UtcNow, 1000, instrumentsList[1].Id),
+                new InstrumentPrice(DateTime.UtcNow.AddDays(-2), DateTime.UtcNow, 130, instrumentsList[0].Id),
+                new InstrumentPrice(DateTime.UtcNow.AddDays(-1), DateTime.UtcNow, 140, instrumentsList[0].Id),
+                new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 150, instrumentsList[0].Id),
+                new InstrumentPrice(DateTime.UtcNow.AddDays(-2), DateTime.UtcNow, 4000, instrumentsList[1].Id),
+                new InstrumentPrice(DateTime.UtcNow.AddDays(-1), DateTime.UtcNow, 2000, instrumentsList[1].Id),
+                new InstrumentPrice(DateTime.UtcNow.Date, DateTime.UtcNow, 2000, instrumentsList[1].Id),
+                new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 1000, instrumentsList[1].Id),
             };
 
             _context.InstrumentPrices.AddRange(prices);

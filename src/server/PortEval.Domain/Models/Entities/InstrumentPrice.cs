@@ -6,15 +6,17 @@ namespace PortEval.Domain.Models.Entities
     {
         public int Id { get; private set; }
         public DateTime Time { get; private set; }
+        public DateTime CreationTime { get; private set; }
         public decimal Price { get; private set; }
         public int InstrumentId { get; private set; }
 
-        internal InstrumentPrice(int id, DateTime time, decimal price, int instrumentId) : this(time, price, instrumentId)
+        internal InstrumentPrice(int id, DateTime time, DateTime creationTime, decimal price, int instrumentId)
+            : this(time, creationTime, price, instrumentId)
         {
             Id = id;
         }
 
-        internal InstrumentPrice(DateTime time, decimal price, int instrumentId)
+        internal InstrumentPrice(DateTime time, DateTime creationTime, decimal price, int instrumentId)
         {
             if (time < PortEvalConstants.FinancialDataStartTime)
                 throw new InvalidOperationException(
@@ -24,18 +26,30 @@ namespace PortEval.Domain.Models.Entities
                 throw new InvalidOperationException("Instrument price must be above zero.");
 
             Time = time;
+            CreationTime = creationTime;
             Price = price;
             InstrumentId = instrumentId;
         }
 
         public static InstrumentPrice Create(DateTime time, decimal price, Instrument instrument)
         {
-            return new InstrumentPrice(time, price, instrument.Id);
+            return new InstrumentPrice(time, DateTime.UtcNow, price, instrument.Id);
         }
 
-        public void ChangePrice(decimal newPrice)
+        public void AdjustForSplit(InstrumentSplit split)
         {
-            Price = newPrice;
+            if (split.Time > CreationTime)
+            {
+                Price /= split.SplitRatio.Factor;
+            }
+        }
+
+        public void AdjustForSplitRollback(InstrumentSplit split)
+        {
+            if (split.Time > CreationTime)
+            {
+                Price *= split.SplitRatio.Factor;
+            }
         }
     }
 }

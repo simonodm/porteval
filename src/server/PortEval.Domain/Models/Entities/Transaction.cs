@@ -7,18 +7,20 @@ namespace PortEval.Domain.Models.Entities
     {
         public int Id { get; private set; }
         public DateTime Time { get; private set; }
+        public DateTime CreationTime { get; private set; }
         public decimal Amount { get; private set; }
         public decimal Price { get; private set; }
         public string Note { get; private set; }
         public int PositionId { get; private set; }
         public Position Position { get; private set; }
 
-        internal Transaction(int id, int positionId, DateTime time, decimal amount, decimal price, string note = "") : this(positionId, time, amount, price, note)
+        internal Transaction(int id, int positionId, DateTime time, DateTime creationTime,
+            decimal amount, decimal price, string note = "") : this(positionId, time, creationTime, amount, price, note)
         {
             Id = id;
         }
 
-        internal Transaction(int positionId, DateTime time, decimal amount, decimal price, string note = "")
+        internal Transaction(int positionId, DateTime time, DateTime creationTime, decimal amount, decimal price, string note = "")
         {
             if (time < PortEvalConstants.FinancialDataStartTime)
                 throw new OperationNotAllowedException(
@@ -32,6 +34,7 @@ namespace PortEval.Domain.Models.Entities
 
             PositionId = positionId;
             Time = time;
+            CreationTime = creationTime;
             Amount = amount;
             Price = price;
             Note = note;
@@ -39,7 +42,7 @@ namespace PortEval.Domain.Models.Entities
 
         public static Transaction Create(int positionId, DateTime time, decimal amount, decimal price, string note = "")
         {
-            return new Transaction(positionId, time, amount, price, note);
+            return new Transaction(positionId, time, DateTime.UtcNow, amount, price, note);
         }
 
         public void SetTime(DateTime time)
@@ -60,6 +63,24 @@ namespace PortEval.Domain.Models.Entities
         public void SetNote(string note)
         {
             Note = note;
+        }
+
+        public void AdjustForSplit(InstrumentSplit split)
+        {
+            if (split.Time > CreationTime)
+            {
+                Amount *= split.SplitRatio.Factor;
+                Price /= split.SplitRatio.Factor;
+            }
+        }
+
+        public void AdjustForSplitRollback(InstrumentSplit split)
+        {
+            if (split.Time > CreationTime)
+            {
+                Amount /= split.SplitRatio.Factor;
+                Price *= split.SplitRatio.Factor;
+            }
         }
     }
 }

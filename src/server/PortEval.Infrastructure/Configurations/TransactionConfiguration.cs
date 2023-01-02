@@ -20,6 +20,9 @@ namespace PortEval.Infrastructure.Configurations
                 .Property(t => t.Time)
                 .IsRequired();
             builder
+                .Property(t => t.CreationTime)
+                .IsRequired();
+            builder
                 .Property(t => t.Amount)
                 .IsRequired()
                 .HasPrecision(19, 10);
