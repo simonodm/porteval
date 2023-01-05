@@ -6,6 +6,7 @@ using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Domain.Events;
 using System.Threading;
 using System.Threading.Tasks;
+using PortEval.Application.Features.Common;
 
 namespace PortEval.Application.Features.DomainEventHandlers.InstrumentSplitRollbackRequested
 {
@@ -22,7 +23,7 @@ namespace PortEval.Application.Features.DomainEventHandlers.InstrumentSplitRollb
                 typeof(AdjustPricesAndTransactionsWhenInstrumentSplitCreatedDomainEventHandler));
         }
 
-        public Task Handle(InstrumentSplitRollbackRequestedDomainEvent notification, CancellationToken cancellationToken)
+        public Task Handle(DomainEventNotificationAdapter<InstrumentSplitRollbackRequestedDomainEvent> notification, CancellationToken cancellationToken)
         {
             _jobClient.Enqueue<ISplitPriceAndTransactionAdjustmentJob>(job => job.Run());
             _logger.LogInformation("Split price and transaction adjustment job enqueued.");

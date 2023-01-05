@@ -21,6 +21,7 @@
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="EFCore.BulkExtensions" Version="5.4.1" />
     <PackageReference Include="Hangfire" Version="1.7.28" />
+    <PackageReference Include="MediatR" Version="11.1.0" />
     <PackageReference Include="System.IO.Abstractions" Version="17.2.3" />
   </ItemGroup>
 

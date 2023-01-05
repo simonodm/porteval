@@ -1,7 +1,10 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using PortEval.Domain.Models.Entities;
+using PortEval.Application.Features.Common;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Domain.Events;
 
 namespace PortEval.Infrastructure
 {
@@ -13,8 +16,9 @@ namespace PortEval.Infrastructure
                 .Entries<Entity>()
                 .Where(entry => entry.Entity.DomainEvents != null && entry.Entity.DomainEvents.Any());
 
-            var domainEvents = domainEntities
+            var notifications = domainEntities
                 .SelectMany(entry => entry.Entity.DomainEvents)
+                .Select(CreateNotificationFromDomainEvent)
                 .ToList();
 
             foreach (var entity in domainEntities)
@@ -22,10 +26,16 @@ namespace PortEval.Infrastructure
                 entity.Entity.ClearDomainEvents();
             }
 
-            foreach (var domainEvent in domainEvents)
+            foreach (var notification in notifications)
             {
-                await mediator.Publish(domainEvent);
+                await mediator.Publish(notification);
             }
+        }
+
+        private static INotification CreateNotificationFromDomainEvent(IDomainEvent domainEvent)
+        {
+            var genericDispatcherType = typeof(DomainEventNotificationAdapter<>).MakeGenericType(domainEvent.GetType());
+            return (INotification)Activator.CreateInstance(genericDispatcherType, domainEvent);
         }
     }
 }

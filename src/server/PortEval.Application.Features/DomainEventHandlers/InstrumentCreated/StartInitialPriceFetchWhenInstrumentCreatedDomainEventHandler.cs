@@ -5,6 +5,7 @@ using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Domain.Events;
 using System.Threading;
 using System.Threading.Tasks;
+using PortEval.Application.Features.Common;
 using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Application.Features.DomainEventHandlers.InstrumentCreated
@@ -21,13 +22,14 @@ namespace PortEval.Application.Features.DomainEventHandlers.InstrumentCreated
             _logger = loggerFactory.CreateLogger(typeof(StartInitialPriceFetchWhenInstrumentCreatedDomainEventHandler));
         }
 
-        public Task Handle(InstrumentCreatedDomainEvent notification, CancellationToken cancellationToken)
+        public Task Handle(DomainEventNotificationAdapter<InstrumentCreatedDomainEvent> notification, CancellationToken cancellationToken)
         {
-            _jobClient.Enqueue<IInitialPriceFetchJob>(job => job.Run(notification.Instrument.Id));
+            var domainEvent = notification.DomainEvent;
+            _jobClient.Enqueue<IInitialPriceFetchJob>(job => job.Run(domainEvent.Instrument.Id));
 
-            notification.Instrument.SetTrackingStatus(InstrumentTrackingStatus.SearchingForPrices);
+            domainEvent.Instrument.SetTrackingStatus(InstrumentTrackingStatus.SearchingForPrices);
 
-            _logger.LogInformation($"Initial price fetch job enqueued for instrument {notification.Instrument.Symbol}, ID {notification.Instrument.Id}.");
+            _logger.LogInformation($"Initial price fetch job enqueued for instrument {domainEvent.Instrument.Symbol}, ID {domainEvent.Instrument.Id}.");
             return Task.CompletedTask;
         }
     }

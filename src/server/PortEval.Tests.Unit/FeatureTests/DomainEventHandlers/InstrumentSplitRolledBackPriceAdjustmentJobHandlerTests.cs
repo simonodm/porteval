@@ -8,6 +8,7 @@ using PortEval.Application.Features.DomainEventHandlers.InstrumentSplitRollbackR
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Domain.Events;
 using System.Threading.Tasks;
+using PortEval.Application.Features.Common;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
@@ -21,11 +22,13 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
                 .Customize(new AutoMoqCustomization());
 
             var domainEvent = fixture.Create<InstrumentSplitRollbackRequestedDomainEvent>();
+            var domainEventAdapter =
+                new DomainEventNotificationAdapter<InstrumentSplitRollbackRequestedDomainEvent>(domainEvent);
             var jobClient = fixture.Freeze<Mock<IBackgroundJobClient>>();
 
             var sut = fixture.Create<AdjustPricesAndTransactionsWhenInstrumentSplitRolledBackDomainEventHandler>();
 
-            await sut.Handle(domainEvent, default);
+            await sut.Handle(domainEventAdapter, default);
 
             jobClient.Verify(c => c.Create(
                 It.Is<Job>(job =>

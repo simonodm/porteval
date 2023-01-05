@@ -1,11 +1,10 @@
-﻿using System;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
+using PortEval.Application.Features.Common;
 using PortEval.Application.Features.DomainEventHandlers.TransactionChanged;
 using PortEval.Domain.Events;
 using PortEval.Tests.Unit.Helpers.Extensions;
 using System.Threading.Tasks;
-using PortEval.Domain.Models.Entities;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
@@ -19,11 +18,13 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
                 .Customize(new AutoMoqCustomization());
             
             var domainEvent = fixture.Create<TransactionChangedDomainEvent>();
+            var domainEventAdapter =
+                new DomainEventNotificationAdapter<TransactionChangedDomainEvent>(domainEvent);
             var priceService = fixture.CreateDefaultInstrumentPriceServiceMock();
 
             var sut = fixture.Create<CreateInstrumentPriceIfNotExistsWhenTransactionIsUpdatedDomainEventHandler>();
 
-            await sut.Handle(domainEvent, default);
+            await sut.Handle(domainEventAdapter, default);
 
             priceService.Verify(s =>
                 s.AddPriceIfNotExistsAsync(

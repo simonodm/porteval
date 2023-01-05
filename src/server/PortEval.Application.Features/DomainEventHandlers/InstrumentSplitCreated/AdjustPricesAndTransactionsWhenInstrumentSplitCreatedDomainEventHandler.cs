@@ -5,6 +5,7 @@ using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Domain.Events;
 using System.Threading;
 using System.Threading.Tasks;
+using PortEval.Application.Features.Common;
 
 namespace PortEval.Application.Features.DomainEventHandlers.InstrumentSplitCreated
 {
@@ -21,7 +22,7 @@ namespace PortEval.Application.Features.DomainEventHandlers.InstrumentSplitCreat
                 typeof(AdjustPricesAndTransactionsWhenInstrumentSplitCreatedDomainEventHandler));
         }
 
-        public Task Handle(InstrumentSplitCreatedDomainEvent notification, CancellationToken cancellationToken)
+        public Task Handle(DomainEventNotificationAdapter<InstrumentSplitCreatedDomainEvent> notification, CancellationToken cancellationToken)
         {
             _jobClient.Enqueue<ISplitPriceAndTransactionAdjustmentJob>(job => job.Run());
             _logger.LogInformation("Split price and transaction adjustment job enqueued.");

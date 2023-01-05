@@ -5,6 +5,7 @@ using Hangfire;
 using Hangfire.Common;
 using Hangfire.States;
 using Moq;
+using PortEval.Application.Features.Common;
 using PortEval.Application.Features.DomainEventHandlers.InstrumentCreated;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Domain.Events;
@@ -22,12 +23,12 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
                 .Customize(new AutoMoqCustomization());
 
             var domainEvent = fixture.Create<InstrumentCreatedDomainEvent>();
-
+            var domainEventAdapter = new DomainEventNotificationAdapter<InstrumentCreatedDomainEvent>(domainEvent);
             var backgroundJobClient = fixture.Freeze<Mock<IBackgroundJobClient>>();
 
             var sut = fixture.Create<StartInitialPriceFetchWhenInstrumentCreatedDomainEventHandler>();
 
-            await sut.Handle(domainEvent, default);
+            await sut.Handle(domainEventAdapter, default);
 
             backgroundJobClient.Verify(c => c.Create(
                 It.Is<Job>(job =>

@@ -4,6 +4,7 @@ using PortEval.Application.Features.DomainEventHandlers.TransactionAddedToPositi
 using PortEval.Domain.Events;
 using PortEval.Tests.Unit.Helpers.Extensions;
 using System.Threading.Tasks;
+using PortEval.Application.Features.Common;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
@@ -17,11 +18,13 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
                 .Customize(new AutoMoqCustomization());
 
             var domainEvent = fixture.Create<TransactionAddedToPositionDomainEvent>();
+            var domainEventAdapter =
+                new DomainEventNotificationAdapter<TransactionAddedToPositionDomainEvent>(domainEvent);
             var priceService = fixture.CreateDefaultInstrumentPriceServiceMock();
 
             var sut = fixture.Create<CreateInstrumentPriceIfNotExistsWhenTransactionIsAddedDomainEventHandler>();
 
-            await sut.Handle(domainEvent, default);
+            await sut.Handle(domainEventAdapter, default);
 
             priceService.Verify(s => 
                 s.AddPriceIfNotExistsAsync(

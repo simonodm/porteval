@@ -8,6 +8,7 @@ using PortEval.Application.Features.DomainEventHandlers.InstrumentSplitCreated;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Domain.Events;
 using System.Threading.Tasks;
+using PortEval.Application.Features.Common;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
@@ -21,11 +22,12 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
                 .Customize(new AutoMoqCustomization());
 
             var domainEvent = fixture.Create<InstrumentSplitCreatedDomainEvent>();
+            var domainEventAdapter = new DomainEventNotificationAdapter<InstrumentSplitCreatedDomainEvent>(domainEvent);
             var jobClient = fixture.Freeze<Mock<IBackgroundJobClient>>();
 
             var sut = fixture.Create<AdjustPricesAndTransactionsWhenInstrumentSplitCreatedDomainEventHandler>();
 
-            await sut.Handle(domainEvent, default);
+            await sut.Handle(domainEventAdapter, default);
 
             jobClient.Verify(c => c.Create(
                 It.Is<Job>(job =>
