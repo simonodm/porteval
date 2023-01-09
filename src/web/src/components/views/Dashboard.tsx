@@ -121,7 +121,6 @@ function Dashboard(): JSX.Element {
                                     <button
                                         className="btn btn-danger grid-remove-button"
                                         onClick={() => onRemove(chart.id)}
-                                        role="button"
                                     >
                                         X
                                     </button>

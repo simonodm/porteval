@@ -120,7 +120,7 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
             <DataTable 
                 className="w-100 entity-list"
                 columns={columns}
-                ariaLabel={`Instrument ${instrumentId} table`}
+                ariaLabel={`Instrument ${instrumentId} prices table`}
                 data={{
                     data: prices.data?.data ?? [],
                     isLoading: !isLoaded,

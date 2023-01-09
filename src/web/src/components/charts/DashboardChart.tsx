@@ -26,7 +26,7 @@ type Props = {
  */
 function DashboardChart({ chart, disabled }: Props): JSX.Element {
     return (
-        <div className="dashboard-chart-item-wrapper">
+        <div className="dashboard-chart-item-wrapper" aria-label="dashboard-chart">
             {
                 disabled
                     ? <h6 className="mb-0 text-center">{chart.name}</h6>

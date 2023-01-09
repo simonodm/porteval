@@ -107,7 +107,7 @@ function LineChart({ config, lines }: Props): JSX.Element {
         [config, lines, containerRef, containerRef.current?.clientHeight, containerRef.current?.clientWidth]);
 
     return (
-        <div className="chart" ref={containerRef}>
+        <div className="chart" aria-label="chart" ref={containerRef}>
         </div>
     )
 }

@@ -70,7 +70,7 @@ function ExportDataForm({ onSuccess }: Props): JSX.Element {
                         : null
                 }
             </LoadingWrapper>
-            <input type="submit" className="btn btn-primary">Export</input>
+            <input type="submit" className="btn btn-primary" value="Export" />
         </form>
     )
 }

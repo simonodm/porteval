@@ -1,4 +1,4 @@
-import { Currency, EntityStatistics, Instrument, InstrumentPrice, Portfolio, Position, PositionStatistics, Transaction } from "../../types";
+import { Chart, Currency, CurrencyExchangeRate, DashboardLayout, EntityStatistics, ImportEntry, Instrument, InstrumentPrice, Portfolio, Position, PositionStatistics, Transaction } from "../../types";
 
 export const testCurrencies: Array<Currency> = [
     {
@@ -63,7 +63,8 @@ export const testInstruments: Array<Instrument> = [
         currencyCode: "USD",
         type: "stock",
         exchange: "NASDAQ",
-        note: "Test note AAPL"
+        note: "Test note AAPL",
+        currentPrice: 100
     },
     {
         id: 2,
@@ -71,7 +72,8 @@ export const testInstruments: Array<Instrument> = [
         symbol: "BTC",
         currencyCode: "USD",
         type: "cryptoCurrency",
-        note: "Test note BTC"
+        note: "Test note BTC",
+        currentPrice: 80
     }
 ];
 
@@ -166,7 +168,56 @@ export const testPrices: Array<InstrumentPrice> = [
     {
         id: 4,
         instrumentId: testInstruments[1].id,
-        time: "2010-01-01T00:00:00Z",
+        time: "2022-01-01T00:00:00Z",
         price: 80
     },
 ];
+
+export const testCharts: Array<Chart> = [
+    {
+        id: 1,
+        name: 'Test chart 1',
+        type: 'price',
+        isToDate: true,
+        toDateRange: {
+            unit: 'month',
+            value: 6
+        },
+        currencyCode: 'USD',
+        lines: []
+    }
+];
+
+export const testExchangeRates: Array<CurrencyExchangeRate> = [
+    {
+        id: 1,
+        currencyFromCode: 'USD',
+        currencyToCode: 'EUR',
+        exchangeRate: 1,
+        time: '2022-01-01'
+    }
+];
+
+export const testDataImports: Array<ImportEntry> = [
+    {
+        importId: 'test-import',
+        time: '2022-01-01',
+        status: 'finished',
+        statusDetails: '',
+        templateType: 'instruments',
+        errorLogAvailable: false,
+        errorLogUrl: ''
+    }
+];
+
+export const testDashboardLayout: DashboardLayout = {
+    items: [
+        {
+            chartId: testCharts[0].id,
+            dashboardPositionX: 0,
+            dashboardPositionY: 0,
+            dashboardHeight: 1,
+            dashboardWidth: 1
+        }
+    ]
+}
