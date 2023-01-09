@@ -1,10 +1,10 @@
-﻿using System;
-using MediatR;
-using PortEval.Domain.Models.Entities;
+﻿using MediatR;
 using PortEval.Application.Features.Common;
+using PortEval.Domain.Events;
+using PortEval.Domain.Models.Entities;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Domain.Events;
 
 namespace PortEval.Infrastructure
 {

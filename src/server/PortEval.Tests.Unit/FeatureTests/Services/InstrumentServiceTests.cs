@@ -1,10 +1,7 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Hangfire;
-using Hangfire.Common;
-using Hangfire.States;
 using Moq;
-using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Application.Features.Services;
 using PortEval.Application.Models.DTOs;

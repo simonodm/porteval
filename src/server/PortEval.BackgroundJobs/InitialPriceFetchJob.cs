@@ -1,14 +1,14 @@
 using Microsoft.Extensions.Logging;
+using PortEval.Application.Features.Interfaces;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs.Enums;
+using PortEval.Application.Models.PriceFetcher;
 using PortEval.BackgroundJobs.Helpers;
 using PortEval.Domain;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
-using PortEval.FinancialDataFetcher.Interfaces;
-using PortEval.FinancialDataFetcher.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +32,7 @@ namespace PortEval.BackgroundJobs
         private readonly ILogger _logger;
 
         public InitialPriceFetchJob(IInstrumentRepository instrumentRepository, IInstrumentPriceRepository instrumentPriceRepository,
-            INotificationService notificationService, IPriceFetcher fetcher, ILoggerFactory loggerFactory)
+            INotificationService notificationService, IFinancialDataFetcher fetcher, ILoggerFactory loggerFactory)
             : base(fetcher)
         {
             _instrumentRepository = instrumentRepository;
@@ -126,7 +126,7 @@ namespace PortEval.BackgroundJobs
                 {
                     continue;
                 }
-                
+
                 pricesToAdd.Add(InstrumentPrice.Create(pricePoint.Time, pricePoint.Price, instrument));
 
                 if (pricePoint.Time < minTime)

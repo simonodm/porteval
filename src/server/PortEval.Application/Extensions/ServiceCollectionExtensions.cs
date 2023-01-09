@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using Hangfire.SqlServer;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,15 +20,18 @@ using PortEval.Application.Features.Services;
 using PortEval.Application.Features.Services.BulkImportExport;
 using PortEval.Application.Models.DTOs;
 using PortEval.BackgroundJobs;
-using PortEval.FinancialDataFetcher;
-using PortEval.FinancialDataFetcher.Interfaces;
+using PortEval.DataFetcher;
+using PortEval.DataFetcher.Interfaces;
+using PortEval.Domain.Services;
 using PortEval.Infrastructure;
+using PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost;
+using PortEval.Infrastructure.FinancialDataFetcher.OpenExchangeRates;
+using PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum;
+using PortEval.Infrastructure.FinancialDataFetcher.Tiingo;
 using PortEval.Infrastructure.Repositories;
 using System;
 using System.Data;
 using System.IO.Abstractions;
-using MediatR;
-using PortEval.Domain.Services;
 
 namespace PortEval.Application.Extensions
 {
@@ -219,29 +223,47 @@ namespace PortEval.Application.Extensions
         /// <param name="configuration">ASP.NET application configuration.</param>
         public static void ConfigurePriceFetcher(this IServiceCollection services, IConfiguration configuration)
         {
-            var fetcher = new PriceFetcher();
+            var dataFetcher = new DataFetcher.DataFetcher();
             var mboumKey = configuration.GetConfigurationValue("PORTEVAL_RapidAPI_Mboum_Key");
             var tiingoKey = configuration.GetConfigurationValue("PORTEVAL_Tiingo_Key");
             var openExchangeRatesKey = configuration.GetConfigurationValue("PORTEVAL_OpenExchangeRates_Key");
 
             if (tiingoKey != null)
             {
-                fetcher.AddTiingo(tiingoKey, new RateLimiter(TimeSpan.FromHours(1), 500));
+                dataFetcher.RegisterDataSource<TiingoApi>(new DataSourceConfiguration
+                {
+                    Credentials = new DataSourceCredentials
+                    {
+                        Token = tiingoKey
+                    }
+                });
             }
 
             if (mboumKey != null)
             {
-                fetcher.AddMboum(mboumKey, new RateLimiter(TimeSpan.FromSeconds(1), 10));
+                dataFetcher.RegisterDataSource<MboumApi>(new DataSourceConfiguration
+                {
+                    Credentials = new DataSourceCredentials
+                    {
+                        Token = mboumKey
+                    }
+                });
             }
 
             if (openExchangeRatesKey != null)
             {
-                fetcher.AddOpenExchangeRates(openExchangeRatesKey, new RateLimiter(TimeSpan.FromHours(3), 4));
+                dataFetcher.RegisterDataSource<OpenExchangeRatesApi>(new DataSourceConfiguration
+                {
+                    Credentials = new DataSourceCredentials
+                    {
+                        Token = openExchangeRatesKey
+                    }
+                });
             }
 
-            fetcher.AddExchangeRateHost();
-
-            services.AddSingleton<IPriceFetcher>(fetcher);
+            dataFetcher.RegisterDataSource<ExchangeRateHostApi>();
+            services.AddSingleton<IDataFetcher>(dataFetcher);
+            services.AddScoped<IFinancialDataFetcher, Infrastructure.FinancialDataFetcher.FinancialDataFetcher>();
         }
 
     }

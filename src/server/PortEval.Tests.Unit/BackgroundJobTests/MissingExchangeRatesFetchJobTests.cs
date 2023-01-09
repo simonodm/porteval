@@ -1,12 +1,11 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Features.Interfaces;
+using PortEval.Application.Models.PriceFetcher;
 using PortEval.BackgroundJobs;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
-using PortEval.FinancialDataFetcher.Interfaces;
-using PortEval.FinancialDataFetcher.Models;
-using PortEval.FinancialDataFetcher.Responses;
 using PortEval.Tests.Unit.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
@@ -146,16 +145,12 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             await Assert.ThrowsAsync<OperationNotAllowedException>(sut.Run);
         }
 
-        private Mock<IPriceFetcher> CreatePriceFetcherReturningExchangeRates(IFixture fixture, IEnumerable<ExchangeRates> exchangeRates)
+        private Mock<IFinancialDataFetcher> CreatePriceFetcherReturningExchangeRates(IFixture fixture, IEnumerable<ExchangeRates> exchangeRates)
         {
-            var priceFetcher = fixture.Freeze<Mock<IPriceFetcher>>();
+            var priceFetcher = fixture.Freeze<Mock<IFinancialDataFetcher>>();
             priceFetcher
                 .Setup(m => m.GetHistoricalDailyExchangeRates(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                .ReturnsAsync(new Response<IEnumerable<ExchangeRates>>
-                {
-                    StatusCode = StatusCode.Ok,
-                    Result = exchangeRates
-                });
+                .ReturnsAsync(exchangeRates);
 
             return priceFetcher;
         }

@@ -1,12 +1,11 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Features.Interfaces;
+using PortEval.Application.Models.PriceFetcher;
 using PortEval.BackgroundJobs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
-using PortEval.FinancialDataFetcher.Interfaces;
-using PortEval.FinancialDataFetcher.Models;
-using PortEval.FinancialDataFetcher.Responses;
 using PortEval.Tests.Unit.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
@@ -91,16 +90,12 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             instrumentRepository.Verify(m => m.Update(It.Is<Instrument>(i => i.Id == instrument.Id)), Times.Never());
         }
 
-        private Mock<IPriceFetcher> CreatePriceFetcherMockReturningLatestPriceData(IFixture fixture, Instrument instrument, PricePoint price)
+        private Mock<IFinancialDataFetcher> CreatePriceFetcherMockReturningLatestPriceData(IFixture fixture, Instrument instrument, PricePoint price)
         {
-            var priceFetcher = fixture.Freeze<Mock<IPriceFetcher>>();
+            var priceFetcher = fixture.Freeze<Mock<IFinancialDataFetcher>>();
             priceFetcher
                 .Setup(m => m.GetLatestInstrumentPrice(instrument.Symbol, instrument.CurrencyCode))
-                .ReturnsAsync(new Response<PricePoint>
-                {
-                    StatusCode = price == null ? StatusCode.ConnectionError : StatusCode.Ok,
-                    Result = price
-                });
+                .ReturnsAsync(price);
 
             return priceFetcher;
         }

@@ -1,9 +1,9 @@
-﻿using PortEval.Domain.Exceptions;
+﻿using PortEval.Domain.Events;
+using PortEval.Domain.Exceptions;
+using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PortEval.Domain.Events;
-using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Domain.Models.Entities
 {

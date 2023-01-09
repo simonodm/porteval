@@ -52,7 +52,7 @@ namespace PortEval.Application.Features.Services
             {
                 return _fileSystem.FileStream.Create(GetErrorLogPath(guid), FileMode.Open);
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }

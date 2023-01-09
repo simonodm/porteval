@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Controllers
 {

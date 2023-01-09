@@ -16,7 +16,7 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
-            
+
             var domainEvent = fixture.Create<TransactionChangedDomainEvent>();
             var domainEventAdapter =
                 new DomainEventNotificationAdapter<TransactionChangedDomainEvent>(domainEvent);

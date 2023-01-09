@@ -1,7 +1,7 @@
-﻿using System;
-using PortEval.Application.Features.Interfaces.Repositories;
+﻿using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Infrastructure.Repositories;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;

@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using PortEval.Application.Features.Interfaces;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.BackgroundJobs.Helpers;
 using PortEval.Domain;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
-using PortEval.FinancialDataFetcher.Interfaces;
-using PortEval.FinancialDataFetcher.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +20,11 @@ namespace PortEval.BackgroundJobs
     {
         private readonly ICurrencyRepository _currencyRepository;
         private readonly ICurrencyExchangeRateRepository _exchangeRateRepository;
-        private readonly IPriceFetcher _fetcher;
+        private readonly IFinancialDataFetcher _fetcher;
         private readonly ILogger _logger;
 
         public MissingExchangeRatesFetchJob(ICurrencyRepository currencyRepository, ICurrencyExchangeRateRepository exchangeRateRepository,
-            IPriceFetcher fetcher, ILoggerFactory loggerFactory)
+            IFinancialDataFetcher fetcher, ILoggerFactory loggerFactory)
         {
             _currencyRepository = currencyRepository;
             _exchangeRateRepository = exchangeRateRepository;
@@ -80,13 +79,12 @@ namespace PortEval.BackgroundJobs
         private async Task ProcessCurrencyRange(IEnumerable<Currency> currencies, Currency currency, TimeRange range, DateTime startTime)
         {
             var fetchResult = await _fetcher.GetHistoricalDailyExchangeRates(currency.Code, range.From, range.To);
-            if (fetchResult.StatusCode != StatusCode.Ok || fetchResult.Result is null) return;
 
             var currenciesList = currencies.ToList();
             int i = 0;
             var newExchangeRates = new List<CurrencyExchangeRate>();
             var minTime = DateTime.UtcNow;
-            foreach (var exchangeRateData in fetchResult.Result)
+            foreach (var exchangeRateData in fetchResult)
             {
                 if (exchangeRateData.Time < range.From || exchangeRateData.Time > range.To) continue;
 
@@ -111,7 +109,7 @@ namespace PortEval.BackgroundJobs
                 i = 0;
             }
 
-            if (currency.TrackingInfo == null && fetchResult.Result.Any())
+            if (currency.TrackingInfo == null && fetchResult.Any())
             {
                 currency.SetTrackingFrom(minTime);
                 currency.TrackingInfo.Update(startTime);

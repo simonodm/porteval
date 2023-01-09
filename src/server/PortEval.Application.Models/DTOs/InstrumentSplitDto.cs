@@ -1,5 +1,5 @@
-﻿using System;
-using PortEval.Domain.Models.Enums;
+﻿using PortEval.Domain.Models.Enums;
+using System;
 
 namespace PortEval.Application.Models.DTOs
 {

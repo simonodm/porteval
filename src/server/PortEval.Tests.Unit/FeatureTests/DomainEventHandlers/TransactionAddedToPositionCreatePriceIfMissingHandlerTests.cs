@@ -1,10 +1,10 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
+using PortEval.Application.Features.Common;
 using PortEval.Application.Features.DomainEventHandlers.TransactionAddedToPosition;
 using PortEval.Domain.Events;
 using PortEval.Tests.Unit.Helpers.Extensions;
 using System.Threading.Tasks;
-using PortEval.Application.Features.Common;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
@@ -26,7 +26,7 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
 
             await sut.Handle(domainEventAdapter, default);
 
-            priceService.Verify(s => 
+            priceService.Verify(s =>
                 s.AddPriceIfNotExistsAsync(
                     domainEvent.Position.InstrumentId,
                     domainEvent.Transaction.Time,

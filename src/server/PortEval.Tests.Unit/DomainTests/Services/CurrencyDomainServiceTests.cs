@@ -1,13 +1,8 @@
-﻿using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
-using Moq;
-using PortEval.Application.Features.Services;
-using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Services;
-using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
 
 namespace PortEval.Tests.Unit.DomainTests.Services
@@ -19,7 +14,7 @@ namespace PortEval.Tests.Unit.DomainTests.Services
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
-            
+
             var newDefaultCurrency = new Currency(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             var previousDefaultCurrency = new Currency(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), true);
 

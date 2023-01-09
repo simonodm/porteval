@@ -1,10 +1,10 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Models.PriceFetcher;
 using PortEval.BackgroundJobs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
-using PortEval.FinancialDataFetcher.Models;
 using PortEval.Tests.Unit.Helpers.Extensions;
 using System;
 using System.Collections.Generic;

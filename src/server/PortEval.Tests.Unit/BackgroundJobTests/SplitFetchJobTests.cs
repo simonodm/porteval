@@ -1,13 +1,12 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Features.Interfaces;
+using PortEval.Application.Models.PriceFetcher;
 using PortEval.BackgroundJobs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
-using PortEval.FinancialDataFetcher.Interfaces;
-using PortEval.FinancialDataFetcher.Models;
-using PortEval.FinancialDataFetcher.Responses;
 using PortEval.Tests.Unit.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
@@ -151,17 +150,13 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             )));
         }
 
-        private Mock<IPriceFetcher> CreatePriceFetcherMockReturningSplitData(IFixture fixture,
+        private Mock<IFinancialDataFetcher> CreatePriceFetcherMockReturningSplitData(IFixture fixture,
             IEnumerable<InstrumentSplitData> splitData)
         {
-            var mock = fixture.Freeze<Mock<IPriceFetcher>>();
+            var mock = fixture.Freeze<Mock<IFinancialDataFetcher>>();
             mock
                 .Setup(m => m.GetInstrumentSplits(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                .ReturnsAsync(new Response<IEnumerable<InstrumentSplitData>>
-                {
-                    StatusCode = StatusCode.Ok,
-                    Result = splitData
-                });
+                .ReturnsAsync(splitData);
 
             return mock;
         }

@@ -1,9 +1,9 @@
-﻿using PortEval.Application.Features.Interfaces.Services;
+﻿using PortEval.Application.Features.Common;
+using PortEval.Application.Features.Interfaces;
+using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Domain.Events;
 using System.Threading;
 using System.Threading.Tasks;
-using PortEval.Application.Features.Common;
-using PortEval.Application.Features.Interfaces;
 
 namespace PortEval.Application.Features.DomainEventHandlers.TransactionChanged
 {

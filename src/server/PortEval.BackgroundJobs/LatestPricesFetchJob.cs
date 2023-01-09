@@ -1,17 +1,15 @@
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Features.Extensions;
+using PortEval.Application.Features.Interfaces;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs.Enums;
-using PortEval.BackgroundJobs.Helpers;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
-using PortEval.FinancialDataFetcher.Interfaces;
-using PortEval.FinancialDataFetcher.Models;
+using PortEval.Domain.Models.Enums;
 using System;
 using System.Threading.Tasks;
-using PortEval.Domain.Models.Enums;
 
 namespace PortEval.BackgroundJobs
 {
@@ -26,7 +24,7 @@ namespace PortEval.BackgroundJobs
         private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
 
-        public LatestPricesFetchJob(IPriceFetcher fetcher, IInstrumentRepository instrumentRepository,
+        public LatestPricesFetchJob(IFinancialDataFetcher fetcher, IInstrumentRepository instrumentRepository,
             IInstrumentPriceRepository instrumentPriceRepository, ICurrencyExchangeRateRepository exchangeRateRepository,
             INotificationService notificationService, ILoggerFactory loggerFactory) : base(fetcher)
         {

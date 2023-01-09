@@ -3,7 +3,6 @@ using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
-using PortEval.Domain.Models.Enums;
 using System;
 using System.Threading.Tasks;
 

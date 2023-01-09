@@ -6,8 +6,10 @@ using PortEval.Application.Features.Extensions;
 using PortEval.Application.Features.Interfaces;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Application.Features.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Features.Services.BulkImportExport;
 using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Enums;
 using System;
@@ -17,8 +19,6 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Features.Interfaces.Services;
-using PortEval.Application.Models.DTOs.Enums;
 
 namespace PortEval.BackgroundJobs
 {

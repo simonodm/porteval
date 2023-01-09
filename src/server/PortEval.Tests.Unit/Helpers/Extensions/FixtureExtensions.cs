@@ -1,20 +1,19 @@
 ﻿using AutoFixture;
 using Moq;
 using PortEval.Application.Features.Common;
+using PortEval.Application.Features.Interfaces;
 using PortEval.Application.Features.Interfaces.Calculators;
 using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.PriceFetcher;
 using PortEval.Domain.Models.Entities;
-using PortEval.FinancialDataFetcher.Interfaces;
-using PortEval.FinancialDataFetcher.Models;
-using PortEval.FinancialDataFetcher.Responses;
+using PortEval.Domain.Models.Enums;
+using PortEval.Domain.Models.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Domain.Models.Enums;
-using PortEval.Domain.Models.ValueObjects;
 
 namespace PortEval.Tests.Unit.Helpers.Extensions
 {
@@ -158,7 +157,7 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
             mock
                 .Setup(m => m.FindPriceAtAsync(It.IsAny<int>(), It.IsAny<DateTime>()))
                 .Returns<int, DateTime>((instrumentId, dt) => Task.FromResult(
-                    new InstrumentPrice(fixture.Create<int>(), dt, dt, fixture.Create<decimal>(), instrumentId)    
+                    new InstrumentPrice(fixture.Create<int>(), dt, dt, fixture.Create<decimal>(), instrumentId)
                 ));
             mock
                 .Setup(m => m.ExistsAsync(It.IsAny<int>(), It.IsAny<int>()))
@@ -348,35 +347,23 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
 
         #endregion
 
-        public static Mock<IPriceFetcher> CreatePriceFetcherMockReturningHistoricalPrices(this IFixture fixture, Instrument instrument,
+        public static Mock<IFinancialDataFetcher> CreatePriceFetcherMockReturningHistoricalPrices(this IFixture fixture, Instrument instrument,
             IEnumerable<PricePoint> dailyPrices, IEnumerable<PricePoint> hourlyPrices,
             IEnumerable<PricePoint> fiveMinPrices)
         {
-            var priceFetcher = fixture.Freeze<Mock<IPriceFetcher>>();
+            var priceFetcher = fixture.Freeze<Mock<IFinancialDataFetcher>>();
             priceFetcher
                 .Setup(m => m.GetHistoricalDailyPrices(instrument.Symbol,
                     instrument.CurrencyCode, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                .ReturnsAsync(new Response<IEnumerable<PricePoint>>
-                {
-                    StatusCode = StatusCode.Ok,
-                    Result = dailyPrices ?? Enumerable.Empty<PricePoint>()
-                });
+                .ReturnsAsync(dailyPrices ?? Enumerable.Empty<PricePoint>());
             priceFetcher
                 .Setup(m => m.GetIntradayPrices(instrument.Symbol,
                     instrument.CurrencyCode, It.IsAny<DateTime>(), It.IsAny<DateTime>(), IntradayInterval.OneHour))
-                .ReturnsAsync(new Response<IEnumerable<PricePoint>>
-                {
-                    StatusCode = StatusCode.Ok,
-                    Result = hourlyPrices ?? Enumerable.Empty<PricePoint>()
-                });
+                .ReturnsAsync(hourlyPrices ?? Enumerable.Empty<PricePoint>());
             priceFetcher
                 .Setup(m => m.GetIntradayPrices(instrument.Symbol,
                     instrument.CurrencyCode, It.IsAny<DateTime>(), It.IsAny<DateTime>(), IntradayInterval.FiveMinutes))
-                .ReturnsAsync(new Response<IEnumerable<PricePoint>>
-                {
-                    StatusCode = StatusCode.Ok,
-                    Result = fiveMinPrices ?? Enumerable.Empty<PricePoint>()
-                });
+                .ReturnsAsync(fiveMinPrices ?? Enumerable.Empty<PricePoint>());
 
             return priceFetcher;
         }

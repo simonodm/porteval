@@ -32,7 +32,7 @@ namespace PortEval.Application.Models.DTOs
         public string Note { get; set; }
 
         [SwaggerSchema("Whether the instrument's prices are tracked and updated automatically.")]
-        public InstrumentTrackingStatus TrackingStatus{ get; set; }
+        public InstrumentTrackingStatus TrackingStatus { get; set; }
 
         [SwaggerSchema("Time of the last automatic price update.")]
         public DateTime? LastPriceUpdate { get; set; }

@@ -16,7 +16,6 @@ namespace PortEval.Tests.Integration.QueryTests
     [Collection("Query test collection")]
     public class ChartQueriesTests
     {
-        private readonly PortEvalDbContext _context;
         private readonly IChartQueries _chartQueries;
 
         private readonly int _portfolioChartId;

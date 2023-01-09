@@ -3,9 +3,9 @@ using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
-using System.Threading.Tasks;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Features.Services
 {
@@ -44,7 +44,7 @@ namespace PortEval.Application.Features.Services
         public async Task<InstrumentSplit> UpdateSplitAsync(int instrumentId, InstrumentSplitDto options)
         {
             var split = await _splitRepository.FindAsync(options.Id);
-            if(split == null)
+            if (split == null)
             {
                 throw new ItemNotFoundException($"Split {options.Id} does not exist.");
             }

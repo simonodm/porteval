@@ -12,7 +12,6 @@
   <ItemGroup>
     <ProjectReference Include="..\PortEval.Application.Features\PortEval.Application.Features.csproj" />
     <ProjectReference Include="..\PortEval.Domain\PortEval.Domain.csproj" />
-    <ProjectReference Include="..\PortEval.FinancialDataFetcher\PortEval.FinancialDataFetcher.csproj" />
     <ProjectReference Include="..\PortEval.Infrastructure\PortEval.Infrastructure.csproj" />
   </ItemGroup>
 

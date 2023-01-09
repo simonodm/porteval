@@ -1,6 +1,6 @@
-﻿using PortEval.Domain.Models.ValueObjects;
+﻿using PortEval.Domain.Events;
+using PortEval.Domain.Models.ValueObjects;
 using System;
-using PortEval.Domain.Events;
 
 namespace PortEval.Domain.Models.Entities
 {

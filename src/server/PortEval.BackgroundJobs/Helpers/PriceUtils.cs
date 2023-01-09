@@ -1,7 +1,7 @@
 using PortEval.Application.Features.Extensions;
 using PortEval.Application.Features.Interfaces.Repositories;
+using PortEval.Application.Models.PriceFetcher;
 using PortEval.Domain.Models.Entities;
-using PortEval.FinancialDataFetcher.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

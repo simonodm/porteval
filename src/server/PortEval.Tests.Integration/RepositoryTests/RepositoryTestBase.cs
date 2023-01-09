@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 using PortEval.Infrastructure;
 using System;
-using MediatR;
-using Moq;
 
 namespace PortEval.Tests.Integration.RepositoryTests
 {

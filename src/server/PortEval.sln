@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortEval.Application.Featur
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortEval.Application.Models", "PortEval.Application.Models\PortEval.Application.Models.csproj", "{9CAC675D-8694-4593-98E3-D9CC1C1128B4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortEval.FinancialDataFetcher", "PortEval.FinancialDataFetcher\PortEval.FinancialDataFetcher.csproj", "{B1F0616B-20AE-472D-9538-D5F7F1B341F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortEval.DataFetcher", "PortEval.DataFetcher\PortEval.DataFetcher.csproj", "{B1F0616B-20AE-472D-9538-D5F7F1B341F1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortEval.BackgroundJobs", "PortEval.BackgroundJobs\PortEval.BackgroundJobs.csproj", "{EB804A08-42E8-48C1-A05F-C282E90F7C55}"
 EndProject

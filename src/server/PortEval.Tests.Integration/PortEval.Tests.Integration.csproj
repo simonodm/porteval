@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PortEval.Application\PortEval.Application.csproj" />
+    <ProjectReference Include="..\PortEval.DataFetcher\PortEval.DataFetcher.csproj" />
   </ItemGroup>
 
 </Project>

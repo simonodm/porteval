@@ -1,12 +1,12 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
+using PortEval.Application.Features.Common;
 using PortEval.Application.Features.Interfaces;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Domain.Events;
+using PortEval.Domain.Models.Enums;
 using System.Threading;
 using System.Threading.Tasks;
-using PortEval.Application.Features.Common;
-using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Application.Features.DomainEventHandlers.InstrumentCreated
 {

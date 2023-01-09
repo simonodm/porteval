@@ -1,12 +1,12 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
+using PortEval.Application.Features.Common;
 using PortEval.Application.Features.DomainEventHandlers.InstrumentSplitCreated;
 using PortEval.Application.Features.Interfaces;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Domain.Events;
 using System.Threading;
 using System.Threading.Tasks;
-using PortEval.Application.Features.Common;
 
 namespace PortEval.Application.Features.DomainEventHandlers.InstrumentSplitRollbackRequested
 {

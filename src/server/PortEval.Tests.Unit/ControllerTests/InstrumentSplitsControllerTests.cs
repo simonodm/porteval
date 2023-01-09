@@ -1,15 +1,15 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PortEval.Application.Controllers;
 using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
+using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using PortEval.Application.Features.Interfaces.Services;
-using PortEval.Domain.Models.Entities;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests
@@ -28,7 +28,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
             instrumentQueries
                 .Setup(m => m.GetInstrumentSplits(instrumentId))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse<IEnumerable<InstrumentSplitDto>>(new [] { split }));
+                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse<IEnumerable<InstrumentSplitDto>>(new[] { split }));
 
             var sut = fixture.Build<InstrumentSplitsController>().OmitAutoProperties().Create();
 

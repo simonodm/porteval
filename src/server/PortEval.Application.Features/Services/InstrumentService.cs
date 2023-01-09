@@ -1,6 +1,4 @@
-﻿using Hangfire;
-using PortEval.Application.Features.Interfaces.BackgroundJobs;
-using PortEval.Application.Features.Interfaces.Repositories;
+﻿using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Exceptions;

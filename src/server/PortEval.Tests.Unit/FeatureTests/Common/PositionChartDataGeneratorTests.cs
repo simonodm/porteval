@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Features.Common;
@@ -13,6 +8,9 @@ using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
 using PortEval.Tests.Unit.Helpers.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Common

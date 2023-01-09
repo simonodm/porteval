@@ -3,12 +3,12 @@ using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Features.Services;
 using PortEval.Application.Models.DTOs;
+using PortEval.Domain.Events;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers.Extensions;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Domain.Events;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.Services
@@ -87,7 +87,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<TransactionService>();
 
             await sut.AddTransactionAsync(transaction);
-            
+
             Assert.Collection(position.DomainEvents, evt =>
             {
                 Assert.IsAssignableFrom<TransactionAddedToPositionDomainEvent>(evt);

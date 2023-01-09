@@ -1,16 +1,15 @@
-﻿using PortEval.Application.Features.Interfaces.BackgroundJobs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using PortEval.Application.Features.Interfaces;
+using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
-using PortEval.FinancialDataFetcher.Interfaces;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.BackgroundJobs
 {
@@ -18,12 +17,12 @@ namespace PortEval.BackgroundJobs
     {
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly IInstrumentSplitRepository _splitRepository;
-        private readonly IPriceFetcher _priceFetcher;
+        private readonly IFinancialDataFetcher _priceFetcher;
         private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
 
         public SplitFetchJob(IInstrumentRepository instrumentRepository, IInstrumentSplitRepository splitRepository,
-            IPriceFetcher priceFetcher, ILoggerFactory loggerFactory, INotificationService notificationService)
+            IFinancialDataFetcher priceFetcher, ILoggerFactory loggerFactory, INotificationService notificationService)
         {
             _instrumentRepository = instrumentRepository;
             _splitRepository = splitRepository;
@@ -48,12 +47,12 @@ namespace PortEval.BackgroundJobs
                 var startTime = existingSplits.LastOrDefault()?.Time ?? instrument.TrackingInfo.TrackedSince;
 
                 var splits = await _priceFetcher.GetInstrumentSplits(instrument.Symbol, startTime, DateTime.UtcNow);
-                if (splits.Result == null)
+                if (splits == null)
                 {
                     continue;
                 }
 
-                foreach (var split in splits.Result)
+                foreach (var split in splits)
                 {
                     var splitRatio = new SplitRatio(split.Denominator, split.Numerator);
                     var newSplit = InstrumentSplit.Create(instrument, split.Time, splitRatio);

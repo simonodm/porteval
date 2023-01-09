@@ -4,11 +4,11 @@ using Hangfire;
 using Hangfire.Common;
 using Hangfire.States;
 using Moq;
+using PortEval.Application.Features.Common;
 using PortEval.Application.Features.DomainEventHandlers.InstrumentSplitCreated;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Domain.Events;
 using System.Threading.Tasks;
-using PortEval.Application.Features.Common;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers

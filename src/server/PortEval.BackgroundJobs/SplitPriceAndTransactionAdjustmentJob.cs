@@ -3,10 +3,10 @@ using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs.Enums;
+using PortEval.Domain.Models.Entities;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Domain.Models.Entities;
 
 namespace PortEval.BackgroundJobs
 {
