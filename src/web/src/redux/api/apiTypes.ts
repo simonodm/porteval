@@ -1,6 +1,6 @@
 import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query';
 import { SerializedError } from '@reduxjs/toolkit';
-import { Instrument, Portfolio, Position, Transaction } from '../../types'
+import { Instrument, InstrumentSplit, Portfolio, Position, Transaction } from '../../types'
 
 /**
  * Parameters required to create an instrument using PortEval's API.
@@ -26,6 +26,11 @@ export type CreatePositionParameters = Omit<Position, 'id' | 'instrument' | 'pos
  * @category API
  */
 export type CreateTransactionParameters = Omit<Transaction, 'id' | 'instrument' | 'portfolioId'>;
+
+/**
+ * Parameters required to update an instrument split using PortEval's API.
+ */
+export type CreateInstrumentSplitParameters = Omit<InstrumentSplit, 'id' | 'status'>;
 
 /**
  * PortEval's API pagination query parameters

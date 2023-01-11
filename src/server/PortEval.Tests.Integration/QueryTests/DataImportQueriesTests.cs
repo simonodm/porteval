@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Queries;
+using PortEval.Domain.Models.Enums;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using PortEval.Application.Services.Queries;
-using PortEval.Application.Services.Queries.Interfaces;
-using PortEval.Domain.Models.Enums;
 using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
@@ -27,24 +27,24 @@ namespace PortEval.Tests.Integration.QueryTests
 
             var dataImports = queryResult.Response.ToList();
 
-            Assert.Equal(QueryStatus.Ok,  queryResult.Status);
+            Assert.Equal(QueryStatus.Ok, queryResult.Status);
             Assert.Collection(dataImports,
-                import =>
-                {
-                    Assert.Equal(Guid.Parse("4c0019c2-402f-41e8-9ddf-b3c98027e2d5"), import.ImportId);
-                    Assert.Equal(TemplateType.Portfolios, import.TemplateType);
-                    Assert.Equal(ImportStatus.Error, import.Status);
-                    Assert.Equal("Internal error.", import.StatusDetails);
-                    Assert.Equal(DateTime.UtcNow, import.Time, TimeSpan.FromHours(1));
-                    Assert.False(import.ErrorLogAvailable);
-                    Assert.True(string.IsNullOrEmpty(import.ErrorLogUrl));
-                },
                 import =>
                 {
                     Assert.Equal(Guid.Parse("974c9b22-8276-4121-96ce-6bf3f0f70152"), import.ImportId);
                     Assert.Equal(TemplateType.Instruments, import.TemplateType);
                     Assert.Equal(ImportStatus.Finished, import.Status);
                     Assert.Equal(DateTime.UtcNow, import.Time, TimeSpan.FromHours(1));
+                    Assert.False(import.ErrorLogAvailable);
+                    Assert.True(string.IsNullOrEmpty(import.ErrorLogUrl));
+                },
+                import =>
+                {
+                    Assert.Equal(Guid.Parse("4c0019c2-402f-41e8-9ddf-b3c98027e2d5"), import.ImportId);
+                    Assert.Equal(TemplateType.Portfolios, import.TemplateType);
+                    Assert.Equal(ImportStatus.Error, import.Status);
+                    Assert.Equal("Internal error.", import.StatusDetails);
+                    Assert.Equal(DateTime.UtcNow.AddHours(-6), import.Time, TimeSpan.FromHours(1));
                     Assert.False(import.ErrorLogAvailable);
                     Assert.True(string.IsNullOrEmpty(import.ErrorLogUrl));
                 });

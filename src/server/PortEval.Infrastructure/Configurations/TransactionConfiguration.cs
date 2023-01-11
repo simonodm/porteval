@@ -20,6 +20,9 @@ namespace PortEval.Infrastructure.Configurations
                 .Property(t => t.Time)
                 .IsRequired();
             builder
+                .Property(t => t.CreationTime)
+                .IsRequired();
+            builder
                 .Property(t => t.Amount)
                 .IsRequired()
                 .HasPrecision(19, 10);
@@ -30,9 +33,6 @@ namespace PortEval.Infrastructure.Configurations
             builder
                 .Property(t => t.Note)
                 .HasMaxLength(255);
-            builder
-                .Property(c => c.Version)
-                .IsConcurrencyToken();
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System;
-using PortEval.Domain.Models.Enums;
+﻿using PortEval.Domain.Models.Enums;
 using Swashbuckle.AspNetCore.Annotations;
+using System;
 
 namespace PortEval.Application.Models.DTOs
 {
@@ -32,7 +32,7 @@ namespace PortEval.Application.Models.DTOs
         public string Note { get; set; }
 
         [SwaggerSchema("Whether the instrument's prices are tracked and updated automatically.")]
-        public bool IsTracked { get; set; }
+        public InstrumentTrackingStatus TrackingStatus { get; set; }
 
         [SwaggerSchema("Time of the last automatic price update.")]
         public DateTime? LastPriceUpdate { get; set; }

@@ -1,8 +1,6 @@
-﻿using PortEval.Domain.Exceptions;
-using PortEval.Domain.Models.Enums;
+﻿using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
 namespace PortEval.Domain.Models.Entities
@@ -43,6 +41,16 @@ namespace PortEval.Domain.Models.Entities
             Name = name;
             DateRange = new ChartDateRange(new ToDateRange(DateRangeUnit.YEAR, 1));
             TypeConfiguration = ChartTypeSettings.PerformanceChart();
+        }
+
+        public static Chart Create(string name, ChartDateRange dateRange, ChartTypeSettings typeConfig)
+        {
+            return new Chart(name, dateRange, typeConfig);
+        }
+
+        public static Chart Create(string name)
+        {
+            return new Chart(name);
         }
 
         public ChartLine FindChartLineById(int id)

@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Configurations>Debug;Release</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PortEval.Application.Models\PortEval.Application.Models.csproj" />
+    <ProjectReference Include="..\PortEval.Domain\PortEval.Domain.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+			<_Parameter1>PortEval.Tests.Unit</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="27.2.1" />
+    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="EFCore.BulkExtensions" Version="5.4.1" />
+    <PackageReference Include="Hangfire" Version="1.7.28" />
+    <PackageReference Include="MediatR" Version="11.1.0" />
+    <PackageReference Include="System.IO.Abstractions" Version="17.2.3" />
+  </ItemGroup>
+
+</Project>

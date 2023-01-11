@@ -26,7 +26,7 @@ function ImportDataForm({ onSuccess }: Props): JSX.Element {
 
     const [uploadFile] = useUploadImportFileMutation();
 
-    const handleFileUpload = (file: File) => {
+    const handleFileSelect = (file: File) => {
         setFile(file);
     }
 
@@ -65,7 +65,7 @@ function ImportDataForm({ onSuccess }: Props): JSX.Element {
                 onClick={handleTemplateExport}
             >Download template
             </button>
-            <FileUpload label="Choose import file" onUpload={handleFileUpload} />
+            <FileUpload label="Choose import file" onFileSelected={handleFileSelect} />
             <button 
                 className="btn btn-primary"
                 role="button"

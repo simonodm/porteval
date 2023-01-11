@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using PortEval.Application.Services.Queries;
-using PortEval.Application.Services.Queries.Interfaces;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Queries;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests

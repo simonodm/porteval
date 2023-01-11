@@ -1,18 +1,19 @@
 import React, { Fragment, useState } from 'react';
 import PositionsTable from '../tables/PositionsTable';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import PortEvalChart from '../charts/PortEvalChart';
 import PageHeading from '../ui/PageHeading';
 import useUserSettings from '../../hooks/useUserSettings';
 import ModalWrapper from '../modals/ModalWrapper';
 import OpenPositionForm from '../forms/OpenPositionForm';
 import ExpandAllButtons from '../tables/ExpandAllButtons';
+import ChartPreview from '../charts/ChartPreview';
 
 import { useParams } from 'react-router-dom';
 import { generateDefaultPortfolioChart } from '../../utils/chart';
 import { getPerformanceString, getPriceString } from '../../utils/string';
 import { useGetPortfolioByIdQuery, useGetPortfolioCurrentValueQuery, useGetPortfolioStatisticsQuery } from '../../redux/api/portfolioApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
+
 
 type Params = {
     /**
@@ -144,7 +145,7 @@ function PortfolioView(): JSX.Element {
                         </table>
                 </div>
                 <div className="col-xs-12 col-sm-6">
-                    { chart && <PortEvalChart chart={chart} /> }
+                    { chart && <ChartPreview chart={chart} /> }
                 </div>
             </div>
             <div className="action-buttons">

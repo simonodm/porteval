@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 type Props = {
     /**
@@ -12,9 +12,9 @@ type Props = {
     className?: string;
 
     /**
-     * A callback which is invoked every time a file is uploaded.
+     * A callback which is invoked every time a file is selected.
      */
-    onUpload?: (file: File) => void;
+    onFileSelected?: (file: File) => void;
 }
 
 /**
@@ -24,19 +24,22 @@ type Props = {
  * @subcategory Fields
  * @component
  */
-function FileUpload({label, className, onUpload}: Props): JSX.Element {
+function FileUpload({label, className, onFileSelected}: Props): JSX.Element {
+    const inputRef = useRef<HTMLInputElement | null>(null);
+
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if(!e.target.files?.length) {
             return;
         }
 
-        onUpload && onUpload(e.target.files[0]);
+        onFileSelected && onFileSelected(e.target.files[0]);
     }
     
     return (
         <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="file">{label}:</label>
             <input
+                ref={inputRef}
                 accept="text/csv"
                 className="form-control-file"
                 id="file"

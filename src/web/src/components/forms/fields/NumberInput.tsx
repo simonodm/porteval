@@ -95,8 +95,8 @@ function NumberInput(
 
     useEffect(() => {
         if(value !== undefined) {
-            // Since JS differentiates between +0 and -0, this special check is enough
-            // to convert -0 to '-0' string (which naturally gets converted to '0' by .toString())
+            // Since JS differentiates between +0 and -0, this check is enough
+            // to convert -0 to '-0' string (which normally gets converted to '0' by .toString())
             if(Object.is(value, -0)) {
                 setNumberText('-0');
             } else {

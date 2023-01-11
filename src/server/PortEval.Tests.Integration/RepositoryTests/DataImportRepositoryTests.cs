@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PortEval.Application.Services.Interfaces.Repositories;
+﻿using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure.Repositories;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Integration.RepositoryTests
@@ -23,8 +21,8 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task ListAllAsync_ReturnsAllDataImports()
         {
-            var first = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
-            var second = new DataImport(Guid.NewGuid(), TemplateType.Instruments, ImportStatus.Finished, "errorMessage");
+            var first = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
+            var second = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Instruments, ImportStatus.Finished, "errorMessage");
 
             DbContext.Add(first);
             DbContext.Add(second);
@@ -39,7 +37,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task Add_CreatesNewDataImport()
         {
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Instruments, ImportStatus.Finished, "errorMessage");
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Instruments, ImportStatus.Finished, "errorMessage");
 
             _dataImportRepository.Add(dataImport);
             await _dataImportRepository.UnitOfWork.CommitAsync();
@@ -52,7 +50,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task Update_UpdatesDataImport()
         {
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Instruments, ImportStatus.Pending, "errorMessage");
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Instruments, ImportStatus.Pending, "errorMessage");
             DbContext.Add(dataImport);
             await DbContext.SaveChangesAsync();
 
@@ -70,7 +68,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task DeleteAsync_DeletesDataImport()
         {
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Instruments, ImportStatus.Finished, "errorMessage");
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Instruments, ImportStatus.Finished, "errorMessage");
             DbContext.Add(dataImport);
             await DbContext.SaveChangesAsync();
 
@@ -85,7 +83,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task Delete_DeletesDataImport()
         {
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Instruments, ImportStatus.Finished, "errorMessage");
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Instruments, ImportStatus.Finished, "errorMessage");
             DbContext.Add(dataImport);
             await DbContext.SaveChangesAsync();
 
@@ -100,7 +98,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
         [Fact]
         public async Task ExistsAsync_ReturnsTrue_WhenDataImportExists()
         {
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Instruments, ImportStatus.Finished, "errorMessage");
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Instruments, ImportStatus.Finished, "errorMessage");
             DbContext.Imports.Add(dataImport);
             await DbContext.SaveChangesAsync();
 

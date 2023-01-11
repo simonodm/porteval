@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Interfaces.Services;
+using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Services.Interfaces;
-using PortEval.Application.Services.Queries;
-using PortEval.Application.Services.Queries.Interfaces;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;

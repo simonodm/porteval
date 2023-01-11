@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using PortEval.Domain.Exceptions;
+using System;
 using System.Drawing;
 using System.Globalization;
-using Newtonsoft.Json;
-using PortEval.Domain.Exceptions;
 
 namespace PortEval.Application.Models.DTOs.Converters
 {

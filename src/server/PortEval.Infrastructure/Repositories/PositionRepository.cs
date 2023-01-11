@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,9 +21,17 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<IEnumerable<Position>> ListPortfolioPositionsAsync(int portfolioId)
         {
             return await _context.Positions
-                .AsNoTracking()
                 .Where(p => p.PortfolioId == portfolioId)
                 .OrderBy(p => p.InstrumentId)
+                .Include(p => p.Transactions)
+                .ToListAsync();
+        }
+
+        /// <inheritdoc cref="IPositionRepository.ListAllInstrumentPositionsAsync"/>
+        public async Task<IEnumerable<Position>> ListAllInstrumentPositionsAsync(int instrumentId)
+        {
+            return await _context.Positions
+                .Where(p => p.InstrumentId == instrumentId)
                 .Include(p => p.Transactions)
                 .ToListAsync();
         }
@@ -32,7 +40,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<Position> FindAsync(int positionId)
         {
             var position = await _context.Positions
-                .AsNoTracking()
                 .Include(p => p.Transactions)
                 .FirstOrDefaultAsync(p => p.Id == positionId);
 
@@ -43,7 +50,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<Position> FindParentPositionAsync(int transactionId)
         {
             var transaction = await _context.Transactions
-                .AsNoTracking()
                 .Include(t => t.Position)
                 .FirstOrDefaultAsync(t => t.Id == transactionId);
 
@@ -68,7 +74,7 @@ namespace PortEval.Infrastructure.Repositories
         public async Task DeleteAsync(int positionId)
         {
             var foundPosition = await _context.Positions.FirstOrDefaultAsync(p => p.Id == positionId);
-            if(foundPosition != null)
+            if (foundPosition != null)
             {
                 Delete(foundPosition);
             }

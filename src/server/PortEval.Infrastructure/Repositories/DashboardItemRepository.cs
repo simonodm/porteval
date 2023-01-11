@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<IEnumerable<DashboardItem>> GetDashboardItemsAsync()
         {
             return await _context.DashboardItems
-                .AsNoTracking()
                 .OrderBy(i => i.Position.X)
                 .ThenBy(i => i.Position.Y)
                 .ToListAsync();

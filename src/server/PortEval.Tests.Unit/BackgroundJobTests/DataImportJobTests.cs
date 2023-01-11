@@ -2,11 +2,11 @@
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
 using Moq;
+using PortEval.Application.Features.Interfaces;
+using PortEval.Application.Features.Interfaces.Repositories;
+using PortEval.Application.Features.Services.BulkImportExport;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Services.BulkImportExport;
-using PortEval.Application.Services.BulkImportExport.Interfaces;
-using PortEval.Application.Services.Interfaces.Repositories;
-using PortEval.BackgroundJobs.DataImport;
+using PortEval.BackgroundJobs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using System;
@@ -33,7 +33,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -42,12 +42,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             dataImportRepository.Verify(m => m.Update(It.Is<DataImport>(i => i.Id == dataImport.Id && i.Status == ImportStatus.Finished)));
         }
@@ -61,7 +64,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -70,6 +73,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -77,7 +83,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             portfolioImportProcessor.Verify(p => p.ImportRecords(
                 It.Is<IEnumerable<PortfolioDto>>(e => e.Count() == 1 && e.Any(p => p.Name == "ABC" && p.CurrencyCode == "USD" && p.Note == "TestNote"))
@@ -93,7 +99,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Positions);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Positions);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -102,6 +108,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -109,7 +118,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             positionImportProcessor.Verify(p => p.ImportRecords(
                 It.Is<IEnumerable<PositionDto>>(e =>
@@ -127,7 +136,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Transactions);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Transactions);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -136,6 +145,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -143,7 +155,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             transactionImportProcessor.Verify(p => p.ImportRecords(
                 It.Is<IEnumerable<TransactionDto>>(e =>
@@ -161,7 +173,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Instruments);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Instruments);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -170,6 +182,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -177,7 +192,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             instrumentImportProcessor.Verify(p => p.ImportRecords(
                 It.Is<IEnumerable<InstrumentDto>>(e =>
@@ -196,7 +211,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Prices);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Prices);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -205,6 +220,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -212,7 +230,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             priceImportProcessor.Verify(p => p.ImportRecords(
                 It.Is<IEnumerable<InstrumentPriceDto>>(e =>
@@ -230,7 +248,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -239,6 +257,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -246,7 +267,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             portfolioImportProcessor.Verify(p => p.ImportRecords(
                 It.Is<IEnumerable<PortfolioDto>>(e => !e.Any())
@@ -262,7 +283,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -278,6 +299,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -288,7 +312,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             var logFileLines = fileSystem.File.ReadAllLines(logPath);
             var errorMessage = logFileLines[0].Split(',')[4];
@@ -306,7 +330,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -315,12 +339,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             var logFileLines = fileSystem.File.ReadAllLines(logPath);
             var errorMessage = logFileLines[0].Split(',')[4];
@@ -338,7 +365,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -347,6 +374,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
@@ -354,7 +384,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             dataImportRepository.Verify(r => r.Update(It.Is<DataImport>(d => d.Status == ImportStatus.Error && !string.IsNullOrEmpty(d.StatusDetails))));
         }
@@ -368,7 +398,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -376,6 +406,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note"));
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
             dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
@@ -387,7 +420,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             dataImportRepository.Verify(r => r.Update(It.Is<DataImport>(d => d.Status == ImportStatus.Error && !string.IsNullOrEmpty(d.StatusDetails))));
         }
@@ -401,7 +434,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             GetServiceProviderMockWithImportProcessors(fixture);
 
-            var dataImport = new DataImport(Guid.NewGuid(), TemplateType.Portfolios);
+            var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
@@ -410,12 +443,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
             dataImportRepository
+                .Setup(m => m.FindAsync(dataImport.Id))
+                .ReturnsAsync(dataImport);
+            dataImportRepository
                 .Setup(m => m.Update(It.IsAny<DataImport>()))
                 .Returns<DataImport>(d => d);
 
             var sut = fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport, inputPath, logPath);
+            await sut.Run(dataImport.Id, inputPath, logPath);
 
             Assert.False(fileSystem.FileExists(inputPath));
         }

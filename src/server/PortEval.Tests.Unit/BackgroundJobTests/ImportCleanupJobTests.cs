@@ -2,8 +2,8 @@
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
 using Moq;
-using PortEval.Application.Services.Interfaces.Repositories;
-using PortEval.BackgroundJobs.DatabaseCleanup;
+using PortEval.Application.Features.Interfaces.Repositories;
+using PortEval.BackgroundJobs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using System;
@@ -11,8 +11,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -28,14 +26,14 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var importsToRemove = new List<DataImport>
             {
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-24)),
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-48)),
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-72)),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-24), TemplateType.Portfolios),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-48), TemplateType.Portfolios),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-72), TemplateType.Portfolios),
             };
             var imports = new List<DataImport>()
             {
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-5)),
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-3)),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-5), TemplateType.Portfolios),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-3), TemplateType.Portfolios),
             };
 
             imports.AddRange(importsToRemove);
@@ -49,7 +47,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run();
 
-            foreach(var import in importsToRemove)
+            foreach (var import in importsToRemove)
             {
                 dataImportRepository.Verify(m => m.DeleteAsync(import.Id), Times.Once());
             }
@@ -67,21 +65,21 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var importsToRemove = new List<DataImport>
             {
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-24)),
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-48)),
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-72)),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-24), TemplateType.Portfolios),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-48), TemplateType.Portfolios),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-72), TemplateType.Portfolios),
             };
             var imports = new List<DataImport>()
             {
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-5)),
-                new DataImport(Guid.NewGuid(), TemplateType.Portfolios, DateTime.UtcNow.AddHours(-3)),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-5), TemplateType.Portfolios),
+                new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-3), TemplateType.Portfolios),
             };
 
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddDirectory(storagePath);
 
             imports.AddRange(importsToRemove);
-            foreach(var import in imports)
+            foreach (var import in imports)
             {
                 import.AddErrorLog(Path.Combine(storagePath, $"{import.Id}_log.csv"));
                 fileSystem.AddFile(import.ErrorLogPath, import.Id.ToString());
@@ -96,7 +94,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run();
 
-            foreach(var import in importsToRemove)
+            foreach (var import in importsToRemove)
             {
                 Assert.False(fileSystem.FileExists(import.ErrorLogPath));
             }

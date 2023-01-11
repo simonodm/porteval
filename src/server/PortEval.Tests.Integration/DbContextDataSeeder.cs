@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using PortEval.Infrastructure;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Tests.Integration
 {
@@ -22,7 +22,7 @@ namespace PortEval.Tests.Integration
 
         public async Task SeedDatabase()
         {
-            
+
             var currencies = await SeedCurrencies();
             var exchangeRates = await SeedCurrencyExchangeRates();
             var exchanges = await SeedExchanges();
@@ -34,6 +34,7 @@ namespace PortEval.Tests.Integration
             var charts = await SeedCharts(portfolios, positions, instruments);
             var dashboardItems = await SeedDashboardItems(charts);
             var dataImports = await SeedDataImports();
+            var splits = await SeedInstrumentSplits(instruments);
         }
 
         private async Task<List<Currency>> SeedCurrencies()
@@ -114,8 +115,8 @@ namespace PortEval.Tests.Integration
 
             var transactions = new List<Transaction>
             {
-                new Transaction(positionsList[0].Id, DateTime.UtcNow.AddDays(-2), 1m, 100m, ""),
-                new Transaction(positionsList[1].Id, DateTime.UtcNow.AddDays(-1), 5m, 5000m, "bitcoin")
+                new Transaction(positionsList[0].Id, DateTime.UtcNow.AddDays(-2), DateTime.UtcNow, 1m, 100m, ""),
+                new Transaction(positionsList[1].Id, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow, 5m, 5000m, "bitcoin")
             };
 
             _context.Transactions.AddRange(transactions);
@@ -151,13 +152,13 @@ namespace PortEval.Tests.Integration
 
             var prices = new List<InstrumentPrice>
             {
-                new InstrumentPrice(DateTime.UtcNow.AddDays(-2), 130, instrumentsList[0].Id),
-                new InstrumentPrice(DateTime.UtcNow.AddDays(-1), 140, instrumentsList[0].Id),
-                new InstrumentPrice(DateTime.UtcNow, 150, instrumentsList[0].Id),
-                new InstrumentPrice(DateTime.UtcNow.AddDays(-2), 4000, instrumentsList[1].Id),
-                new InstrumentPrice(DateTime.UtcNow.AddDays(-1), 2000, instrumentsList[1].Id),
-                new InstrumentPrice(DateTime.UtcNow.Date, 2000, instrumentsList[1].Id),
-                new InstrumentPrice(DateTime.UtcNow, 1000, instrumentsList[1].Id),
+                new InstrumentPrice(DateTime.UtcNow.AddDays(-2), DateTime.UtcNow, 130, instrumentsList[0].Id),
+                new InstrumentPrice(DateTime.UtcNow.AddDays(-1), DateTime.UtcNow, 140, instrumentsList[0].Id),
+                new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 150, instrumentsList[0].Id),
+                new InstrumentPrice(DateTime.UtcNow.AddDays(-2), DateTime.UtcNow, 4000, instrumentsList[1].Id),
+                new InstrumentPrice(DateTime.UtcNow.AddDays(-1), DateTime.UtcNow, 2000, instrumentsList[1].Id),
+                new InstrumentPrice(DateTime.UtcNow.Date, DateTime.UtcNow, 2000, instrumentsList[1].Id),
+                new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 1000, instrumentsList[1].Id),
             };
 
             _context.InstrumentPrices.AddRange(prices);
@@ -195,7 +196,7 @@ namespace PortEval.Tests.Integration
 
             var chart1 = new Chart("Portfolio chart", new ChartDateRange(new ToDateRange(DateRangeUnit.MONTH, 1)),
                 ChartTypeSettings.PriceChart("USD"));
-            chart1.ReplaceLines(new[] { new ChartLinePortfolio(chart1.Id, 1, LineDashType.Solid, Color.Red, portfoliosList[0].Id)});
+            chart1.ReplaceLines(new[] { new ChartLinePortfolio(chart1.Id, 1, LineDashType.Solid, Color.Red, portfoliosList[0].Id) });
 
             var chart2 = new Chart("Position/instrument chart",
                 new ChartDateRange(DateTime.Parse("2022-01-01"), DateTime.Parse("2022-01-15")), ChartTypeSettings.AggregatedPerformanceChart(AggregationFrequency.Day));
@@ -233,14 +234,30 @@ namespace PortEval.Tests.Integration
         {
             var dataImports = new List<DataImport>
             {
-                new DataImport(Guid.Parse("974c9b22-8276-4121-96ce-6bf3f0f70152"), TemplateType.Instruments, ImportStatus.Finished),
-                new DataImport(Guid.Parse("4c0019c2-402f-41e8-9ddf-b3c98027e2d5"), TemplateType.Portfolios, ImportStatus.Error, "Internal error.")
+                new DataImport(Guid.Parse("974c9b22-8276-4121-96ce-6bf3f0f70152"), DateTime.UtcNow, TemplateType.Instruments, ImportStatus.Finished),
+                new DataImport(Guid.Parse("4c0019c2-402f-41e8-9ddf-b3c98027e2d5"), DateTime.UtcNow.AddHours(-6), TemplateType.Portfolios, ImportStatus.Error, "Internal error.")
             };
 
             _context.Imports.AddRange(dataImports);
             await _context.CommitAsync();
 
             return dataImports;
+        }
+
+        private async Task<List<InstrumentSplit>> SeedInstrumentSplits(IEnumerable<Instrument> instruments)
+        {
+            var instrumentsList = instruments.ToList();
+
+            var splits = new List<InstrumentSplit>
+            {
+                new InstrumentSplit(instrumentsList[0].Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(1, 3)),
+                new InstrumentSplit(instrumentsList[1].Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(1, 5))
+            };
+
+            _context.InstrumentSplits.AddRange(splits);
+            await _context.CommitAsync();
+
+            return splits;
         }
     }
 }

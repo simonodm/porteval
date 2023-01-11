@@ -1,5 +1,5 @@
 import { toast } from 'react-toastify';
-import { ChartConfig, ChartLineBase, InstrumentType, ChartToDateRange } from './types';
+import { ChartConfig, ChartLineBase, InstrumentType, ChartToDateRange, InstrumentSplitProcessingStatus } from './types';
 
 /**
  * Default date format setting.
@@ -170,6 +170,17 @@ export const INSTRUMENT_TYPE_TO_STRING: Record<InstrumentType, string> = {
 }
 
 /**
+ * Map between {@link InstrumentSplitProcessingStatus} and its string representation in the UI.
+ * @category Constants
+ */
+export const INSTRUMENT_SPLIT_STATUS_TO_STRING: Record<InstrumentSplitProcessingStatus, string> = {
+    "notProcessed": "Not processed",
+    "processed": "Processed",
+    "rollbackRequested": "Rollback requested",
+    "rolledBack": "Rolled back"
+}
+
+/**
  * All tags used by RTK invalidation mechanism.
  * @category Constants
  */
@@ -190,6 +201,7 @@ export const RTK_API_TAGS = [
     'InstrumentPrices',
     'InstrumentPrice',
     'InstrumentTransactions',
+    'InstrumentSplits',
     'Charts',
     'Chart',
     'DashboardLayout',
@@ -212,3 +224,18 @@ export const TOAST_OPTIONS = {
     draggable: true,
     progress: undefined,
 }
+
+/**
+ * Default chart line colors for the first 8 lines added to the chart.
+ * @category Constants
+ */
+export const CHART_LINE_COLOR_CODE_PROGRESSION = [
+    "#00ff00",
+    "#ff0000",
+    "#e3ae00",
+    "#00bac7",
+    "#b500a0",
+    "#0082b5",
+    "#eb5470",
+    "#0000ff",
+];

@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Interfaces.Services;
+using PortEval.Application.Features.Queries;
 using PortEval.Application.Models;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Services.Queries.Interfaces;
-using PortEval.Application.Services.Interfaces;
 using PortEval.Domain.Models.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Services.Queries;
 
 namespace PortEval.Application.Controllers
 {
@@ -79,7 +79,7 @@ namespace PortEval.Application.Controllers
         {
             _logger.LogInformation($"Instrument {id} performance between {dateRange.From} and {dateRange.To} requested.");
 
-            var performance  = await _instrumentQueries.GetInstrumentPerformance(id, dateRange);
+            var performance = await _instrumentQueries.GetInstrumentPerformance(id, dateRange);
             if (performance.Status == QueryStatus.NotFound)
             {
                 return NotFound($"Instrument {id} not found.");

@@ -1,6 +1,6 @@
-﻿using System;
-using PortEval.Domain;
+﻿using PortEval.Domain;
 using Swashbuckle.AspNetCore.Annotations;
+using System;
 
 namespace PortEval.Application.Models.QueryParams
 {

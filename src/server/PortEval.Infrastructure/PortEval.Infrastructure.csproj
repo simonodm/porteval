@@ -19,9 +19,20 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+			<_Parameter1>PortEval.Tests.Unit</_Parameter1>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+			<_Parameter1>PortEval.Tests.Integration</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+
+	<ItemGroup>
+    <ProjectReference Include="..\PortEval.Application.Models\PortEval.Application.Models.csproj" />
+    <ProjectReference Include="..\PortEval.DataFetcher\PortEval.DataFetcher.csproj" />
     <ProjectReference Include="..\PortEval.Domain\PortEval.Domain.csproj" />
-    <ProjectReference Include="..\PortEval.Application.Services\PortEval.Application.Services.csproj" />
+    <ProjectReference Include="..\PortEval.Application.Features\PortEval.Application.Features.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,3 @@
-using System;
 using FluentValidation.AspNetCore;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
@@ -11,14 +10,14 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using PortEval.Application.Extensions;
+using PortEval.Application.Features.Hubs;
+using PortEval.Application.Filters;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Converters;
 using PortEval.Application.Models.Validators;
 using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure;
 using System.ComponentModel;
-using Microsoft.AspNetCore.SignalR;
-using PortEval.Application.Services.Hubs;
 
 namespace PortEval.Application
 {
@@ -65,6 +64,10 @@ namespace PortEval.Application
 
             services.AddLogging();
 
+            services.AddDomainServices();
+
+            services.AddDomainEventHandlers();
+
             services.ConfigureDbContext(Configuration);
 
             services.ConfigurePriceFetcher(Configuration);
@@ -76,6 +79,10 @@ namespace PortEval.Application
             services.AddBackgroundJobs();
 
             services.AddServices(Configuration);
+
+            services.AddCalculators();
+
+            services.AddChartGenerators();
 
             services.AddQueries();
 
@@ -101,7 +108,7 @@ namespace PortEval.Application
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PortEvalAPI v1"));
                 app.UseHangfireDashboard("/hangfire", new DashboardOptions
                 {
-                    Authorization = new [] { new HangfireDevAuthorizationFilter() }
+                    Authorization = new[] { new HangfireDevAuthorizationFilter() }
                 });
             }
 

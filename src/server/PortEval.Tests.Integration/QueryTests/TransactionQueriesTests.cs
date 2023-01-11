@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Services.Queries;
-using PortEval.Application.Services.Queries.Interfaces;
 using PortEval.Infrastructure;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests

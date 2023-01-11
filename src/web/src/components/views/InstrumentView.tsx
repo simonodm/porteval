@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import PortEvalChart from '../charts/PortEvalChart';
-import ModalWrapper from '../modals/ModalWrapper';
 import PageHeading from '../ui/PageHeading';
-import CreateInstrumentPriceForm from '../forms/CreateInstrumentPriceForm';
-import useUserSettings from '../../hooks/useUserSettings';
-import InstrumentPricesTable from '../tables/InstrumentPricesTable';
+import InstrumentPriceHistory from '../ui/InstrumentPriceHistory';
+import InstrumentSplitHistory from '../ui/InstrumentSplitHistory';
+import InstrumentCurrentPriceText from '../ui/InstrumentCurrentPriceText';
+import ChartPreview from '../charts/ChartPreview';
 
 import { useGetInstrumentByIdQuery } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { generateDefaultInstrumentChart } from '../../utils/chart';
-import { getPriceString } from '../../utils/string';
 import { useParams } from 'react-router-dom';
 
 import './InstrumentView.css';
+
 
 type Params = {
     /**
@@ -34,19 +33,15 @@ function InstrumentView(): JSX.Element {
 
     const instrument = useGetInstrumentByIdQuery(instrumentId);
 
-    const [userSettings] = useUserSettings();
-
     const instrumentLoaded = checkIsLoaded(instrument);
     const instrumentError = checkIsError(instrument);
-
-    const [modalIsOpen, setModalIsOpen] = useState(false);
 
     const chart = instrument.data ? generateDefaultInstrumentChart(instrument.data) : undefined;
 
     return (
         <LoadingWrapper isError={instrumentError} isLoaded={instrumentLoaded}>
             <PageHeading heading={instrument.data?.name ?? 'Instrument'}>
-                { instrument.data?.isTracked  && instrument.data.lastPriceUpdate &&
+                { instrument.data?.trackingStatus === 'tracked'  && instrument.data.lastPriceUpdate &&
                     <span className="float-right last-updated">
                         Prices updated: {
                             new Date(instrument.data.lastPriceUpdate).toLocaleString()
@@ -77,15 +72,7 @@ function InstrumentView(): JSX.Element {
                             </tr>
                             <tr>
                                 <td>Current price:</td>
-                                <td>
-                                    { 
-                                        getPriceString(
-                                            instrument.data?.currentPrice,
-                                            instrument.data?.currencyCode,
-                                            userSettings
-                                        )
-                                    }
-                                </td>
+                                <td>{ instrument.data && <InstrumentCurrentPriceText instrument={instrument.data} /> }</td>
                             </tr>
                             <tr>
                                 <td>Note:</td>
@@ -95,37 +82,11 @@ function InstrumentView(): JSX.Element {
                     </table>
                 </div>
                 <div className="col-xs-12 col-md-6">
-                    { chart && <PortEvalChart chart={chart} /> }
+                    { chart && <ChartPreview chart={chart} /> }
                 </div>
             </div>
-            <div className="action-buttons">
-                <button
-                    className="btn btn-success btn-sm float-right"
-                    onClick={() => setModalIsOpen(true)} role="button"
-                >
-                    Add price
-                </button>
-            </div>
-            <div className="row">
-                <div className="col-xs-12 container-fluid">
-                    <div className="content-heading">
-                        <h5>Price history</h5>
-                    </div>
-                    {instrument.data && 
-                        <InstrumentPricesTable currencyCode={instrument.data.currencyCode}
-                            instrumentId={instrument.data.id}
-                        />
-                    }
-                </div>
-            </div>
-            <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Add new price" isOpen={modalIsOpen}>
-                { instrument.data &&
-                    <CreateInstrumentPriceForm
-                        instrumentId={instrument.data.id}
-                        onSuccess={() => setModalIsOpen(false)}
-                    />
-                }
-            </ModalWrapper>
+            <InstrumentSplitHistory instrument={instrument.data} />
+            <InstrumentPriceHistory instrument={instrument.data} />
         </LoadingWrapper>
     )
 }

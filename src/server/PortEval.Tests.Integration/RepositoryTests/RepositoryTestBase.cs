@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 using PortEval.Infrastructure;
 using System;
 
@@ -11,7 +13,8 @@ namespace PortEval.Tests.Integration.RepositoryTests
         public RepositoryTestBase()
         {
             DbContext = new PortEvalDbContext(new DbContextOptionsBuilder<PortEvalDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options,
+                new Mock<IMediator>().Object);
         }
 
         public void Dispose()

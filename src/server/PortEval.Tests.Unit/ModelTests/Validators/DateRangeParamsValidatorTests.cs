@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Application.Models.Validators;
 using PortEval.Domain;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ModelTests.Validators

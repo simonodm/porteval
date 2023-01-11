@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +22,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<IEnumerable<Portfolio>> ListAllAsync()
         {
             return await _context.Portfolios
-                .AsNoTracking()
                 .OrderBy(p => p.Name)
                 .ToListAsync();
         }
@@ -31,7 +30,6 @@ namespace PortEval.Infrastructure.Repositories
         public async Task<Portfolio> FindAsync(int id)
         {
             var portfolio = await _context.Portfolios
-                .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             return portfolio;
@@ -55,7 +53,7 @@ namespace PortEval.Infrastructure.Repositories
         public async Task DeleteAsync(int portfolioId)
         {
             var foundPortfolioEntity = await _context.Portfolios.FirstOrDefaultAsync(p => p.Id == portfolioId);
-            if(foundPortfolioEntity != null)
+            if (foundPortfolioEntity != null)
             {
                 Delete(foundPortfolioEntity);
             }

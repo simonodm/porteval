@@ -28,6 +28,9 @@ namespace PortEval.Infrastructure.Configurations
             builder
                 .Property(i => i.ErrorLogPath)
                 .HasMaxLength(256);
+            builder
+                .Property(i => i.Version)
+                .IsConcurrencyToken();
         }
     }
 }

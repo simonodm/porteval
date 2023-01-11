@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,12 @@ namespace PortEval.Infrastructure.Repositories
 
         public async Task<IEnumerable<DataImport>> ListAllAsync()
         {
-            return await _context.Imports.AsNoTracking().ToListAsync();
+            return await _context.Imports.ToListAsync();
+        }
+
+        public async Task<DataImport> FindAsync(Guid id)
+        {
+            return await _context.Imports.FirstOrDefaultAsync(import => import.Id == id);
         }
 
         public DataImport Add(DataImport import)

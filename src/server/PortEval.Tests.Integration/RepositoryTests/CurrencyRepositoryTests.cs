@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using PortEval.Application.Services.Interfaces.Repositories;
+﻿using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Infrastructure.Repositories;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Integration.RepositoryTests
@@ -66,7 +63,7 @@ namespace PortEval.Tests.Integration.RepositoryTests
             DbContext.Add(usd);
             await DbContext.SaveChangesAsync();
 
-            usd.UnsetDefault();
+            usd.SetTrackingFrom(DateTime.UtcNow);
 
             _currencyRepository.Update(usd);
             await _currencyRepository.UnitOfWork.CommitAsync();
@@ -101,6 +98,8 @@ namespace PortEval.Tests.Integration.RepositoryTests
             Assert.Equal(expected?.Name, actual?.Name);
             Assert.Equal(expected?.Code, actual?.Code);
             Assert.Equal(expected?.IsDefault, actual?.IsDefault);
+            Assert.Equal(expected?.TrackingInfo?.LastUpdate, actual?.TrackingInfo?.LastUpdate);
+            Assert.Equal(expected?.TrackingInfo?.StartTime, actual?.TrackingInfo?.StartTime);
         }
     }
 }

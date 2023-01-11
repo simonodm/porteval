@@ -52,12 +52,12 @@ namespace PortEval.Infrastructure.Configurations
 
     internal class CurrencySeedJsonConverter : JsonConverter
     {
-        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             throw new NotImplementedException("Write operation not supported.");
         }
 
-        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var data = JArray.Load(reader);
             var result = new List<Currency>();
@@ -67,11 +67,9 @@ namespace PortEval.Infrastructure.Configurations
                 var name = (string)currency["name"];
                 var symbol = (string)currency["symbol"];
 
-                var createdCurrency = new Currency(code, name, symbol);
-                if (createdCurrency.Code == "USD")
-                {
-                    createdCurrency.SetAsDefault();
-                }
+                var isDefault = code == "USD";
+
+                var createdCurrency = Currency.Create(code, name, symbol, isDefault);
 
                 result.Add(createdCurrency);
             }

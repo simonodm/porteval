@@ -1,5 +1,6 @@
 import { SerializedError } from '@reduxjs/toolkit';
-import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query';
+import { FetchBaseQueryError, TagDescription } from '@reduxjs/toolkit/dist/query';
+import { portEvalApi } from '../redux/api/portEvalApi';
 
 type Query = {
     isFetching?: boolean;
@@ -53,4 +54,28 @@ export function onSuccessfulResponse<T>(val: PromiseReturnType<T>, callback?: (d
     if(!Object.hasOwnProperty.call(val, 'error')) {
         callback && callback((<SuccessfulResponse<T>>val).data);
     }
+}
+
+/**
+ * Invalidates RTK Query tags related to price data, including relevant calculations. 
+ * 
+ * @returns A PayloadAction.
+ */
+export function invalidateFinancialData(): { payload: TagDescription<string>[], type: string } {
+    return portEvalApi.util.invalidateTags([
+        'PortfolioCalculations',
+        'PositionCalculations',
+        'InstrumentCalculations',
+        'InstrumentPrices',
+        'InstrumentPrice',
+        'Instrument',
+        'Instruments',
+        'InstrumentSplits',
+        'PortfolioTransactions',
+        'PositionTransactions',
+        'InstrumentTransactions',
+        'Transaction',
+        'Imports',
+        'Import'
+    ]);
 }

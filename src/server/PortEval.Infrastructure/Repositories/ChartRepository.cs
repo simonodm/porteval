@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PortEval.Application.Services.Interfaces.Repositories;
+using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,14 +21,13 @@ namespace PortEval.Infrastructure.Repositories
         /// <inheritdoc cref="IChartRepository.ListAllAsync"/>
         public async Task<IEnumerable<Chart>> ListAllAsync()
         {
-            return await _context.Charts.AsNoTracking().Include(c => c.Lines).OrderBy(c => c.Name).ToListAsync();
+            return await _context.Charts.Include(c => c.Lines).OrderBy(c => c.Name).ToListAsync();
         }
 
         /// <inheritdoc cref="IChartRepository.FindAsync"/>
         public async Task<Chart> FindAsync(int id)
         {
             var chart = await _context.Charts
-                .AsNoTracking()
                 .Include(c => c.Lines)
                 .FirstOrDefaultAsync(c => c.Id == id);
 

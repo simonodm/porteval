@@ -1,13 +1,13 @@
+using Hangfire;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Infrastructure;
 using System;
 using System.Threading.Tasks;
-using Hangfire;
-using PortEval.Application.Services.Interfaces.BackgroundJobs;
 
 namespace PortEval.Application
 {
@@ -76,11 +76,15 @@ namespace PortEval.Application
                 job => job.Run(), Cron.Daily);
             recurringJobManager.AddOrUpdate<IInstrumentPriceCleanupJob>("db_cleanup", job => job.Run(), Cron.Daily);
             recurringJobManager.AddOrUpdate<IImportCleanupJob>("import_cleanup", job => job.Run(), Cron.Daily);
+            recurringJobManager.AddOrUpdate<ISplitFetchJob>("split_fetch", job => job.Run(), Cron.Daily);
+            recurringJobManager.AddOrUpdate<ISplitPriceAndTransactionAdjustmentJob>("split_price_adjustment", job => job.Run(), Cron.Daily);
 
             recurringJobManager.Trigger("db_cleanup");
             recurringJobManager.Trigger("fetch_missing_prices");
             recurringJobManager.Trigger("fetch_missing_exchange_rates");
             recurringJobManager.Trigger("import_cleanup");
+            recurringJobManager.Trigger("split_price_adjustment");
+            recurringJobManager.Trigger("split_fetch");
         }
     }
 }

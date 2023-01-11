@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PortEval.Domain.Models.Enums;
+﻿using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Domain.Models.ValueObjects
 {

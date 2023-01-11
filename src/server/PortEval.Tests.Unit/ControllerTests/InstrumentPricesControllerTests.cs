@@ -3,13 +3,13 @@ using AutoFixture.AutoMoq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PortEval.Application.Controllers;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Services.Queries.Interfaces;
+using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers;
 using System;
 using System.Threading.Tasks;
-using PortEval.Application.Services.Interfaces;
-using PortEval.Domain.Models.Entities;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests
@@ -109,7 +109,9 @@ namespace PortEval.Tests.Unit.ControllerTests
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var price = fixture.Create<InstrumentPriceDto>();
+            var price = fixture.Build<InstrumentPriceDto>()
+                .With(p => p.Time, DateTime.UtcNow)
+                .Create();
 
             var instrumentPriceService = fixture.Freeze<Mock<IInstrumentPriceService>>();
             instrumentPriceService

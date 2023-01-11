@@ -1,13 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Services.Queries;
-using PortEval.Application.Services.Queries.Interfaces;
 using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
@@ -90,7 +90,7 @@ namespace PortEval.Tests.Integration.QueryTests
             });
 
             Assert.Equal(QueryStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsAAPLCurrentPrice, AssertIsAAPLYesterdayPrice);
+            Assert.Collection(queryResult.Response, AssertIsAAPLYesterdayPrice, AssertIsAAPLCurrentPrice);
         }
 
         [Fact]
@@ -153,6 +153,15 @@ namespace PortEval.Tests.Integration.QueryTests
 
             Assert.Equal(QueryStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response.Data, AssertIsBTCCurrentPrice, AssertIsBTCYesterdaysPrice, AssertIsBTCTwoDaysOldPrice);
+        }
+
+        [Fact]
+        public async Task GetInstrumentSplits_ReturnsInstrumentSplits()
+        {
+            var queryResult = await _instrumentQueries.GetInstrumentSplits(_appleInstrumentId);
+
+            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Collection(queryResult.Response, AssertIsAAPLYesterdaysSplit);
         }
 
         [Fact]
@@ -226,7 +235,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task ChartInstrumentPrices_ReturnsChartedInstrumentPricesConvertedToTargetCurrency_WhenTargetCurrencyIsNotInstrumentCurrency()
         {
             var queryResult =
-                await _instrumentQueries.ChartInstrumentPrices(_btcInstrumentId, new DateRangeParams { From = DateTime.UtcNow.AddDays(-2)},
+                await _instrumentQueries.ChartInstrumentPrices(_btcInstrumentId, new DateRangeParams { From = DateTime.UtcNow.AddDays(-2) },
                     AggregationFrequency.Day, "EUR");
 
             Assert.Equal(QueryStatus.Ok, queryResult.Status);
@@ -407,6 +416,14 @@ namespace PortEval.Tests.Integration.QueryTests
             Assert.Equal(_btcInstrumentId, p.InstrumentId);
             Assert.Equal(4000m, p.Price);
             Assert.Equal(DateTime.UtcNow.AddDays(-2), p.Time, TimeSpan.FromHours(1));
+        }
+
+        private void AssertIsAAPLYesterdaysSplit(InstrumentSplitDto split)
+        {
+            Assert.Equal(_appleInstrumentId, split.InstrumentId);
+            Assert.Equal(3, split.SplitRatioNumerator);
+            Assert.Equal(1, split.SplitRatioDenominator);
+            Assert.Equal(DateTime.UtcNow.AddDays(-1), split.Time, TimeSpan.FromHours(1));
         }
     }
 }

@@ -20,12 +20,14 @@ import {
 } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-import { RTK_API_TAGS, TOAST_OPTIONS } from '../constants';
+import { TOAST_OPTIONS } from '../constants';
 import { useDispatch } from 'react-redux';
-import { portEvalApi } from '../redux/api/portEvalApi';
 
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
+import { invalidateFinancialData } from '../utils/queries';
+
+
 
 /**
  * Renders the application.
@@ -33,8 +35,25 @@ import 'react-toastify/dist/ReactToastify.css';
  * @component
  */
 function App(): JSX.Element {
-    const dispatch = useDispatch(); // used to invalidate all API cache on refresh
+    const dispatch = useDispatch();
     const [signalRConnection, setSignalRConnection] = useState<HubConnection | null>(null);
+
+    const startSignalRConnection = (connection: HubConnection) => {
+        if(connection) {
+            connection.start()
+            .then(_ => {
+                connection.on('ReceiveNotification', message => {
+                    if(message.message !== undefined && message.message !== null) {
+                        toast.info(message.message, TOAST_OPTIONS);
+                    }
+                    if(message.type === "newDataAvailable") {
+                        dispatch(invalidateFinancialData());
+                    }
+                })
+            })
+            .catch(e => console.log(`SignalR connection failed: ${e}`));
+        }
+    }
 
     // establish SignalR hub connection on first render
     useEffect(() => {
@@ -50,18 +69,8 @@ function App(): JSX.Element {
     // init SignalR callbacks when connection changes
     useEffect(() => {
         if(signalRConnection) {
-            signalRConnection.start()
-                .then(_ => {
-                    signalRConnection.on('ReceiveNotification', message => {
-                        if(message.message !== undefined && message.message !== null) {
-                            toast.info(message.message, TOAST_OPTIONS);
-                        }
-                        if(message.type === "newDataAvailable") {
-                            dispatch(portEvalApi.util.invalidateTags(RTK_API_TAGS));
-                        }
-                    })
-                })
-                .catch(e => console.log(`SignalR connection failed: ${e}`));
+            startSignalRConnection(signalRConnection);
+            signalRConnection.onclose(() => startSignalRConnection(signalRConnection));
         }
     }, [signalRConnection])
 

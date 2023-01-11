@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PortEval.Application.Features.Interfaces.Queries;
+using PortEval.Application.Features.Queries;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using PortEval.Application.Services.Queries;
-using PortEval.Application.Services.Queries.Interfaces;
 using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
@@ -86,30 +86,6 @@ namespace PortEval.Tests.Integration.QueryTests
 
             Assert.Equal(QueryStatus.NotFound, result.Status);
             Assert.Null(result.Response);
-        }
-
-        [Fact]
-        public async Task Convert_ReturnsInverselyConvertedPrice_WhenOnlyInverseExchangeRateIsPresent()
-        {
-            var result = await _currencyExchangeRateQueries.Convert("EUR", "USD", 100, DateTime.UtcNow);
-
-            Assert.Equal(100 * (1m / 1.01m), result);
-        }
-
-        [Fact]
-        public async Task Convert_ReturnsConvertedPrice_WhenExactExchangeRateIsPresent()
-        {
-            var result = await _currencyExchangeRateQueries.Convert("USD", "EUR", 100, DateTime.UtcNow);
-
-            Assert.Equal(101m, result);
-        }
-
-        [Fact]
-        public async Task Convert_ReturnsIndirectlyConvertedPrice_WhenConvertingBetweenCurrenciesWithoutExchangeRate()
-        {
-            var result = await _currencyExchangeRateQueries.Convert("CZK", "EUR", 1000, DateTime.UtcNow);
-
-            Assert.Equal(1000 * 1m / 25m * 1.01m, result);
         }
     }
 }

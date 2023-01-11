@@ -43,8 +43,8 @@ function PortEvalChart({ chart }: Props): JSX.Element {
         width: line.width,
         color: line.color,
         strokeDashArray: convertDashToStrokeDashArray(line.dash),
-        data: chartData?.data ? chartData.data[idx] : [],
-        transactions: transactionData?.data ? transactionData.data[idx] : []
+        data: chartData?.data ? chartData.data[idx] ?? [] : [],
+        transactions: transactionData?.data ? transactionData.data[idx] ?? [] : []
     }));
 
     const transactionSignRenderCallback = (dataPoint: RenderedLineChartLineDataPoint) => {
@@ -70,7 +70,7 @@ function PortEvalChart({ chart }: Props): JSX.Element {
     const isError = checkIsError(chartData, transactionData, currency);
 
     return (
-        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
+        <LoadingWrapper isError={isError} isLoaded={isLoaded} displayLoadingOnQueryRefresh>
             <LineChart config={chartRenderConfig} lines={lines} />
         </LoadingWrapper>
     )
