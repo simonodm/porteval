@@ -62,7 +62,7 @@ describe('Portfolio view', () => {
     test('renders preview chart', async () => {
         renderTestPortfolioView();
 
-        await screen.findByLabelText('chart');
+        await screen.findByLabelText('Chart preview');
     });
 
     test('renders positions table', async () => {

@@ -51,7 +51,7 @@ describe('Instrument view', () => {
     test('renders preview chart', async () => {
         renderTestInstrumentView();
 
-        await screen.findByLabelText('chart');
+        await screen.findByLabelText('Chart preview');
     });
 
     test('renders price history table', async () => {
