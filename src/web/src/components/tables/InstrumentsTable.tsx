@@ -82,6 +82,7 @@ function InstrumentsTable(): JSX.Element {
                         to={{
                             pathname: '/charts/view', state: { chart: generateDefaultInstrumentChart(i) 
                         }}}
+                        role='button'
                     >Chart
                     </NavLink>
                     <button

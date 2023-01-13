@@ -1,9 +1,9 @@
-import { fireEvent, screen } from '@testing-library/react';
 import React from 'react';
+import Dashboard from '../../components/views/Dashboard';
+import { fireEvent, screen } from '@testing-library/react';
 import { Route, Router } from 'react-router-dom';
 import { renderWithProviders } from '../utils';
 import { createMemoryHistory } from 'history';
-import Dashboard from '../../components/views/Dashboard';
 import { testDashboardLayout } from '../mocks/testData';
 
 const renderTestDashboard = () => {
@@ -34,7 +34,7 @@ describe('Dashboard view', () => {
 
         const removeButtons = await screen.findAllByRole('button', { name: /x/i });
         expect(removeButtons.length).toBe(testDashboardLayout.items.length);
-    })
+    });
 
     test('renders add charts button', async () => {
         renderTestDashboard();

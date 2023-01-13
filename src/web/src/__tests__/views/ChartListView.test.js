@@ -1,7 +1,7 @@
-import { fireEvent, screen } from '@testing-library/react';
 import React from 'react';
-import { Route, Router } from 'react-router-dom';
 import ChartListView from '../../components/views/ChartListView';
+import { fireEvent, screen } from '@testing-library/react';
+import { Route, Router } from 'react-router-dom';
 import { renderWithProviders } from '../utils';
 import { createMemoryHistory } from 'history';
 

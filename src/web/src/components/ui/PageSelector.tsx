@@ -43,7 +43,7 @@ function PageSelector({ page, totalPages, onPageChange, prefetch }: Props): JSX.
     }, [page, totalPages]);
 
     return (
-        <span className="page-selector d-inline">
+        <span className="page-selector d-inline" aria-label="Pagination controls">
             { page > 1 &&
                 <button
                     className="btn btn-primary btn-sm mr-1"

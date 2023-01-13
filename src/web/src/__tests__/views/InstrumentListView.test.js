@@ -7,7 +7,7 @@ import InstrumentListView from '../../components/views/InstrumentListView';
 
 const renderTestInstrumentListView = () => {
     const history = createMemoryHistory();
-    history.push(`/instruments`)
+    history.push('/instruments')
 
     renderWithProviders(
         <Router history={history}>
@@ -19,19 +19,19 @@ const renderTestInstrumentListView = () => {
 }
 
 describe('Instrument list view', () => {
-    test("renders instruments table", async () => {
+    test('renders instruments table', async () => {
         renderTestInstrumentListView();
 
         await screen.findByRole('table', { name: /instruments table/i });
     });
 
-    test("renders create new instrument button", async () => {
+    test('renders create new instrument button', async () => {
         renderTestInstrumentListView();
 
         await screen.findByRole('button', { name: /create new instrument/i });
     });
 
-    test("create new instrument button opens instrument creation form on click", async () => {
+    test('create new instrument button opens instrument creation form on click', async () => {
         renderTestInstrumentListView();
 
         const createButton = await screen.findByRole('button', { name: /create new instrument/i });

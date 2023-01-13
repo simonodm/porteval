@@ -3,11 +3,11 @@ import PortfolioView from '../../components/views/PortfolioView';
 import { fireEvent, screen } from '@testing-library/react';
 import { renderWithProviders } from '../utils';
 import { Route, Router } from 'react-router-dom';
-import { testPortfolios, testPortfolioStats } from '../mocks/testData';
+import { testPortfolios, testPortfoliosStats } from '../mocks/testData';
 import { createMemoryHistory } from 'history';
 
 const testPortfolio = testPortfolios[0];
-const testStats = testPortfolioStats[0];
+const testStats = testPortfoliosStats[0];
 
 const renderTestPortfolioView = () => {
     const history = createMemoryHistory();

@@ -8,7 +8,10 @@ import { parseISO } from 'date-fns';
 import { createMemoryHistory } from 'history';
 
 const testInstrument = testInstruments[0];
-const testInstrumentPrice = testPrices.slice().reverse().find(p => p.instrumentId === testInstrument.id && parseISO(p.time) <= Date.now());
+const testInstrumentPrice = testPrices
+    .slice()
+    .reverse()
+    .find(p => p.instrumentId === testInstrument.id && parseISO(p.time) <= Date.now());
 
 const renderTestInstrumentView = () => {
     const history = createMemoryHistory();

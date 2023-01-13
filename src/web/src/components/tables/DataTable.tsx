@@ -224,7 +224,7 @@ function DataTable<T extends Record<string, unknown>>(
             {headerGroups.map(headerGroup => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map(column => (
-                    <th {...column.getHeaderProps(sortable ? column.getSortByToggleProps() : undefined)}>
+                    <th {...column.getHeaderProps(sortable ? column.getSortByToggleProps({ title: undefined }) : undefined)}>
                     {column.render('Header')}
                     { sortable &&
                         <span>

@@ -7,7 +7,7 @@ import { createMemoryHistory } from 'history';
 
 const renderTestPortfolioListView = () => {
     const history = createMemoryHistory();
-    history.push(`/portfolios`)
+    history.push('/portfolios')
 
     renderWithProviders(
         <Router history={history}>
@@ -19,19 +19,19 @@ const renderTestPortfolioListView = () => {
 }
 
 describe('Portfolio list view', () => {
-    test("renders portfolios table", async () => {
+    test('renders portfolios table', async () => {
         renderTestPortfolioListView();
 
         await screen.findByRole('table', { name: /portfolios table/i });
     });
 
-    test("renders create new portfolio button", async () => {
+    test('renders create new portfolio button', async () => {
         renderTestPortfolioListView();
 
         await screen.findByRole('button', { name: /create new portfolio/i });
     });
 
-    test("create new portfolio button opens portfolio creation form on click", async () => {
+    test('create new portfolio button opens portfolio creation form on click', async () => {
         renderTestPortfolioListView();
 
         const createButton = await screen.findByRole('button', { name: /create new portfolio/i });

@@ -1,9 +1,9 @@
-import { screen } from '@testing-library/react';
 import React from 'react';
+import CurrenciesView from '../../components/views/CurrenciesView';
+import { screen } from '@testing-library/react';
 import { Route, Router } from 'react-router-dom';
 import { renderWithProviders } from '../utils';
 import { createMemoryHistory } from 'history';
-import CurrenciesView from '../../components/views/CurrenciesView';
 
 const renderTestCurrenciesView = () => {
     const history = createMemoryHistory();
