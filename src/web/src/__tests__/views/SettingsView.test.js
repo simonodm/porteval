@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import React from 'react';
 import { Route, Router } from 'react-router-dom';
 import { renderWithProviders } from '../utils';
@@ -23,5 +23,33 @@ describe('Settings view', () => {
         renderTestSettingsView();
 
         await screen.findByRole('form', { name: /settings form/i });
+    });
+
+    test('settings form contains date format field', async () => {
+        renderTestSettingsView();
+
+        const form = await screen.findByRole('form', { name: /settings form/i });
+        await within(form).findByRole('textbox', { name: /date format/i });
+    });
+
+    test('settings form contains time format field', async () => {
+        renderTestSettingsView();
+
+        const form = await screen.findByRole('form', { name: /settings form/i });
+        await within(form).findByRole('textbox', { name: /time format/i });
+    });
+
+    test('settings form contains decimal separator field', async () => {
+        renderTestSettingsView();
+
+        const form = await screen.findByRole('form', { name: /settings form/i });
+        await within(form).findByRole('textbox', { name: /decimal separator/i });
+    });
+
+    test('settings form contains thousands separator field', async () => {
+        renderTestSettingsView();
+
+        const form = await screen.findByRole('form', { name: /settings form/i });
+        await within(form).findByRole('textbox', { name: /thousands separator/i });
     });
 })

@@ -1,9 +1,14 @@
 import { parseISO } from 'date-fns';
 import { rest } from 'msw';
-import { Instrument, InstrumentPrice, InstrumentSplit, PaginatedResponse } from '../../types';
-import { TestState, DEFAULT_TEST_STATE } from './testData';
+import { CreateInstrumentParameters, CreatePortfolioParameters,
+    CreatePositionParameters
+} from '../../redux/api/apiTypes';
+import { Instrument, InstrumentPrice, InstrumentPriceConfig,
+    InstrumentSplit, PaginatedResponse, Portfolio
+} from '../../types';
+import { TestState, DEFAULT_TEST_STATE, testInstruments } from './testData';
 
-let currentState: TestState = JSON.parse(JSON.stringify(DEFAULT_TEST_STATE));
+export let currentState: TestState = JSON.parse(JSON.stringify(DEFAULT_TEST_STATE));
 
 export const resetState = () => {
     currentState = JSON.parse(JSON.stringify(DEFAULT_TEST_STATE));
@@ -16,6 +21,26 @@ const getCurrencies = () => {
             ctx.json(currentState.currencies)
         );
     });
+}
+
+const putCurrency = () => {
+    return rest.put('/api/currencies/:code', (req, res, ctx) => {
+        const { code } = req.params;
+        const defaultCurrency = currentState.currencies.find(c => c.isDefault);
+        const currencyToUpdate = currentState.currencies.find(c => c.code === code);
+        if(!defaultCurrency || !currencyToUpdate) {
+            return res(
+                ctx.status(404)
+            )
+        }
+
+        currencyToUpdate.isDefault = true;
+        defaultCurrency.isDefault = false;
+
+        return res(
+            ctx.status(200)
+        )
+    })
 }
 
 const getPortfolios = () => {
@@ -34,6 +59,46 @@ const getPortfolio = () => {
         return res(
             ctx.status(200),
             ctx.json(currentState.portfolios.find(p => p.id === parseInt(id as string)))
+        );
+    })
+}
+
+const postPortfolio = () => {
+    return rest.post('/api/portfolios', async (req, res, ctx) => {
+        const body = await req.json() as CreatePortfolioParameters;
+
+        currentState.portfolios.push({
+            ...body,
+            id: 999
+        });
+        currentState.portfolioStatistics.push({
+            id: 999,
+            totalPerformance: 0,
+            lastDayPerformance: 0,
+            lastWeekPerformance: 0,
+            lastMonthPerformance: 0,
+            totalProfit: 0,
+            lastDayProfit: 0,
+            lastWeekProfit: 0,
+            lastMonthProfit: 0
+        });
+
+        return res(
+            ctx.status(201),
+            ctx.json(body)
+        );
+    });
+}
+
+const putPortfolio = () => {
+    return rest.put('/api/portfolios/:id', async (req, res, ctx) => {
+        const body = await req.json() as Portfolio;
+
+        currentState.portfolios = [...currentState.portfolios.filter(p => p.id !== body.id), body];
+
+        return res(
+            ctx.status(200),
+            ctx.json(body)
         );
     })
 }
@@ -118,6 +183,45 @@ const getPortfolioPositionsStats = () => {
                         currentState.positions.find(pos => pos.id === p.id)?.portfolioId === parseInt(id as string)))
         );
     })
+}
+
+const postPosition = () => {
+    return rest.post('/api/positions', async (req, res, ctx) => {
+        const body = await req.json() as CreatePositionParameters;
+
+        const instrument = testInstruments.find(i => i.id === body.instrumentId);
+        if(!instrument) {
+            return res(
+                ctx.status(404)
+            );
+        }
+
+        const position = {
+            ...body,
+            instrument,
+            positionSize: body.amount,
+            id: 999
+        };
+
+        currentState.positions.push(position);
+        currentState.positionStatistics.push({
+            id: 999,
+            totalPerformance: 0,
+            lastDayPerformance: 0,
+            lastWeekPerformance: 0,
+            lastMonthPerformance: 0,
+            totalProfit: 0,
+            lastDayProfit: 0,
+            lastWeekProfit: 0,
+            lastMonthProfit: 0,
+            breakEvenPoint: 0
+        });
+
+        return res(
+            ctx.status(201),
+            ctx.json(position)
+        );
+    });
 }
 
 const deletePosition = () => {
@@ -232,6 +336,35 @@ const getInstrument = () => {
     })
 }
 
+const postInstrument = () => {
+    return rest.post('/api/instruments', async (req, res, ctx) => {
+        const body = await req.json() as CreateInstrumentParameters;
+        const instrument: Instrument = {
+            ...body,
+            id: 999
+        };
+
+        currentState.instruments.push(instrument);
+        return res(
+            ctx.status(201),
+            ctx.json(instrument)
+        );
+    })
+}
+
+const putInstrument = () => {
+    return rest.put('/api/instruments/:id', async (req, res, ctx) => {
+        const body = await req.json() as Instrument;
+
+        currentState.instruments = [...currentState.instruments.filter(i => i.id !== body.id), body];
+
+        return res(
+            ctx.status(200),
+            ctx.json(body)
+        );
+    })
+}
+
 const getInstrumentPriceChart = () => {
     return rest.get('/api/instruments/:id/prices/chart', (req, res, ctx) => {
         return res(
@@ -254,6 +387,23 @@ const getInstrumentPriceAt = () => {
                 currentState.instrumentPrices
                     .find(p => p.instrumentId === parseInt(id as string) && parseISO(p.time) <= time)
             )
+        );
+    })
+}
+
+const postInstrumentPrice = () => {
+    return rest.post('/api/instruments/:id/prices', async (req, res, ctx) => {
+        const body = await req.json() as InstrumentPriceConfig;
+        const price = {
+            ...body,
+            id: 999
+        };
+
+        currentState.instrumentPrices.push(price);
+
+        return res(
+            ctx.status(201),
+            ctx.json(price)
         );
     })
 }
@@ -281,6 +431,18 @@ const getInstrumentSplits = () => {
             ctx.json(data)
         );
     });
+}
+
+const postInstrumentSplit = () => {
+    return rest.post('/api/instruments/:id/splits', async (req, res, ctx) => {
+        const split = await req.json() as InstrumentSplit;
+
+        currentState.instrumentSplits.push(split);
+        return res(
+            ctx.status(201),
+            ctx.json(split)
+        );
+    })
 }
 
 const deleteInstrument = () => {
@@ -346,6 +508,17 @@ const getCharts = () => {
     })
 }
 
+const getChart = () => {
+    return rest.get('/api/charts/:id', (req, res, ctx) => {
+        const { id } = req.params;
+
+        return res(
+            ctx.status(200),
+            ctx.json(currentState.charts.find(c => c.id === parseInt(id as string)))
+        );
+    });
+}
+
 const deleteChart = () => {
     return rest.delete('/api/charts/:id', (req, res, ctx) => {
         const { id } = req.params;
@@ -387,6 +560,7 @@ const getExchanges = () => {
 
 export const handlers = [
     getCurrencies(),
+    putCurrency(),
     getPortfolios(),
     getAllPortfoliosStats(),
     getPortfolio(),
@@ -396,22 +570,30 @@ export const handlers = [
     getPortfolioPositions(),
     getPortfolioPositionsStats(),
     getPositionStats(),
+    postPortfolio(),
+    putPortfolio(),
     deletePortfolio(),
+    postPosition(),
     deletePosition(),
     getTransactions(),
     deleteTransaction(),
     getInstrumentsPage(),
     getInstrument(),
+    postInstrument(),
+    putInstrument(),
     deleteInstrument(),
     getInstrumentPriceChart(),
     getInstrumentPriceAt(),
+    postInstrumentPrice(),
     getInstrumentPrices(),
     getInstrumentSplits(),
+    postInstrumentSplit(),
     putInstrumentSplit(),
     deleteInstrumentPrice(),
     getCurrency(),
     getLatestCurrencyExchangeRates(),
     getCharts(),
+    getChart(),
     getDataImports(),
     getDashboardLayout(),
     deleteChart(),

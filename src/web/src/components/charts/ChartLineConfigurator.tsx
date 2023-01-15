@@ -55,11 +55,17 @@ function ChartLineConfigurator({ line: lineProp, onSave }: Props): JSX.Element {
             <div className="form-group">
                 <label htmlFor="width">Width:</label>
                 <div id="width">
-                    <input type="radio" id="width-thin" name="width" checked={line.width === 1} value={1} onChange={(e) => handleWidthChange(parseInt(e.target.value))} />
+                    <input type="radio" id="width-thin" name="width"
+                        checked={line.width === 1} value={1} onChange={(e) => handleWidthChange(parseInt(e.target.value))}
+                    />
                     <label htmlFor='width-thin' className="mr-2">thin</label>
-                    <input type="radio" id="width-medium" name="width" checked={line.width === 3} value={3} onChange={(e) => handleWidthChange(parseInt(e.target.value))} />
+                    <input type="radio" id="width-medium" name="width"
+                        checked={line.width === 3} value={3} onChange={(e) => handleWidthChange(parseInt(e.target.value))}
+                    />
                     <label htmlFor='width-medium' className="mr-2">medium</label>
-                    <input type="radio" id="width-thick" name="width" checked={line.width === 5} value={5} onChange={(e) => handleWidthChange(parseInt(e.target.value))} />
+                    <input type="radio" id="width-thick" name="width"
+                        checked={line.width === 5} value={5} onChange={(e) => handleWidthChange(parseInt(e.target.value))}
+                    />
                     <label htmlFor='width-thick' className="mr-2">thick</label>
                 </div>
             </div>

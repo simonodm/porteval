@@ -160,7 +160,9 @@ function ChartConfigurator({ onChange }: Props): JSX.Element {
                 <form autoComplete="off" className="chart-configurator" onSubmit={(e) => e.preventDefault() }>
                     <span className="chart-configurator-setting">
                         <label htmlFor="chart-type">Type:</label>
-                        <select className="form-select" id="chart-type" onChange={handleTypeChange}>
+                        <select aria-label='Chart type' className="form-select" id="chart-type"
+                            onChange={handleTypeChange}
+                        >
                             {types.map(type =>
                                 <option
                                     key={type}

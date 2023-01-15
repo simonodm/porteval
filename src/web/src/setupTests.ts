@@ -7,6 +7,12 @@ import server from './__tests__/mocks/server';
 
 const store = setupStore({});
 
+global.console = {
+    ...console,
+    warn: jest.fn(),
+    error: jest.fn()
+}
+
 beforeAll(() => {
     server.listen();
 });

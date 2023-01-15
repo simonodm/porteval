@@ -5,7 +5,7 @@ import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import CurrencyDropdown from './fields/CurrencyDropdown';
 
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
-import { Exchange, Instrument, InstrumentType } from '../../types';
+import { Instrument, InstrumentType } from '../../types';
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { useUpdateInstrumentMutation } from '../../redux/api/instrumentApi';
 import ExchangeDropdown from './fields/ExchangeDropdown';

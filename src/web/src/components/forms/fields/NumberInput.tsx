@@ -111,6 +111,7 @@ function NumberInput(
         <div className={`form-group ${className ?? ''}`}>
             <label htmlFor={label?.toLowerCase().replaceAll(' ', '-')}>{label}:</label>
             <input
+                aria-label={label}
                 className="form-control"
                 disabled={disabled}
                 id={label?.toLowerCase().replaceAll(' ', '-')}

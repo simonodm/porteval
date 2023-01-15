@@ -82,6 +82,7 @@ function DateTimeSelector({
         <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="date">{label}:</label>
             <DatePicker
+                ariaLabelledBy={label}
                 dateFormat={dateFormat && timeFormat ? dateFormat + ' ' + timeFormat : dateFormat}
                 disabled={disabled}
                 id="date"

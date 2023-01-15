@@ -61,7 +61,7 @@ function InstrumentSplitsTable({ instrumentId }: Props): JSX.Element {
                                 handleSplitRollback(s)
                             }}
                             role="button"
-                        >Rollback
+                           >Rollback
                         </button>
                     }
                 </>
@@ -71,6 +71,7 @@ function InstrumentSplitsTable({ instrumentId }: Props): JSX.Element {
 
     return (
         <DataTable
+            ariaLabel={`Instrument ${instrumentId} splits table`}
             className="w-100 entity-list"
             sortable
             columns={columns}

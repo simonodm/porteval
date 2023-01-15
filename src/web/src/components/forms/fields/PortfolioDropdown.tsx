@@ -65,7 +65,7 @@ function PortfolioDropdown({ className, portfolios, disabled, value, onChange }:
         <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="portfolio">Portfolio:</label>
             <select className="form-control" disabled={disabled} id="portfolio"
-                onChange={handlePortfolioChange} value={portfolioId}
+                onChange={handlePortfolioChange} value={portfolioId} aria-label="Portfolio"
             >
                 {portfolios.map(portfolio => <option key={portfolio.id} value={portfolio.id}>{portfolio.name}</option>)}
             </select>

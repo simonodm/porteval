@@ -67,6 +67,7 @@ function ExchangeDropdown({ className, value, disabled, exchanges, onChange }: P
         <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="exchange">Exchange:</label>
             <CreatableSelect
+                aria-label='Exchange'
                 id="exchange"
                 isDisabled={disabled}
                 isSearchable

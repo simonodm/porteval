@@ -51,98 +51,98 @@ function PortfolioView(): JSX.Element {
             <div className="row mb-5">
                 <div className="col-xs-12 col-sm-6">
                     <h5>Data</h5>
-                        <table className="entity-data w-100">
-                            <tbody>
-                                <tr>
-                                    <td>Name:</td>
-                                    <td>{portfolio.data?.name}</td>
-                                </tr>
-                                <tr>
-                                    <td>Current value:</td>
-                                    <td>
-                                        {
+                    <table className="entity-data w-100">
+                        <tbody>
+                            <tr>
+                                <td>Name:</td>
+                                <td>{portfolio.data?.name}</td>
+                            </tr>
+                            <tr>
+                                <td>Current value:</td>
+                                <td>
+                                    {
                                             getPriceString(
                                                 value.data?.value,
                                                 portfolio.data?.currencyCode,
                                                 userSettings)
                                         }
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Total profit:</td>
-                                    <td>
-                                        {
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Total profit:</td>
+                                <td>
+                                    {
                                             getPriceString(
                                                 stats.data?.totalProfit,
                                                 portfolio.data?.currencyCode,
                                                 userSettings
                                             )
                                         }
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Total performance:</td>
-                                    <td>
-                                        {
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Total performance:</td>
+                                <td>
+                                    {
                                             getPerformanceString(stats.data?.totalPerformance, userSettings)
                                         }
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Daily/weekly/monthly profit:</td>
-                                    <td>
-                                        {
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Daily/weekly/monthly profit:</td>
+                                <td>
+                                    {
                                             getPriceString(
                                                 stats.data?.lastDayProfit,
                                                 portfolio.data?.currencyCode,
                                                 userSettings
                                             ) + ' / '
                                         }
-                                        {
+                                    {
                                             getPriceString(
                                                 stats.data?.lastWeekProfit,
                                                 portfolio.data?.currencyCode,
                                                 userSettings
                                             ) + ' / '
                                         }
-                                        {
+                                    {
                                             getPriceString(
                                                 stats.data?.lastMonthProfit,
                                                 portfolio.data?.currencyCode,
                                                 userSettings
                                             )
                                         }
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Daily/weekly/monthly performance:</td>
-                                    <td>
-                                        {
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Daily/weekly/monthly performance:</td>
+                                <td>
+                                    {
                                             getPerformanceString(
                                                 stats.data?.lastDayPerformance,
                                                 userSettings
                                             ) + ' / '
                                         }
-                                        {
+                                    {
                                             getPerformanceString(
                                                 stats.data?.lastWeekPerformance,
                                                 userSettings
                                             ) + ' / '
                                         }
-                                        {
+                                    {
                                             getPerformanceString(
                                                 stats.data?.lastMonthPerformance,
                                                 userSettings
                                             )
                                         }
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Note:</td>
-                                    <td>{portfolio.data?.note}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Note:</td>
+                                <td>{portfolio.data?.note}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 <div className="col-xs-12 col-sm-6">
                     { chart && <ChartPreview chart={chart} /> }

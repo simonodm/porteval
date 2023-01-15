@@ -1,9 +1,10 @@
 import React from 'react';
 import PortfolioView from '../../components/views/PortfolioView';
-import { fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { fireEvent, screen, within } from '@testing-library/react';
 import { renderWithProviders } from '../utils';
 import { Route, Router } from 'react-router-dom';
-import { testPortfolios, testPortfoliosStats } from '../mocks/testData';
+import { testInstruments, testPortfolios, testPortfoliosStats } from '../mocks/testData';
 import { createMemoryHistory } from 'history';
 
 const testPortfolio = testPortfolios[0];
@@ -20,6 +21,13 @@ const renderTestPortfolioView = () => {
             </Route>
         </Router>
     );
+}
+
+const openCreatePositionForm = async () => {
+    const openPositionButton = await screen.findByRole('button', { name: /open position/i });
+    fireEvent.click(openPositionButton);
+
+    return await screen.findByRole('form', { name: /open position form/i });
 }
 
 describe('Portfolio view', () => {
@@ -92,9 +100,71 @@ describe('Portfolio view', () => {
     test('open position button displays open position form on click', async () => {
         renderTestPortfolioView();
 
-        const openPositionButton = await screen.findByRole('button', { name: 'Open position' });
-        fireEvent.click(openPositionButton);
-
-        await screen.findByRole('form', { name: 'Open position form' });
+        await openCreatePositionForm();
     });
+
+    test('open position form contains instrument field', async () => {
+        renderTestPortfolioView();
+
+        const form = await openCreatePositionForm();
+        await within(form).findByRole('combobox', { name: /instrument/i });
+    });
+
+    test('open position form contains amount field', async () => {
+        renderTestPortfolioView();
+
+        const form = await openCreatePositionForm();
+        await within(form).findByRole('textbox', { name: /amount/i });
+    });
+
+    test('open position form contains date field', async () => {
+        renderTestPortfolioView();
+
+        const form = await openCreatePositionForm();
+        await within(form).findByRole('textbox', { name: /date/i });
+    });
+
+    test('open position form contains price field', async () => {
+        renderTestPortfolioView();
+
+        const form = await openCreatePositionForm();
+        await within(form).findByRole('textbox', { name: /price/i });
+    });
+
+    test('open position form contains note field', async () => {
+        renderTestPortfolioView();
+
+        const form = await openCreatePositionForm();
+        await within(form).findByRole('textbox', { name: /note/i });
+    });
+
+    test('created position appears in view after open position form is submitted', async () => {
+        renderTestPortfolioView();
+
+        const instrument = testInstruments[1];
+        const amount = '3';
+        const price = '120.61';
+        const note = 'test form note';
+
+        const form = await openCreatePositionForm();
+        const instrumentInput = await within(form).findByRole('combobox', { name: /instrument/i });
+        await userEvent.selectOptions(instrumentInput, instrument.id.toString());
+
+        const amountInput = await within(form).findByRole('textbox', { name: /amount/i });
+        await userEvent.clear(amountInput);
+        await userEvent.type(amountInput, amount);
+
+        const priceInput = await within(form).findByRole('textbox', { name: /price/i });
+        await userEvent.clear(priceInput);
+        await userEvent.type(priceInput, price);
+
+        const noteInput = await within(form).findByRole('textbox', { name: /note/i });
+        await userEvent.clear(noteInput);
+        await userEvent.type(noteInput, note);
+
+        const saveButton = await within(form).findByRole('button', { name: /save/i });
+        await userEvent.click(saveButton);
+
+        await screen.findByRole('cell', { name: instrument.name });
+    })
 })

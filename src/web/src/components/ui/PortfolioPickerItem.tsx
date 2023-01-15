@@ -45,7 +45,7 @@ function PortfolioPickerItem(
     { portfolio, line, onLineAdd, onLineRemove, onLineConfigure, onConfigurePositions }: Props
 ): JSX.Element {
     return (
-        <div className="picker-item">
+        <div className="picker-item" aria-label={`${portfolio.name} picker item`}>
             <span className="picker-item-name">{portfolio.name}</span>
             {
                 line && <LinePreview length={LINE_PREVIEW_LENGTH} line={line} />

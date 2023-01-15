@@ -15,6 +15,12 @@ export const testCurrencies: Array<Currency> = [
         code: 'EUR',
         symbol: '€',
         isDefault: false
+    },
+    {
+        name: 'Czech Koruna',
+        code: 'CZK',
+        symbol: 'Kč',
+        isDefault: false
     }
 ];
 
@@ -188,7 +194,16 @@ export const testCharts: Array<Chart> = [
             value: 6
         },
         currencyCode: 'USD',
-        lines: []
+        lines: [
+            {
+                instrumentId: testInstruments[0].id,
+                color: '#000',
+                dash: 'solid',
+                name: testInstruments[0].name,
+                width: 1,
+                type: 'instrument'
+            }
+        ]
     }
 ];
 
@@ -197,7 +212,14 @@ export const testExchangeRates: Array<CurrencyExchangeRate> = [
         id: 1,
         currencyFromCode: 'USD',
         currencyToCode: 'EUR',
-        exchangeRate: 1,
+        exchangeRate: 1.1,
+        time: '2022-01-01'
+    },
+    {
+        id: 2,
+        currencyFromCode: 'EUR',
+        currencyToCode: 'USD',
+        exchangeRate: 0.91,
         time: '2022-01-01'
     }
 ];

@@ -107,12 +107,15 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
                 </div>
                 <Select
                     className="float-right mr-2"
+                    aria-label='Price aggregation frequency'
                     defaultValue={frequencyOptions[0]}
                     onChange={(newValue) => newValue && setFrequency(newValue.value)}
                     options={frequencyOptions}
                 />
                 <div className="form-check float-left">
-                    <input id="compress-prices" className="form-check-input" type="checkbox" checked={compressPrices} onClick={() => setCompressPrices(!compressPrices)} />
+                    <input id="compress-prices" className="form-check-input" type="checkbox"
+                        checked={compressPrices} onClick={() => setCompressPrices(!compressPrices)}
+                    />
                     <label htmlFor="compress-prices" className="form-check-label">Only display price changes</label>
                 </div>
             </div>

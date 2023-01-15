@@ -59,8 +59,9 @@ function InstrumentTypeDropdown({ className, value, disabled, onChange }: Props)
 
     return (
         <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor="instrument-type">Type:</label>
+            <label htmlFor="instrument-type">Instrument type:</label>
             <select
+                aria-label="Instrument type"
                 className="form-control"
                 disabled={disabled}
                 id="instrument-type"

@@ -4,7 +4,7 @@ import React, { useEffect, useMemo } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import DataTableExpandableComponent from './DataTableExpandableComponent';
 
-import { Column, Row, useExpanded, useSortBy, useTable } from "react-table"
+import { Column, Row, useExpanded, useSortBy, useTable } from 'react-table'
 import { COLLAPSE_ALL_ROWS_EVENT_NAME, EXPAND_ALL_ROWS_EVENT_NAME } from '../../constants';
 
 /**
@@ -132,13 +132,13 @@ function getExpanderColumn<T extends Record<string, unknown>>(): Column<T> {
         Header: () => null,
         id: 'expander',
         Cell: ({ row }: { row: Row<T> }) => (
-          <span {...row.getToggleRowExpandedProps()} data-testid="expander">
-            {
+            <span {...row.getToggleRowExpandedProps()} data-testid="expander">
+                {
                 row.isExpanded
                     ? <i className="bi bi-arrow-down-short"></i>
                     : <i className="bi bi-arrow-right-short"></i>
             }            
-          </span>
+            </span>
         )
     }
 }
@@ -156,8 +156,7 @@ function getColumnCount<T extends Record<string, unknown>>(columns: Array<Column
     columns.forEach(column => {
         if(column.columns) {
             result += getColumnCount(column.columns);
-        }
-        else {
+        } else {
             result++;
         }
     });
@@ -221,23 +220,23 @@ function DataTable<T extends Record<string, unknown>>(
     return (
         <table className={className ?? ''} aria-label={ariaLabel} {...getTableProps()}>
             <thead>
-            {headerGroups.map(headerGroup => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map(column => (
-                    <th {...column.getHeaderProps(sortable ? column.getSortByToggleProps({ title: undefined }) : undefined)}>
-                    {column.render('Header')}
-                    { sortable &&
-                        <span>
-                            {column.isSorted
+                {headerGroups.map(headerGroup => (
+                    <tr {...headerGroup.getHeaderGroupProps()}>
+                        {headerGroup.headers.map(column => (
+                            <th {...column.getHeaderProps(sortable ? column.getSortByToggleProps({ title: undefined }) : undefined)}>
+                                {column.render('Header')}
+                                { sortable &&
+                                <span>
+                                    {column.isSorted
                             ? column.isSortedDesc
                                 ? ' 🔽'
                                 : ' 🔼'
                             : ''}
-                        </span>
+                                </span>
                     }
-                    </th>
+                            </th>
                 ))}
-                </tr>
+                    </tr>
             ))}
             </thead>
             <LoadingWrapper isLoaded={!data.isLoading} isError={!!data.isError}>
@@ -248,7 +247,7 @@ function DataTable<T extends Record<string, unknown>>(
                         return (
                             <>
                                 <tr {...row.getRowProps()} data-testid="datarow">
-                                {row.cells.map(cell => {
+                                    {row.cells.map(cell => {
                                     return (
                                         <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                                     )
@@ -262,7 +261,8 @@ function DataTable<T extends Record<string, unknown>>(
                                     />
                                 }
                             </>
-                        )}
+                        )
+}
                     )}
                 </tbody>
             </LoadingWrapper>

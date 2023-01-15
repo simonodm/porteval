@@ -35,7 +35,7 @@ function SettingsForm({ onSuccess, onFailure }: Props): JSX.Element {
         e.preventDefault();
 
         if(!isValidDateTimeFormat(dateFormatValue) || !isValidDateTimeFormat(timeFormatValue)) {
-            onFailure && onFailure(`Invalid date or time format.`);
+            onFailure && onFailure('Invalid date or time format.');
             return;
         }
 

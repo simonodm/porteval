@@ -12,7 +12,7 @@ import ReactModal from 'react-modal';
 const root = document.getElementById('root');
 const store = setupStore({});
 
-ReactModal.setAppElement("#app");
+ReactModal.setAppElement('#app');
 
 render(
     <StrictMode>

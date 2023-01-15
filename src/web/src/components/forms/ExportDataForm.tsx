@@ -57,7 +57,7 @@ function ExportDataForm({ onSuccess }: Props): JSX.Element {
 
     return (
         <form onSubmit={onSubmit} aria-label="Export CSV data form">
-            <TemplateTypeDropdown onChange={setTemplateType} />
+            <TemplateTypeDropdown label='Export data type' onChange={setTemplateType} />
             <LoadingWrapper isError={isError} isLoaded={isLoaded}>
                 {
                     templateType === 'prices'
