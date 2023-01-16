@@ -1,5 +1,6 @@
 import React from 'react';
 import PortfoliosTable from '../../components/tables/PortfoliosTable';
+import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 import { renderWithProviders } from '../utils';
 import { Router, Route } from 'react-router';
@@ -17,6 +18,13 @@ const renderTestPortfoliosTable = (preconfiguredHistory = null) => {
             </Route>            
         </Router>
     );
+}
+
+const openEditPortfolioForm = async () => {
+    const editPortfolioButton = await screen.findAllByRole('button', { name: /edit/i });
+    fireEvent.click(editPortfolioButton[0]);
+
+    return await screen.findByRole('form', { name: /edit portfolio form/i });
 }
 
 describe('Portfolios table', () => {
@@ -67,13 +75,62 @@ describe('Portfolios table', () => {
         });
     });
 
-    test('edit button opens portfolio edit form', async () => {
+    test('edit portfolio button opens portfolio edit form on click', async () => {
         renderTestPortfoliosTable();
 
-        const editButtons = await screen.findAllByRole('button', { name: /edit/i });
-        fireEvent.click(editButtons[0]);
+        await openEditPortfolioForm();
+    });
 
-        await screen.findByLabelText(/edit portfolio form/i);
+    test('edit portfolio form contains editable name field', async () => {
+        renderTestPortfoliosTable();
+        
+        const form = await openEditPortfolioForm();
+        const nameInput = within(form).getByRole('textbox', { name: /name/i });
+        expect(nameInput).toBeEnabled();
+    });
+
+    test('edit portfolio form contains editable currency field', async () => {
+        renderTestPortfoliosTable();
+        
+        const form = await openEditPortfolioForm();
+        const currencyInput = within(form).getByRole('combobox', { name: /currency/i });
+        expect(currencyInput).toBeEnabled();
+    });
+
+    test('edit portfolio form contains editable note field', async () => {
+        renderTestPortfoliosTable();
+        
+        const form = await openEditPortfolioForm();
+        const noteInput = within(form).getByRole('textbox', { name: /note/i });
+        expect(noteInput).toBeEnabled();
+    });
+
+    test('edited portfolio changes in view after edit portfolio form submit', async () => {
+        renderTestPortfoliosTable();
+
+        const newName = 'Form test portfolio';
+        const newCurrency = 'CZK';
+        const newNote = 'Form test note';
+
+        const form = await openEditPortfolioForm();
+        
+        const nameInput = await within(form).findByRole('textbox', { name: /name/i });
+        await userEvent.clear(nameInput);
+        await userEvent.type(nameInput, newName);
+
+        const currencyInput = await within(form).findByRole('combobox', { name: /currency/i });
+        await userEvent.selectOptions(currencyInput, newCurrency);
+
+        const noteInput = await within(form).findByRole('textbox', { name: /note/i });
+        await userEvent.clear(noteInput);
+        await userEvent.type(noteInput, newNote);
+
+        const saveButton = await within(form).findByRole('button', { name: /save/i });
+        await userEvent.click(saveButton);
+
+        await screen.findByText(newName);
+        await screen.findByText(newCurrency);
+        await screen.findByText(newNote);
     });
 
     test('chart button navigates to chart view', async () => {

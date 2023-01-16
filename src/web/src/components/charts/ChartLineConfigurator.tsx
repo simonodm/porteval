@@ -51,7 +51,7 @@ function ChartLineConfigurator({ line: lineProp, onSave }: Props): JSX.Element {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} aria-label="Edit chart line form">
             <div className="form-group">
                 <label htmlFor="width">Width:</label>
                 <div id="width">
@@ -72,7 +72,7 @@ function ChartLineConfigurator({ line: lineProp, onSave }: Props): JSX.Element {
             <div className="form-group">
                 <label htmlFor="color">Color:</label>
                 <input className="form-control" id="color" onChange={(e) => handleColorChange(e.target.value)}
-                    type="color" value={line.color}
+                    type="color" value={line.color} data-testid="line-color-picker"
                 />
             </div>
             <div className="form-group">

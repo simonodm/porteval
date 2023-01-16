@@ -41,7 +41,7 @@ function PositionPickerItem(
     { position, line, onLineAdd, onLineRemove, onLineConfigure }: Props
 ): JSX.Element {
     return (
-        <div className="picker-item">
+        <div className="picker-item" aria-label={`${position.instrument.name} position picker item`}>
             <span className="picker-item-name">{position.instrument.name}</span>
             {
                 line && <LinePreview length={LINE_PREVIEW_LENGTH} line={line} />

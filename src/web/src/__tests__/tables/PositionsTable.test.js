@@ -1,10 +1,11 @@
 import React from 'react';
 import PositionsTable from '../../components/tables/PositionsTable';
+import userEvent from '@testing-library/user-event';
 import { Router, Route } from 'react-router';
 import { testPortfolios, testPositions, testPositionStats } from '../mocks/testData';
 import { fireEvent, screen, waitForElementToBeRemoved, within } from '@testing-library/react';
 import { createMemoryHistory } from 'history';
-import { renderWithProviders } from '../utils';
+import { renderWithProviders, reformatDateTime } from '../utils';
 
 const testPortfolio = testPortfolios[0];
 const testPortfolioPositions = testPositions.filter(p => p.portfolioId === testPortfolio.id);
@@ -22,6 +23,20 @@ const renderTestPositionsTable = (preconfiguredHistory = null) => {
             </Route>            
         </Router>
     );
+}
+
+const openAddTransactionForm = async () => {
+    const addButton = await screen.findAllByRole('button', { name: /add transaction/i });
+    fireEvent.click(addButton[0]);
+
+    return await screen.findByRole('form', { name: /create transaction form/i });
+}
+
+const openEditPositionForm = async () => {
+    const editButtons = await screen.findAllByRole('button', { name: /edit/i });
+    fireEvent.click(editButtons[0]);
+
+    return await screen.findByRole('form', { name: /edit position form/i });
 }
 
 describe('Positions table', () => {
@@ -127,10 +142,119 @@ describe('Positions table', () => {
     test('edit button renders position edit form', async () => {
         renderTestPositionsTable();
 
-        const editButtons = await screen.findAllByRole('button', { name: /edit/i });
-        fireEvent.click(editButtons[0]);
+        await openEditPositionForm();
+    });
 
-        await screen.findByLabelText('Edit position form');
+    test('position edit form renders disabled portfolio dropdown', async () => {
+        renderTestPositionsTable();
+
+        const form = await openEditPositionForm();
+        const portfolioInput = within(form).getByRole('combobox', { name: /portfolio/i });
+        expect(portfolioInput).toBeDisabled();
+    });
+
+    test('position edit form renders disabled instrument dropdown', async () => {
+        renderTestPositionsTable();
+
+        const form = await openEditPositionForm();
+        const instrumentInput = within(form).getByRole('combobox', { name: /instrument/i });
+        expect(instrumentInput).toBeDisabled();
+    });
+
+    test('position edit form renders editable note input', async () => {
+        renderTestPositionsTable();
+
+        const form = await openEditPositionForm();
+        const noteInput = within(form).getByRole('textbox', { name: /note/i });
+        expect(noteInput).toBeEnabled();
+    });
+
+    test('edited position changes in the table after position edit form is submitted', async () => {
+        renderTestPositionsTable();
+
+        const newNote = 'edited position note';
+
+        const form = await openEditPositionForm();
+        const noteInput = within(form).getByRole('textbox', { name: /note/i });
+        await userEvent.clear(noteInput);
+        await userEvent.type(noteInput, newNote);
+
+        const saveButton = within(form).getByRole('button', { name: /save/i });
+        await userEvent.click(saveButton);
+
+        await screen.findByRole('cell', { name: newNote });
+    });
+
+    test('add transaction button opens add transaction form', async () => {
+        renderTestPositionsTable();
+
+        await openAddTransactionForm();
+    });
+
+    test('add transaction form contains editable amount input', async () => {
+        renderTestPositionsTable();
+
+        const form = await openAddTransactionForm();
+        within(form).getByRole('textbox', { name: /amount/i });
+    });
+
+    test('add transaction form contains editable price input', async () => {
+        renderTestPositionsTable();
+
+        const form = await openAddTransactionForm();
+        within(form).getByRole('textbox', { name: /price/i });
+    });
+
+    test('add transaction form contains editable date input', async () => {
+        renderTestPositionsTable();
+
+        const form = await openAddTransactionForm();
+        within(form).getByRole('textbox', { name: /date/i });
+    });
+
+    test('add transaction form contains editable note input', async () => {
+        renderTestPositionsTable();
+
+        const form = await openAddTransactionForm();
+        within(form).getByRole('textbox', { name: /note/i });
+    });
+
+    test('new transaction appears in table after add transaction is submitted', async () => {
+        renderTestPositionsTable();
+
+        const newAmount = '0.33';
+        const newPrice = '101.12';
+        const newDate = reformatDateTime('2022-06-06T12:11:59Z');
+        const newNote = 'new transaction note';
+
+        const form = await openAddTransactionForm();
+
+        const amountInput = within(form).getByRole('textbox', { name: /amount/i });
+        await userEvent.clear(amountInput);
+        await userEvent.type(amountInput, newAmount);
+
+        const priceInput = within(form).getByRole('textbox', { name: /price/i });
+        await userEvent.clear(priceInput);
+        await userEvent.type(priceInput, newPrice);
+
+        const dateInput = within(form).getByRole('textbox', { name: /date/i });
+        await userEvent.clear(dateInput);
+        await userEvent.type(dateInput, newDate);
+
+        const noteInput = within(form).getByRole('textbox', { name: /note/i });
+        await userEvent.clear(noteInput);
+        await userEvent.type(noteInput, newNote);
+
+        const saveButton = within(form).getByRole('button', { name: /save/i });
+        await userEvent.click(saveButton);
+
+        const amountRegexp = new RegExp(newAmount, 'i');
+        const priceRegexp = new RegExp(`.*${newPrice}.*`, 'i');
+
+        await screen.findByRole('cell', { name: amountRegexp, hidden: true });
+        await screen.findByRole('cell', { name: priceRegexp, hidden: true });
+        await screen.findByRole('cell', { name: newNote, hidden: true });
+        await screen.findByRole('cell', { name: newDate, hidden: true });
     });
 
     test('chart button navigates to chart view', async () => {

@@ -1,10 +1,11 @@
 import { parseISO } from 'date-fns';
 import { rest } from 'msw';
 import { CreateInstrumentParameters, CreatePortfolioParameters,
-    CreatePositionParameters
+    CreatePositionParameters,
+    CreateTransactionParameters
 } from '../../redux/api/apiTypes';
-import { Instrument, InstrumentPrice, InstrumentPriceConfig,
-    InstrumentSplit, PaginatedResponse, Portfolio
+import { Chart, Instrument, InstrumentPrice, InstrumentPriceConfig,
+    InstrumentSplit, PaginatedResponse, Portfolio, Position, Transaction
 } from '../../types';
 import { TestState, DEFAULT_TEST_STATE, testInstruments } from './testData';
 
@@ -224,6 +225,30 @@ const postPosition = () => {
     });
 }
 
+const getPosition = () => {
+    return rest.get('/api/positions/:id', async (req, res, ctx) => {
+        const { id } = req.params;
+
+        return res(
+            ctx.status(200),
+            ctx.json(currentState.positions.find(p => p.id === parseInt(id as string)))
+        );
+    });
+}
+
+const putPosition = () => {
+    return rest.put('/api/positions/:id', async (req, res, ctx) => {
+        const body = await req.json() as Position;
+
+        currentState.positions = [...currentState.positions.filter(p => p.id !== body.id), body];
+
+        return res(
+            ctx.status(200),
+            ctx.json(body)
+        );
+    });
+}
+
 const deletePosition = () => {
     return rest.delete('/api/positions/:id', (req, res, ctx) => {
         const { id } = req.params;
@@ -234,6 +259,15 @@ const deletePosition = () => {
             ctx.status(200)
         );
     })
+}
+
+const getPositionValueChart = () => {
+    return rest.get('/api/positions/:id/value/chart', (req, res, ctx) => {
+        return res(
+            ctx.status(200),
+            ctx.json([])
+        );
+    });
 }
 
 const getPositionStats = () => {
@@ -262,6 +296,45 @@ const getTransactions = () => {
             ))
         );
     })
+}
+
+const postTransaction = () => {
+    return rest.post('/api/transactions', async (req, res, ctx) => {
+        const body = await req.json() as CreateTransactionParameters;
+
+        const parentPosition = currentState.positions.find(p => p.id === body.positionId);
+        if(!parentPosition) {
+            return res(
+                ctx.status(404)
+            );
+        }
+
+        const transaction = {
+            ...body,
+            portfolioId: parentPosition.portfolioId,
+            instrument: parentPosition.instrument,
+            id: 999
+        };
+        currentState.transactions.push(transaction);
+
+        return res(
+            ctx.status(200),
+            ctx.json(transaction)
+        );
+    });
+}
+
+const putTransaction = () => {
+    return rest.put('/api/transactions/:id', async (req, res, ctx) => {
+        const body = await req.json() as Transaction;
+
+        currentState.transactions = [...currentState.transactions.filter(t => t.id !== body.id), body];
+
+        return res(
+            ctx.status(200),
+            ctx.json(body)
+        );
+    });
 }
 
 const deleteTransaction = () => {
@@ -367,6 +440,24 @@ const putInstrument = () => {
 
 const getInstrumentPriceChart = () => {
     return rest.get('/api/instruments/:id/prices/chart', (req, res, ctx) => {
+        return res(
+            ctx.status(200),
+            ctx.json([])
+        );
+    });
+}
+
+const getInstrumentAggregatedProfitChart = () => {
+    return rest.get('/api/instruments/:id/profit/chart/aggregated', (req, res, ctx) => {
+        return res(
+            ctx.status(200),
+            ctx.json([])
+        );
+    });
+}
+
+const getInstrumentPerformanceChart = () => {
+    return rest.get('/api/instruments/:id/performance/chart', (req, res, ctx) => {
         return res(
             ctx.status(200),
             ctx.json([])
@@ -519,6 +610,19 @@ const getChart = () => {
     });
 }
 
+const putChart = () => {
+    return rest.put('/api/charts/:id', async (req, res, ctx) => {
+        const body = await req.json() as Chart;
+
+        currentState.charts = [...currentState.charts.filter(c => c.id !== body.id), body];
+
+        return res(
+            ctx.status(200),
+            ctx.json(body)
+        );
+    })
+}
+
 const deleteChart = () => {
     return rest.delete('/api/charts/:id', (req, res, ctx) => {
         const { id } = req.params;
@@ -570,12 +674,17 @@ export const handlers = [
     getPortfolioPositions(),
     getPortfolioPositionsStats(),
     getPositionStats(),
+    getPositionValueChart(),
     postPortfolio(),
     putPortfolio(),
     deletePortfolio(),
+    getPosition(),
     postPosition(),
+    putPosition(),
     deletePosition(),
     getTransactions(),
+    postTransaction(),
+    putTransaction(),
     deleteTransaction(),
     getInstrumentsPage(),
     getInstrument(),
@@ -583,6 +692,8 @@ export const handlers = [
     putInstrument(),
     deleteInstrument(),
     getInstrumentPriceChart(),
+    getInstrumentAggregatedProfitChart(),
+    getInstrumentPerformanceChart(),
     getInstrumentPriceAt(),
     postInstrumentPrice(),
     getInstrumentPrices(),
@@ -594,6 +705,7 @@ export const handlers = [
     getLatestCurrencyExchangeRates(),
     getCharts(),
     getChart(),
+    putChart(),
     getDataImports(),
     getDashboardLayout(),
     deleteChart(),

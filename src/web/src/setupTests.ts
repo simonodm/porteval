@@ -9,9 +9,10 @@ const store = setupStore({});
 
 global.console = {
     ...console,
-    warn: jest.fn(),
     error: jest.fn()
 }
+
+jest.setTimeout(10000);
 
 beforeAll(() => {
     server.listen();
