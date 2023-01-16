@@ -11,7 +11,7 @@ type Props = {
 
 export default function ChartPreview({ chart }: Props): JSX.Element {
     return (
-        <div className="chart-preview-wrapper">
+        <div className="chart-preview-wrapper" aria-label="Chart preview">
             <div className="action-buttons clearfix">
                 <NavLink
                     className="btn btn-primary float-right btn-sm"

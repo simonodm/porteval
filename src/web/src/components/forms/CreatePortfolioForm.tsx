@@ -55,7 +55,7 @@ function CreatePortfolioForm({ onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-label="Create portfolio form">
                 <TextInput label='Name' onChange={(val) => setName(val)} placeholder='e.g. US stocks'
                     value={name}
                 />

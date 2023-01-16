@@ -1,5 +1,9 @@
 {
     "root": true,
+    "env": {
+        "browser": true,
+        "jest": true
+    },
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
@@ -12,7 +16,9 @@
     "plugins": [
         "@typescript-eslint",
         "import",
-        "react"
+        "react",
+        "eslint-plugin-testing-library",
+        "eslint-plugin-jest-dom"
     ],
     "rules": {
         "eqeqeq": "warn",
@@ -22,19 +28,15 @@
         "brace-style": "warn",
         "max-len": ["warn", { "code": 120 }],
         "@typescript-eslint/no-non-null-assertion": "off",
-        "import/order": ["warn", {
-            "newlines-between": "always-and-inside-groups"
-        }],
         "react/jsx-closing-bracket-location": "warn",
         "react/jsx-closing-tag-location": "warn",
         "react/jsx-curly-brace-presence": "warn",
         "react/jsx-indent": "warn",
         "react/jsx-indent-props": "warn",
         "react/jsx-max-props-per-line": ["warn", {"maximum": 3}],
-        "react/jsx-no-useless-fragment": "warn",
-        "react/jsx-sort-props": "warn"
+        "react/jsx-no-useless-fragment": "warn"
     },
-    "ignorePatterns": ["src/**/*.test.ts", "src/frontend/generated/*", "Dockerfile*", "*.md", "*.json"],
+    "ignorePatterns": ["Dockerfile*", "*.md", "*.json"],
     "settings": {
         "import/resolver": {
             "node": {

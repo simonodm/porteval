@@ -4,7 +4,7 @@ import React, { useEffect, useMemo } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import DataTableExpandableComponent from './DataTableExpandableComponent';
 
-import { Column, Row, useExpanded, useSortBy, useTable } from "react-table"
+import { Column, Row, useExpanded, useSortBy, useTable } from 'react-table'
 import { COLLAPSE_ALL_ROWS_EVENT_NAME, EXPAND_ALL_ROWS_EVENT_NAME } from '../../constants';
 
 /**
@@ -81,6 +81,11 @@ type Props<T extends Record<string, unknown>> = {
     idSelector?: (entry: T) => string | number;
 
     /**
+     * Table's aria-label attribute.
+     */
+    ariaLabel?: string;
+
+    /**
      * Determines whether sorting is enabled for this table.
      */
     sortable?: boolean;
@@ -127,13 +132,13 @@ function getExpanderColumn<T extends Record<string, unknown>>(): Column<T> {
         Header: () => null,
         id: 'expander',
         Cell: ({ row }: { row: Row<T> }) => (
-          <span {...row.getToggleRowExpandedProps()}>
-            {
+            <span {...row.getToggleRowExpandedProps()} data-testid="expander">
+                {
                 row.isExpanded
                     ? <i className="bi bi-arrow-down-short"></i>
                     : <i className="bi bi-arrow-right-short"></i>
             }            
-          </span>
+            </span>
         )
     }
 }
@@ -151,8 +156,7 @@ function getColumnCount<T extends Record<string, unknown>>(columns: Array<Column
     columns.forEach(column => {
         if(column.columns) {
             result += getColumnCount(column.columns);
-        }
-        else {
+        } else {
             result++;
         }
     });
@@ -167,7 +171,7 @@ function getColumnCount<T extends Record<string, unknown>>(columns: Array<Column
  * @component
  */
 function DataTable<T extends Record<string, unknown>>(
-    { className, columns, data, idSelector, sortable, expandable, expandElement }: Props<T>
+    { className, columns, data, idSelector, ariaLabel, sortable, expandable, expandElement }: Props<T>
 ) {
     // Column definitions need to be converted, expander column needs to be added and the result needs to be memoized
     // to work correctly with `react-table`.
@@ -214,25 +218,25 @@ function DataTable<T extends Record<string, unknown>>(
     }, [expandable]);
 
     return (
-        <table className={className ?? ''} {...getTableProps()}>
+        <table className={className ?? ''} aria-label={ariaLabel} {...getTableProps()}>
             <thead>
-            {headerGroups.map(headerGroup => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map(column => (
-                    <th {...column.getHeaderProps(sortable ? column.getSortByToggleProps() : undefined)}>
-                    {column.render('Header')}
-                    { sortable &&
-                        <span>
-                            {column.isSorted
+                {headerGroups.map(headerGroup => (
+                    <tr {...headerGroup.getHeaderGroupProps()}>
+                        {headerGroup.headers.map(column => (
+                            <th {...column.getHeaderProps(sortable ? column.getSortByToggleProps({ title: undefined }) : undefined)}>
+                                {column.render('Header')}
+                                { sortable &&
+                                <span>
+                                    {column.isSorted
                             ? column.isSortedDesc
                                 ? ' 🔽'
                                 : ' 🔼'
                             : ''}
-                        </span>
+                                </span>
                     }
-                    </th>
+                            </th>
                 ))}
-                </tr>
+                    </tr>
             ))}
             </thead>
             <LoadingWrapper isLoaded={!data.isLoading} isError={!!data.isError}>
@@ -242,8 +246,8 @@ function DataTable<T extends Record<string, unknown>>(
                         prepareRow(row);
                         return (
                             <>
-                                <tr {...row.getRowProps()}>
-                                {row.cells.map(cell => {
+                                <tr {...row.getRowProps()} data-testid="datarow">
+                                    {row.cells.map(cell => {
                                     return (
                                         <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                                     )
@@ -257,7 +261,8 @@ function DataTable<T extends Record<string, unknown>>(
                                     />
                                 }
                             </>
-                        )}
+                        )
+}
                     )}
                 </tbody>
             </LoadingWrapper>

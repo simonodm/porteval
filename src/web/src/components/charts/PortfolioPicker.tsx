@@ -31,7 +31,7 @@ function PortfolioPicker(): JSX.Element {
     }
 
     return (
-        <div className="chart-picker">
+        <div className="chart-picker" aria-label="Portfolio picker">
             <h6>Portfolios</h6>
             <LoadingWrapper isError={isError} isLoaded={isLoaded}>
                 {portfolios.data?.map(portfolio => {

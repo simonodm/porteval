@@ -381,6 +381,8 @@ class D3LineChart {
             this._svg?.append('path')
                 .datum(this._lines[index].data)
                 .attr('fill', 'none')
+                .attr('aria-label', `${this._lines[index].name} line`)
+                .attr('role', 'line')
                 .style('stroke', this._lines[index].color)
                 .style('stroke-width', this._lines[index].width)
                 .style('stroke-dasharray', this._lines[index].strokeDashArray)
@@ -488,7 +490,7 @@ class D3LineChart {
                         const [, point] = findClosestDataPoints(d.data, time);
                         return point
                             ? `${d.name}: ${this._yFormat(point ? point.value : 0)}`
-                            : ``;
+                            : '';
                     });
 
                 if(this._tooltipCallback) {

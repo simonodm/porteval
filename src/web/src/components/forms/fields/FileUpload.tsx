@@ -39,6 +39,7 @@ function FileUpload({label, className, onFileSelected}: Props): JSX.Element {
         <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="file">{label}:</label>
             <input
+                aria-label={label}
                 ref={inputRef}
                 accept="text/csv"
                 className="form-control-file"

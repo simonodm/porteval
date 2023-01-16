@@ -41,7 +41,7 @@ function InstrumentPickerItem(
     { instrument, line, onLineAdd, onLineRemove, onLineConfigure }: Props
 ): JSX.Element {
     return (
-        <div className="picker-item">
+        <div className="picker-item" aria-label={`${instrument.name} picker item`}>
             <span className="picker-item-name">{instrument.name}</span>
             {
                 line && <LinePreview length={LINE_PREVIEW_LENGTH} line={line} />

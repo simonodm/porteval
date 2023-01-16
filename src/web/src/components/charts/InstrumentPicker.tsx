@@ -21,7 +21,7 @@ function InstrumentPicker(): JSX.Element {
     const isError = checkIsError(instruments);
 
     return (
-        <div className="chart-picker">
+        <div className="chart-picker" aria-label="Instrument picker">
             <h6>Instruments</h6>
             <LoadingWrapper isError={isError} isLoaded={isLoaded}>
                 {instruments.data?.map(instrument => {

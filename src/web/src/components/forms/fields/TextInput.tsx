@@ -67,6 +67,7 @@ function TextInput(
         <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="transaction-note">{label}:</label>
             <input 
+                aria-label={label}
                 className="form-control"
                 disabled={disabled}
                 id="position-note"

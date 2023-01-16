@@ -93,7 +93,7 @@ function InstrumentDropdown(
         <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="instrument">Instrument:</label>
             <select className="form-control" disabled={disabled || creatingNew} id="instrument"
-                onChange={handleInstrumentIdChange} value={instrumentId}
+                onChange={handleInstrumentIdChange} value={instrumentId} aria-label='Instrument'
             >
                 {instruments
                         .filter(instrument => instrument.type !== 'index')

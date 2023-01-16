@@ -50,7 +50,7 @@ function EditPositionForm({ position, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-label="Edit position form">
                 <PortfolioDropdown disabled portfolios={portfolios.data ?? []} value={position.portfolioId} />
                 <InstrumentDropdown disabled instruments={instruments.data ?? []} value={position.instrumentId} />
                 <TextInput label='Note' onChange={(val) => setNote(val)} value={note} />

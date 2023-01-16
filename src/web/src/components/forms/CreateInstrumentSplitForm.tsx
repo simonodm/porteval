@@ -50,7 +50,7 @@ function CreateInstrumentSplitForm({ instrumentId, onSuccess }: Props): JSX.Elem
 
     return (
         <LoadingWrapper isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit}>
+            <form aria-label='Create instrument split form' onSubmit={handleSubmit}>
                 <DateTimeSelector
                     dateFormat={userSettings.dateFormat}
                     enableTime

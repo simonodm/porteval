@@ -63,9 +63,9 @@ function PositionDropdown({ positions, className, disabled, value, onChange }: P
 
     return (
         <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor="position">Instrument:</label>
+            <label htmlFor="position">Position:</label>
             <select className="form-control" disabled={disabled} id="portfolio-position"
-                onChange={handlePositionChange} value={positionId}
+                onChange={handlePositionChange} value={positionId} aria-label="Position"
             >
                 {positions.map(position =>
                     <option key={position.id} value={position.id}>{position.instrument.name}</option>)}

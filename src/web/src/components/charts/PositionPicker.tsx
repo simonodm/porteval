@@ -39,7 +39,7 @@ function PositionPicker({ portfolio }: Props): JSX.Element {
     }
 
     return (
-        <div className="chart-picker">
+        <div className="chart-picker" aria-label="Position picker">
             <h6>Positions</h6>
             <LoadingWrapper isError={isError} isLoaded={isLoaded}>
                 <button

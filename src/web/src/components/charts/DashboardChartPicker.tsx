@@ -25,7 +25,7 @@ function DashboardChartPicker({ charts, onDrag }: Props): JSX.Element {
     }
     
     return (
-        <div>
+        <div role="picker" aria-label="Dashboard chart picker">
             {charts.map(chart => 
                 <div
                     className="picker-item draggable"

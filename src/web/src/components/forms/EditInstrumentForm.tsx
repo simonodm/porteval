@@ -5,7 +5,7 @@ import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import CurrencyDropdown from './fields/CurrencyDropdown';
 
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
-import { Exchange, Instrument, InstrumentType } from '../../types';
+import { Instrument, InstrumentType } from '../../types';
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { useUpdateInstrumentMutation } from '../../redux/api/instrumentApi';
 import ExchangeDropdown from './fields/ExchangeDropdown';
@@ -61,7 +61,7 @@ function EditInstrumentForm({ instrument, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-label="Edit instrument form">
                 <TextInput label='Name' onChange={(val) => setName(val)} value={name} />
                 <TextInput disabled label='Symbol' onChange={(val) => setSymbol(val)}
                     value={symbol}

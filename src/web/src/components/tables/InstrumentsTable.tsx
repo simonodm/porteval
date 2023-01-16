@@ -82,6 +82,7 @@ function InstrumentsTable(): JSX.Element {
                         to={{
                             pathname: '/charts/view', state: { chart: generateDefaultInstrumentChart(i) 
                         }}}
+                        role='button'
                     >Chart
                     </NavLink>
                     <button
@@ -114,6 +115,7 @@ function InstrumentsTable(): JSX.Element {
                 sortable
                 columns={columns}
                 idSelector={i => i.id}
+                ariaLabel="Instruments table"
                 data={{
                     data: instruments.data?.data ?? [],
                     isLoading: !isLoaded,

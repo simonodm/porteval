@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Dashboard from './views/Dashboard';
@@ -28,7 +28,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { invalidateFinancialData } from '../utils/queries';
 
 
-
 /**
  * Renders the application.
  * 
@@ -46,7 +45,7 @@ function App(): JSX.Element {
                     if(message.message !== undefined && message.message !== null) {
                         toast.info(message.message, TOAST_OPTIONS);
                     }
-                    if(message.type === "newDataAvailable") {
+                    if(message.type === 'newDataAvailable') {
                         dispatch(invalidateFinancialData());
                     }
                 })

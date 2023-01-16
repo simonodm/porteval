@@ -4,20 +4,30 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { portEvalApi } from './api/portEvalApi';
 
 /**
- * PortEval's redux store.
+ * Configures PortEval's Redux store with optional initial state.
  * 
  * @category Redux
+ * @param preloadedState Initial state
+ * @returns A Redux store representing PortEval's application state.
  */
-const store = configureStore({
-    reducer: {
-        [portEvalApi.reducerPath]: portEvalApi.reducer
-    },
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware()
-            .concat(portEvalApi.middleware)
-            .concat(rtkQueryErrorDisplay)
-});
+const setupStore = (preloadedState: any) => {
+    const store = configureStore({
+        reducer: {
+            [portEvalApi.reducerPath]: portEvalApi.reducer,
+        },
+        preloadedState,
+        middleware: getDefaultMiddleware =>
+            getDefaultMiddleware({
+                immutableCheck: false,
+                serializableCheck: false,
+            })
+                .concat(portEvalApi.middleware)
+                .concat(rtkQueryErrorDisplay),
+    });
 
-setupListeners(store.dispatch);
+    setupListeners(store.dispatch);
 
-export default store;
+    return store;
+}
+
+export default setupStore;

@@ -102,10 +102,9 @@ export function getPerformanceString(
  */
 export function isValidDateTimeFormat(dtFormat: string): boolean {
     try {
-        format(Date.parse("1999-01-01T00:00:00Z"), dtFormat);
+        format(Date.parse('1999-01-01T00:00:00Z'), dtFormat);
         return true;
-    }
-    catch (ex) {
+    } catch (ex) {
         return false;
     }
 }

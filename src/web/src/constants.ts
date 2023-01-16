@@ -174,10 +174,10 @@ export const INSTRUMENT_TYPE_TO_STRING: Record<InstrumentType, string> = {
  * @category Constants
  */
 export const INSTRUMENT_SPLIT_STATUS_TO_STRING: Record<InstrumentSplitProcessingStatus, string> = {
-    "notProcessed": "Not processed",
-    "processed": "Processed",
-    "rollbackRequested": "Rollback requested",
-    "rolledBack": "Rolled back"
+    'notProcessed': 'Not processed',
+    'processed': 'Processed',
+    'rollbackRequested': 'Rollback requested',
+    'rolledBack': 'Rolled back'
 }
 
 /**
@@ -230,12 +230,12 @@ export const TOAST_OPTIONS = {
  * @category Constants
  */
 export const CHART_LINE_COLOR_CODE_PROGRESSION = [
-    "#00ff00",
-    "#ff0000",
-    "#e3ae00",
-    "#00bac7",
-    "#b500a0",
-    "#0082b5",
-    "#eb5470",
-    "#0000ff",
+    '#00ff00',
+    '#ff0000',
+    '#e3ae00',
+    '#00bac7',
+    '#b500a0',
+    '#0082b5',
+    '#eb5470',
+    '#0000ff',
 ];

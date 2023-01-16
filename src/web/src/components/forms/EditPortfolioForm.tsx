@@ -52,7 +52,7 @@ function EditPortfolioForm({ portfolio, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-label="Edit portfolio form">
                 <TextInput label='Name' onChange={(val) => setName(val)} value={name} />
                 <CurrencyDropdown
                     currencies={currencies.data!}

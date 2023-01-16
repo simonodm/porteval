@@ -187,6 +187,7 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
                     <NavLink
                         className="btn btn-primary btn-extra-sm mr-1"
                         to={{pathname: '/charts/view', state: {chart: generateDefaultPositionChart(position)}}}
+                        role="button"
                     >
                         Chart
                     </NavLink>
@@ -212,6 +213,7 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
                     isLoading: !isLoaded,
                     isError
                 }}
+                ariaLabel={`Portfolio ${portfolioId} positions table`}
                 idSelector={p => p.id}
                 expandElement={p =>
                     <TransactionsTable className="w-100 entity-list entity-list-nested" positionId={p.id} currencyCode={p.instrument.currencyCode} />

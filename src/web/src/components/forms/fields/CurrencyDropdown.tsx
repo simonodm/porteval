@@ -61,7 +61,7 @@ function CurrencyDropdown({ currencies, className, disabled, value, onChange }: 
         <div className={`form-group ${className ?? ''}`}>
             <label htmlFor="currency">Currency:</label>
             <select className="form-control" disabled={disabled} id="currency"
-                onChange={(e) => handleCurrencyChange(e.target.value)} value={currencyCode}
+                aria-label='Currency' onChange={(e) => handleCurrencyChange(e.target.value)} value={currencyCode}
             >
                 {currencies.map(currency => <option key={currency.code} value={currency.code}>{currency.code}</option>)}
             </select>

@@ -101,6 +101,7 @@ function TransactionsTable({ className, positionId, currencyCode }: Props): JSX.
                     isLoading: !isLoaded,
                     isError
                 }}
+                ariaLabel={`Position ${positionId} transactions table`}
                 idSelector={t => t.id}
             />
             <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Edit transaction" isOpen={modalIsOpen}>

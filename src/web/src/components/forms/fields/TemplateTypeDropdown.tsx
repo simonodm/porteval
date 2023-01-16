@@ -13,6 +13,11 @@ type Props = {
     value?: TemplateType;
 
     /**
+     * Custom label to use for the form field.
+     */
+    label?: string
+
+    /**
      * Determines whether the form field is disabled.
      */
     disabled?: boolean;
@@ -30,7 +35,7 @@ type Props = {
  * @subcategory Fields
  * @component
  */
-function TemplateTypeDropdown({ className, value, disabled, onChange }: Props): JSX.Element {
+function TemplateTypeDropdown({ className, label, value, disabled, onChange }: Props): JSX.Element {
     const types: Array<TemplateType> = ['portfolios', 'positions', 'instruments', 'prices', 'transactions'];
     const [type, setType] = useState<TemplateType>(value ?? 'portfolios');
 
@@ -42,11 +47,12 @@ function TemplateTypeDropdown({ className, value, disabled, onChange }: Props): 
 
     return (
         <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor="template-type">Template:</label>
+            <label htmlFor={label?.toLowerCase().replaceAll(' ', '-')}>{label}:</label>
             <select
+                aria-label={label}
                 className="form-control"
                 disabled={disabled}
-                id="template-type"
+                id={label?.toLowerCase().replaceAll(' ', '-')}
                 onChange={handleTypeChange}
                 value={type}
             >

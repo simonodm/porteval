@@ -73,6 +73,7 @@ function ImportsTable(): JSX.Element {
             className="w-100 entity-list"
             sortable
             columns={columns}
+            ariaLabel="Imports table"
             data={{
                 data: imports.data ?? [],
                 isLoading: !isLoaded,
