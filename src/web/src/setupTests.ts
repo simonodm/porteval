@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import ReactModal from 'react-modal';
+import { configure } from '@testing-library/react';
 import { portEvalApi } from './redux/api/portEvalApi';
 import setupStore from './redux/store';
 import { resetState } from './__tests__/mocks/handlers';
@@ -12,6 +12,7 @@ global.console = {
     error: jest.fn()
 }
 
+configure({ asyncUtilTimeout: 3000 });
 jest.setTimeout(10000);
 
 beforeAll(() => {
