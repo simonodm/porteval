@@ -68,6 +68,13 @@ namespace PortEval.BackgroundJobs
                     fetchStart);
                 await SavePrices(instrument, pricesWithMissingRangesFilled);
             }
+            else
+            {
+                instrument.SetTrackingStatus(InstrumentTrackingStatus.Untracked);
+                instrument.IncreaseVersion();
+                _instrumentRepository.Update(instrument);
+                await _instrumentRepository.UnitOfWork.CommitAsync();
+            }
 
             _logger.LogInformation($"First price fetch for instrument {instrumentId} finished at {DateTime.UtcNow}.");
             if (prices.Count > 0)
@@ -76,7 +83,7 @@ namespace PortEval.BackgroundJobs
             }
             else
             {
-                await _notificationService.SendNotificationAsync(NotificationType.Info,
+                await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable,
                     $"No prices found for {instrument.Symbol}.");
             }
         }
@@ -109,15 +116,6 @@ namespace PortEval.BackgroundJobs
         /// <returns>A task representing the asynchronous price save operation.</returns>
         private async Task SavePrices(Instrument instrument, IEnumerable<PricePoint> prices)
         {
-            if (!prices.Any())
-            {
-                instrument.SetTrackingStatus(InstrumentTrackingStatus.Untracked);
-                instrument.IncreaseVersion();
-                _instrumentRepository.Update(instrument);
-                await _instrumentRepository.UnitOfWork.CommitAsync();
-                return;
-            }
-
             var pricesToAdd = new List<InstrumentPrice>();
             var minTime = DateTime.UtcNow;
             foreach (var pricePoint in prices)
