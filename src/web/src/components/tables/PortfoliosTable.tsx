@@ -57,7 +57,8 @@ function PortfoliosTable(): JSX.Element {
         {
             id: 'name',
             header: 'Name',
-            accessor: p => <Link to={`/portfolios/${p.id}`}>{p.name}</Link>
+            accessor: p => p.name,
+            render: p => <Link to={`/portfolios/${p.id}`}>{p.name}</Link>
         },
         {
             id: 'currency',

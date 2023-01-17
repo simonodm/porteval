@@ -68,7 +68,8 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
         {
             id: 'name',
             header: 'Name',
-            accessor: p => <Link to={`/instruments/${p.instrument.id}`}>{p.instrument.name}</Link>
+            accessor: p => p.instrument.name,
+            render: p => <Link to={`/instruments/${p.instrument.id}`}>{p.instrument.name}</Link>
         },
         {
             id: 'exchange',

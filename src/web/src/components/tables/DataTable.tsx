@@ -115,7 +115,8 @@ function convertColumnDefinition<T extends Record<string, unknown>>(colDef: Colu
         Header: colDef.header,
         columns: colDef.columns?.map(c => convertColumnDefinition(c)),
         ...(colDef.render ? { Cell: ({ row }: { row: Row<T> }) => colDef.render!(row.original) } : undefined),
-        ...(colDef.accessor ? { accessor: colDef.accessor } : undefined)
+        ...(colDef.accessor ? { accessor: colDef.accessor } : undefined),
+        sortType: 'basic'
     };
 
     return result;
