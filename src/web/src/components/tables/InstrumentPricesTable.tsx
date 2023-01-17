@@ -51,7 +51,6 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
     const prices = useGetInstrumentPricePageQuery(
         { instrumentId, page, limit: pageLimit, frequency: frequency, compressed: compressPrices }
     );
-    const prefetchPrices = usePrefetch('getInstrumentPricePage');
     const [deletePrice, mutationStatus] = useDeleteInstrumentPriceMutation()
 
     const [userSettings] = useUserSettings();
@@ -135,8 +134,6 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
                 <PageSelector
                     onPageChange={(p) => setPage(p)}
                     page={page}
-                    prefetch={(p) => 
-                        prefetchPrices({ instrumentId, page: p, limit: pageLimit, frequency, compressed: compressPrices })}
                     totalPages={prices.data ? prices.data.totalCount / pageLimit : 1}
                 />
             </div>

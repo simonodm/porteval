@@ -76,6 +76,7 @@ const instrumentApi = portEvalApi.injectEndpoints({
                         'PositionTransactions',
                         'Exchanges',
                         { type: 'Instrument', id: arg },
+                        { type: 'InstrumentPrices', id: arg },
                         { type: 'InstrumentCalculations', id: arg },
                         { type: 'InstrumentTransactions', id: arg }
                     ]

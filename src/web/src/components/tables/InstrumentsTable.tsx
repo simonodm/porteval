@@ -27,9 +27,6 @@ function InstrumentsTable(): JSX.Element {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [instrumentBeingEdited, setInstrumentBeingEdited] = useState<Instrument | undefined>(undefined);
 
-    const [userSettings] = useUserSettings();
-
-    const prefetchInstruments = usePrefetch('getInstrumentPage');
     const instruments = useGetInstrumentPageQuery({ page: page, limit: pageLimit});
     const [deleteInstrument, mutationStatus] = useDeleteInstrumentMutation();
 
@@ -126,7 +123,6 @@ function InstrumentsTable(): JSX.Element {
                 <PageSelector
                     onPageChange={(p) => setPage(p)}
                     page={page}
-                    prefetch={(p) => prefetchInstruments({ page: p, limit: pageLimit })}
                     totalPages={instruments.data ? instruments.data.totalCount / pageLimit : 1}
                 />
             </div>
