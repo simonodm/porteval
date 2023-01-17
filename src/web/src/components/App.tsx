@@ -26,6 +26,7 @@ import { useDispatch } from 'react-redux';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { invalidateFinancialData } from '../utils/queries';
+import ReactModal from 'react-modal';
 
 
 /**
@@ -63,6 +64,10 @@ function App(): JSX.Element {
             .build();
 
         setSignalRConnection(connection);
+    }, [])
+
+    useEffect(() => {
+        ReactModal.setAppElement('#app');
     }, [])
 
     // init SignalR callbacks when connection changes

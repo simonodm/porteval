@@ -7,12 +7,10 @@ import { Provider } from 'react-redux';
 import App from './components/App';
 import reportWebVitals from './reportWebVitals';
 import setupStore from './redux/store';
-import ReactModal from 'react-modal';
 
 const root = document.getElementById('root');
 const store = setupStore({});
 
-ReactModal.setAppElement('#app');
 
 render(
     <StrictMode>
