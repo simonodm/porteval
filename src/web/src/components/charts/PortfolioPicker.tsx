@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import PortfolioPickerItem from '../ui/PortfolioPickerItem';
+import PortfolioPickerItem from './PortfolioPickerItem';
 import ModalWrapper from '../modals/ModalWrapper';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
 import ChartPortfolioConfigurator from './ChartPortfolioConfigurator';

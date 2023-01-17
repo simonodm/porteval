@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
-import PositionPickerItem from '../ui/PositionPickerItem';
+import PositionPickerItem from './PositionPickerItem';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
 
 import { checkIsLoaded, checkIsError } from '../../utils/queries';

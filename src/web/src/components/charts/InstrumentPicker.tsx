@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import InstrumentPickerItem from '../ui/InstrumentPickerItem';
+import InstrumentPickerItem from './InstrumentPickerItem';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
 
