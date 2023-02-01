@@ -38,7 +38,7 @@ namespace PortEval.Domain.Models.Entities
 
         public void AdjustForSplit(InstrumentSplit split)
         {
-            if (split.Time > CreationTime)
+            if (split.Time > CreationTime && split.Time > Time)
             {
                 Price /= split.SplitRatio.Factor;
             }
@@ -46,7 +46,7 @@ namespace PortEval.Domain.Models.Entities
 
         public void AdjustForSplitRollback(InstrumentSplit split)
         {
-            if (split.Time > CreationTime)
+            if (split.Time > CreationTime && split.Time > Time)
             {
                 Price *= split.SplitRatio.Factor;
             }
