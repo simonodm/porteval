@@ -20,6 +20,9 @@ namespace PortEval.Infrastructure.Migrations
                 type: "datetime2",
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
+            migrationBuilder.Sql("UPDATE [dbo].[Transactions] SET [CreationTime] = [Time]");
+            migrationBuilder.Sql("UPDATE [dbo].[InstrumentPrices] SET [CreationTime] = [Time]");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
