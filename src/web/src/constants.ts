@@ -230,7 +230,7 @@ export const TOAST_OPTIONS = {
  * @category Constants
  */
 export const CHART_LINE_COLOR_CODE_PROGRESSION = [
-    '#00ff00',
+    '#00b300',
     '#ff0000',
     '#e3ae00',
     '#00bac7',

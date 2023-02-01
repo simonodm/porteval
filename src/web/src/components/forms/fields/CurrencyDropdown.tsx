@@ -41,7 +41,7 @@ function CurrencyDropdown({ currencies, className, disabled, value, onChange }: 
     // adjust internal state if `value` prop changes
     useEffect(() => {
         if(value !== undefined) {
-            handleCurrencyChange(value);
+            setCurrencyCode(value);
         }
     }, [value]);
 

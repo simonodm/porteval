@@ -149,12 +149,14 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
         {
             id: 'bep',
             header: 'BEP',
-            accessor: p => getPriceString(p.breakEvenPoint, p.instrument.currencyCode, userSettings)
+            accessor: p => p.breakEvenPoint,
+            render: p => getPriceString(p.breakEvenPoint, p.instrument.currencyCode, userSettings)
         },
         {
             id: 'currentPrice',
             header: 'Current price',
-            accessor: p => getPriceString(p.instrument.currentPrice, p.instrument.currencyCode, userSettings)
+            accessor: p => p.instrument.currentPrice,
+            render: p => getPriceString(p.instrument.currentPrice, p.instrument.currencyCode, userSettings)
         },
         {
             id: 'note',

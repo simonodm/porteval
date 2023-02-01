@@ -1,4 +1,4 @@
-import React, { useRef, useState , useLayoutEffect } from 'react';
+import React, { useRef, useState, useLayoutEffect } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PortEvalChart from '../charts/PortEvalChart';
 import useGetRouteState from '../../hooks/useGetRouteState';
@@ -17,7 +17,6 @@ import { isSuccessfulResponse } from '../../redux/api/apiTypes';
 import { useParams } from 'react-router';
 import { ChartConfig, ChartLine, ChartLineConfigurationContextType,
     ChartLineInstrument, ChartLinePortfolio, ChartLinePosition, Instrument, Portfolio, Position } from '../../types';
-import { toast } from 'react-toastify';
 import { useCreateChartMutation, useGetChartQuery, useUpdateChartMutation } from '../../redux/api/chartApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
@@ -39,7 +38,8 @@ function ChartView(): JSX.Element {
     const [chart, setChart] = useState(useGetRouteState<ChartConfig>('chart'));
 
     // track automated color fill for chart lines when they are first configured
-    // color fill progresses through a constant set of default colors (see constants.CHART_LINE_COLOR_CODE_PROGRESSION), and resets to the first one when running through them
+    // color fill progresses through a constant set of default colors (see constants.CHART_LINE_COLOR_CODE_PROGRESSION),
+    // and resets to the first one when running through them
     const [lastUsedColorCodeIndex, setLastUsedColorCodeIndex] = useState(-1);
 
     const chartFromState = useRef(chartId === undefined && chart !== undefined);
@@ -49,11 +49,12 @@ function ChartView(): JSX.Element {
 
     const [isChanged, setIsChanged] = useState(chartFromState.current);
 
-    const isLoaded = checkIsLoaded(chartQuery);
-    const isError = checkIsError(chartQuery);
     const [lineModalIsOpen, setLineModalIsOpen] = useState(false);
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
     const [modalLine, setModalLine] = useState<ChartLine | undefined>(undefined);
+
+    const isLoaded = checkIsLoaded(chartQuery);
+    const isError = checkIsError(chartQuery);
 
     useLayoutEffect(() => {
         if(chartQuery?.data) {
@@ -108,6 +109,10 @@ function ChartView(): JSX.Element {
     }
 
     const addPortfolioPositionLines = (positions: Array<Position>) => {
+        if(!chart) {
+            return;
+        }
+
         const newLines: Array<ChartLine> = positions.map((position, idx) => {
             const colorIndex = (lastUsedColorCodeIndex + 1 + idx) % constants.CHART_LINE_COLOR_CODE_PROGRESSION.length;
 
@@ -120,16 +125,19 @@ function ChartView(): JSX.Element {
             }
         });
 
-        setLastUsedColorCodeIndex((lastUsedColorCodeIndex + positions.length) % constants.CHART_LINE_COLOR_CODE_PROGRESSION.length);
+        setLastUsedColorCodeIndex(
+            (lastUsedColorCodeIndex + positions.length) % constants.CHART_LINE_COLOR_CODE_PROGRESSION.length
+        );
 
-        chart && setChart({
+
+        const updatedChart = {
             ...chart,
             lines: [
-            ...chart.lines,
-            ...newLines
+                ...chart.lines,
+                ...newLines
             ]
-        });
-        setIsChanged(true);
+        };
+        handleChartSave(updatedChart);
     }
 
     const configureLine = (line: ChartLine) => {
@@ -138,20 +146,24 @@ function ChartView(): JSX.Element {
     }
 
     const removeLine = (line: ChartLine) => {
-        chart && setChart({
+        if(!chart) {
+            return;
+        }
+
+        const updatedChart = {
             ...chart,
             lines: chart.lines.filter(existingLine => existingLine !== line)
-        });
-        setIsChanged(true);
-    }
-
-    const handleChartConfigurationUpdate = (newChart: ChartConfig) => {
-        setChart(newChart);
-        setIsChanged(true);
+        };
+        
+        handleChartSave(updatedChart);
     }
 
     const handleLineSave = (line: ChartLine) => {
-        chart && setChart({
+        if(!chart) {
+            return;
+        }
+
+        const updatedChart = {
             ...chart,
             lines: [...chart.lines.filter(existingLine =>
                 existingLine.type !== line.type
@@ -161,37 +173,35 @@ function ChartView(): JSX.Element {
                     existingLine.portfolioId !== (line as ChartLinePortfolio).portfolioId)
                 || (existingLine.type === 'position' &&
                     existingLine.positionId !== (line as ChartLinePosition).positionId)),
-                line]
-            });
-        setIsChanged(true);
+                line
+            ]
+        };
+
+        handleChartSave(updatedChart);
         setLineModalIsOpen(false);
     }
 
-    const handleEditSave = (updatedChart: ChartConfig) => {
-        setChart(updatedChart);
+    const handleChartEditSave = (updatedChart: ChartConfig) => {
+        setEditModalIsOpen(false);
         handleChartSave(updatedChart);
     }
 
     const handleChartSave = (updatedChart: ChartConfig) => {
-        const onSuccess = () => {
-            toast.success('Saved');
-            setIsChanged(false);
-            setEditModalIsOpen(false);
-        }
-
         if(!chartId) {
             createChart(updatedChart).then((res) => {
                 if(isSuccessfulResponse(res)) {
                     setChartId(res.data.id.toString());
-                    onSuccess();
                 }
             });
         } else {
             updateChart({
                 ...updatedChart,
                 id: parseInt(chartId)
-            }).then(onSuccess);
+            });
         }
+
+        setChart(updatedChart);
+        setIsChanged(false);
     }
 
     const context: ChartLineConfigurationContextType = {
@@ -228,7 +238,7 @@ function ChartView(): JSX.Element {
                     <div className="container-fluid row flex-grow-1">
                         <div className="col-xs-12 col-md-8 container-fluid d-flex flex-column">
                             <div>
-                                <ChartConfigurator onChange={handleChartConfigurationUpdate} />
+                                <ChartConfigurator onChange={handleChartSave} />
                             </div>
                             <PortEvalChart chart={chart} />
                         </div>
@@ -255,7 +265,7 @@ function ChartView(): JSX.Element {
                             heading="Edit chart info"
                             isOpen={editModalIsOpen}
                         >
-                            <EditChartMetaForm chart={chart} onSave={handleEditSave} />
+                            <EditChartMetaForm chart={chart} onSave={handleChartEditSave} />
                         </ModalWrapper>
                     </div>
                 }

@@ -25,7 +25,8 @@ type Props = {
 }
 
 /**
- * Renders a chart configuration component, enabling modification of the chart's type, date range, frequency, and currency.
+ * Renders a chart configuration component, enabling modification of the chart's type, date range,
+ * frequency, and currency.
  *
  * @category Chart
  * @component
