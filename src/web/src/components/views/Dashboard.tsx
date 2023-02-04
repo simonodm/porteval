@@ -46,8 +46,13 @@ function Dashboard(): JSX.Element {
                     dashboardHeight: item.h
                 }))
             }
-            setDashboardLayout(newDashboardLayout);
-            updateLayout(newDashboardLayout);
+
+            // doublecheck if the layout has indeed changed, as react-grid-layout sometimes triggers the change event
+            // multiple times
+            if(JSON.stringify(newDashboardLayout) !== JSON.stringify(dashboardLayout)) {
+                setDashboardLayout(newDashboardLayout);
+                updateLayout(newDashboardLayout);
+            }            
         }
     }
 
@@ -63,7 +68,7 @@ function Dashboard(): JSX.Element {
         }
     }
 
-    // Refresh layout if new layout is received from query
+    // Refresh layout if a new layout is received from query
     useEffect(() => {
         if(layoutQuery.data) {
             setDashboardLayout(layoutQuery.data);
@@ -98,9 +103,7 @@ function Dashboard(): JSX.Element {
                 isDraggable={isEditable}
                 isDroppable={true}
                 isResizable={isEditable}
-                onDragStop={saveLayout}
-                onDrop={saveLayout}
-                onResizeStop={saveLayout}
+                onLayoutChange={saveLayout}
                 rowHeight={150}
             >
                 {charts.data && dashboardLayout && charts.data.map(chart => {
