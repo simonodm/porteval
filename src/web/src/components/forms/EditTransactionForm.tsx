@@ -5,6 +5,9 @@ import DateTimeSelector from './fields/DateTimeSelector';
 import NumberInput from './fields/NumberInput';
 import TextInput from './fields/TextInput';
 
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
 import { checkIsLoaded, onSuccessfulResponse } from '../../utils/queries';
 import { useUpdateTransactionMutation } from '../../redux/api/transactionApi';
 import { Transaction } from '../../types';
@@ -53,24 +56,26 @@ function EditTransactionForm({ transaction, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit} aria-label="Edit transaction form">
-                <NumberInput allowFloat allowNegativeValues
+            <Form onSubmit={handleSubmit} aria-label="Edit transaction form">
+                <NumberInput className="mb-3" allowFloat allowNegativeValues
                     label='Amount' onChange={setAmount} value={amount}
                 />
-                <NumberInput allowFloat label='Price'
+                <NumberInput className="mb-3" allowFloat label='Price'
                     onChange={setPrice} value={price}
                 />
-                <DateTimeSelector dateFormat={userSettings.dateFormat} label='Date'
+                <DateTimeSelector className="mb-3" dateFormat={userSettings.dateFormat} label='Date'
                     onChange={setTime} timeFormat={userSettings.timeFormat}
                     timeInterval={1} value={time} enableTime
                 />
-                <TextInput label='Note' onChange={setNote} value={note} />
-                <button 
-                    className="btn btn-primary"
-                    role="button"
+                <TextInput className="mb-3" label='Note' onChange={setNote}
+                    value={note}
+                />
+                <Button 
+                    variant="primary"
+                    type="submit"
                 >Save
-                </button>
-            </form>
+                </Button>
+            </Form>
         </LoadingWrapper>
     )
 }

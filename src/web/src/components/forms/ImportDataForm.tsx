@@ -60,8 +60,8 @@ function ImportDataForm({ onSuccess }: Props): JSX.Element {
     }
     
     return (
-        <Form aria-label="Import CSV data form">
-            <TemplateTypeDropdown className="mb-2" label='Import template' onChange={setTemplateType} />
+        <Form onSubmit={handleUpload} aria-label="Import CSV data form">
+            <TemplateTypeDropdown className="mb-3" label='Import template' onChange={setTemplateType} />
             <Button
                 className="mb-4"
                 variant="primary"
@@ -70,12 +70,11 @@ function ImportDataForm({ onSuccess }: Props): JSX.Element {
             >
                 Download template
             </Button>
-            <FileUpload className="mb-2" label="Choose import file" onFileSelected={handleFileSelect} />
+            <FileUpload className="mb-3" label="Choose import file" onChange={handleFileSelect} />
             <Button
-                className="mb-2"
+                className="mb-3"
                 variant="primary"
-                role="button"
-                onClick={handleUpload}
+                type="submit"
             >
                 Upload
             </Button>

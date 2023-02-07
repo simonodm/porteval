@@ -3,6 +3,9 @@ import LoadingWrapper from '../ui/LoadingWrapper';
 import CurrencyDropdown from './fields/CurrencyDropdown';
 import TextInput from './fields/TextInput';
 
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
 import { useUpdatePortfolioMutation } from '../../redux/api/portfolioApi';
@@ -52,20 +55,26 @@ function EditPortfolioForm({ portfolio, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit} aria-label="Edit portfolio form">
-                <TextInput label='Name' onChange={(val) => setName(val)} value={name} />
+            <Form onSubmit={handleSubmit} aria-label="Edit portfolio form">
+                <TextInput className="mb-3"  label='Name' onChange={(val) => setName(val)}
+                    value={name}
+                />
                 <CurrencyDropdown
+                    className="mb-3" 
                     currencies={currencies.data!}
                     onChange={(code) => setCurrencyCode(code)}
                     value={currencyCode}
                 />
-                <TextInput label='Note' onChange={(val) => setNote(val)} value={note} />
-                <button 
-                    className="btn btn-primary"
-                    role="button"
-                >Save
-                </button>
-            </form>
+                <TextInput className="mb-3" label='Note' onChange={(val) => setNote(val)}
+                    value={note}
+                />
+                <Button 
+                    variant="primary"
+                    type="submit"
+                >
+                    Save
+                </Button>
+            </Form>
         </LoadingWrapper>
         
     )

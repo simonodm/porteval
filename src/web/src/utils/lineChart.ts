@@ -148,6 +148,8 @@ class D3LineChart {
     _margins = { top: 0, left: 0, bottom: 0, right: 0 };
     _fontSize = 10;
 
+    _rightSideYAxis = false;
+
     /**
      * Specifies lines to be rendered in the chart.
      * 
@@ -228,6 +230,16 @@ class D3LineChart {
     }
 
     /**
+     * Configures the chart to render the Y axis on the right side instead of left.
+     * 
+     * @returns An updated {@link D3LineChart}
+     */
+    withRightSideYAxis() {
+        this._rightSideYAxis = true;
+        return this;
+    }
+
+    /**
      * Appends the chart to the specified HTML element.
      */
     appendTo(container: HTMLElement) {
@@ -269,9 +281,12 @@ class D3LineChart {
                 (prev, curr) => Math.max(prev, curr),
                 0
             );
-        this._margins.left = maxValueLength * this._fontSize / 1.5;
+
+        const yAxisMargin = maxValueLength * this._fontSize / 1.5
+
+        this._margins.left = this._rightSideYAxis ? 5 : yAxisMargin;
+        this._margins.right = this._rightSideYAxis ? yAxisMargin : 5;
         this._margins.bottom = this._fontSize * 2.2;
-        this._margins.right = 5;
         this._margins.top = 5;
     }
 
@@ -329,11 +344,18 @@ class D3LineChart {
             )
         this._svg?.append('g')
             .attr('class', 'y-axis')
+            .attr('transform', `translate(${this._rightSideYAxis ? this._width : 0}, 0)`)
             .style('font-size', this._fontSize)
             .call(
-                d3.axisLeft<number>(this._yScale)
-                    .ticks(this._height / CHART_TICK_INTERVAL)
-                    .tickFormat(this._yFormat)
+                this._rightSideYAxis
+                    ?   
+                        d3.axisRight<number>(this._yScale)
+                            .ticks(this._height / CHART_TICK_INTERVAL)
+                            .tickFormat(this._yFormat)
+                    :  
+                        d3.axisLeft<number>(this._yScale)
+                            .ticks(this._height / CHART_TICK_INTERVAL)
+                            .tickFormat(this._yFormat)
             )
     }
 
@@ -428,7 +450,9 @@ class D3LineChart {
             .attr('height', this._height)
             .attr('opacity', 0)
 
-        const findClosestDataPoints = (data: LineChartLineDataPoint[], time: number): [LineChartLineDataPoint?, LineChartLineDataPoint?, LineChartLineDataPoint?] => {
+        const findClosestDataPoints = (
+            data: LineChartLineDataPoint[], time: number
+        ): [LineChartLineDataPoint?, LineChartLineDataPoint?, LineChartLineDataPoint?] => {
             if(data.length === 0) {
                 return [undefined, undefined, undefined];
             }

@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useRef } from 'react';
 import createChart, { LineChartLine, RenderCallback, TooltipCallback } from '../../utils/lineChart';
 import * as d3 from 'd3';
 
+import { RESPONSIVE_BREAKPOINTS } from '../../constants';
 import { getXAxisD3Interval } from '../../utils/chart';
 
 import './LineChart.css';
@@ -87,6 +88,10 @@ function LineChart({ config, lines }: Props): JSX.Element {
 
             if(config?.additionalRenderCallback) {
                 chart.withAdditionalRenderCallback(config.additionalRenderCallback)
+            }
+
+            if(containerRef.current.clientWidth < RESPONSIVE_BREAKPOINTS.md) {
+                chart.withRightSideYAxis();
             }
 
             chart.appendTo(containerRef.current);

@@ -35,7 +35,7 @@ function CurrenciesView(): JSX.Element {
         <>
             <PageHeading heading="Currencies" />
             <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                <Container fluid>
+                <Container fluid className="g-0">
                     <Row className="mb-5">
                         <Col>
                             <ChangeDefaultCurrencyForm

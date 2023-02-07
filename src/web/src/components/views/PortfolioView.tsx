@@ -52,7 +52,7 @@ function PortfolioView(): JSX.Element {
         <>
             <PageHeading heading={portfolio.data?.name ?? 'Portfolio'} />
             <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                <Container fluid>
+                <Container fluid className="g-0">
                     <Row className="mb-5 gy-5">
                         <Col xs={{ span: 12, order: 2}} lg={{ span: 6, order: 1}}>
                             {

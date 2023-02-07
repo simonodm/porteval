@@ -1,23 +1,8 @@
 import React, { useRef } from 'react';
-
 import Form from 'react-bootstrap/Form';
+import { FormFieldProps } from '../../../types';
 
-type Props = {
-    /**
-     * Custom label to use for the form field.
-     */
-    label?: string;
-
-    /**
-     * Custom class name to use for the form field.
-     */
-    className?: string;
-
-    /**
-     * A callback which is invoked every time a file is selected.
-     */
-    onFileSelected?: (file: File) => void;
-}
+type Props = Omit<FormFieldProps<File>, 'value'>;
 
 /**
  * Renders a file upload form feild.
@@ -26,7 +11,7 @@ type Props = {
  * @subcategory Fields
  * @component
  */
-function FileUpload({label, className, onFileSelected}: Props): JSX.Element {
+function FileUpload({label, disabled, className, onChange}: Props): JSX.Element {
     const inputRef = useRef<HTMLInputElement | null>(null);
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,13 +19,14 @@ function FileUpload({label, className, onFileSelected}: Props): JSX.Element {
             return;
         }
 
-        onFileSelected && onFileSelected(e.target.files[0]);
+        onChange && onChange(e.target.files[0]);
     }
     
     return (
         <Form.Group className={className} controlId="form-file-upload">
             <Form.Label htmlFor="file">{label}:</Form.Label>
             <Form.Control
+                disabled={disabled}
                 aria-label={label}
                 ref={inputRef}
                 accept="text/csv"

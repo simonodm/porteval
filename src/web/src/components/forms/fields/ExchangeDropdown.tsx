@@ -1,32 +1,13 @@
 import React, { useState } from 'react';
 import CreatableSelect from 'react-select/creatable'; 
-import { Exchange } from '../../../types';
+import Form from 'react-bootstrap/Form';
+import { Exchange, FormFieldProps } from '../../../types';
 
-type Props = {
-    /**
-     * Custom class name to use for the form field.
-     */
-    className?: string;
-
-    /**
-     * Binding property for the dropdown's current value.
-     */
-    value?: Exchange,
-
-    /**
-     * Determines whether the form field is disabled.
-     */
-    disabled?: boolean;
-
+type Props = FormFieldProps<Exchange> & {
     /**
      * An array of stock exchanges to display in the dropdown. 
      */
     exchanges: Array<Exchange>
-
-    /**
-     * A callback which is invoked every time the dropdown selection changes.
-     */
-    onChange?: (exchange: Exchange) => void;
 }
 
 type Option = {
@@ -64,8 +45,8 @@ function ExchangeDropdown({ className, value, disabled, exchanges, onChange }: P
     }
 
     return (
-        <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor="exchange">Exchange:</label>
+        <Form.Group className={className} controlId="form-exchange">
+            <Form.Label>Exchange:</Form.Label>
             <CreatableSelect
                 aria-label='Exchange'
                 id="exchange"
@@ -76,7 +57,7 @@ function ExchangeDropdown({ className, value, disabled, exchanges, onChange }: P
                 placeholder='e.g. NASDAQ'
                 value={exchange ? createOption(exchange) : undefined}
             />
-        </div>
+        </Form.Group>
     )
 }
 

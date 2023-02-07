@@ -54,7 +54,7 @@ function InstrumentView(): JSX.Element {
                 }
             </PageHeading>
             <LoadingWrapper isError={instrumentError} isLoaded={instrumentLoaded}>
-                <Container fluid>
+                <Container fluid className="g-0">
                     <Row className="mb-5 gy-5">
                         <Col xs={{ span: 12, order: 2 }} lg={{ span: 6, order: 1 }}>
                             { instrument.data && <InstrumentInformation instrument={instrument.data} /> }

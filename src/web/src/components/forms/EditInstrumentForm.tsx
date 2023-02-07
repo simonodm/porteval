@@ -3,12 +3,15 @@ import LoadingWrapper from '../ui/LoadingWrapper';
 import TextInput from './fields/TextInput';
 import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import CurrencyDropdown from './fields/CurrencyDropdown';
+import ExchangeDropdown from './fields/ExchangeDropdown';
+
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
 import { Instrument, InstrumentType } from '../../types';
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { useUpdateInstrumentMutation } from '../../redux/api/instrumentApi';
-import ExchangeDropdown from './fields/ExchangeDropdown';
 import { useGetAllKnownExchangesQuery } from '../../redux/api/exchangeApi';
 
 type Props = {
@@ -61,23 +64,34 @@ function EditInstrumentForm({ instrument, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit} aria-label="Edit instrument form">
-                <TextInput label='Name' onChange={(val) => setName(val)} value={name} />
+            <Form onSubmit={handleSubmit} aria-label="Edit instrument form">
+                <TextInput className="mb-3" label='Name' onChange={(val) => setName(val)}
+                    value={name}
+                />
                 <TextInput disabled label='Symbol' onChange={(val) => setSymbol(val)}
-                    value={symbol}
+                    value={symbol} className="mb-3" 
                 />
-                <ExchangeDropdown exchanges={exchanges.data ?? []} onChange={(e) => setExchange(e.symbol)} value={exchange ? { symbol: exchange } : undefined} />
-                <InstrumentTypeDropdown disabled onChange={(t) => setType(t)} value={type} />
-                <CurrencyDropdown currencies={currencies.data ?? []} disabled onChange={(code) => setCurrencyCode(code)}
-                    value={currencyCode}
+                <ExchangeDropdown
+                    className="mb-3" 
+                    exchanges={exchanges.data ?? []}
+                    onChange={(e) => setExchange(e.symbol)}
+                    value={exchange ? { symbol: exchange } : undefined} 
                 />
-                <TextInput label='Note' onChange={(val) => setNote(val)} value={note} />
-                <button 
-                    className="btn btn-primary"
-                    role="button"
+                <InstrumentTypeDropdown className="mb-3" disabled onChange={(t) => setType(t)}
+                    value={type}
+                />
+                <CurrencyDropdown className="mb-3"  currencies={currencies.data ?? []} disabled
+                    onChange={(code) => setCurrencyCode(code)} value={currencyCode}
+                />
+                <TextInput className="mb-3"  label='Note' onChange={(val) => setNote(val)}
+                    value={note}
+                />
+                <Button 
+                    variant="primary"
+                    type="submit"
                 >Save
-                </button>
-            </form>
+                </Button>
+            </Form>
         </LoadingWrapper>
     )
 }

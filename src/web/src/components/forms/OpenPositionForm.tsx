@@ -10,6 +10,9 @@ import DateTimeSelector from './fields/DateTimeSelector';
 import CurrencyDropdown from './fields/CurrencyDropdown';
 import ExchangeDropdown from './fields/ExchangeDropdown';
 
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
 import { useCreateInstrumentMutation, useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
 import { Instrument, InstrumentType } from '../../types';
@@ -152,8 +155,9 @@ function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit} aria-label="Open position form">
+            <Form onSubmit={handleSubmit} aria-label="Open position form">
                 <InstrumentDropdown
+                    className="mb-3" 
                     creatable
                     instruments={instruments.data ?? []}
                     onCancelCreate={handleInstrumentCreationCancel}
@@ -165,45 +169,52 @@ function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX.Element {
                     isNewInstrument &&
                     <>
                         <TextInput
+                            className="mb-3" 
                             label='Instrument name'
                             onChange={setInstrumentName}
                             placeholder='e.g. Apple Inc.'
                             value={instrumentName}
                         />
                         <TextInput
+                            className="mb-3" 
                             label='Instrument symbol'
                             onChange={setInstrumentSymbol}
                             placeholder='e.g. AAPL'
                             value={instrumentSymbol}
                         />
                         <ExchangeDropdown
-                            exchanges={exchanges.data ?? []} onChange={(e) => setInstrumentExchange(e.symbol)}
+                            className="mb-3" 
+                            exchanges={exchanges.data ?? []}
+                            onChange={(e) => setInstrumentExchange(e.symbol)}
                         />
                         <CurrencyDropdown
+                            className="mb-3" 
                             currencies={currencies.data ?? []}
                             onChange={setInstrumentCurrency}
                             value={instrumentCurrency}
                         />
-                        <InstrumentTypeDropdown onChange={setInstrumentType} value={instrumentType} />
+                        <InstrumentTypeDropdown className="mb-3" onChange={setInstrumentType} value={instrumentType} />
                     </>
                 }
-                <NumberInput allowFloat label='Amount' onChange={setAmount}
-                    value={amount}
+                <NumberInput className="mb-3" allowFloat label='Amount'
+                    onChange={setAmount} value={amount}
                 />
-                <NumberInput allowFloat label='Price' onChange={handlePriceChange}
-                    value={price}
+                <NumberInput className="mb-3" allowFloat label='Price'
+                    onChange={handlePriceChange} value={price}
                 />
                 <DateTimeSelector dateFormat={userSettings.dateFormat} enableTime label='Date'
                     onChange={handleTimeChange} timeFormat={userSettings.timeFormat} timeInterval={1}
-                    value={time}
+                    value={time} className="mb-3" 
                 />
-                <TextInput label='Note' onChange={setPositionNote} value={positionNote} />
-                <button 
-                    className="btn btn-primary"
-                    role="button"
+                <TextInput className="mb-3" label='Note' onChange={setPositionNote}
+                    value={positionNote}
+                />
+                <Button 
+                    variant="primary"
+                    type="submit"
                 >Save
-                </button>
-            </form>
+                </Button>
+            </Form>
         </LoadingWrapper>
     )
 }

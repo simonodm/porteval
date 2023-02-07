@@ -14,7 +14,7 @@
 
 #content {
     display: flex;
-    padding: 24px;
+    padding: 1rem;
     flex-grow: 1;
     flex-direction: column;
 }
@@ -85,6 +85,8 @@ table.entity-data td:nth-child(2) {
     overflow: auto;
     background-color: rgb(250, 250, 250);
     padding: 8px;
+    margin: 2px;
+    border: 1px solid #ddd;
 }
 
 .picker-item {

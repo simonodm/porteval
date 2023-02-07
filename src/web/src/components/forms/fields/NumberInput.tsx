@@ -1,26 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import Form from 'react-bootstrap/Form';
+import { FormFieldProps } from '../../../types';
 
-type Props = {
-    /**
-     * Custom class name to use for the form field.
-     */
-    className?: string;
-
-    /**
-     * Custom label to use for the form field.
-     */
-    label?: string;
-
-    /**
-     * Binding property for the input's current value.
-     */
-    value?: number;
-    
-    /**
-     * Determines whether the form field is disabled.
-     */
-    disabled?: boolean;
-
+type Props = FormFieldProps<number> & {
     /**
      * Determines whether negative numeric values are allowed.
      */
@@ -35,11 +17,6 @@ type Props = {
      * Validator function. The return value of this determines whether {@link onChange} is invoked.
      */
     validator?: (num: number) => boolean;
-
-    /**
-     * A callback which is invoked whenever input's value changes and passes the validator.
-     */
-    onChange?: (num: number) => void;
 }
 
 /**
@@ -67,9 +44,10 @@ function NumberInput(
     }
 
     const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // We do two separate input validations - one to test whether the text is valid (only contains valid symbols), and another
-        // to check if the text is a valid number.
-        // The reason for that is to allow users to type in values like "1." or "-" without breaking the input or parent state.
+        // We do two separate input validations - one to test whether the text is valid (only contains valid symbols),
+        // and another to check if the text is a valid number.
+        // The reason for that is to allow users to type in values like "1." or "-"
+        // without breaking the input or parent state.
         // The number change callback only gets called if the text is a valid number, otherwise old number persists.
         let inputRegexPattern = '\\d*';
         let numberRegexPattern = '\\d+';
@@ -108,17 +86,16 @@ function NumberInput(
     }, [value]);
 
     return (
-        <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor={label?.toLowerCase().replaceAll(' ', '-')}>{label}:</label>
-            <input
+        <Form.Group className={className} controlId={`form-number-${label?.replaceAll(' ', '-').toLowerCase()}`}>
+            <Form.Label>{label}:</Form.Label>
+            <Form.Control
+                type="text"
                 aria-label={label}
-                className="form-control"
                 disabled={disabled}
-                id={label?.toLowerCase().replaceAll(' ', '-')}
                 onChange={handleNumberChange}
                 value={numberText}
             />
-        </div>
+        </Form.Group>
     )    
 }
 

@@ -24,7 +24,7 @@ function ChartListView(): JSX.Element {
                 >Create new chart
                 </NavLink>
             </PageHeading>
-            <Container fluid>
+            <Container fluid className="g-0">
                 <ChartsTable />
             </Container>            
         </>

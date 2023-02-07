@@ -459,3 +459,33 @@ export type UserSettings = {
     decimalSeparator: string;
     thousandsSeparator: string;
 }
+
+/**
+ * Represents core form field props which each implemented form field should include.
+ */
+export type FormFieldProps<T> = {
+    /**
+     * Custom label to use for the form field.
+     */
+    label?: string;
+
+    /**
+     * Custom class name to use for the form field.
+     */
+    className?: string;
+
+    /**
+     * Determines whether the form field is disabled.
+     */
+    disabled?: boolean;
+
+    /**
+     * Binding property for the field's current value.
+     */
+    value?: T;
+
+    /**
+     * A callback which is invoked whenever field's value changes.
+     */
+    onChange?: (value: T) => void;
+}

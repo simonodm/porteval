@@ -18,3 +18,7 @@ html, body, #root, #app {
 .w-5 {
   width: 5%!important;
 }
+
+.min-vh-50 {
+  min-height: 50vh!important;
+}

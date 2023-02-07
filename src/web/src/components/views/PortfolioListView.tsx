@@ -4,6 +4,9 @@ import ModalWrapper from '../modals/ModalWrapper';
 import PageHeading from '../ui/PageHeading';
 import CreatePortfolioForm from '../forms/CreatePortfolioForm';
 
+import Container from 'react-bootstrap/Container';
+import Button from 'react-bootstrap/Button';
+
 /**
  * Renders the portfolio list view.
  * 
@@ -16,17 +19,18 @@ function PortfolioListView(): JSX.Element {
     return (
         <Fragment>
             <PageHeading heading="Portfolios">
-                <button
-                    className="btn btn-success btn-sm float-right"
+                <Button
+                    variant="success"
+                    size="sm"
+                    className="float-right"
                     onClick={() => setModalIsOpen(true)}
-                    role="button"
                 >
                     Create new portfolio
-                </button>
+                </Button>
             </PageHeading>
-            <div className="col-xs-12 container-fluid">
+            <Container fluid className="g-0">
                 <PortfoliosTable />
-            </div>
+            </Container>
             <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Create new portfolio" isOpen={modalIsOpen}>
                 <CreatePortfolioForm onSuccess={() => setModalIsOpen(false)} />
             </ModalWrapper>

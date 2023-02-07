@@ -1,39 +1,17 @@
 import React, { useEffect, useState } from 'react';
-
 import Form from 'react-bootstrap/Form';
+import { FormFieldProps, Instrument } from '../../../types';
 
-import { Instrument } from '../../../types';
-
-type Props = {
+type Props = FormFieldProps<number> & {
     /**
      * An array of instruments to display in the dropdown.
      */
     instruments: Array<Instrument>;
 
     /**
-     * A custom class name to use for the form field.
-     */
-    className?: string;
-
-    /**
-     * Binding property for the dropdown's current instrument ID.
-     */
-    value?: number;
-
-    /**
-     * Custom label to use for the form field.
-     */
-    label?: string;
-
-    /**
      * Determines whether user can specify to create a new instrument.
      */
     creatable?: boolean;
-
-    /**
-     * Determines whether the form field is disabled.
-     */
-    disabled?: boolean;
 
     /**
      * A callback which is invoked whenever a new instrument is requested to be created.
@@ -44,11 +22,6 @@ type Props = {
      * A callback which is invoked whenever new instrument creation is cancelled.
      */
     onCancelCreate?: () => void;
-
-    /**
-     * A callback which is invoked whenever the dropdown's value changes.
-     */
-    onChange?: (instrumentId: number) => void;
 }
 
 /**
@@ -119,7 +92,6 @@ function InstrumentDropdown(
                     />
                 </Form.Group>
             }
-            
         </Form.Group>
     )
 }

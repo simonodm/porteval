@@ -2,6 +2,9 @@ import React, { useState } from 'react'
 import useUserSettings from '../../hooks/useUserSettings';
 import TextInput from './fields/TextInput';
 
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
 import { isValidDateTimeFormat } from '../../utils/string';
 
 type Props = {
@@ -50,19 +53,25 @@ function SettingsForm({ onSuccess, onFailure }: Props): JSX.Element {
     }
 
     return (
-        <form onSubmit={handleSubmit} aria-label="Settings form">
-            <TextInput label="Date format" onChange={setDateFormatValue} value={dateFormatValue} />
-            <TextInput label="Time format" onChange={setTimeFormatValue} value={timeFormatValue} />
-            <TextInput label="Decimal separator" onChange={setDecimalSeparatorValue} value={decimalSeparatorValue} />
-            <TextInput label="Thousands separator" onChange={setThousandsSeparatorValue}
+        <Form onSubmit={handleSubmit} aria-label="Settings form">
+            <TextInput className="mb-3" label="Date format" onChange={setDateFormatValue}
+                value={dateFormatValue}
+            />
+            <TextInput className="mb-3" label="Time format" onChange={setTimeFormatValue}
+                value={timeFormatValue}
+            />
+            <TextInput className="mb-3" label="Decimal separator" onChange={setDecimalSeparatorValue}
+                value={decimalSeparatorValue}
+            />
+            <TextInput className="mb-3" label="Thousands separator" onChange={setThousandsSeparatorValue}
                 value={thousandsSeparatorValue}
             />
-            <button 
-                className="btn btn-primary"
-                role="button"
+            <Button 
+                variant="primary"
+                type="submit"
             >Save
-            </button>
-        </form>
+            </Button>
+        </Form>
     )
 }
 

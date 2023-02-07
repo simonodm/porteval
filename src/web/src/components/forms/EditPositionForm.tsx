@@ -4,6 +4,9 @@ import PortfolioDropdown from './fields/PortfolioDropdown';
 import InstrumentDropdown from './fields/InstrumentDropdown';
 import TextInput from './fields/TextInput';
 
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
 import { useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
 import { useGetAllPortfoliosQuery } from '../../redux/api/portfolioApi';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
@@ -50,16 +53,23 @@ function EditPositionForm({ position, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit} aria-label="Edit position form">
-                <PortfolioDropdown disabled portfolios={portfolios.data ?? []} value={position.portfolioId} />
-                <InstrumentDropdown disabled instruments={instruments.data ?? []} value={position.instrumentId} />
-                <TextInput label='Note' onChange={(val) => setNote(val)} value={note} />
-                <button 
-                    className="btn btn-primary"
-                    role="button"
-                >Save
-                </button>
-            </form>
+            <Form onSubmit={handleSubmit} aria-label="Edit position form">
+                <PortfolioDropdown className="mb-3" disabled portfolios={portfolios.data ?? []}
+                    value={position.portfolioId}
+                />
+                <InstrumentDropdown className="mb-3" disabled instruments={instruments.data ?? []}
+                    value={position.instrumentId}
+                />
+                <TextInput className="mb-3" label='Note' onChange={(val) => setNote(val)}
+                    value={note}
+                />
+                <Button 
+                    variant="primary"
+                    type="submit"
+                >
+                    Save
+                </Button>
+            </Form>
         </LoadingWrapper>
     )
 }

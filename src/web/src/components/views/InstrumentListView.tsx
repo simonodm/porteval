@@ -4,6 +4,9 @@ import ModalWrapper from '../modals/ModalWrapper';
 import PageHeading from '../ui/PageHeading';
 import CreateInstrumentForm from '../forms/CreateInstrumentForm';
 
+import Container from 'react-bootstrap/Container';
+import Button from 'react-bootstrap/Button';
+
 /**
  * Renders the instrument list view.
  * 
@@ -16,16 +19,18 @@ function InstrumentListView(): JSX.Element {
     return (
         <Fragment>
             <PageHeading heading="Instruments">
-                <button
-                    className="btn btn-success btn-sm float-right"
+                <Button
+                    variant="success"
+                    size="sm"
+                    className="float-right"
                     onClick={() => setModalIsOpen(true)}
                 >
                     Create new instrument
-                </button>
+                </Button>
             </PageHeading>
-            <div className="col-xs-12 container-fluid">
+            <Container fluid className="g-0">
                 <InstrumentsTable />
-            </div>
+            </Container>
             <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Create new instrument" isOpen={modalIsOpen}>
                 <CreateInstrumentForm onSuccess={() => setModalIsOpen(false)} />
             </ModalWrapper>

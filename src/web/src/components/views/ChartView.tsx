@@ -242,14 +242,14 @@ function ChartView(): JSX.Element {
             </PageHeading>
             <LoadingWrapper isError={isError} isLoaded={isLoaded}>
                 <ChartLineConfigurationContext.Provider value={context}>
-                    <Container fluid className="d-flex flex-column flex-grow-1">
+                    <Container fluid className="d-flex flex-column flex-grow-1 g-0">
                         <Row className="mb-5">
                             <Col>
                                 <ChartConfigurator onChange={handleChartSave} />
                             </Col>
                         </Row>
-                        <Row className="flex-grow-1">
-                            <Col xs={12} lg={8}>
+                        <Row className="flex-grow-1 gy-5">
+                            <Col xs={12} lg={8} className="min-vh-50">
                                 {chart && <PortEvalChart chart={chart} /> }
                             </Col>
                             <Col xs={12} lg={4}>

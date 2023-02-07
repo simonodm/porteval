@@ -16,7 +16,7 @@ function SettingsView(): JSX.Element {
     return (
         <>
             <PageHeading heading='Settings' />
-            <Container fluid>
+            <Container fluid className="g-0">
                 <SettingsForm onSuccess={() => toast.success('Saved')} onFailure={(error) => toast.error(error)}/>
             </Container>            
         </>

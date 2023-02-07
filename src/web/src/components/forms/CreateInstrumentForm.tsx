@@ -5,6 +5,9 @@ import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import CurrencyDropdown from './fields/CurrencyDropdown';
 import ExchangeDropdown from './fields/ExchangeDropdown';
 
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
 import { InstrumentType } from '../../types';
@@ -65,27 +68,33 @@ function CreateInstrumentForm({ onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit} aria-label="Create instrument form">
-                <TextInput label='Name' onChange={(val) => setName(val)} placeholder='e.g. Apple Inc.'
-                    value={name}
+            <Form onSubmit={handleSubmit} aria-label="Create instrument form">
+                <TextInput className="mb-3" label='Name' onChange={(val) => setName(val)}
+                    placeholder='e.g. Apple Inc.' value={name}
                 />
-                <TextInput label='Symbol' onChange={(val) => setSymbol(val)} placeholder='e.g. AAPL'
-                    value={symbol}
+                <TextInput className="mb-3"  label='Symbol' onChange={(val) => setSymbol(val)}
+                    placeholder='e.g. AAPL' value={symbol}
                 />
-                <ExchangeDropdown exchanges={exchanges.data ?? []} onChange={(e) => setExchange(e.symbol)} />
-                <InstrumentTypeDropdown onChange={(t) => setType(t)} value={type} />
+                <ExchangeDropdown className="mb-3" exchanges={exchanges.data ?? []}
+                    onChange={(e) => setExchange(e.symbol)}
+                />
+                <InstrumentTypeDropdown className="mb-3" onChange={(t) => setType(t)} value={type} />
                 <CurrencyDropdown
+                    className="mb-3" 
                     currencies={currencies.data ?? []}
                     onChange={(code) => setCurrencyCode(code)}
                     value={currencyCode}
                 />
-                <TextInput label='Note' onChange={(val) => setNote(val)} value={note} />
-                <button 
-                    className="btn btn-primary"
-                    role="button"
-                >Save
-                </button>
-            </form>
+                <TextInput className="mb-3"  label='Note' onChange={(val) => setNote(val)}
+                    value={note}
+                />
+                <Button
+                    variant="primary" 
+                    type="submit"
+                >
+                    Save
+                </Button>
+            </Form>
         </LoadingWrapper>
     )
 }

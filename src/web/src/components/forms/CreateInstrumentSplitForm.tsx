@@ -4,6 +4,9 @@ import useUserSettings from '../../hooks/useUserSettings';
 import DateTimeSelector from './fields/DateTimeSelector';
 import NumberInput from './fields/NumberInput';
 
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
 import { useCreateInstrumentSplitMutation } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, onSuccessfulResponse } from '../../utils/queries';
 
@@ -50,8 +53,9 @@ function CreateInstrumentSplitForm({ instrumentId, onSuccess }: Props): JSX.Elem
 
     return (
         <LoadingWrapper isLoaded={isLoaded}>
-            <form aria-label='Create instrument split form' onSubmit={handleSubmit}>
+            <Form aria-label='Create instrument split form' onSubmit={handleSubmit}>
                 <DateTimeSelector
+                    className="mb-3" 
                     dateFormat={userSettings.dateFormat}
                     enableTime
                     label='Date'
@@ -61,17 +65,19 @@ function CreateInstrumentSplitForm({ instrumentId, onSuccess }: Props): JSX.Elem
                     value={time}
                 /> 
                 <NumberInput
+                    className="mb-3" 
                     label='Split factor numerator'
                     onChange={(n) => setNumerator(n)}
                     value={numerator}
                 />
                 <NumberInput
+                    className="mb-3" 
                     label='Split factor denominator'
                     onChange={(n) => setDenominator(n)}
                     value={denominator}
                 />
-                <button className="btn btn-primary" role="button">Save</button>
-            </form>
+                <Button variant="primary" type="submit">Save</Button>
+            </Form>
         </LoadingWrapper>        
     )
 }

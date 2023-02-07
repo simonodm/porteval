@@ -27,7 +27,7 @@ function ImportExportView(): JSX.Element {
     return (
         <LoadingWrapper isLoaded={isLoaded} isError={isError}>
             <PageHeading heading="Data import and export" />
-            <Container fluid>
+            <Container fluid className="g-0">
                 <Row className="mb-5">
                     <Col>
                         <h5>Export</h5>

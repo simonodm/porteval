@@ -4,6 +4,9 @@ import useUserSettings from '../../hooks/useUserSettings';
 import DateTimeSelector from './fields/DateTimeSelector';
 import NumberInput from './fields/NumberInput';
 
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
 import { useAddInstrumentPriceMutation } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, onSuccessfulResponse } from '../../utils/queries';
 
@@ -48,11 +51,12 @@ function CreateInstrumentPriceForm({ instrumentId, onSuccess }: Props): JSX.Elem
 
     return (
         <LoadingWrapper isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit} aria-label="Create instrument price form">
-                <NumberInput allowFloat label='Price'
+            <Form onSubmit={handleSubmit} aria-label="Create instrument price form">
+                <NumberInput className="mb-3" allowFloat label='Price'
                     onChange={(newPrice) => setPrice(newPrice)} value={price}
                 />
                 <DateTimeSelector
+                    className="mb-3" 
                     dateFormat={userSettings.dateFormat}
                     enableTime
                     label='Date'
@@ -61,8 +65,8 @@ function CreateInstrumentPriceForm({ instrumentId, onSuccess }: Props): JSX.Elem
                     timeInterval={1}
                     value={time}
                 /> 
-                <button className="btn btn-primary" role="button">Save</button>
-            </form>
+                <Button type="submit" variant="primary">Save</Button>
+            </Form>
         </LoadingWrapper>        
     )
 }

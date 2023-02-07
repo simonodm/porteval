@@ -1,35 +1,6 @@
 import React, { useState } from 'react';
-
 import Form from 'react-bootstrap/Form';
-
-import { TemplateType } from '../../../types';
-
-type Props = {
-    /**
-     * Custom class name to use for the form field.
-     */
-    className?: string;
-
-    /**
-     * Binding property for the dropdown's current value.
-     */
-    value?: TemplateType;
-
-    /**
-     * Custom label to use for the form field.
-     */
-    label?: string;
-
-    /**
-     * Determines whether the form field is disabled.
-     */
-    disabled?: boolean;
-
-    /**
-     * A callback which is invoked whenever the dropdown's selection changes.
-     */
-    onChange?: (value: TemplateType) => void;
-}
+import { FormFieldProps, TemplateType } from '../../../types';
 
 /**
  * Renders an import template type dropdown form field.
@@ -38,7 +9,9 @@ type Props = {
  * @subcategory Fields
  * @component
  */
-function TemplateTypeDropdown({ className, label, value, disabled, onChange }: Props): JSX.Element {
+function TemplateTypeDropdown(
+    { className, label, value, disabled, onChange }: FormFieldProps<TemplateType>
+): JSX.Element {
     const types: Array<TemplateType> = ['portfolios', 'positions', 'instruments', 'prices', 'transactions'];
     const [type, setType] = useState<TemplateType>(value ?? 'portfolios');
 

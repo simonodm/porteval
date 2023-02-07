@@ -41,7 +41,7 @@ function ExportDataForm({ instruments, onSuccess }: Props): JSX.Element {
         }
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = (e: React.FormEvent) => {
         const fetchUrl = getExportUrl();
 
         fetch(fetchUrl)
@@ -52,11 +52,12 @@ function ExportDataForm({ instruments, onSuccess }: Props): JSX.Element {
             });
 
         onSuccess && onSuccess();
+        e.preventDefault();
     }
 
     return (
-        <Form aria-label="Export CSV data form">
-            <TemplateTypeDropdown className="mb-2" label='Export data type' onChange={setTemplateType} />
+        <Form onSubmit={handleSubmit} aria-label="Export CSV data form">
+            <TemplateTypeDropdown className="mb-3" label='Export data type' onChange={setTemplateType} />
             {
                 templateType === 'prices'
                     ?
@@ -68,7 +69,7 @@ function ExportDataForm({ instruments, onSuccess }: Props): JSX.Element {
                         />
                     : null
             }
-            <Button variant="primary" onClick={handleSubmit}>Export</Button>
+            <Button variant="primary" type="submit">Export</Button>
         </Form>
     )
 }

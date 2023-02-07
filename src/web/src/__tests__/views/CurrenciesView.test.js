@@ -42,13 +42,13 @@ describe('Currencies view', () => {
     test('renders currency selection', async () => {
         renderTestCurrenciesView();
 
-        await screen.findByRole('combobox', { name: /choose default currency/i });
+        await screen.findByLabelText(/choose default currency/i);
     });
 
     test('currency selection has default currency selected', async () => {
         renderTestCurrenciesView();
 
-        const currencySelect = await screen.findByRole('combobox', { name: /choose default currency/i });
+        const currencySelect = await screen.findByLabelText(/choose default currency/i);
         expect(currencySelect.value).toBe(defaultCurrency.code);
     });
 
@@ -84,7 +84,7 @@ describe('Currencies view', () => {
 
         const newDefaultCurrencyCode = 'EUR';
 
-        const currencySelect = await screen.findByRole('combobox', { name: /choose default currency/i });
+        const currencySelect = await screen.findByLabelText(/choose default currency/i);
         userEvent.selectOptions(currencySelect, newDefaultCurrencyCode);
 
         const saveButton = await screen.findByRole('button', { name: /save/i });

@@ -1,31 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Portfolio } from '../../../types';
+import Form from 'react-bootstrap/Form';
+import { FormFieldProps, Portfolio } from '../../../types';
 
-type Props = {
+type Props = FormFieldProps<number> & {
     /**
      * An array of portfolios to display in the dropdown.
      */
     portfolios: Array<Portfolio>;
-
-    /**
-     * Custom class name to use for the form field.
-     */
-    className?: string;
-
-    /**
-     * Determines whether the form field is disabled.
-     */
-    disabled?: boolean;
-
-    /**
-     * Binding property for the dropdown's current portfolio ID.
-     */
-    value?: number;
-
-    /**
-     * A callback which is invoked whenever the dropdown's selection changes.
-     */
-    onChange?: (portfolioId: number) => void;
 }
 
 /**
@@ -62,14 +43,14 @@ function PortfolioDropdown({ className, portfolios, disabled, value, onChange }:
     }, [portfolios]);
 
     return (
-        <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor="portfolio">Portfolio:</label>
-            <select className="form-control" disabled={disabled} id="portfolio"
+        <Form.Group className={className} controlId="form-portfolio">
+            <Form.Label>Portfolio:</Form.Label>
+            <Form.Select disabled={disabled}
                 onChange={handlePortfolioChange} value={portfolioId} aria-label="Portfolio"
             >
                 {portfolios.map(portfolio => <option key={portfolio.id} value={portfolio.id}>{portfolio.name}</option>)}
-            </select>
-        </div>
+            </Form.Select>
+        </Form.Group>
     )
 }
 

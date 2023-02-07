@@ -1,17 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
+import Form from 'react-bootstrap/Form';
+import { FormFieldProps } from '../../../types';
 
-type Props = {
-    /**
-     * Custom label to use for the form field.
-     */
-    label: string;
-
-    /**
-     * Custom class name to use for the form field.
-     */
-    className?: string;
-
+type Props = FormFieldProps<Date> & {
     /**
      * Date format to display the selected date in.
      */
@@ -23,11 +15,6 @@ type Props = {
     timeFormat?: string;
 
     /**
-     * Determines whether the field is disabled.
-     */
-    disabled?: boolean;
-
-    /**
      * Determines whether time can be selected.
      */
     enableTime?: boolean;
@@ -36,16 +23,6 @@ type Props = {
      * Determines discrete time intervals to display in the selector. The value is in minutes.
      */
     timeInterval?: number;
-
-    /**
-     * Binding property for the selector's current value.
-     */
-    value?: Date;
-
-    /**
-     * A callback which is invoked every time the selected date/time changes.
-     */
-    onChange?: (dt: Date) => void;
 }
 
 /**
@@ -79,20 +56,20 @@ function DateTimeSelector({
     }, [value]);
 
     return (
-        <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor="date">{label}:</label>
+        <Form.Group className={className}>
+            <Form.Label htmlFor="form-date">{label}:</Form.Label>
             <DatePicker
                 ariaLabelledBy={label}
                 dateFormat={dateFormat && timeFormat ? dateFormat + ' ' + timeFormat : dateFormat}
                 disabled={disabled}
-                id="date"
+                id="form-date"
                 onChange={handleTimeChange}
                 selected={time}
                 showTimeSelect={!!enableTime}
                 timeFormat={timeFormat}
                 timeIntervals={timeInterval ?? 5}
             />
-        </div>
+        </Form.Group>
     )
 }
 

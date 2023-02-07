@@ -29,18 +29,17 @@ function ChangeDefaultCurrencyForm({ currencies, onSuccess }: Props): JSX.Elemen
     }
 
     return (
-        <Form>
+        <Form onSubmit={handleSubmit} aria-label="Change default currency form">
             <CurrencyDropdown
-                className="mb-2"
+                className="mb-3"
                 currencies={currencies}
-                label='Default currency'
+                label='Choose default currency'
                 value={selectedCurrency?.code ?? 'USD'}
                 onChange={(code) => setSelectedCurrency(currencies.find(c => c.code === code))}
             />
             <Button
                 variant="primary"
                 type="submit"
-                onClick={handleSubmit}
             >
                 Save
             </Button>

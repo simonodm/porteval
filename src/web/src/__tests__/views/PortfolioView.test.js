@@ -24,7 +24,7 @@ const renderTestPortfolioView = () => {
 }
 
 const openCreatePositionForm = async () => {
-    const openPositionButton = await screen.findByRole('button', { name: /open position/i });
+    const openPositionButton = await screen.findByRole('button', { name: /open a position/i });
     fireEvent.click(openPositionButton);
 
     return await screen.findByRole('form', { name: /open position form/i });
@@ -94,7 +94,7 @@ describe('Portfolio view', () => {
     test('renders open position button', async () => {
         renderTestPortfolioView();
 
-        await screen.findByRole('button', { name: 'Open position' });
+        await screen.findByRole('button', { name: /open a position/i });
     });
 
     test('open position button displays open position form on click', async () => {

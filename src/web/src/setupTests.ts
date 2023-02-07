@@ -18,6 +18,23 @@ jest.setTimeout(10000);
 beforeAll(() => {
     server.listen();
 });
+beforeEach(() => {
+    // window.matchMedia(query) mock, as JSDom does not support it
+    // see https://jestjs.io/docs/manual-mocks#mocking-methods-which-are-not-implemented-in-jsdom
+    Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        value: jest.fn().mockImplementation(query => ({
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: jest.fn(),
+            removeListener: jest.fn(),
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            dispatchEvent: jest.fn(),
+        })),
+    });
+});
 afterEach(() => {
     resetState();
     server.resetHandlers();

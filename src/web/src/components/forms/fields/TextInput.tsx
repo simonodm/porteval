@@ -1,40 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import Form from 'react-bootstrap/Form';
+import { FormFieldProps } from '../../../types';
 
-type Props = {
-    /**
-     * Custom label to use for the form field.
-     */
-    label: string;
-
-    /**
-     * Custom class name to use for the form field.
-     */
-    className?: string;
-
+type Props = FormFieldProps<string> & {
     /**
      * Placeholder text to display in the text input.
      */
     placeholder?: string;
 
     /**
-     * Determines whether the form field is disabled.
-     */
-    disabled?: boolean;
-
-    /**
-     * Binding property for the text input's current value.
-     */
-    value?: string;
-
-    /**
      * Validator function. The return value of this determines whether {@link onChange} is invoked.
      */
     validator?: (value: string) => boolean;
-
-    /**
-     * A callback which is invoked whenever input's value changes and passes the validator.
-     */
-    onChange?: (value: string) => void;
 }
 
 /**
@@ -64,19 +41,17 @@ function TextInput(
     }, [value]);
 
     return (
-        <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor="transaction-note">{label}:</label>
-            <input 
+        <Form.Group className={className} controlId={`form-text-${label?.replaceAll(' ', '-').toLowerCase()}`}>
+            <Form.Label>{label}:</Form.Label>
+            <Form.Control 
                 aria-label={label}
-                className="form-control"
                 disabled={disabled}
-                id="position-note"
                 onChange={handleTextChange}
                 placeholder={placeholder}
                 type="text"
                 value={text}
             />
-        </div>
+        </Form.Group>
     )
 }
 

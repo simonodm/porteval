@@ -1,28 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { InstrumentType } from '../../../types';
 import * as constants from '../../../constants';
-
-type Props = {
-    /**
-     * Custom class name to use for the form field.
-     */
-    className?: string;
-
-    /**
-     * Binding property for the dropdown's current value.
-     */
-    value?: InstrumentType;
-
-    /**
-     * Determines whether the form field is disabled.
-     */
-    disabled?: boolean;
-
-    /**
-     * A callback which is invoked whenever the dropdown's selection changes.
-     */
-    onChange?: (type: InstrumentType) => void;
-}
+import Form from 'react-bootstrap/Form';
+import { FormFieldProps, InstrumentType } from '../../../types';
 
 /**
  * Renders an instrument type dropdown form field.
@@ -31,7 +10,9 @@ type Props = {
  * @subcategory Fields
  * @component
  */
-function InstrumentTypeDropdown({ className, value, disabled, onChange }: Props): JSX.Element {
+function InstrumentTypeDropdown(
+    { className, value, label, disabled, onChange }: FormFieldProps<InstrumentType>
+): JSX.Element {
     const types: Array<InstrumentType> =
         ['stock', 'bond', 'mutualFund', 'commodity', 'cryptoCurrency', 'etf', 'index', 'other']
     const [type, setType] = useState<InstrumentType>(value ?? 'stock');
@@ -58,19 +39,16 @@ function InstrumentTypeDropdown({ className, value, disabled, onChange }: Props)
     }, [])
 
     return (
-        <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor="instrument-type">Instrument type:</label>
-            <select
-                aria-label="Instrument type"
-                className="form-control"
+        <Form.Group className={className} controlId="form-instrument-type">
+            <Form.Label>{label ?? 'Instrument type'}:</Form.Label>
+            <Form.Select
                 disabled={disabled}
-                id="instrument-type"
                 onChange={handleTypeChange}
                 value={type}
             >
                 {types.map(t => <option key={t} value={t}>{constants.INSTRUMENT_TYPE_TO_STRING[t]}</option>)}
-            </select>
-        </div>
+            </Form.Select>
+        </Form.Group>
     )
 }
 

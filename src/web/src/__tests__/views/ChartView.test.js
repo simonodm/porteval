@@ -194,14 +194,12 @@ describe('Chart view', () => {
             .toBe(testChart.lines.length + testPositions.filter(p => p.portfolioId === testPortfolio.id).length);
     })
 
-    test('line configuration form contains width radio buttons', async () => {
+    test('line configuration form contains width slider', async () => {
         renderTestChartView();
 
         await addInstrumentLine();
         const form = await screen.findByRole('form', { name: /edit chart line form/i });
-        within(form).getByRole('radio', { name: /thin/i });
-        within(form).getByRole('radio', { name: /medium/i });
-        within(form).getByRole('radio', { name: /thick/i });
+        within(form).getByRole('slider', { name: /width/i });
     });
 
     test('line configuration form contains color picker', async () => {
@@ -228,8 +226,8 @@ describe('Chart view', () => {
         await addInstrumentLine();
         const form = await screen.findByRole('form', { name: /edit chart line form/i });
 
-        const mediumRadioButton = within(form).getByRole('radio', { name: /medium/i });
-        await userEvent.click(mediumRadioButton);
+        const widthSlider = within(form).getByRole('slider', { name: /width/i });
+        fireEvent.change(widthSlider, { target: { value: 3 }});
 
         const colorPicker = within(form).getByTestId('line-color-picker');
         fireEvent.input(colorPicker, { target: { value: '#ffffff' }}); // no better way in RTL to simulate color picker 

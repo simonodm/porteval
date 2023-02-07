@@ -33,7 +33,7 @@ const renderTestInstrumentView = () => {
 }
 
 const openPriceAddForm = async () => {
-    const addPriceButton = await screen.findByRole('button', { name: /add price/i });
+    const addPriceButton = await screen.findByRole('button', { name: /add a price/i });
     fireEvent.click(addPriceButton);
 
     return await screen.findByRole('form', { name: /create instrument price form/i });
@@ -100,7 +100,7 @@ describe('Instrument view', () => {
     test('renders add price button', async () => {
         renderTestInstrumentView();
 
-        await screen.findByRole('button', { name: /add price/i });
+        await screen.findByRole('button', { name: /add a price/i });
     });
 
     test('add price button opens add price form', async () => {

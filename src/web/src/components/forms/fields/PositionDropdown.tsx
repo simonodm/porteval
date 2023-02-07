@@ -1,31 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Position } from '../../../types';
+import Form from 'react-bootstrap/Form';
+import { FormFieldProps, Position } from '../../../types';
 
-type Props = {
+type Props = FormFieldProps<number> & {
     /**
      * An array of positions to display in the dropdown.
      */
     positions: Array<Position>;
-
-    /**
-     * Custom class name to use for the form field.
-     */
-    className?: string;
-
-    /**
-     * Determines whether the form field is disabled.
-     */
-    disabled?: boolean;
-
-    /**
-     * Binding property for the dropdown's current position ID.
-     */
-    value?: number;
-
-    /**
-     * A callback which is invoked whenever dropdown's selection changes.
-     */
-    onChange?: (positionId: number) => void;
 }
 
 /**
@@ -62,15 +43,15 @@ function PositionDropdown({ positions, className, disabled, value, onChange }: P
     }, [positions]);
 
     return (
-        <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor="position">Position:</label>
-            <select className="form-control" disabled={disabled} id="portfolio-position"
+        <Form.Group className={className} controlId="form-position">
+            <Form.Label>Position:</Form.Label>
+            <Form.Select disabled={disabled}
                 onChange={handlePositionChange} value={positionId} aria-label="Position"
             >
                 {positions.map(position =>
                     <option key={position.id} value={position.id}>{position.instrument.name}</option>)}
-            </select>
-        </div>
+            </Form.Select>
+        </Form.Group>
     )
 }
 

@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import LinePreview from './LinePreview';
+
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 
 import { ChartLineDashType, ChartLine } from '../../types';
 import { API_MAX_CHART_LINE_WIDTH } from '../../constants';
@@ -46,59 +50,50 @@ function ChartLineConfigurator({ line: lineProp, onSave }: Props): JSX.Element {
         });
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = (e: React.FormEvent) => {
         onSave(line as ChartLine);
+        e.preventDefault();
     }
 
     return (
-        <form onSubmit={handleSubmit} aria-label="Edit chart line form">
-            <div className="form-group">
-                <label htmlFor="width">Width:</label>
-                <div id="width">
-                    <input type="radio" id="width-thin" name="width"
-                        checked={line.width === 1} value={1} onChange={(e) => handleWidthChange(parseInt(e.target.value))}
-                    />
-                    <label htmlFor='width-thin' className="mr-2">thin</label>
-                    <input type="radio" id="width-medium" name="width"
-                        checked={line.width === 3} value={3} onChange={(e) => handleWidthChange(parseInt(e.target.value))}
-                    />
-                    <label htmlFor='width-medium' className="mr-2">medium</label>
-                    <input type="radio" id="width-thick" name="width"
-                        checked={line.width === 5} value={5} onChange={(e) => handleWidthChange(parseInt(e.target.value))}
-                    />
-                    <label htmlFor='width-thick' className="mr-2">thick</label>
-                </div>
-            </div>
-            <div className="form-group">
-                <label htmlFor="color">Color:</label>
-                <input className="form-control" id="color" onChange={(e) => handleColorChange(e.target.value)}
+        <Form onSubmit={handleSubmit} aria-label="Edit chart line form">
+            <Form.Group className="mb-3" controlId="form-line-width">
+                <Form.Label>Width:</Form.Label>
+                <Form.Range
+                    value={line.width}
+                    min={1}
+                    max={API_MAX_CHART_LINE_WIDTH}
+                    onChange={(e) => handleWidthChange(parseInt(e.target.value))}
+                />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="form-line-color">
+                <Form.Label>Color:</Form.Label>
+                <Form.Control className="w-100" onChange={(e) => handleColorChange(e.target.value)}
                     type="color" value={line.color} data-testid="line-color-picker"
                 />
+            </Form.Group>
+            <Form.Group className="mb-3">
+                {
+                    dashTypes.map(dashType =>
+                        <Form.Check 
+                            inline
+                            key={dashType}
+                            type="radio"
+                            name="form-line-dash"
+                            checked={line.dash === dashType} 
+                            value={dashType}
+                            onChange={(e) => handleDashChange(e.target.value as ChartLineDashType)}
+                            label={dashType}
+                            id={`dash-${dashType}`}
+                        />
+                    )
+                }
+            </Form.Group>
+            <div className="mb-3">
+                <LinePreview line={line} length={80} />
             </div>
-            <div className="form-group">
-                <label htmlFor="dash">Dash:</label>
-                <div id="dash">
-                    {
-                        dashTypes.map(dashType =>
-                            <>
-                                <input 
-                                    key={dashType}
-                                    id={`dash-${dashType}`}
-                                    type="radio"
-                                    name="dash"
-                                    checked={line.dash === dashType} 
-                                    value={dashType}
-                                    onChange={(e) => handleDashChange(e.target.value as ChartLineDashType)}
-                                />
-                                <label htmlFor={`dash-${dashType}`} className="mr-2">{dashType}</label>
-                            </>
-                        )
-                    }
-                </div>
-                
-            </div>
-            <button className="btn btn-primary" role="button">Save</button>
-        </form>
+            <Button variant="primary" type="submit">Save</Button>
+        </Form>
     )
 }
 

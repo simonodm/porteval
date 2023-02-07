@@ -6,6 +6,9 @@ import NumberInput from './fields/NumberInput';
 import DateTimeSelector from './fields/DateTimeSelector';
 import TextInput from './fields/TextInput';
 
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
 import { useGetPositionQuery } from '../../redux/api/positionApi';
 import { useAddTransactionMutation } from '../../redux/api/transactionApi';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
@@ -91,24 +94,27 @@ function CreateTransactionForm({ positionId, onSuccess }: Props): JSX.Element {
 
     return (
         <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-            <form onSubmit={handleSubmit} aria-label="Create transaction form">
-                <NumberInput allowFloat allowNegativeValues label='Amount'
-                    onChange={handleAmountChange} value={amount}
+            <Form onSubmit={handleSubmit} aria-label="Create transaction form">
+                <NumberInput className="mb-3" allowFloat allowNegativeValues
+                    label='Amount' onChange={handleAmountChange} value={amount}
                 />
-                <NumberInput allowFloat label='Price' onChange={handlePriceChange}
-                    value={price}
+                <NumberInput className="mb-3" allowFloat label='Price'
+                    onChange={handlePriceChange} value={price}
                 />
                 <DateTimeSelector dateFormat={userSettings.dateFormat} enableTime label='Date'
                     onChange={handleTimeChange} timeFormat={userSettings.timeFormat} timeInterval={1}
-                    value={time}
+                    value={time} className="mb-3" 
                 />
-                <TextInput label='Note' onChange={handleNoteChange} value={note} />
-                <button 
-                    className="btn btn-primary"
-                    role="button"
-                >Save
-                </button>
-            </form>
+                <TextInput className="mb-3" label='Note' onChange={handleNoteChange}
+                    value={note}
+                />
+                <Button 
+                    variant="primary"
+                    type="submit"
+                >
+                    Save
+                </Button>
+            </Form>
         </LoadingWrapper>
     )
 }

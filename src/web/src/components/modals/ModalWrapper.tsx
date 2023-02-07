@@ -43,7 +43,7 @@ function ModalWrapper({ heading, children, isOpen, closeModal }: Props): JSX.Ele
             shouldCloseOnEsc={true}
             shouldCloseOnOverlayClick={true}
         >
-            <Container fluid>
+            <Container fluid className="g-0">
                 <Row>
                     <Col>
                         { heading !== undefined &&
@@ -61,7 +61,7 @@ function ModalWrapper({ heading, children, isOpen, closeModal }: Props): JSX.Ele
                 </Row>
                 <Row>
                     <Col>                        
-                        <Container fluid className="modal-inner">
+                        <Container fluid className="modal-inner g-0">
                             {
                                 Array.isArray(children)
                                     ? children.map(child => React.cloneElement(child, { closeModal }))
