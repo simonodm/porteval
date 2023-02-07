@@ -10,7 +10,11 @@ import ExpandAllButtons from './ExpandAllButtons';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { getPerformanceString, getPriceString } from '../../utils/string';
-import { useDeletePortfolioMutation, useGetAllPortfoliosQuery, useGetAllPortfoliosStatisticsQuery } from '../../redux/api/portfolioApi';
+import {
+    useDeletePortfolioMutation,
+    useGetAllPortfoliosQuery,
+    useGetAllPortfoliosStatisticsQuery
+} from '../../redux/api/portfolioApi';
 import { Link, NavLink } from 'react-router-dom';
 import { generateDefaultPortfolioChart } from '../../utils/chart';
 import { EntityStatistics, Portfolio } from '../../types';
@@ -43,7 +47,7 @@ function PortfoliosTable(): JSX.Element {
 
     // As portfolios' data and statistics are retrieved from 2 separate endpoints, we merge and memoize them here 
     const portfoliosWithStats = useMemo<Array<PortfolioWithStats>>(() => {
-        if(portfolios.data && portfolioStats.data && portfolios.data.length == portfolioStats.data.length) {
+        if(portfolios.data && portfolioStats.data && portfolios.data.length === portfolioStats.data.length) {
             return portfolios.data.map((portfolio, idx) => ({
                 ...portfolio,
                 ...portfolioStats.data![idx]
@@ -53,7 +57,66 @@ function PortfoliosTable(): JSX.Element {
         return []
     }, [portfolios.data, portfolioStats.data]);
 
-    const columns = useMemo<ColumnDefinition<PortfolioWithStats>[]>(() => [
+    const columnsCompact = useMemo<ColumnDefinition<PortfolioWithStats>[]>(() => [
+        {
+            id: 'name',
+            header: 'Name',
+            accessor: p => p.name,
+            render: p => <Link to={`/portfolios/${p.id}`}>{p.name}</Link>
+        },
+        {
+            id: 'currency',
+            header: 'Currency',
+            accessor: p => p.currencyCode
+        },
+        {
+            id: 'profit',
+            header: 'Profit',
+            accessor: p => p.totalProfit,
+            render: p => getPriceString(p.totalProfit, p.currencyCode, userSettings)
+        },
+        {
+            id: 'performance',
+            header: 'Performance',
+            accessor: p => p.totalPerformance,
+            render: p => getPerformanceString(p.totalPerformance, userSettings)
+        },
+        {
+            id: 'actions',
+            header: 'Actions',
+            render: (data) => 
+                <>
+                    <button
+                        className="btn btn-primary btn-extra-sm mr-1"
+                        onClick={() => {
+                        setOpenPositionPortfolio(data);
+                        setOpenPositionModalIsOpen(true);
+                    }}
+                        role="button"
+                    >Open position
+                    </button>
+                    <button
+                        className="btn btn-primary btn-extra-sm mr-1"
+                        onClick={() => {
+                        setPortfolioBeingEdited(data);
+                        setEditModalIsOpen(true);
+                    }}
+                        role="button"
+                    >Edit
+                    </button>
+                    <button className="btn btn-danger btn-extra-sm"
+                        onClick={() => {
+                        setRemovedPortfolioId(data.id);
+                        deletePortfolio(data.id);
+                    }}
+                        role="button"
+                    >Remove
+                    </button>
+                </>
+        }
+    ], []);
+
+    const columnsFull = useMemo<ColumnDefinition<PortfolioWithStats>[]>(() => [
         {
             id: 'name',
             header: 'Name',
@@ -178,7 +241,10 @@ function PortfoliosTable(): JSX.Element {
         <>
             <ExpandAllButtons />
             <DataTable className="w-100 entity-list" sortable expandable
-                columns={columns}
+                columnDefinitions={{
+                    lg: columnsFull,
+                    xs: columnsCompact
+                }}
                 data={{
                     data: portfoliosWithStats,
                     isLoading: !isLoaded,
@@ -188,7 +254,11 @@ function PortfoliosTable(): JSX.Element {
                 idSelector={p => p.id}
                 expandElement={portfolio =>
                     removedPortfolioId !== portfolio.id
-                        ? <PositionsTable className="w-100 entity-list entity-list-nested" portfolioId={portfolio.id} />
+                        ? 
+                            <PositionsTable
+                                className="w-100 entity-list entity-list-nested"
+                                portfolioId={portfolio.id}
+                            />
                         : null                 
                 }
             />
@@ -197,7 +267,11 @@ function PortfoliosTable(): JSX.Element {
             >
                 {
                     openPositionPortfolio !== undefined
-                        ? <OpenPositionForm onSuccess={() => setOpenPositionModalIsOpen(false)} portfolioId={openPositionPortfolio.id} />
+                        ? 
+                            <OpenPositionForm
+                                onSuccess={() => setOpenPositionModalIsOpen(false)}
+                                portfolioId={openPositionPortfolio.id}
+                            />
                         : null
                 }
             </ModalWrapper>
@@ -206,7 +280,11 @@ function PortfoliosTable(): JSX.Element {
             >
                 {
                     portfolioBeingEdited !== undefined
-                        ? <EditPortfolioForm onSuccess={() => setEditModalIsOpen(false)} portfolio={portfolioBeingEdited} />
+                        ? 
+                            <EditPortfolioForm
+                                onSuccess={() => setEditModalIsOpen(false)}
+                                portfolio={portfolioBeingEdited}
+                            />
                         : null
                 }
             </ModalWrapper>

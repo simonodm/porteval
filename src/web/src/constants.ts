@@ -126,8 +126,8 @@ export const COLLAPSE_ALL_ROWS_EVENT_NAME = 'dataTableCollapseAll';
  * @category Constants
  */
 export const DEFAULT_CHART_TODATE_RANGE: ChartToDateRange = {
-    unit: 'day',
-    value: 5
+    unit: 'month',
+    value: 1
 };
 
 /**
@@ -207,6 +207,7 @@ export const RTK_API_TAGS = [
     'DashboardLayout',
     'Exchanges',
     'Currencies',
+    'CurrencyExchangeRates',
     'Imports',
     'Import'
 ];
@@ -239,3 +240,12 @@ export const CHART_LINE_COLOR_CODE_PROGRESSION = [
     '#eb5470',
     '#0000ff',
 ];
+
+export const RESPONSIVE_BREAKPOINTS = {
+    xs: 0,
+    sm: 576,
+    md: 768,
+    lg: 992,
+    xl: 1200,
+    xxl: 1400
+};

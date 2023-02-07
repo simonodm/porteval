@@ -3,6 +3,8 @@
 }
 
 .heading-row {
+    display: flex;
+    justify-content: space-between;
     border-bottom: 1px solid #343a40;
     min-width: 180px;
     margin-bottom: 1em;

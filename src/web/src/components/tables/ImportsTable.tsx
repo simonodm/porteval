@@ -27,7 +27,40 @@ function ImportsTable(): JSX.Element {
             })
     }
 
-    const columns: Array<ColumnDefinition<ImportEntry>> = useMemo(() => [
+    const columnsCompact: Array<ColumnDefinition<ImportEntry>> = useMemo(() => [
+        {
+            id: 'time',
+            header: 'Time',
+            accessor: i => i.time,
+            render: i => formatDateTimeString(i.time, userSettings.dateFormat + ' ' + userSettings.timeFormat)
+        },
+        {
+            id: 'template',
+            header: 'Template',
+            accessor: i => i.templateType
+        },
+        {
+            id: 'status',
+            header: 'Status',
+            accessor: i => i.status
+        },
+        {
+            id: 'errorLog',
+            header: 'Error log',
+            render: i => (
+                i.errorLogAvailable
+                    ? (
+                        <button className="btn btn-primary btn-sm"
+                            onClick={() => handleLogDownload(i)}
+                        >Download
+                        </button>
+                    )
+                    : 'No error log available.'
+            )
+        }
+    ], []);
+
+    const columnsFull: Array<ColumnDefinition<ImportEntry>> = useMemo(() => [
         {
             id: 'time',
             header: 'Time',
@@ -72,7 +105,10 @@ function ImportsTable(): JSX.Element {
         <DataTable
             className="w-100 entity-list"
             sortable
-            columns={columns}
+            columnDefinitions={{
+                lg: columnsFull,
+                xs: columnsCompact
+            }}
             ariaLabel="Imports table"
             data={{
                 data: imports.data ?? [],

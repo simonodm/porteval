@@ -10,7 +10,11 @@ import { Link, NavLink } from 'react-router-dom';
 import { generateDefaultPositionChart } from '../../utils/chart';
 import { getPriceString, getPerformanceString } from '../../utils/string';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
-import { useDeletePositionMutation, useGetPortfolioPositionsStatisticsQuery, useGetPositionsQuery } from '../../redux/api/positionApi';
+import {
+    useDeletePositionMutation,
+    useGetPortfolioPositionsStatisticsQuery,
+    useGetPositionsQuery
+} from '../../redux/api/positionApi';
 import { Position, PositionStatistics } from '../../types';
 
 type Props = {
@@ -43,7 +47,7 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
 
     // As positions' data and statistics need to be retrieved from 2 separate endpoints, we merge and memoize them here
     const positionsWithStats = useMemo(() => {
-        if(positions.data && positionStats.data && positions.data.length == positionStats.data.length) {
+        if(positions.data && positionStats.data && positions.data.length === positionStats.data.length) {
             return positions.data.map((position, idx) => ({
                 ...position,
                 ...positionStats.data![idx]
@@ -64,7 +68,75 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
     const isLoaded = checkIsLoaded(positions, positionStats);
     const isError = checkIsError(positions, positionStats);
 
-    const columns = useMemo<ColumnDefinition<PositionWithStats>[]>(() => [
+    const columnsCompact = useMemo<ColumnDefinition<PositionWithStats>[]>(() => [
+        {
+            id: 'name',
+            header: 'Name',
+            accessor: p => p.instrument.name,
+            render: p => <Link to={`/instruments/${p.instrument.id}`}>{p.instrument.name}</Link>
+        },
+        {
+            id: 'positionSize',
+            header: 'Size',
+            accessor: p => p.positionSize
+        },
+        {
+            id: 'profitTotal',
+            header: 'Total',
+            accessor: p => p.totalProfit,
+            render: p => getPriceString(p.totalProfit, p.instrument.currencyCode, userSettings)
+        },
+        {
+            id: 'performanceTotal',
+            header: 'Total',
+            accessor: p => p.totalPerformance,
+            render: p => getPerformanceString(p.totalPerformance, userSettings)
+        },
+        {
+            id: 'actions',
+            header: 'Actions',
+            render: (position: PositionWithStats) => 
+                <>
+                    <button
+                        className="btn btn-primary btn-extra-sm mr-1"
+                        onClick={() => {
+                            setCreateTransactionPosition(position);
+                            setCreateTransactionModalIsOpen(true);
+                        }}
+                        role="button"
+                    >
+                        Add transaction
+                    </button>
+                    <button
+                        className="btn btn-primary btn-extra-sm mr-1"
+                        onClick={() => {
+                            setPositionBeingEdited(position);
+                            setUpdatePositionModalIsOpen(true);
+                        }} role="button"
+                    >
+                        Edit
+                    </button>
+                    <NavLink
+                        className="btn btn-primary btn-extra-sm mr-1"
+                        to={{pathname: '/charts/view', state: {chart: generateDefaultPositionChart(position)}}}
+                        role="button"
+                    >
+                        Chart
+                    </NavLink>
+                    <button
+                        className="btn btn-danger btn-extra-sm"
+                        onClick={() => {
+                            deletePosition(position);
+                        }}
+                        role="button"
+                    >
+                        Remove
+                    </button>
+                </>
+        }
+    ], []);
+
+    const columnsFull = useMemo<ColumnDefinition<PositionWithStats>[]>(() => [
         {
             id: 'name',
             header: 'Name',
@@ -210,7 +282,10 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
     return (
         <>
             <DataTable className={className} sortable expandable
-                columns={columns}
+                columnDefinitions={{
+                    lg: columnsFull,
+                    xs: columnsCompact
+                }}
                 data={{
                     data: positionsWithStats,
                     isLoading: !isLoaded,
@@ -219,7 +294,11 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
                 ariaLabel={`Portfolio ${portfolioId} positions table`}
                 idSelector={p => p.id}
                 expandElement={p =>
-                    <TransactionsTable className="w-100 entity-list entity-list-nested" positionId={p.id} currencyCode={p.instrument.currencyCode} />
+                    <TransactionsTable
+                        className="w-100 entity-list entity-list-nested"
+                        positionId={p.id}
+                        currencyCode={p.instrument.currencyCode}
+                    />
                 }
             />
             <ModalWrapper closeModal={() => setCreateTransactionModalIsOpen(false)} heading="Add new transaction"
@@ -227,7 +306,11 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
             >
                 {
                     createTransactionPosition !== undefined
-                        ? <CreateTransactionForm onSuccess={() => setCreateTransactionModalIsOpen(false)} positionId={createTransactionPosition.id} />
+                        ?
+                            <CreateTransactionForm
+                                onSuccess={() => setCreateTransactionModalIsOpen(false)}
+                                positionId={createTransactionPosition.id}
+                            />
                         : null
                 }                
             </ModalWrapper>
@@ -238,7 +321,11 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
             >
                 {
                     positionBeingEdited !== undefined
-                        ? <EditPositionForm onSuccess={() => setUpdatePositionModalIsOpen(false)} position={positionBeingEdited} />
+                        ?
+                            <EditPositionForm
+                                onSuccess={() => setUpdatePositionModalIsOpen(false)}
+                                position={positionBeingEdited}
+                            />
                         : null
                 }
             </ModalWrapper>

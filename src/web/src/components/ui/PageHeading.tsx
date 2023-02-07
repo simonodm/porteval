@@ -26,7 +26,9 @@ function PageHeading({ heading, children }: Props): JSX.Element {
     return (
         <div className="heading-row">
             <h3 id="content-heading">{heading}</h3>
-            {children}
+            <div>
+                {children}
+            </div>
         </div>
     )
 }

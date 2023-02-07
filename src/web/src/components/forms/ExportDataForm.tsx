@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
-import LoadingWrapper from '../ui/LoadingWrapper';
 import InstrumentDropdown from './fields/InstrumentDropdown';
 import TemplateTypeDropdown from './fields/TemplateTypeDropdown';
 
-import { useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
-import { TemplateType } from '../../types';
-import { checkIsError, checkIsLoaded } from '../../utils/queries';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
+import { Instrument, TemplateType } from '../../types';
 
 type Props = {
+    /**
+     * A list of instruments to select from for price export.
+     */
+    instruments: Instrument[];
+
     /**
      * A callback which is invoked whenever the form is successfully submitted.
      */
@@ -21,15 +26,9 @@ type Props = {
  * @subcategory Forms
  * @component
  */
-function ExportDataForm({ onSuccess }: Props): JSX.Element {
+function ExportDataForm({ instruments, onSuccess }: Props): JSX.Element {
     const [templateType, setTemplateType] = useState<TemplateType>('portfolios');
-    
     const [instrumentId, setInstrumentId] = useState<number | undefined>(undefined);
-
-    const instruments = useGetAllInstrumentsQuery();
-
-    const isLoaded = checkIsLoaded(instruments);
-    const isError = checkIsError(instruments);
     
     const getExportUrl = () => {
         const baseUrl = '/api/export/';
@@ -42,7 +41,7 @@ function ExportDataForm({ onSuccess }: Props): JSX.Element {
         }
     }
 
-    const onSubmit = () => {
+    const handleSubmit = () => {
         const fetchUrl = getExportUrl();
 
         fetch(fetchUrl)
@@ -56,22 +55,21 @@ function ExportDataForm({ onSuccess }: Props): JSX.Element {
     }
 
     return (
-        <form onSubmit={onSubmit} aria-label="Export CSV data form">
-            <TemplateTypeDropdown label='Export data type' onChange={setTemplateType} />
-            <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                {
-                    templateType === 'prices'
-                        ?
-                            <InstrumentDropdown
-                                instruments={instruments.data ?? []}
-                                onChange={setInstrumentId}
-                                value={instrumentId}
-                            />
-                        : null
-                }
-            </LoadingWrapper>
-            <input type="submit" className="btn btn-primary" value="Export" />
-        </form>
+        <Form aria-label="Export CSV data form">
+            <TemplateTypeDropdown className="mb-2" label='Export data type' onChange={setTemplateType} />
+            {
+                templateType === 'prices'
+                    ?
+                        <InstrumentDropdown
+                            className="mb-2"
+                            instruments={instruments}
+                            onChange={setInstrumentId}
+                            value={instrumentId}
+                        />
+                    : null
+            }
+            <Button variant="primary" onClick={handleSubmit}>Export</Button>
+        </Form>
     )
 }
 

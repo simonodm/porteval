@@ -1,5 +1,7 @@
 import React, { useRef } from 'react';
 
+import Form from 'react-bootstrap/Form';
+
 type Props = {
     /**
      * Custom label to use for the form field.
@@ -36,19 +38,17 @@ function FileUpload({label, className, onFileSelected}: Props): JSX.Element {
     }
     
     return (
-        <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor="file">{label}:</label>
-            <input
+        <Form.Group className={className} controlId="form-file-upload">
+            <Form.Label htmlFor="file">{label}:</Form.Label>
+            <Form.Control
                 aria-label={label}
                 ref={inputRef}
                 accept="text/csv"
                 className="form-control-file"
-                id="file"
-                name="file"
                 onChange={handleFileUpload}
                 type="file"
             />
-        </div>
+        </Form.Group>
     )
 }
 

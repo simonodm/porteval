@@ -5,7 +5,8 @@ import LoadingWrapper from '../ui/LoadingWrapper';
 import DataTableExpandableComponent from './DataTableExpandableComponent';
 
 import { Column, Row, useExpanded, useSortBy, useTable } from 'react-table'
-import { COLLAPSE_ALL_ROWS_EVENT_NAME, EXPAND_ALL_ROWS_EVENT_NAME } from '../../constants';
+import { COLLAPSE_ALL_ROWS_EVENT_NAME, EXPAND_ALL_ROWS_EVENT_NAME, RESPONSIVE_BREAKPOINTS } from '../../constants';
+import { useBreakpoint } from 'use-breakpoint';
 
 /**
  * Represents a definition of a single table column.
@@ -23,12 +24,16 @@ export type ColumnDefinition<T extends Record<string, unknown>> = {
     header: string;
 
     /**
-     * Callback to access the specific property value displayed in this column. If this property is `undefined`, then sorting is disabled for this column.
+     * Callback to access the specific property value displayed in this column.
+     * If this property is `undefined`, then sorting is disabled for this column.
      */
-    accessor?: (data: T) => any;
+    accessor?: (data: T) => unknown;
 
     /**
-     * Nested columns to be displayed. This converts this column to a grouping column, after which {@link accessor} and {@link render} properties are ignored.
+     * Nested columns to be displayed.
+     * 
+     * This converts this column to a grouping column,
+     * after which {@link accessor} and {@link render} properties are ignored.
      */
     columns?: Array<ColumnDefinition<T>>;
 
@@ -59,6 +64,18 @@ export type TableData<T extends Record<string, unknown>> = {
     isError?: boolean;
 }
 
+/**
+ * Available breakpoints.
+ */
+type Breakpoint = keyof typeof RESPONSIVE_BREAKPOINTS;
+
+/**
+ * Represents a set of column definitions to be applied on specific breakpoints.
+ * @template T Table data type
+ */
+type ResponsiveColumnDefinitions<T extends Record<string, unknown>>
+    = Partial<Record<Breakpoint, ColumnDefinition<T>[]>>;
+
 type Props<T extends Record<string, unknown>> = {
     /**
      * Custom class name to use for the table.
@@ -66,9 +83,9 @@ type Props<T extends Record<string, unknown>> = {
     className?: string;
 
     /**
-     * An array of column definitions.
+     * Columns to be displayed in the table.
      */
-    columns: ColumnDefinition<T>[];
+    columnDefinitions: ColumnDefinition<T>[] | ResponsiveColumnDefinitions<T>;
 
     /**
      * Table data.
@@ -103,6 +120,20 @@ type Props<T extends Record<string, unknown>> = {
 };
 
 /**
+ * A type guard which determines whether the provided parameter is of type {@link ResponsiveColumnDefinitions<T>}.
+ * @param obj Object to check type of.
+ */
+function isResponsiveColumnDefinitions<T extends Record<string, unknown>>(
+    obj: unknown
+): obj is ResponsiveColumnDefinitions<T> {
+    return obj !== null
+        && obj !== undefined
+        && typeof obj === 'object'
+        && Object.keys(obj)
+            .every(breakpoint => Object.keys(RESPONSIVE_BREAKPOINTS).includes(breakpoint));
+}
+
+/**
  * Converts {@link ColumnDefinition} to format accepted by `react-table`
  * 
  * @param colDef Column definition
@@ -120,6 +151,49 @@ function convertColumnDefinition<T extends Record<string, unknown>>(colDef: Colu
     };
 
     return result;
+}
+
+function findColumnDefinitionsForBreakpoint<T extends Record<string, unknown>>(
+    responsiveDefinitions: ResponsiveColumnDefinitions<T>,
+    currentBreakpoint: Breakpoint
+): ColumnDefinition<T>[] {
+    // Object.keys() will keep the order of key definitions, so it's safe to use here
+    const breakpointArray = Object.keys(RESPONSIVE_BREAKPOINTS);
+    let currentBreakpointSeen = false;
+    let result: ColumnDefinition<T>[] = [];
+
+    breakpointArray.forEach(breakpoint => {
+        if(!currentBreakpointSeen && Object.prototype.hasOwnProperty.call(responsiveDefinitions, breakpoint)) {
+            const currentBreakpointColumnDefinitions
+                = responsiveDefinitions[breakpoint as Breakpoint];
+            if(currentBreakpointColumnDefinitions !== undefined) {
+                result = currentBreakpointColumnDefinitions;
+            }
+        }
+
+        currentBreakpointSeen = currentBreakpointSeen || breakpoint === currentBreakpoint;
+    });
+
+    return result;
+}   
+
+/**
+ * Determines column definitions to use for the specified breakpoint.
+ * 
+ * @param definitions Column definitions provided as a prop to {@link DataTable}
+ * @param currentBreakpoint Current screen breakpoint
+ * @returns Definitions of columns for the provided breakpoint if the provided definitions are responsive,
+ * original definitions otherwise.
+ */
+function preprocessColumnDefinitions<T extends Record<string, unknown>>(
+    definitions: ColumnDefinition<T>[] | ResponsiveColumnDefinitions<T>,
+    currentBreakpoint: Breakpoint
+): ColumnDefinition<T>[] {
+    if(isResponsiveColumnDefinitions<T>(definitions)) {
+        return findColumnDefinitionsForBreakpoint(definitions, currentBreakpoint);        
+    }
+
+    return definitions;
 }
 
 /**
@@ -172,16 +246,20 @@ function getColumnCount<T extends Record<string, unknown>>(columns: Array<Column
  * @component
  */
 function DataTable<T extends Record<string, unknown>>(
-    { className, columns, data, idSelector, ariaLabel, sortable, expandable, expandElement }: Props<T>
+    { className, columnDefinitions, data, idSelector, ariaLabel, sortable, expandable, expandElement }: Props<T>
 ) {
+    const { breakpoint } = useBreakpoint(RESPONSIVE_BREAKPOINTS, 'lg');
+
+    const columns = preprocessColumnDefinitions(columnDefinitions, breakpoint);
+
     // Column definitions need to be converted, expander column needs to be added and the result needs to be memoized
     // to work correctly with `react-table`.
     const convertedColumns = useMemo<Array<Column<T>>>(() => {
         return [
             ...(expandable ? [getExpanderColumn<T>()] : []),
-            ...columns.map(c => convertColumnDefinition(c))
+            ...columns.map(convertColumnDefinition)
         ]
-    }, [columns, expandable]);
+    }, [breakpoint, columnDefinitions, expandable]);
 
     const {
       getTableProps,
@@ -224,17 +302,22 @@ function DataTable<T extends Record<string, unknown>>(
                 {headerGroups.map(headerGroup => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
                         {headerGroup.headers.map(column => (
-                            <th {...column.getHeaderProps(sortable ? column.getSortByToggleProps({ title: undefined }) : undefined)}>
+                            <th {...column.getHeaderProps(
+                                    sortable
+                                        ? column.getSortByToggleProps({ title: undefined })
+                                        : undefined
+                                )}
+                            >
                                 {column.render('Header')}
                                 { sortable &&
-                                <span>
-                                    {column.isSorted
-                            ? column.isSortedDesc
-                                ? ' 🔽'
-                                : ' 🔼'
-                            : ''}
-                                </span>
-                    }
+                                    <span>
+                                        {column.isSorted
+                                            ? column.isSortedDesc
+                                                ? ' 🔽'
+                                                : ' 🔼'
+                                            : ''}
+                                    </span>
+                                }
                             </th>
                 ))}
                     </tr>
@@ -244,27 +327,26 @@ function DataTable<T extends Record<string, unknown>>(
                 <tbody {...getTableBodyProps()}>
                     {rows.map(
                         (row) => {
-                        prepareRow(row);
-                        return (
-                            <>
-                                <tr {...row.getRowProps()} data-testid="datarow">
-                                    {row.cells.map(cell => {
-                                    return (
-                                        <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                                    )
-                                })}
-                                </tr>
-                                {expandable && expandElement &&
-                                    <DataTableExpandableComponent 
-                                        originalRowColumnCount={getColumnCount(columns) + 1}
-                                        render={() => expandElement(row.original)}
-                                        hidden={!row.isExpanded} 
-                                    />
-                                }
-                            </>
-                        )
-}
-                    )}
+                            prepareRow(row);
+                            return (
+                                <>
+                                    <tr {...row.getRowProps()} data-testid="datarow">
+                                        {row.cells.map(cell => {
+                                        return (
+                                            <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                                        )
+                                    })}
+                                    </tr>
+                                    {expandable && expandElement &&
+                                        <DataTableExpandableComponent 
+                                            originalRowColumnCount={getColumnCount(columns) + 1}
+                                            render={() => expandElement(row.original)}
+                                            hidden={!row.isExpanded} 
+                                        />
+                                    }
+                                </>
+                            )
+                    })}
                 </tbody>
             </LoadingWrapper>
         </table>

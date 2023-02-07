@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+
+import Form from 'react-bootstrap/Form';
+
 import { TemplateType } from '../../../types';
 
 type Props = {
@@ -15,7 +18,7 @@ type Props = {
     /**
      * Custom label to use for the form field.
      */
-    label?: string
+    label?: string;
 
     /**
      * Determines whether the form field is disabled.
@@ -46,19 +49,17 @@ function TemplateTypeDropdown({ className, label, value, disabled, onChange }: P
     }
 
     return (
-        <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor={label?.toLowerCase().replaceAll(' ', '-')}>{label}:</label>
-            <select
+        <Form.Group className={className} controlId="form-template-type">
+            <Form.Label>{label}:</Form.Label>
+            <Form.Select
                 aria-label={label}
-                className="form-control"
                 disabled={disabled}
-                id={label?.toLowerCase().replaceAll(' ', '-')}
                 onChange={handleTypeChange}
                 value={type}
             >
                 {types.map(t => <option key={t} value={t}>{t[0].toUpperCase() + t.substring(1)}</option>)}
-            </select>
-        </div>
+            </Form.Select>
+        </Form.Group>
     )
 }
 

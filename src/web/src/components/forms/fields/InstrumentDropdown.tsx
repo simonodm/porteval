@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+
+import Form from 'react-bootstrap/Form';
+
 import { Instrument } from '../../../types';
 
 type Props = {
@@ -16,6 +19,11 @@ type Props = {
      * Binding property for the dropdown's current instrument ID.
      */
     value?: number;
+
+    /**
+     * Custom label to use for the form field.
+     */
+    label?: string;
 
     /**
      * Determines whether user can specify to create a new instrument.
@@ -51,7 +59,7 @@ type Props = {
  * @component
  */
 function InstrumentDropdown(
-    { instruments, className, value, disabled, creatable, onCreate, onCancelCreate, onChange }: Props
+    { instruments, className, label, value, disabled, creatable, onCreate, onCancelCreate, onChange }: Props
 ): JSX.Element {
     const [instrumentId, setInstrumentId] = useState(value);
     const [creatingNew, setCreatingNew] = useState(false);
@@ -90,27 +98,29 @@ function InstrumentDropdown(
     }, [value]);
 
     return (
-        <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor="instrument">Instrument:</label>
-            <select className="form-control" disabled={disabled || creatingNew} id="instrument"
+        <Form.Group className={className} controlId="form-instrument">
+            <Form.Label>{label ?? 'Instrument'}:</Form.Label>
+            <Form.Select disabled={disabled || creatingNew}
                 onChange={handleInstrumentIdChange} value={instrumentId} aria-label='Instrument'
             >
                 {instruments
                         .filter(instrument => instrument.type !== 'index')
                         .map(instrument =>
                             <option key={instrument.id} value={instrument.id}>{instrument.name}</option>)}
-            </select>
+            </Form.Select>
             {
                 creatable &&
-                <div className="form-check">
-                    <input checked={creatingNew} id="instrument-create-new" onChange={handleCreateNewInstrumentCheck}
-                        type="checkbox" className="form-check-input"
+                <Form.Group controlId="form-create-instrument">
+                    <Form.Check
+                        type="checkbox"
+                        checked={creatingNew}
+                        onChange={handleCreateNewInstrumentCheck}
+                        label="Create new instrument"
                     />
-                    <label htmlFor="instrument-create-new" className="form-check-label">Create new instrument</label>
-                </div>
+                </Form.Group>
             }
             
-        </div>
+        </Form.Group>
     )
 }
 

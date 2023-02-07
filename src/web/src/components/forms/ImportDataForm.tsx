@@ -2,6 +2,9 @@ import React, { useState } from 'react'
 import FileUpload from './fields/FileUpload'
 import TemplateTypeDropdown from './fields/TemplateTypeDropdown';
 
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
 import { useUploadImportFileMutation } from '../../redux/api/importApi';
 import { onSuccessfulResponse } from '../../utils/queries';
 import { TemplateType } from '../../types';
@@ -57,22 +60,26 @@ function ImportDataForm({ onSuccess }: Props): JSX.Element {
     }
     
     return (
-        <form onSubmit={handleUpload} aria-label="Import CSV data form">
-            <TemplateTypeDropdown label='Import template' onChange={setTemplateType} />
-            <button
-                className="btn btn-primary btn-sm"
-                role="button"
+        <Form aria-label="Import CSV data form">
+            <TemplateTypeDropdown className="mb-2" label='Import template' onChange={setTemplateType} />
+            <Button
+                className="mb-4"
+                variant="primary"
+                size="sm"
                 onClick={handleTemplateExport}
-            >Download template
-            </button>
-            <FileUpload label="Choose import file" onFileSelected={handleFileSelect} />
-            <button 
-                className="btn btn-primary"
+            >
+                Download template
+            </Button>
+            <FileUpload className="mb-2" label="Choose import file" onFileSelected={handleFileSelect} />
+            <Button
+                className="mb-2"
+                variant="primary"
                 role="button"
                 onClick={handleUpload}
-            >Upload
-            </button>
-        </form>
+            >
+                Upload
+            </Button>
+        </Form>
     )
 }
 

@@ -74,7 +74,7 @@ function InstrumentSplitsTable({ instrumentId }: Props): JSX.Element {
             ariaLabel={`Instrument ${instrumentId} splits table`}
             className="w-100 entity-list"
             sortable
-            columns={columns}
+            columnDefinitions={columns}
             data={{
                 data: splits.data ?? [],
                 isLoading: !isLoaded,

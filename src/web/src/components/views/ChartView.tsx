@@ -12,6 +12,11 @@ import PageHeading from '../ui/PageHeading';
 import EditChartMetaForm from '../forms/EditChartMetaForm';
 import * as constants from '../../constants';
 
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
+
 import { skipToken } from '@reduxjs/toolkit/dist/query';
 import { isSuccessfulResponse } from '../../redux/api/apiTypes';
 import { useParams } from 'react-router';
@@ -215,62 +220,67 @@ function ChartView(): JSX.Element {
     }
 
     return (
-        <LoadingWrapper isError={isError} isLoaded={isLoaded}>
+        <>
             <PageHeading heading={'Chart: ' + chart?.name ?? ''}>
-                <button
-                    className="btn btn-primary btn-sm float-right"
+                <Button
+                    variant="primary"
+                    size="sm"
+                    className="float-right"
                     disabled={!isChanged}
                     onClick={() => chart && handleChartSave(chart)}
-                    role="button"
                 >
                     Save
-                </button>
-                <button
-                    className="btn btn-primary btn-sm float-right mr-1"
+                </Button>
+                <Button
+                    variant="primary"
+                    size="sm"
+                    className="float-right"
                     onClick={() => setEditModalIsOpen(true)}
-                    role="button"
                 >
                     Rename
-                </button>
+                </Button>
             </PageHeading>
-            <ChartLineConfigurationContext.Provider value={context}>
-                { chart &&
-                    <div className="container-fluid row flex-grow-1">
-                        <div className="col-xs-12 col-md-8 container-fluid d-flex flex-column">
-                            <div>
+            <LoadingWrapper isError={isError} isLoaded={isLoaded}>
+                <ChartLineConfigurationContext.Provider value={context}>
+                    <Container fluid className="d-flex flex-column flex-grow-1">
+                        <Row className="mb-5">
+                            <Col>
                                 <ChartConfigurator onChange={handleChartSave} />
-                            </div>
-                            <PortEvalChart chart={chart} />
-                        </div>
-                        
-                        <div className="col-xs-12 col-md-4 container-fluid w-100">
-                            <PortfolioPicker />
-                            <InstrumentPicker />
-                        </div>
-                        <ModalWrapper
-                            closeModal={() => setLineModalIsOpen(false)}
-                            heading={`Configure line ${modalLine?.name ?? ''}`} 
-                            isOpen={lineModalIsOpen}
-                        >
-                            {
-                                modalLine &&
-                                    <ChartLineConfigurator
-                                        line={modalLine}
-                                        onSave={(line) => handleLineSave(line)}
-                                    />
-                            }
-                        </ModalWrapper>
-                        <ModalWrapper
-                            closeModal={() => setEditModalIsOpen(false)}
-                            heading="Edit chart info"
-                            isOpen={editModalIsOpen}
-                        >
-                            <EditChartMetaForm chart={chart} onSave={handleChartEditSave} />
-                        </ModalWrapper>
-                    </div>
-                }
-            </ChartLineConfigurationContext.Provider>
-        </LoadingWrapper>
+                            </Col>
+                        </Row>
+                        <Row className="flex-grow-1">
+                            <Col xs={12} lg={8}>
+                                {chart && <PortEvalChart chart={chart} /> }
+                            </Col>
+                            <Col xs={12} lg={4}>
+                                <PortfolioPicker />
+                                <InstrumentPicker />
+                            </Col>
+                        </Row>
+                    </Container>
+                    <ModalWrapper
+                        closeModal={() => setLineModalIsOpen(false)}
+                        heading={`Configure line ${modalLine?.name ?? ''}`} 
+                        isOpen={lineModalIsOpen}
+                    >
+                        {
+                            modalLine &&
+                                <ChartLineConfigurator
+                                    line={modalLine}
+                                    onSave={(line) => handleLineSave(line)}
+                                />
+                        }
+                    </ModalWrapper>
+                    <ModalWrapper
+                        closeModal={() => setEditModalIsOpen(false)}
+                        heading="Edit chart info"
+                        isOpen={editModalIsOpen}
+                    >
+                        {chart && <EditChartMetaForm chart={chart} onSave={handleChartEditSave} /> }
+                    </ModalWrapper>
+                </ChartLineConfigurationContext.Provider>
+            </LoadingWrapper>
+        </>
     )
 }
 

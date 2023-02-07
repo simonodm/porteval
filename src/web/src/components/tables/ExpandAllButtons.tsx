@@ -1,9 +1,11 @@
 import React from 'react';
+import Button from 'react-bootstrap/Button';
+
 import { COLLAPSE_ALL_ROWS_EVENT_NAME, EXPAND_ALL_ROWS_EVENT_NAME } from '../../constants';
 
 /**
- * Renders "expand all" and "collapse all" buttons. These buttons emit an event which all {@link DataTable} tables react to by expanding or collapsing
- * all their rows.
+ * Renders "expand all" and "collapse all" buttons. These buttons emit an event
+ * which all {@link DataTable} tables react to by expanding or collapsing all their rows.
  * 
  * @category Tables
  * @subcategory Utilities
@@ -19,10 +21,10 @@ function ExpandAllButtons(): JSX.Element {
     }
 
     return (
-        <div className="expand-all-rows-buttons">
-            <button className="btn btn-primary btn-sm mr-1" onClick={handleExpandAllClick}>Expand all</button>
-            <button className="btn btn-primary btn-sm" onClick={handleCollapseAllClick}>Collapse all</button>
-        </div>
+        <div>
+            <Button variant="primary" size="sm" onClick={handleExpandAllClick}>Expand all</Button>
+            <Button variant="primary" size="sm" onClick={handleCollapseAllClick}>Collapse all</Button>
+        </div>                    
     )
 }
 

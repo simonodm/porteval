@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import PageSelector from '../ui/PageSelector';
 import DataTable, { ColumnDefinition } from './DataTable';
-import useUserSettings from '../../hooks/useUserSettings';
 import EditInstrumentForm from '../forms/EditInstrumentForm';
 import ModalWrapper from '../modals/ModalWrapper';
 
@@ -9,10 +8,8 @@ import { Link, NavLink } from 'react-router-dom';
 import { generateDefaultInstrumentChart } from '../../utils/chart';
 import { Instrument } from '../../types';
 import { INSTRUMENT_TYPE_TO_STRING } from '../../constants';
-import { getPriceString } from '../../utils/string';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
-import { useDeleteInstrumentMutation, useGetInstrumentPageQuery, usePrefetch } from '../../redux/api/instrumentApi';
-import LoadingBubbles from '../ui/LoadingBubbles';
+import { useDeleteInstrumentMutation, useGetInstrumentPageQuery } from '../../redux/api/instrumentApi';
 import InstrumentCurrentPriceText from '../ui/InstrumentCurrentPriceText';
 
 /**
@@ -30,7 +27,63 @@ function InstrumentsTable(): JSX.Element {
     const instruments = useGetInstrumentPageQuery({ page: page, limit: pageLimit});
     const [deleteInstrument, mutationStatus] = useDeleteInstrumentMutation();
 
-    const columns: Array<ColumnDefinition<Instrument>> = useMemo(() => [
+    const columnsCompact: Array<ColumnDefinition<Instrument>> = useMemo(() => [
+        {
+            id: 'name',
+            header: 'Name',
+            accessor: i => i.name,
+            render: i => <Link to={`/instruments/${i.id}`}>{i.name}</Link>
+        },
+        {
+            id: 'symbol',
+            header: 'Symbol',
+            accessor: i => i.symbol
+        },
+        {
+            id: 'currency',
+            header: 'Currency',
+            accessor: i => i.currencyCode
+        },
+        {
+            id: 'currentPrice',
+            header: 'Current price',
+            accessor: i => i.currentPrice ?? 0,
+            render: i => <InstrumentCurrentPriceText instrument={i} />
+        },
+        {
+            id: 'actions',
+            header: 'Actions',
+            render: i => (
+                <>
+                    <NavLink
+                        className="btn btn-primary btn-extra-sm mr-1"
+                        to={{
+                            pathname: '/charts/view', state: { chart: generateDefaultInstrumentChart(i) 
+                        }}}
+                        role='button'
+                    >Chart
+                    </NavLink>
+                    <button
+                        className="btn btn-primary btn-extra-sm mr-1"
+                        onClick={() => {
+                            setInstrumentBeingEdited(i);
+                            setIsModalOpen(true);
+                        }}
+                        role="button"
+                    >Edit
+                    </button>
+                    <button
+                        className="btn btn-danger btn-extra-sm"
+                        onClick={() => deleteInstrument(i.id)}
+                        role="button"
+                    >Remove
+                    </button>
+                </>
+            )
+        },
+    ], []);
+
+    const columnsFull: Array<ColumnDefinition<Instrument>> = useMemo(() => [
         {
             id: 'name',
             header: 'Name',
@@ -110,7 +163,10 @@ function InstrumentsTable(): JSX.Element {
             <DataTable
                 className="w-100 entity-list"
                 sortable
-                columns={columns}
+                columnDefinitions={{
+                    lg: columnsFull,
+                    xs: columnsCompact
+                }}
                 idSelector={i => i.id}
                 ariaLabel="Instruments table"
                 data={{
@@ -131,7 +187,11 @@ function InstrumentsTable(): JSX.Element {
             >
                 {
                     instrumentBeingEdited !== undefined
-                        ? <EditInstrumentForm instrument={instrumentBeingEdited} onSuccess={() => setIsModalOpen(false)} />
+                        ?
+                            <EditInstrumentForm
+                                instrument={instrumentBeingEdited}
+                                onSuccess={() => setIsModalOpen(false)}
+                            />
                         : null
                 }
             </ModalWrapper>

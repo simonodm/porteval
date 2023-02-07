@@ -6,6 +6,7 @@
     margin: 0 4px;
     display: inline-block;
     text-align: left;
+    min-width: 80px;
 }
 
 .chart-configurator-setting label {

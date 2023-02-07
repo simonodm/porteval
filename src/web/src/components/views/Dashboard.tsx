@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import GridLayout, { Layout, WidthProvider } from 'react-grid-layout';
+import { Responsive, Layout, WidthProvider } from 'react-grid-layout';
 import DashboardChart from '../charts/DashboardChart';
 import ModalWrapper from '../modals/ModalWrapper';
 import DashboardChartPicker from '../charts/DashboardChartPicker';
 import PageHeading from '../ui/PageHeading';
+import Button from 'react-bootstrap/Button';
 
 import { useGetDashboardLayoutQuery, useUpdateDashboardLayoutMutation } from '../../redux/api/dashboardApi';
 import { useGetAllChartsQuery } from '../../redux/api/chartApi';
@@ -11,7 +12,7 @@ import { useGetAllChartsQuery } from '../../redux/api/chartApi';
 import 'react-grid-layout/css/styles.css';
 import './Dashboard.css';
 
-const ResponsiveGridLayout = WidthProvider(GridLayout);
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 /**
  * Renders the dashboard.
@@ -35,17 +36,17 @@ function Dashboard(): JSX.Element {
         setModalIsOpen(false);
     }
 
-    const saveLayout = (layout: Layout[]) => {
+    const saveLayout = (items: Layout[]) => {
         if(dashboardLayout !== undefined) {
             const newDashboardLayout = {
-                items: layout.map(item => ({
+                items: items.map(item => ({
                     chartId: parseInt(item.i),
                     dashboardPositionX: item.x,
                     dashboardPositionY: item.y,
                     dashboardWidth: item.w,
                     dashboardHeight: item.h
                 }))
-            }
+            };
 
             // doublecheck if the layout has indeed changed, as react-grid-layout sometimes triggers the change event
             // multiple times
@@ -78,33 +79,44 @@ function Dashboard(): JSX.Element {
     return (
         <>
             <PageHeading heading="Dashboard">
-                <button
-                    className="btn btn-success btn-sm float-right"
+                <Button
+                    className="d-none d-lg-inline-block"
+                    variant="success"
+                    size="sm"
                     onClick={() => setIsEditable(!isEditable)}
-                    role="button"
                 >
                     Toggle dashboard edit
-                </button>
-                <button
-                    className="btn btn-primary btn-sm float-right mr-1"
+                </Button>
+                <Button
+                    className="d-none d-lg-inline-block"
+                    variant="primary"
+                    size="sm"
                     onClick={() => {
                         setModalIsOpen(true); setIsEditable(true) 
                     }}
-                    role="button"
                 >
                     Add charts
-                </button>
+                </Button>           
             </PageHeading>
             <ResponsiveGridLayout
                 className="layout"
-                cols={6}
+                cols={{
+                    lg: 6,
+                    md: 2,
+                    sm: 1,
+                    xs: 1,
+                    xxs: 1
+                }}
                 droppingItem={{i: droppingItemId.toString(), w: 1, h: 1}}
                 isBounded={true}
                 isDraggable={isEditable}
                 isDroppable={true}
                 isResizable={isEditable}
-                onLayoutChange={saveLayout}
+                onDrop={saveLayout}
+                onResizeStop={saveLayout}
+                onDragStop={saveLayout}
                 rowHeight={150}
+                preventCollision
             >
                 {charts.data && dashboardLayout && charts.data.map(chart => {
                     const chartPosition = dashboardLayout.items.find(l => l.chartId === chart.id);

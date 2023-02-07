@@ -8,12 +8,14 @@ import InstrumentTypeDropdown from './fields/InstrumentTypeDropdown';
 import NumberInput from './fields/NumberInput';
 import DateTimeSelector from './fields/DateTimeSelector';
 import CurrencyDropdown from './fields/CurrencyDropdown';
+import ExchangeDropdown from './fields/ExchangeDropdown';
 
 import { useCreateInstrumentMutation, useGetAllInstrumentsQuery } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, checkIsError, onSuccessfulResponse } from '../../utils/queries';
 import { Instrument, InstrumentType } from '../../types';
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { useAddPositionMutation } from '../../redux/api/positionApi';
+import { useGetAllKnownExchangesQuery } from '../../redux/api/exchangeApi';
 
 type Props = {
     /**
@@ -37,6 +39,7 @@ type Props = {
 function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX.Element {
     const instruments = useGetAllInstrumentsQuery();
     const currencies = useGetAllKnownCurrenciesQuery();
+    const exchanges = useGetAllKnownExchangesQuery();
     
     const [createInstrument, instrumentMutationStatus] = useCreateInstrumentMutation();
     const [createPosition, positionMutationStatus] = useAddPositionMutation();
@@ -65,8 +68,9 @@ function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX.Element {
 
     const [userSettings] = useUserSettings();
 
-    const isLoaded = checkIsLoaded(instruments, currencies, instrumentMutationStatus, positionMutationStatus);
-    const isError = checkIsError(instruments, currencies);
+    const isLoaded = checkIsLoaded(instruments, currencies, exchanges,
+        instrumentMutationStatus, positionMutationStatus);
+    const isError = checkIsError(instruments, currencies, exchanges);
 
     // set instrument currency to default after currencies are loaded
     useEffect(() => {
@@ -126,7 +130,8 @@ function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX.Element {
             }
         }
 
-        // If new instrument is being created, then it needs to be successfully created first before we attempt to create the position.
+        // If new instrument is being created, then it needs to be successfully created first
+        // before we attempt to create the position.
         if(isNewInstrument) {
             createInstrument({
                 symbol: instrumentSymbol,
@@ -171,11 +176,8 @@ function OpenPositionForm({ portfolioId, onSuccess }: Props): JSX.Element {
                             placeholder='e.g. AAPL'
                             value={instrumentSymbol}
                         />
-                        <TextInput
-                            label='Instrument exchange'
-                            onChange={setInstrumentExchange}
-                            placeholder='e.g. NASDAQ'
-                            value={instrumentExchange}
+                        <ExchangeDropdown
+                            exchanges={exchanges.data ?? []} onChange={(e) => setInstrumentExchange(e.symbol)}
                         />
                         <CurrencyDropdown
                             currencies={currencies.data ?? []}

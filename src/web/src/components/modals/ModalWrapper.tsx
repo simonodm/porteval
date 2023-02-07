@@ -2,6 +2,11 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import PageHeading from '../ui/PageHeading';
 
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
+
 import { ModalCallbacks } from '../../types';
 
 import './ModalWrapper.css';
@@ -38,19 +43,34 @@ function ModalWrapper({ heading, children, isOpen, closeModal }: Props): JSX.Ele
             shouldCloseOnEsc={true}
             shouldCloseOnOverlayClick={true}
         >
-            <div className="modal-controls">
-                <button className="btn btn-sm btn-danger float-right" onClick={closeModal}>
-                    <i className="bi bi-x"></i>
-                </button>
-            </div>
-            { heading !== undefined && <PageHeading heading={heading} /> }
-            <div className="modal-inner">
-                {
-                    Array.isArray(children)
-                        ? children.map(child => React.cloneElement(child, { closeModal }))
-                        : children ? React.cloneElement(children, { closeModal }) : null
-                }
-            </div>
+            <Container fluid>
+                <Row>
+                    <Col>
+                        { heading !== undefined &&
+                            <PageHeading heading={heading}>
+                                <span className="modal-controls">
+                                    <Button variant="danger" size="sm"
+                                        className="float-right" onClick={closeModal}
+                                    >
+                                        <i className="bi bi-x"></i>
+                                    </Button>
+                                </span>                                
+                            </PageHeading>
+                        }
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>                        
+                        <Container fluid className="modal-inner">
+                            {
+                                Array.isArray(children)
+                                    ? children.map(child => React.cloneElement(child, { closeModal }))
+                                    : children ? React.cloneElement(children, { closeModal }) : null
+                            }
+                        </Container>
+                    </Col>
+                </Row>
+            </Container>
         </ReactModal>
     )
 }

@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+
+import Form from 'react-bootstrap/Form';
+
 import { Currency } from '../../../types';
 
 type Props = {
@@ -18,6 +21,13 @@ type Props = {
     disabled?: boolean;
 
     /**
+     * Custom default label to use for the dropdown.
+     * 
+     * Default value is 'Currency'.
+     */
+    label?: string;
+
+    /**
      * Binding property for the dropdown's current value.
      */
     value?: string;
@@ -35,7 +45,7 @@ type Props = {
  * @subcategory Fields
  * @component
  */
-function CurrencyDropdown({ currencies, className, disabled, value, onChange }: Props): JSX.Element {
+function CurrencyDropdown({ currencies, className, label, disabled, value, onChange }: Props): JSX.Element {
     const [currencyCode, setCurrencyCode] = useState(value);
 
     // adjust internal state if `value` prop changes
@@ -58,14 +68,14 @@ function CurrencyDropdown({ currencies, className, disabled, value, onChange }: 
     }
 
     return (
-        <div className={`form-group ${className ?? ''}`}>
-            <label htmlFor="currency">Currency:</label>
-            <select className="form-control" disabled={disabled} id="currency"
+        <Form.Group className={className ?? ''} controlId="form-currency">
+            <Form.Label>{label ?? 'Currency'}:</Form.Label>
+            <Form.Select disabled={disabled}
                 aria-label='Currency' onChange={(e) => handleCurrencyChange(e.target.value)} value={currencyCode}
             >
                 {currencies.map(currency => <option key={currency.code} value={currency.code}>{currency.code}</option>)}
-            </select>
-        </div>
+            </Form.Select>
+        </Form.Group>
     )
 }
 

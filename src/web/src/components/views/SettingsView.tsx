@@ -1,7 +1,10 @@
 import React from 'react';
 import SettingsForm from '../forms/SettingsForm';
-import { toast } from 'react-toastify';
 import PageHeading from '../ui/PageHeading';
+
+import Container from 'react-bootstrap/Container';
+
+import { toast } from 'react-toastify';
 
 /**
  * Renders the settings configuration view.
@@ -10,10 +13,14 @@ import PageHeading from '../ui/PageHeading';
  * @component
  */
 function SettingsView(): JSX.Element {
-    return <>
-        <PageHeading heading='Settings' />
-        <SettingsForm onSuccess={() => toast.success('Saved')} onFailure={(error) => toast.error(error)}/>
-    </>
+    return (
+        <>
+            <PageHeading heading='Settings' />
+            <Container fluid>
+                <SettingsForm onSuccess={() => toast.success('Saved')} onFailure={(error) => toast.error(error)}/>
+            </Container>            
+        </>
+    )
 }
 
 export default SettingsView;

@@ -4,8 +4,7 @@ import PageSelector from '../ui/PageSelector';
 import useUserSettings from '../../hooks/useUserSettings';
 import DataTable, { ColumnDefinition } from './DataTable';
 
-import { useDeleteInstrumentPriceMutation, useGetInstrumentPricePageQuery,
-    usePrefetch } from '../../redux/api/instrumentApi';
+import { useDeleteInstrumentPriceMutation, useGetInstrumentPricePageQuery } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { formatDateTimeString, getPriceString } from '../../utils/string';
 import { AggregationFrequency, InstrumentPrice } from '../../types';
@@ -121,7 +120,7 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
             
             <DataTable 
                 className="w-100 entity-list"
-                columns={columns}
+                columnDefinitions={columns}
                 ariaLabel={`Instrument ${instrumentId} prices table`}
                 data={{
                     data: prices.data?.data ?? [],

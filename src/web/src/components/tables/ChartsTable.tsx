@@ -43,7 +43,7 @@ function ChartsTable(): JSX.Element {
             <DataTable
                 className="w-100 entity-list"
                 sortable
-                columns={columns}
+                columnDefinitions={columns}
                 idSelector={c => c.id}
                 ariaLabel="Charts table"
                 data={{

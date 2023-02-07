@@ -46,7 +46,7 @@ function ExchangeRatesTable({ sourceCurrencyCode }: Props): JSX.Element {
         <DataTable
             className="w-100 entity-list"
             sortable
-            columns={columns}
+            columnDefinitions={columns}
             idSelector={r => r.id}
             ariaLabel="Exchange rates table"
             data={{

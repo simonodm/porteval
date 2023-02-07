@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { Instrument } from '../../types';
 import CreateInstrumentPriceForm from '../forms/CreateInstrumentPriceForm';
 import ModalWrapper from '../modals/ModalWrapper';
 import InstrumentPricesTable from '../tables/InstrumentPricesTable';
+
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
+
+import { Instrument } from '../../types';
 
 type Props = {
     instrument?: Instrument;
@@ -13,26 +19,32 @@ function InstrumentPriceHistory({ instrument }: Props): JSX.Element {
 
     return (
         <>
-            <div className="action-buttons">
-                <button
-                    className="btn btn-success btn-sm float-right"
-                    onClick={() => setModalIsOpen(true)} role="button"
-                >
-                    Add price
-                </button>
-            </div>
-            <div className="row">
-                <div className="col-xs-12 container-fluid">
-                    <div className="content-heading">
+            <Container fluid>
+                <Row className="mb-2">
+                    <Col xs={6}>
                         <h5>Price history</h5>
-                    </div>
-                    {instrument && 
-                        <InstrumentPricesTable currencyCode={instrument.currencyCode}
-                            instrumentId={instrument.id}
-                        />
-                    }
-                </div>
-            </div>
+                    </Col>  
+                    <Col xs={6}>
+                        <Button
+                            variant="success"
+                            size="sm"
+                            className="float-right"
+                            onClick={() => setModalIsOpen(true)}
+                        >
+                            Add a price
+                        </Button>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col xs={12}>
+                        {instrument && 
+                            <InstrumentPricesTable currencyCode={instrument.currencyCode}
+                                instrumentId={instrument.id}
+                            />
+                        }
+                    </Col>
+                </Row>
+            </Container>
             <ModalWrapper closeModal={() => setModalIsOpen(false)} heading="Add new price" isOpen={modalIsOpen}>
                 { instrument &&
                     <CreateInstrumentPriceForm

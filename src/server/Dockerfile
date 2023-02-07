@@ -7,10 +7,10 @@ WORKDIR /app
 COPY ["PortEval.Application/PortEval.Application.csproj", "PortEval.Application/"]
 COPY ["PortEval.Infrastructure/PortEval.Infrastructure.csproj", "PortEval.Infrastructure/"]
 COPY ["PortEval.Domain/PortEval.Domain.csproj", "PortEval.Domain/"]
-COPY ["PortEval.Application.Services/PortEval.Application.Services.csproj", "PortEval.Application.Services/"]
+COPY ["PortEval.Application.Features/PortEval.Application.Features.csproj", "PortEval.Application.Features/"]
 COPY ["PortEval.Application.Models/PortEval.Application.Models.csproj", "PortEval.Application.Models/"]
 COPY ["PortEval.BackgroundJobs/PortEval.BackgroundJobs.csproj", "PortEval.BackgroundJobs/"]
-COPY ["PortEval.FinancialDataFetcher/PortEval.FinancialDataFetcher.csproj", "PortEval.FinancialDataFetcher/"]
+COPY ["PortEval.DataFetcher/PortEval.DataFetcher.csproj", "PortEval.DataFetcher/"]
 
 RUN dotnet restore "PortEval.Application/PortEval.Application.csproj"
 COPY . .

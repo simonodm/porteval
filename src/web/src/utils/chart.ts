@@ -250,9 +250,8 @@ function generateDefaultPortfolioChart(portfolio: Portfolio): ChartConfig {
     }
 
     const portfolioPriceChart: ChartConfig = {
-        type: 'price',
+        type: 'performance',
         name: portfolio.name,
-        currencyCode: `${portfolio.currencyCode}`,
         isToDate: true,
         toDateRange: DEFAULT_CHART_TODATE_RANGE,
         lines: [portfolioPriceLine]
@@ -280,9 +279,8 @@ function generateDefaultPositionChart(position: Position): ChartConfig {
     };
 
     const positionPriceChart: ChartConfig = {
-        type: 'price',
+        type: 'performance',
         name: `${position.instrument.name} position`,
-        currencyCode: position.instrument.currencyCode,
         isToDate: true,
         toDateRange: DEFAULT_CHART_TODATE_RANGE,
         lines: [positionPriceLine]
@@ -326,7 +324,9 @@ function generateTooltipTransactionList(
             const isPurchase = transaction.amount > 0;
             transactionRowElement.innerHTML = 
                 `${isPurchase ? 'BUY' : 'SELL'} ${Math.abs(transaction.amount)} ` +
-                `${transaction.instrument.symbol} @ ${getPriceString(transaction.price, transaction.instrument.currencyCode, settings)}`;
+                `${transaction.instrument.symbol} @ ${
+                    getPriceString(transaction.price, transaction.instrument.currencyCode, settings)
+                }`;
             transactionsList.append(transactionRowElement);
         });
 
@@ -338,7 +338,8 @@ function generateTooltipTransactionList(
 }
 
 /**
- * Generates an SVG element displaying `+` or `-` depending on transactions' amounts at the specified chart's data point.
+ * Generates an SVG element displaying `+` or `-` depending on transactions' amounts
+ * at the specified chart's data point.
  * 
  * @category Utilities
  * @subcategory Chart

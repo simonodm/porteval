@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PageHeading from '../ui/PageHeading';
 import InstrumentPriceHistory from '../ui/InstrumentPriceHistory';
 import InstrumentSplitHistory from '../ui/InstrumentSplitHistory';
-import InstrumentCurrentPriceText from '../ui/InstrumentCurrentPriceText';
 import ChartPreview from '../charts/ChartPreview';
+
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 import { useGetInstrumentByIdQuery } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
@@ -12,6 +15,7 @@ import { generateDefaultInstrumentChart } from '../../utils/chart';
 import { useParams } from 'react-router-dom';
 
 import './InstrumentView.css';
+import InstrumentInformation from '../ui/InstrumentInformation';
 
 
 type Params = {
@@ -39,55 +43,39 @@ function InstrumentView(): JSX.Element {
     const chart = instrument.data ? generateDefaultInstrumentChart(instrument.data) : undefined;
 
     return (
-        <LoadingWrapper isError={instrumentError} isLoaded={instrumentLoaded}>
+        <>
             <PageHeading heading={instrument.data?.name ?? 'Instrument'}>
                 { instrument.data?.trackingStatus === 'tracked'  && instrument.data.lastPriceUpdate &&
-                    <span className="float-right last-updated">
+                    <span className="d-none d-lg-inline float-right last-updated">
                         Prices updated: {
                             new Date(instrument.data.lastPriceUpdate).toLocaleString()
                         }
                     </span>
                 }
             </PageHeading>
-            <div className="row mb-5">
-                <div className="col-xs-12 col-md-6">
-                    <h5>Data</h5>
-                    <table className="entity-data w-100">
-                        <tbody>
-                            <tr>
-                                <td>Name:</td>
-                                <td>{ instrument.data?.name }</td>
-                            </tr>
-                            <tr>
-                                <td>Symbol:</td>
-                                <td>{ instrument.data?.symbol }</td>
-                            </tr> 
-                            <tr>
-                                <td>Exchange:</td>
-                                <td>{ instrument.data?.exchange }</td>
-                            </tr>
-                            <tr>
-                                <td>Currency:</td>
-                                <td>{ instrument.data?.currencyCode }</td>
-                            </tr>
-                            <tr>
-                                <td>Current price:</td>
-                                <td>{ instrument.data && <InstrumentCurrentPriceText instrument={instrument.data} /> }</td>
-                            </tr>
-                            <tr>
-                                <td>Note:</td>
-                                <td>{ instrument.data?.note }</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div className="col-xs-12 col-md-6">
-                    { chart && <ChartPreview chart={chart} /> }
-                </div>
-            </div>
-            <InstrumentSplitHistory instrument={instrument.data} />
-            <InstrumentPriceHistory instrument={instrument.data} />
-        </LoadingWrapper>
+            <LoadingWrapper isError={instrumentError} isLoaded={instrumentLoaded}>
+                <Container fluid>
+                    <Row className="mb-5 gy-5">
+                        <Col xs={{ span: 12, order: 2 }} lg={{ span: 6, order: 1 }}>
+                            { instrument.data && <InstrumentInformation instrument={instrument.data} /> }
+                        </Col>
+                        <Col xs={{ span: 12, order: 1 }} lg={{ span: 6, order: 1 }}>
+                            { chart && <ChartPreview chart={chart} /> }
+                        </Col>
+                    </Row>
+                    <Row className="mb-5">
+                        <Col xs={12}>
+                            <InstrumentSplitHistory instrument={instrument.data} />
+                        </Col>
+                    </Row>
+                    <Row className="mb-5">
+                        <Col xs={12}>
+                            <InstrumentPriceHistory instrument={instrument.data} />
+                        </Col>
+                    </Row>
+                </Container>
+            </LoadingWrapper>
+        </>
     )
 }
 

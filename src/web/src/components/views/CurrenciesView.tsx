@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useMemo } from 'react'
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PageHeading from '../ui/PageHeading';
 import ExchangeRatesTable from '../tables/ExchangeRatesTable';
+import ChangeDefaultCurrencyForm from '../forms/ChangeDefaultCurrencyForm';
 
-import { useGetAllKnownCurrenciesQuery,
-    useGetLatestExchangeRatesQuery, useUpdateCurrencyMutation } from '../../redux/api/currencyApi';
-import { Currency } from '../../types';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+
+import { useGetAllKnownCurrenciesQuery, useGetLatestExchangeRatesQuery } from '../../redux/api/currencyApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { skipToken } from '@reduxjs/toolkit/dist/query';
 import { toast } from 'react-toastify';
@@ -20,71 +23,38 @@ import './CurrenciesView.css';
  */
 function CurrenciesView(): JSX.Element {
     const currencies = useGetAllKnownCurrenciesQuery();
-    const [selectedCurrency, setSelectedCurrency] = useState<Currency | undefined>(undefined);
-    const exchangeRates = useGetLatestExchangeRatesQuery(selectedCurrency?.code ?? skipToken);
-    const [updateCurrency] = useUpdateCurrencyMutation();
+
+    const defaultCurrency = useMemo(() => currencies.data?.find(c => c.isDefault), [currencies.data]);
+
+    const exchangeRates = useGetLatestExchangeRatesQuery(defaultCurrency?.code ?? skipToken);
 
     const isLoaded = checkIsLoaded(currencies, exchangeRates);
     const isError = checkIsError(currencies, exchangeRates);
 
-    useEffect(() => {
-        if(currencies.data) {
-            const foundDefault = currencies.data.find(c => c.isDefault);
-            if(foundDefault) {
-                setSelectedCurrency(foundDefault);
-            }
-        }
-    }, [currencies.data]);
-
-    const onCurrencyChange = (currencyCode: string) => {
-        const currency = currencies.data?.find(c => c.code === currencyCode);
-        setSelectedCurrency(currency);
-    }
-
-    const onSave = () => {
-        if(selectedCurrency !== undefined) {
-            const updatedCurrency = {
-                ...selectedCurrency,
-                isDefault: true
-            };
-
-            setSelectedCurrency(updatedCurrency);
-            updateCurrency(updatedCurrency).then(() => toast.success('Default currency saved.'));
-        }
-    }
-
     return (
         <>
             <PageHeading heading="Currencies" />
-            <div className="container-fluid">
-                <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                    <div className="row default-currency-selector">
-                        <label htmlFor="currency-select">Choose default currency:</label>
-                        <select id="currency-select" onChange={(e) => onCurrencyChange(e.target.value)}>
+            <LoadingWrapper isError={isError} isLoaded={isLoaded}>
+                <Container fluid>
+                    <Row className="mb-5">
+                        <Col>
+                            <ChangeDefaultCurrencyForm
+                                currencies={currencies?.data ?? []}
+                                onSuccess={() => toast.success('Default currency saved.')}
+                            />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <h5>Exchange rates</h5>
                             {
-                                currencies.data?.map(currency =>
-                                    <option
-                                        key={currency.code}
-                                        selected={currency.code === selectedCurrency?.code}
-                                        value={currency.code}
-                                    >
-                                        {currency.code} ({currency.symbol})
-                                    </option>)
+                                defaultCurrency &&
+                                    <ExchangeRatesTable sourceCurrencyCode={defaultCurrency?.code} />
                             }
-                        </select>
-                        <button className="btn btn-primary btn-sm" onClick={onSave} role="button">Save</button>
-                    </div>
-                    <div className="row mt-5">
-                        {
-                            selectedCurrency !== undefined &&
-                                <>
-                                    <h5>Exchange rates</h5>
-                                    <ExchangeRatesTable sourceCurrencyCode={selectedCurrency.code} />
-                                </>
-                        }
-                    </div>
-                </LoadingWrapper>
-            </div>
+                        </Col>                        
+                    </Row>
+                </Container>
+            </LoadingWrapper>
         </>
     )
 }
