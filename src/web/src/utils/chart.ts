@@ -150,8 +150,7 @@ function calculateAppropriateChartFrequency(from: Date, to: Date): AggregationFr
         end: to
     });
 
-    if(durationGreaterThan(diff, { years: 10 })) return 'year';
-    if(durationGreaterThan(diff, { years: 2 })) return 'month';
+    if(durationGreaterThan(diff, { years: 10 })) return 'month';
     if(durationGreaterThan(diff, { years: 1 })) return 'week';
     if(durationGreaterThan(diff, { days: 7 })) return 'day';
     if(durationGreaterThan(diff, { days: 1 })) return 'hour';
