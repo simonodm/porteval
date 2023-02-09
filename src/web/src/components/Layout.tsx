@@ -10,12 +10,17 @@ import InstrumentView from './views/InstrumentView';
 import PortfolioListView from './views/PortfolioListView';
 import PortfolioView from './views/PortfolioView';
 import SettingsView from './views/SettingsView';
+import OffcanvasSidebar from './OffcanvasSidebar';
 import Container from 'react-bootstrap/Container';
 
 import { Switch, Route, Redirect } from 'react-router-dom';
-import OffcanvasSidebar from './OffcanvasSidebar';
 
-function DesktopLayout(): JSX.Element {
+/**
+ * Renders the application layout with `react-router` routes.
+ * 
+ * @component
+ */
+function Layout(): JSX.Element {
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
     const toggleSidebar = () => {
@@ -72,4 +77,4 @@ function DesktopLayout(): JSX.Element {
     )
 }
 
-export default DesktopLayout;
+export default Layout;

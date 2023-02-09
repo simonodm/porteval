@@ -5,11 +5,28 @@ import { EntityStatistics, Portfolio } from '../../types';
 import { getPerformanceString, getPriceString } from '../../utils/string';
 
 type Props = {
+    /**
+     * Portfolio to render information of.
+     */
     portfolio: Portfolio;
+
+    /**
+     * Statistics of the portfolio to render information of.
+     */
     stats: EntityStatistics;
+
+    /**
+     * Portfolio's current value.
+     */
     value: number;
 }
 
+/**
+ * Renders the portfolio's key information in a table format.
+ * 
+ * @category UI
+ * @component
+ */
 function PortfolioInformation({ portfolio, stats, value }: Props): JSX.Element {
     const [userSettings] = useUserSettings();
 

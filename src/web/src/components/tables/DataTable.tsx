@@ -119,10 +119,6 @@ type Props<T extends Record<string, unknown>> = {
     expandElement?: (data: T) => JSX.Element | null;
 };
 
-/**
- * A type guard which determines whether the provided parameter is of type {@link ResponsiveColumnDefinitions<T>}.
- * @param obj Object to check type of.
- */
 function isResponsiveColumnDefinitions<T extends Record<string, unknown>>(
     obj: unknown
 ): obj is ResponsiveColumnDefinitions<T> {
@@ -153,6 +149,19 @@ function convertColumnDefinition<T extends Record<string, unknown>>(colDef: Colu
     return result;
 }
 
+/**
+ * Finds the correct collection of column definitions out of breakpoint-keyed responsive definitions
+ * based on the provided breakpoint.
+ * 
+ * If there are no definitions specified for the exact provided breakpoint, it uses the closest
+ * smaller breakpoint.
+ * 
+ * @param responsiveDefinitions A collection of different column definitions for different breakpoints.
+ * @param currentBreakpoint A breakpoint to find columns definitions for.
+ * @returns A collection of column definitions to use for the current layout.
+ * 
+ * @ignore
+ */
 function findColumnDefinitionsForBreakpoint<T extends Record<string, unknown>>(
     responsiveDefinitions: ResponsiveColumnDefinitions<T>,
     currentBreakpoint: Breakpoint
@@ -184,6 +193,8 @@ function findColumnDefinitionsForBreakpoint<T extends Record<string, unknown>>(
  * @param currentBreakpoint Current screen breakpoint
  * @returns Definitions of columns for the provided breakpoint if the provided definitions are responsive,
  * original definitions otherwise.
+ * 
+ * @ignore
  */
 function preprocessColumnDefinitions<T extends Record<string, unknown>>(
     definitions: ColumnDefinition<T>[] | ResponsiveColumnDefinitions<T>,

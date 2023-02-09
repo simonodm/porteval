@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import * as constants from '../../../constants';
 import Form from 'react-bootstrap/Form';
+import * as constants from '../../../constants';
 import { FormFieldProps, InstrumentType } from '../../../types';
 
 /**

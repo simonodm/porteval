@@ -12,9 +12,18 @@ import Button from 'react-bootstrap/Button';
 import { Portfolio } from '../../types';
 
 type Props = {
+    /**
+     * Portfolio to render positions of.
+     */
     portfolio: Portfolio;
 }
 
+/**
+ * Renders the portfolio's positions with a button to open a new position..
+ * 
+ * @category UI
+ * @component
+ */
 function PortfolioPositionOverview({ portfolio }: Props): JSX.Element {
     const [modalIsOpen, setModalIsOpen] = useState(false);
 

@@ -11,9 +11,18 @@ import Button from 'react-bootstrap/Button';
 import { Instrument } from '../../types';
 
 type Props = {
+    /**
+     * Instrument to display split history of.
+     */
     instrument?: Instrument;
 }
 
+/**
+ * Renders the instrument's split history with a button allowing to add a new split.
+ * 
+ * @category UI
+ * @component
+ */
 function InstrumentSplitHistory({ instrument }: Props): JSX.Element {
     const [modalIsOpen, setModalIsOpen] = useState(false);
 

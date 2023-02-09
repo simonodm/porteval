@@ -4,6 +4,7 @@ import PageHeading from '../ui/PageHeading';
 import InstrumentPriceHistory from '../ui/InstrumentPriceHistory';
 import InstrumentSplitHistory from '../ui/InstrumentSplitHistory';
 import ChartPreview from '../charts/ChartPreview';
+import InstrumentInformation from '../ui/InstrumentInformation';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -15,8 +16,6 @@ import { generateDefaultInstrumentChart } from '../../utils/chart';
 import { useParams } from 'react-router-dom';
 
 import './InstrumentView.css';
-import InstrumentInformation from '../ui/InstrumentInformation';
-
 
 type Params = {
     /**

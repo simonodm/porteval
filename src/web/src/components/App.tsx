@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactModal from 'react-modal';
-import DesktopLayout from './DesktopLayout';
+import Layout from './Layout';
 import Container from 'react-bootstrap/Container';
 
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -67,7 +67,7 @@ function App(): JSX.Element {
     return (
         <Container fluid className="p-0" id="app">
             <Router>
-                <DesktopLayout />
+                <Layout />
             </Router>
             <ToastContainer
                 autoClose={5000}

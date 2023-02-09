@@ -1,12 +1,20 @@
 import React from 'react';
 import InstrumentCurrentPriceText from './InstrumentCurrentPriceText';
-
 import { Instrument } from '../../types';
 
 type Props = {
+    /**
+     * Instrument to display information of.
+     */
     instrument: Instrument;
 }
 
+/**
+ * Renders the instrument's key information in a table format.
+ * 
+ * @category UI
+ * @component
+ */
 function InstrumentInformation({ instrument }: Props): JSX.Element {
     return (
         <table className="entity-data w-100">

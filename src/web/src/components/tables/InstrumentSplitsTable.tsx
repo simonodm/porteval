@@ -1,16 +1,26 @@
 import React, { useMemo } from 'react';
-import { INSTRUMENT_SPLIT_STATUS_TO_STRING } from '../../constants';
 import useUserSettings from '../../hooks/useUserSettings';
+import DataTable, { ColumnDefinition } from './DataTable';
+
+import { INSTRUMENT_SPLIT_STATUS_TO_STRING } from '../../constants';
 import { useGetInstrumentSplitsQuery, useUpdateInstrumentSplitMutation } from '../../redux/api/instrumentApi';
 import { InstrumentSplit } from '../../types';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { formatDateTimeString } from '../../utils/string';
-import DataTable, { ColumnDefinition } from './DataTable';
 
 type Props = {
+    /**
+     * ID of the instrument to display splits of.
+     */
     instrumentId: number;
 }
 
+/**
+ * Loads instrument splits and renders an instrument splits' table.
+ * 
+ * @category Tables
+ * @component
+ */
 function InstrumentSplitsTable({ instrumentId }: Props): JSX.Element {
     const splits = useGetInstrumentSplitsQuery(instrumentId);
     const [updateSplit, mutationStatus] = useUpdateInstrumentSplitMutation();
@@ -53,18 +63,17 @@ function InstrumentSplitsTable({ instrumentId }: Props): JSX.Element {
             id: 'actions',
             header: 'Actions',
             render: s => (
-                <>
-                    {s.status === 'processed'
-                        && <button
+                s.status === 'processed'
+                    ?
+                        <button
                             className="btn btn-danger btn-extra-sm mr-1"
                             onClick={() => {
                                 handleSplitRollback(s)
                             }}
                             role="button"
-                           >Rollback
+                        >Rollback
                         </button>
-                    }
-                </>
+                    : null
             )
         },
     ], []);

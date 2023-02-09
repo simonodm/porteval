@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>fed89d9c-9163-4861-bf48-ec698707de65</UserSecretsId>
     <Configurations>Debug;Release</Configurations>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
 	<ItemGroup>

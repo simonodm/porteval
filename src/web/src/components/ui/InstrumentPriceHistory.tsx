@@ -11,9 +11,18 @@ import Button from 'react-bootstrap/Button';
 import { Instrument } from '../../types';
 
 type Props = {
+    /**
+     * Instrument to display price history of.
+     */
     instrument?: Instrument;
 }
 
+/**
+ * Renders the instrument's price history with a button allowing to create a new price.
+ * 
+ * @category UI
+ * @component
+ */
 function InstrumentPriceHistory({ instrument }: Props): JSX.Element {
     const [modalIsOpen, setModalIsOpen] = useState(false);
 

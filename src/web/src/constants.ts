@@ -241,6 +241,10 @@ export const CHART_LINE_COLOR_CODE_PROGRESSION = [
     '#0000ff',
 ];
 
+/**
+ * A collection of responsive breakpoints used by PortEval in the key => minWidth format.
+ * @category Constants
+ */
 export const RESPONSIVE_BREAKPOINTS = {
     xs: 0,
     sm: 576,

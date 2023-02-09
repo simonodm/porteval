@@ -1,9 +1,7 @@
 import React from 'react';
 import SettingsForm from '../forms/SettingsForm';
 import PageHeading from '../ui/PageHeading';
-
 import Container from 'react-bootstrap/Container';
-
 import { toast } from 'react-toastify';
 
 /**

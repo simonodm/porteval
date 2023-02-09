@@ -3,6 +3,7 @@ import PageSelector from '../ui/PageSelector';
 import DataTable, { ColumnDefinition } from './DataTable';
 import EditInstrumentForm from '../forms/EditInstrumentForm';
 import ModalWrapper from '../modals/ModalWrapper';
+import InstrumentCurrentPriceText from '../ui/InstrumentCurrentPriceText';
 
 import { Link, NavLink } from 'react-router-dom';
 import { generateDefaultInstrumentChart } from '../../utils/chart';
@@ -10,7 +11,6 @@ import { Instrument } from '../../types';
 import { INSTRUMENT_TYPE_TO_STRING } from '../../constants';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useDeleteInstrumentMutation, useGetInstrumentPageQuery } from '../../redux/api/instrumentApi';
-import InstrumentCurrentPriceText from '../ui/InstrumentCurrentPriceText';
 
 /**
  * Loads instruments and renders a paginated instruments table.

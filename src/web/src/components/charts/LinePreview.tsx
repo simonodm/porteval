@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react'
-
 import { ChartLine } from '../../types';
 import { convertDashToStrokeDashArray } from '../../utils/chart';
 

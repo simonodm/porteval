@@ -1,6 +1,7 @@
 function getDurationSeconds(duration: globalThis.Duration): number {
-    // While the result number of seconds may not be applicable to arithmetic with dates (due to different month lengths, leap years, etc.), it
-    // is deterministic, which makes it applicable for duration comparisons.
+    // While the result number of seconds may not be applicable to arithmetic
+    // with dates (due to different month lengths, leap years, etc.),
+    // it is deterministic, which makes it applicable for duration comparisons.
     let result = 0;
     if(duration.years !== undefined) {
         result += duration.years * 365 * 24 * 60 * 60;

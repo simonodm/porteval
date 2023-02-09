@@ -30,7 +30,7 @@ type Props = {
  * @category UI
  * @component
  */
-function LoadingWrapper({ children, isLoaded, isError = false, displayLoadingOnQueryRefresh = false}: Props): JSX.Element {   
+function LoadingWrapper({ children, isLoaded, isError, displayLoadingOnQueryRefresh}: Props): JSX.Element {   
     const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     useEffect(() => {
