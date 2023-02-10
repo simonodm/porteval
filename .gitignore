@@ -91,3 +91,11 @@ app/server/PortEval.Setup/ProductInstallFiles.wxs
 
 app/web/build/
 app/**/docs/
+
+*.aux
+*.lof
+*.toc
+*.xmpi
+*.lot
+*.out
+*.pdf
