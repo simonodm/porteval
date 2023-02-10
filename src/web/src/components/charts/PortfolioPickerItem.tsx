@@ -1,5 +1,8 @@
 import React from 'react';
 import LinePreview from '../charts/LinePreview';
+
+import Button from 'react-bootstrap/Button';
+
 import { LINE_PREVIEW_LENGTH } from '../../constants';
 import { ChartLine, Portfolio } from '../../types';
 
@@ -55,29 +58,29 @@ function PortfolioPickerItem(
                     line
                         ? 
                             <>
-                                <button
-                                    className="btn btn-danger btn-extra-sm"
+                                <Button
+                                    variant="danger"
+                                    className="btn-xs"
                                     onClick={onLineRemove}
-                                    role="button"
                                 >
                                     Remove
-                                </button>
-                                <button
-                                    className="btn btn-primary btn-extra-sm"
+                                </Button>
+                                <Button
+                                    variant="primary"
+                                    className="btn-xs"
                                     onClick={onLineConfigure}
-                                    role="button"
                                 >
                                     Modify
-                                </button>
+                                </Button>
                             </>
                         : 
-                            <button
-                                className="btn btn-primary btn-extra-sm"
+                            <Button
+                                variant="primary"
+                                className="btn-xs"
                                 onClick={onLineAdd}
-                                role="button"
                             >
                                 Add
-                            </button>
+                            </Button>
                 }
                 <button
                     className="btn btn-primary btn-extra-sm"

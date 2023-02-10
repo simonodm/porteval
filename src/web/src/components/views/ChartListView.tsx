@@ -20,7 +20,8 @@ function ChartListView(): JSX.Element {
                 <NavLink
                     className="btn btn-success btn-sm float-right"
                     role="button"
-                    to={{pathname: '/charts/view', state: {chart: constants.DEFAULT_CHART}}}
+                    state={{chart: constants.DEFAULT_CHART}}
+                    to="/charts/view"
                 >Create new chart
                 </NavLink>
             </PageHeading>

@@ -6,6 +6,8 @@ import CreateTransactionForm from '../forms/CreateTransactionForm';
 import EditPositionForm from '../forms/EditPositionForm';
 import ModalWrapper from '../modals/ModalWrapper';
 
+import Button from 'react-bootstrap/Button';
+
 import { Link, NavLink } from 'react-router-dom';
 import { generateDefaultPositionChart } from '../../utils/chart';
 import { getPriceString, getPerformanceString } from '../../utils/string';
@@ -97,41 +99,43 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
             header: 'Actions',
             render: (position: PositionWithStats) => 
                 <>
-                    <button
-                        className="btn btn-primary btn-extra-sm mr-1"
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => {
                             setCreateTransactionPosition(position);
                             setCreateTransactionModalIsOpen(true);
                         }}
-                        role="button"
                     >
                         Add transaction
-                    </button>
-                    <button
-                        className="btn btn-primary btn-extra-sm mr-1"
+                    </Button>
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => {
                             setPositionBeingEdited(position);
                             setUpdatePositionModalIsOpen(true);
-                        }} role="button"
+                        }}
                     >
                         Edit
-                    </button>
+                    </Button>
                     <NavLink
                         className="btn btn-primary btn-extra-sm mr-1"
-                        to={{pathname: '/charts/view', state: {chart: generateDefaultPositionChart(position)}}}
+                        state={{chart: generateDefaultPositionChart(position)}}
+                        to="/charts/view"
                         role="button"
                     >
                         Chart
                     </NavLink>
-                    <button
-                        className="btn btn-danger btn-extra-sm"
+                    <Button
+                        variant="danger"
+                        className="btn-xs"
                         onClick={() => {
                             deletePosition(position);
                         }}
-                        role="button"
                     >
                         Remove
-                    </button>
+                    </Button>
                 </>
         }
     ], []);
@@ -240,41 +244,42 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
             header: 'Actions',
             render: (position: PositionWithStats) => 
                 <>
-                    <button
-                        className="btn btn-primary btn-extra-sm mr-1"
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => {
                             setCreateTransactionPosition(position);
                             setCreateTransactionModalIsOpen(true);
                         }}
-                        role="button"
                     >
                         Add transaction
-                    </button>
-                    <button
-                        className="btn btn-primary btn-extra-sm mr-1"
+                    </Button>
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => {
                             setPositionBeingEdited(position);
                             setUpdatePositionModalIsOpen(true);
-                        }} role="button"
+                        }}
                     >
                         Edit
-                    </button>
+                    </Button>
                     <NavLink
                         className="btn btn-primary btn-extra-sm mr-1"
-                        to={{pathname: '/charts/view', state: {chart: generateDefaultPositionChart(position)}}}
+                        state={{chart: generateDefaultPositionChart(position)}}
+                        to="/charts/view"
                         role="button"
-                    >
-                        Chart
+                    >Chart
                     </NavLink>
-                    <button
-                        className="btn btn-danger btn-extra-sm"
+                    <Button
+                        variant="danger"
+                        className="btn-xs"
                         onClick={() => {
                             deletePosition(position);
                         }}
-                        role="button"
                     >
                         Remove
-                    </button>
+                    </Button>
                 </>
         }
     ], []);

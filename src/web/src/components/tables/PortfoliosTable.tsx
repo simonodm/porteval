@@ -7,6 +7,8 @@ import OpenPositionForm from '../forms/OpenPositionForm';
 import ModalWrapper from '../modals/ModalWrapper';
 import ExpandAllButtons from './ExpandAllButtons';
 
+import Button from 'react-bootstrap/Button';
+
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useGetAllKnownCurrenciesQuery } from '../../redux/api/currencyApi';
 import { getPerformanceString, getPriceString } from '../../utils/string';
@@ -86,32 +88,33 @@ function PortfoliosTable(): JSX.Element {
             header: 'Actions',
             render: (data) => 
                 <>
-                    <button
-                        className="btn btn-primary btn-extra-sm mr-1"
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => {
-                        setOpenPositionPortfolio(data);
-                        setOpenPositionModalIsOpen(true);
-                    }}
-                        role="button"
+                            setOpenPositionPortfolio(data);
+                            setOpenPositionModalIsOpen(true);
+                        }}
                     >Open position
-                    </button>
-                    <button
-                        className="btn btn-primary btn-extra-sm mr-1"
+                    </Button>
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => {
-                        setPortfolioBeingEdited(data);
-                        setEditModalIsOpen(true);
-                    }}
-                        role="button"
+                            setPortfolioBeingEdited(data);
+                            setEditModalIsOpen(true);
+                        }}
                     >Edit
-                    </button>
-                    <button className="btn btn-danger btn-extra-sm"
+                    </Button>
+                    <Button
+                        variant="danger"
+                        className="btn-xs"
                         onClick={() => {
-                        setRemovedPortfolioId(data.id);
-                        deletePortfolio(data.id);
-                    }}
-                        role="button"
+                            setRemovedPortfolioId(data.id);
+                            deletePortfolio(data.id);
+                        }}
                     >Remove
-                    </button>
+                    </Button>
                 </>
         }
     ], []);
@@ -198,38 +201,42 @@ function PortfoliosTable(): JSX.Element {
             header: 'Actions',
             render: (data) => 
                 <>
-                    <button
-                        className="btn btn-primary btn-extra-sm mr-1"
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => {
-                        setOpenPositionPortfolio(data);
-                        setOpenPositionModalIsOpen(true);
-                    }}
-                        role="button"
+                            setOpenPositionPortfolio(data);
+                            setOpenPositionModalIsOpen(true);
+                        }}
                     >Open position
-                    </button>
-                    <button
-                        className="btn btn-primary btn-extra-sm mr-1"
+                    </Button>
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => {
-                        setPortfolioBeingEdited(data);
-                        setEditModalIsOpen(true);
-                    }}
+                            setPortfolioBeingEdited(data);
+                            setEditModalIsOpen(true);
+                        }}
                         role="button"
                     >Edit
-                    </button>
+                    </Button>
                     <NavLink
                         className="btn btn-primary btn-extra-sm mr-1"
-                        to={{pathname: '/charts/view', state: {chart: generateDefaultPortfolioChart(data)}}}
+                        state={{chart: generateDefaultPortfolioChart(data)}}
+                        to="/charts/view"
                         role="button"
                     >Chart
                     </NavLink>
-                    <button className="btn btn-danger btn-extra-sm"
+                    <Button
+                        variant="danger"
+                        className="btn-xs"
                         onClick={() => {
-                        setRemovedPortfolioId(data.id);
-                        deletePortfolio(data.id);
-                    }}
+                            setRemovedPortfolioId(data.id);
+                            deletePortfolio(data.id);
+                        }}
                         role="button"
                     >Remove
-                    </button>
+                    </Button>
                 </>
         }
     ], []);

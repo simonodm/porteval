@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import useUserSettings from '../../hooks/useUserSettings';
 import DataTable, { ColumnDefinition } from './DataTable';
 
+import Button from 'react-bootstrap/Button';
+
 import { useGetAllImportsQuery } from '../../redux/api/importApi';
 import { checkIsError, checkIsLoaded } from '../../utils/queries';
 import { formatDateTimeString } from '../../utils/string';
@@ -50,10 +52,10 @@ function ImportsTable(): JSX.Element {
             render: i => (
                 i.errorLogAvailable
                     ? (
-                        <button className="btn btn-primary btn-sm"
+                        <Button variant="primary" size="sm"
                             onClick={() => handleLogDownload(i)}
                         >Download
-                        </button>
+                        </Button>
                     )
                     : 'No error log available.'
             )

@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import useUserSettings from '../../hooks/useUserSettings';
 import DataTable, { ColumnDefinition } from './DataTable';
 
+import Button from 'react-bootstrap/Button';
+
 import { INSTRUMENT_SPLIT_STATUS_TO_STRING } from '../../constants';
 import { useGetInstrumentSplitsQuery, useUpdateInstrumentSplitMutation } from '../../redux/api/instrumentApi';
 import { InstrumentSplit } from '../../types';
@@ -65,14 +67,14 @@ function InstrumentSplitsTable({ instrumentId }: Props): JSX.Element {
             render: s => (
                 s.status === 'processed'
                     ?
-                        <button
-                            className="btn btn-danger btn-extra-sm mr-1"
+                        <Button
+                            variant="danger"
+                            className="btn-xs"
                             onClick={() => {
                                 handleSplitRollback(s)
                             }}
-                            role="button"
                         >Rollback
-                        </button>
+                        </Button>
                     : null
             )
         },

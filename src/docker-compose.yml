@@ -33,7 +33,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - FILE_STORAGE=/app/files
-      - "CUSTOMCONNSTR_PortEvalDb=Server=porteval-db;Database=PortEvalDbContext;User=sa;Password=Hw82@malzsA!"
+      - "CUSTOMCONNSTR_PortEvalDb=Server=porteval-db;Database=PortEvalDbContext;User=sa;Password=Hw82@malzsA!;TrustServerCertificate=True"
       
   porteval-web:
     image: ${DOCKER_REGISTRY-}porteval-web:dev

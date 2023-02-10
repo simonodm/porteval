@@ -73,7 +73,7 @@ table.entity-data td:nth-child(2) {
     float: right;
 }
 
-.btn-extra-sm {
+.btn-xs {
     padding: .2rem .4rem;
     font-size: .7rem;
     line-height: 1.5;

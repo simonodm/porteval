@@ -1,6 +1,8 @@
 import React from 'react';
 import LinePreview from '../charts/LinePreview';
 
+import Button from 'react-bootstrap/Button';
+
 import { LINE_PREVIEW_LENGTH } from '../../constants';
 import { ChartLine, Instrument } from '../../types';
 
@@ -50,28 +52,29 @@ function InstrumentPickerItem(
                 {
                     line === undefined
                         ? 
-                            <button
-                                className="btn btn-primary btn-extra-sm"
-                                onClick={onLineAdd} role="button"
+                            <Button
+                                variant="primary"
+                                className="btn-xs"
+                                onClick={onLineAdd}
                             >
                                 Add
-                            </button>
+                            </Button>
                         : 
                             <>
-                                <button
-                                    className="btn btn-danger btn-extra-sm"
+                                <Button
+                                    variant="danger"
+                                    className="btn-xs"
                                     onClick={onLineRemove}
-                                    role="button"
                                 >
                                     Remove
-                                </button>
-                                <button
-                                    className="btn btn-primary btn-extra-sm"
+                                </Button>
+                                <Button
+                                    variant="primary"
+                                    className="btn-xs"
                                     onClick={onLineConfigure}
-                                    role="button"
                                 >
                                     Modify
-                                </button>
+                                </Button>
                             </>
                 }
             </span>

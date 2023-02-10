@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router';
+import { useLocation, Location } from 'react-router';
 
 /**
  * A hook to retrieve route state.
@@ -9,7 +9,7 @@ import { useLocation } from 'react-router';
  * @returns State at the specified key if it exists, `undefined` otherwise.
  */
 function useGetRouteState<T>(propName: string): T | undefined {
-    const location = useLocation<{ [propName: string]: T }>();
+    const location = useLocation() as Location & { [propName: string]: T };
     if(location.state && Object.prototype.hasOwnProperty.call(location.state, propName)) {
         return location.state[propName];
     }

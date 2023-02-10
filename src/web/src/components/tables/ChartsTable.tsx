@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import DataTable, { ColumnDefinition } from './DataTable';
 
+import Button from 'react-bootstrap/Button';
+
 import { Chart } from '../../types';
 import { Link } from 'react-router-dom';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
@@ -31,9 +33,9 @@ function ChartsTable(): JSX.Element {
             id: 'actions',
             header: 'Actions',
             render: c => (
-                <button className="btn btn-danger btn-extra-sm" onClick={() => deleteChart(c.id)} role="button">
+                <Button variant="danger" className="btn-xs" onClick={() => deleteChart(c.id)}>
                     Remove
-                </button>
+                </Button>
             )
         }
     ], []);

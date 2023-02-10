@@ -25,7 +25,8 @@ export default function ChartPreview({ chart }: Props): JSX.Element {
             <div className="action-buttons clearfix">
                 <NavLink
                     className="btn btn-primary float-right btn-sm"
-                    to={{ pathname: '/charts/view', state: { chart }}}
+                    state={{chart}}
+                    to="/charts/view"
                 >Go to chart
                 </NavLink>
             </div>            

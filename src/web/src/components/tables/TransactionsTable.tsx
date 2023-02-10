@@ -4,6 +4,8 @@ import useUserSettings from '../../hooks/useUserSettings';
 import ModalWrapper from '../modals/ModalWrapper';
 import EditTransactionForm from '../forms/EditTransactionForm';
 
+import Button from 'react-bootstrap/Button';
+
 import { formatDateTimeString, getPriceString } from '../../utils/string';
 import { useDeleteTransactionMutation, useGetPositionTransactionsQuery } from '../../redux/api/transactionApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
@@ -66,23 +68,24 @@ function TransactionsTable({ className, positionId, currencyCode }: Props): JSX.
             header: 'Actions',
             render: t =>
                 <>
-                    <button
-                        className="btn btn-primary btn-extra-sm mr-1"
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => {
                             setTransactionBeingEdited(t);
                             setModalIsOpen(true);
                         }}
-                        role="button"
                     >
                         Edit
-                    </button>
-                    <button 
-                        className="btn btn-danger btn-extra-sm"
+                    </Button>
+                    <Button
+                        variant="danger"
+                        className="btn-xs"
                         onClick={() => deleteTransaction(t)}
                         role="button"
                     >
                         Remove
-                    </button>
+                    </Button>
                 </>
         }
     ], []);
@@ -115,23 +118,24 @@ function TransactionsTable({ className, positionId, currencyCode }: Props): JSX.
             header: 'Actions',
             render: t =>
                 <>
-                    <button
-                        className="btn btn-primary btn-extra-sm mr-1"
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => {
                             setTransactionBeingEdited(t);
                             setModalIsOpen(true);
                         }}
-                        role="button"
                     >
                         Edit
-                    </button>
-                    <button 
-                        className="btn btn-danger btn-extra-sm"
+                    </Button>
+                    <Button
+                        variant="danger"
+                        className="btn-xs"
                         onClick={() => deleteTransaction(t)}
                         role="button"
                     >
                         Remove
-                    </button>
+                    </Button>
                 </>
         }
     ], []);

@@ -48,7 +48,7 @@ function ChartView(): JSX.Element {
     const [lastUsedColorCodeIndex, setLastUsedColorCodeIndex] = useState(-1);
 
     const chartFromState = useRef(chartId === undefined && chart !== undefined);
-    const chartQuery = useGetChartQuery(!chartFromState.current ? parseInt(chartId) : skipToken);
+    const chartQuery = useGetChartQuery(!chartFromState.current ? parseInt(chartId as string) : skipToken);
     const [createChart] = useCreateChartMutation();
     const [updateChart] = useUpdateChartMutation();
 

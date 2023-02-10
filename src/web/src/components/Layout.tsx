@@ -13,7 +13,7 @@ import SettingsView from './views/SettingsView';
 import OffcanvasSidebar from './OffcanvasSidebar';
 import Container from 'react-bootstrap/Container';
 
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 /**
  * Renders the application layout with `react-router` routes.
@@ -33,44 +33,20 @@ function Layout(): JSX.Element {
             <Container fluid className="p-0" id="main">
                 <OffcanvasSidebar show={sidebarExpanded} onClose={toggleSidebar} />
                 <Container fluid id="content">
-                    <Switch>
-                        <Route path="/instruments/:instrumentId">
-                            <InstrumentView />
-                        </Route>
-                        <Route path="/instruments">
-                            <InstrumentListView />
-                        </Route>
-                        <Route path="/portfolios/:portfolioId">
-                            <PortfolioView />
-                        </Route>
-                        <Route path="/portfolios">
-                            <PortfolioListView />
-                        </Route>
-                        <Route path="/charts/view/:chartId">
-                            <ChartView />
-                        </Route>
-                        <Route path="/charts/view">
-                            <ChartView />
-                        </Route>
-                        <Route path="/charts">
-                            <ChartListView />
-                        </Route>
-                        <Route path="/currencies">
-                            <CurrenciesView />
-                        </Route>
-                        <Route path="/import">
-                            <ImportExportView />
-                        </Route>
-                        <Route path="/settings">
-                            <SettingsView />
-                        </Route>
-                        <Route path="/dashboard">
-                            <Dashboard />
-                        </Route>
-                        <Route path="/">
-                            <Redirect to="/dashboard" />
-                        </Route>
-                    </Switch>
+                    <Routes>
+                        <Route path="/instruments" element={<InstrumentListView />} />
+                        <Route path="/instruments/:instrumentId" element={<InstrumentView />} />
+                        <Route path="/portfolios" element={<PortfolioListView />} />
+                        <Route path="/portfolios/:portfolioId" element={<PortfolioView />} />
+                        <Route path="/charts" element={<ChartListView />} />
+                        <Route path="/charts/view" element={<ChartView />} />
+                        <Route path="/charts/view/:chartId" element={<ChartView />} />
+                        <Route path="/currencies" element={<CurrenciesView />} />
+                        <Route path="/import" element={<ImportExportView />} />
+                        <Route path="/settings" element={<SettingsView />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/" element={<Navigate to="/dashboard" replace/>} />
+                    </Routes>
                 </Container>
             </Container>
         </>

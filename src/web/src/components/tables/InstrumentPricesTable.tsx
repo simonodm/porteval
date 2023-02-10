@@ -4,6 +4,8 @@ import PageSelector from '../ui/PageSelector';
 import useUserSettings from '../../hooks/useUserSettings';
 import DataTable, { ColumnDefinition } from './DataTable';
 
+import Button from 'react-bootstrap/Button';
+
 import { useDeleteInstrumentPriceMutation, useGetInstrumentPricePageQuery } from '../../redux/api/instrumentApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { formatDateTimeString, getPriceString } from '../../utils/string';
@@ -76,16 +78,16 @@ function InstrumentPricesTable({ instrumentId, currencyCode }: Props): JSX.Eleme
             id: 'actions',
             header: 'Actions',
             render: p => (
-                <button
-                    className="btn btn-danger btn-extra-sm"
+                <Button
+                    variant="danger"
+                    className="btn-xs"
                     onClick={() => deletePrice({
                         instrumentId: instrumentId,
                         priceId: p.id 
                     })}
-                    type="button"
                 >
                     Remove
-                </button>
+                </Button>
             )
         }
     ], [])

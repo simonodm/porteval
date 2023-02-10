@@ -5,6 +5,8 @@ import EditInstrumentForm from '../forms/EditInstrumentForm';
 import ModalWrapper from '../modals/ModalWrapper';
 import InstrumentCurrentPriceText from '../ui/InstrumentCurrentPriceText';
 
+import Button from 'react-bootstrap/Button';
+
 import { Link, NavLink } from 'react-router-dom';
 import { generateDefaultInstrumentChart } from '../../utils/chart';
 import { Instrument } from '../../types';
@@ -56,28 +58,27 @@ function InstrumentsTable(): JSX.Element {
             render: i => (
                 <>
                     <NavLink
-                        className="btn btn-primary btn-extra-sm mr-1"
-                        to={{
-                            pathname: '/charts/view', state: { chart: generateDefaultInstrumentChart(i) 
-                        }}}
+                        className="btn btn-primary btn-xs"
+                        state={{ chart: generateDefaultInstrumentChart(i) }}
+                        to="/charts/view"
                         role='button'
                     >Chart
                     </NavLink>
-                    <button
-                        className="btn btn-primary btn-extra-sm mr-1"
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => {
                             setInstrumentBeingEdited(i);
                             setIsModalOpen(true);
                         }}
-                        role="button"
                     >Edit
-                    </button>
-                    <button
-                        className="btn btn-danger btn-extra-sm"
+                    </Button>
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => deleteInstrument(i.id)}
-                        role="button"
                     >Remove
-                    </button>
+                    </Button>
                 </>
             )
         },
@@ -128,28 +129,27 @@ function InstrumentsTable(): JSX.Element {
             render: i => (
                 <>
                     <NavLink
-                        className="btn btn-primary btn-extra-sm mr-1"
-                        to={{
-                            pathname: '/charts/view', state: { chart: generateDefaultInstrumentChart(i) 
-                        }}}
+                        className="btn btn-primary btn-xs"
+                        state={{ chart: generateDefaultInstrumentChart(i) }}
+                        to="/charts/view"
                         role='button'
                     >Chart
                     </NavLink>
-                    <button
-                        className="btn btn-primary btn-extra-sm mr-1"
+                    <Button
+                        variant="primary"
+                        className="btn-xs"
                         onClick={() => {
                             setInstrumentBeingEdited(i);
                             setIsModalOpen(true);
                         }}
-                        role="button"
                     >Edit
-                    </button>
-                    <button
-                        className="btn btn-danger btn-extra-sm"
+                    </Button>
+                    <Button
+                        variant="danger"
+                        className="btn-xs"
                         onClick={() => deleteInstrument(i.id)}
-                        role="button"
                     >Remove
-                    </button>
+                    </Button>
                 </>
             )
         },
