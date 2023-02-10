@@ -1,24 +1,9 @@
 import React from 'react';
 import PortfoliosTable from '../../components/tables/PortfoliosTable';
 import userEvent from '@testing-library/user-event';
-import { createMemoryHistory } from 'history';
 import { renderWithProviders } from '../utils';
-import { Router, Route } from 'react-router';
 import { fireEvent, screen, waitForElementToBeRemoved, within } from '@testing-library/react';
 import { testPortfolios, testPortfoliosStats } from '../mocks/testData';
-
-const renderTestPortfoliosTable = (preconfiguredHistory = null) => {
-    const history = preconfiguredHistory ?? createMemoryHistory();
-    history.push('/portfolios');
-
-    renderWithProviders(
-        <Router history={history}>
-            <Route>
-                <PortfoliosTable />
-            </Route>            
-        </Router>
-    );
-}
 
 const openEditPortfolioForm = async () => {
     const editPortfolioButton = await screen.findAllByRole('button', { name: /edit/i });
@@ -29,7 +14,7 @@ const openEditPortfolioForm = async () => {
 
 describe('Portfolios table', () => {
     test('renders correct headers', async () => {
-        renderTestPortfoliosTable();
+        renderWithProviders(<PortfoliosTable />);
 
         const headers = ['name', 'currency', 'profit', 'performance', 'note', 'actions'];
         for await (const header of headers) {
@@ -39,7 +24,7 @@ describe('Portfolios table', () => {
     });
 
     test('renders portfolios', async () => {
-        renderTestPortfoliosTable();
+        renderWithProviders(<PortfoliosTable />);
 
         const rows = await screen.findAllByTestId('datarow');
         testPortfolios.forEach((portfolio, index) => {
@@ -55,8 +40,8 @@ describe('Portfolios table', () => {
     });
 
     test('renders portfolios metrics', async () => {
-        renderTestPortfoliosTable();
-
+        renderWithProviders(<PortfoliosTable />);
+        
         const rows = await screen.findAllByTestId('datarow');
         testPortfolios.forEach((portfolio, index) => {
             const row = rows[index];
@@ -76,13 +61,13 @@ describe('Portfolios table', () => {
     });
 
     test('edit portfolio button opens portfolio edit form on click', async () => {
-        renderTestPortfoliosTable();
-
+        renderWithProviders(<PortfoliosTable />);
+        
         await openEditPortfolioForm();
     });
 
     test('edit portfolio form contains editable name field', async () => {
-        renderTestPortfoliosTable();
+        renderWithProviders(<PortfoliosTable />);
         
         const form = await openEditPortfolioForm();
         const nameInput = within(form).getByRole('textbox', { name: /name/i });
@@ -90,7 +75,7 @@ describe('Portfolios table', () => {
     });
 
     test('edit portfolio form contains editable currency field', async () => {
-        renderTestPortfoliosTable();
+        renderWithProviders(<PortfoliosTable />);
         
         const form = await openEditPortfolioForm();
         const currencyInput = within(form).getByRole('combobox', { name: /currency/i });
@@ -98,7 +83,7 @@ describe('Portfolios table', () => {
     });
 
     test('edit portfolio form contains editable note field', async () => {
-        renderTestPortfoliosTable();
+        renderWithProviders(<PortfoliosTable />);
         
         const form = await openEditPortfolioForm();
         const noteInput = within(form).getByRole('textbox', { name: /note/i });
@@ -106,7 +91,7 @@ describe('Portfolios table', () => {
     });
 
     test('edited portfolio changes in view after edit portfolio form submit', async () => {
-        renderTestPortfoliosTable();
+        renderWithProviders(<PortfoliosTable />);
 
         const newName = 'Form test portfolio';
         const newCurrency = 'CZK';
@@ -134,17 +119,16 @@ describe('Portfolios table', () => {
     });
 
     test('chart button navigates to chart view', async () => {
-        const history = createMemoryHistory();
-        renderTestPortfoliosTable(history);
+        const { router } = renderWithProviders(<PortfoliosTable />);
 
         const chartButtons = await screen.findAllByRole('button', { name: /chart/i });
         fireEvent.click(chartButtons[0]);
 
-        expect(history.location.pathname).toBe('/charts/view');
+        expect(router.state.location.pathname).toBe('/charts/view');
     });
 
     test('remove button removes portfolio', async () => {
-        renderTestPortfoliosTable();
+        renderWithProviders(<PortfoliosTable />);
 
         const rows = await screen.findAllByTestId('datarow');
         const removeButton = within(rows[0]).getByRole('button', { name: /remove/i });
@@ -154,7 +138,7 @@ describe('Portfolios table', () => {
     });
 
     test('renders expanders', async () => {
-        renderTestPortfoliosTable();
+        renderWithProviders(<PortfoliosTable />);
 
         const rows = await screen.findAllByTestId('datarow');
         rows.forEach(row => {
@@ -163,7 +147,7 @@ describe('Portfolios table', () => {
     });
 
     test('expander renders positions table on click', async () => {
-        renderTestPortfoliosTable();
+        renderWithProviders(<PortfoliosTable />);
 
         const rows = await screen.findAllByTestId('datarow');
         rows.forEach(row => {

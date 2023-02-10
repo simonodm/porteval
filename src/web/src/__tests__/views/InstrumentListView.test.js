@@ -2,26 +2,12 @@
 /* eslint-disable react/display-name */
 
 import React from 'react';
-import { fireEvent, screen, waitForElementToBeRemoved, within } from '@testing-library/react';
-import { Route, Router } from 'react-router-dom';
-import { renderWithProviders } from '../utils';
-import { createMemoryHistory } from 'history';
 import InstrumentListView from '../../components/views/InstrumentListView';
-import { testInstruments } from '../mocks/testData';
 import userEvent from '@testing-library/user-event';
 
-const renderTestInstrumentListView = (preconfiguredHistory) => {
-    const history = preconfiguredHistory ?? createMemoryHistory();
-    history.push('/instruments')
-
-    renderWithProviders(
-        <Router history={history}>
-            <Route path="/instruments">
-                <InstrumentListView />
-            </Route>
-        </Router>
-    );
-}
+import { fireEvent, screen, waitForElementToBeRemoved, within } from '@testing-library/react';
+import { renderWithProviders } from '../utils';
+import { testInstruments } from '../mocks/testData';
 
 const openCreateInstrumentForm = async () => {
     const createNewInstrumentButton = await screen.findByRole('button', { name: /create new instrument/i });
@@ -59,25 +45,25 @@ jest.mock('react-select/creatable', () => ({'aria-label': ariaLabel, id, isDisab
 
 describe('Instrument list view', () => {
     test('renders instruments table', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         await screen.findByRole('table', { name: /instruments table/i });
     });
 
     test('renders create new instrument button', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         await screen.findByRole('button', { name: /create new instrument/i });
     });
 
     test('create new instrument button opens instrument creation form on click', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         await openCreateInstrumentForm();
     });
 
     test('renders correct headers', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const headers = ['name', 'symbol', 'currency', 'exchange', 'type', 'current price', 'actions'];
         for await (const header of headers) {
@@ -87,7 +73,7 @@ describe('Instrument list view', () => {
     });
 
     test('renders instruments', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const rows = await screen.findAllByTestId('datarow');
         testInstruments.forEach((instrument, index) => {
@@ -116,13 +102,13 @@ describe('Instrument list view', () => {
     });
 
     test('renders pagination controls', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         await screen.findByLabelText('Pagination controls');
     });
 
     test('remove button removes instrument', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const rows = await screen.findAllByTestId('datarow');
         const removeButton = within(rows[0]).getByRole('button', { name: /remove/i });
@@ -132,13 +118,13 @@ describe('Instrument list view', () => {
     });
 
     test('edit button opens instrument edit form', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         await openEditInstrumentForm();
     });
 
     test('instrument edit form contains editable name field', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const form = await openEditInstrumentForm();
         const nameInput = within(form).getByRole('textbox', { name: /name/i });
@@ -146,7 +132,7 @@ describe('Instrument list view', () => {
     });
 
     test('instrument edit form contains non-editable symbol field', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const form = await openEditInstrumentForm();
         const symbolInput = within(form).getByRole('textbox', { name: /symbol/i });
@@ -154,7 +140,7 @@ describe('Instrument list view', () => {
     });
 
     test('instrument edit form contains editable exchange field', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const form = await openEditInstrumentForm();
         const exchangeInput = within(form).getByRole('textbox', { name: /exchange/i });
@@ -162,7 +148,7 @@ describe('Instrument list view', () => {
     });
 
     test('instrument edit form contains non-editable type field', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const form = await openEditInstrumentForm();
         const typeInput = within(form).getByRole('combobox', { name: /instrument type/i });
@@ -170,7 +156,7 @@ describe('Instrument list view', () => {
     });
 
     test('instrument edit form contains editable note field', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const form = await openEditInstrumentForm();
         const noteInput = within(form).getByRole('textbox', { name: /note/i });
@@ -178,7 +164,7 @@ describe('Instrument list view', () => {
     });
 
     test('edit instrument form modifies original instrument on submit', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const form = await openEditInstrumentForm();
 
@@ -207,59 +193,58 @@ describe('Instrument list view', () => {
     });
 
     test('chart button navigates to chart view', async () => {
-        const history = createMemoryHistory();
-        renderTestInstrumentListView(history);
+        const { router } = renderWithProviders(<InstrumentListView />);
 
         const chartButtons = await screen.findAllByRole('button', { name: /chart/i });
         fireEvent.click(chartButtons[0]);
 
-        expect(history.location.pathname).toBe('/charts/view');
+        expect(router.state.location.pathname).toBe('/charts/view');
     });
 
     test('create instrument form renders name input', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const form = await openCreateInstrumentForm();
         await within(form).findByRole('textbox', { name: /name/i });
     });
 
     test('create instrument form renders symbol input', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const form = await openCreateInstrumentForm();
         await within(form).findByRole('textbox', { name: /symbol/i });
     });
 
     test('create instrument form renders exchange input', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const form = await openCreateInstrumentForm();
         await within(form).findByRole('textbox', { name: /exchange/i });
     });
 
     test('create instrument form renders instrument type input', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const form = await openCreateInstrumentForm();
         await within(form).findByRole('combobox', { name: /instrument type/i });
     });
 
     test('create instrument form renders currency input', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const form = await openCreateInstrumentForm();
         await within(form).findByRole('combobox', { name: /currency/i });
     });
 
     test('create instrument form renders note input', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const form = await openCreateInstrumentForm();
         await within(form).findByRole('textbox', { name: /note/i });
     });
 
     test('created instrument appears in list after create instrument form submit', async () => {
-        renderTestInstrumentListView();
+        renderWithProviders(<InstrumentListView />);
 
         const name = 'Test form instrument';
         const symbol = 'FORM';

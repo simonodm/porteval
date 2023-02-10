@@ -1,23 +1,9 @@
 import React from 'react';
 import PortfolioListView from '../../components/views/PortfolioListView';
 import userEvent from '@testing-library/user-event';
+
 import { fireEvent, screen, within } from '@testing-library/react';
-import { Route, Router } from 'react-router-dom';
 import { renderWithProviders } from '../utils';
-import { createMemoryHistory } from 'history';
-
-const renderTestPortfolioListView = () => {
-    const history = createMemoryHistory();
-    history.push('/portfolios')
-
-    renderWithProviders(
-        <Router history={history}>
-            <Route path="/portfolios">
-                <PortfolioListView />
-            </Route>
-        </Router>
-    );
-}
 
 const openCreatePortfolioForm = async () => {
     const createPortfolioButton = await screen.findByRole('button', { name: /create new portfolio/i });
@@ -28,46 +14,46 @@ const openCreatePortfolioForm = async () => {
 
 describe('Portfolio list view', () => {
     test('renders portfolios table', async () => {
-        renderTestPortfolioListView();
+        renderWithProviders(<PortfolioListView />);
 
         await screen.findByRole('table', { name: /portfolios table/i });
     });
 
     test('renders create new portfolio button', async () => {
-        renderTestPortfolioListView();
+        renderWithProviders(<PortfolioListView />);
 
         await screen.findByRole('button', { name: /create new portfolio/i });
     });
 
     test('create new portfolio button opens portfolio creation form on click', async () => {
-        renderTestPortfolioListView();
+        renderWithProviders(<PortfolioListView />);
 
         await openCreatePortfolioForm();
     });
 
     test('create new portfolio form contains name field', async () => {
-        renderTestPortfolioListView();
+        renderWithProviders(<PortfolioListView />);
         
         const form = await openCreatePortfolioForm();
         within(form).getByRole('textbox', { name: /name/i });
     });
 
     test('create new portfolio form contains currency field', async () => {
-        renderTestPortfolioListView();
+        renderWithProviders(<PortfolioListView />);
         
         const form = await openCreatePortfolioForm();
         within(form).getByRole('combobox', { name: /currency/i });
     });
 
     test('create new portfolio form contains note field', async () => {
-        renderTestPortfolioListView();
+        renderWithProviders(<PortfolioListView />);
         
         const form = await openCreatePortfolioForm();
         within(form).getByRole('textbox', { name: /note/i });
     });
 
     test('created portfolio appears in view after create new portfolio form submit', async () => {
-        renderTestPortfolioListView();
+        renderWithProviders(<PortfolioListView />);
 
         const name = 'Form test portfolio';
         const currency = 'EUR';

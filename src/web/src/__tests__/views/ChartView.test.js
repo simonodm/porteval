@@ -1,26 +1,22 @@
 import React from 'react';
-import { createMemoryHistory } from 'history';
 import { testCharts, testInstruments, testPortfolios, testPositions } from '../mocks/testData';
-import { Router, Route } from 'react-router-dom';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import ChartView from '../../components/views/ChartView';
-import { renderWithProviders } from '../utils';
+import { createTestMemoryRouter, renderWithProviders } from '../utils';
 import userEvent from '@testing-library/user-event';
 
 const testChart = testCharts[0];
 const testPortfolio = testPortfolios[0];
 
 const renderTestChartView = () => {
-    const history = createMemoryHistory();
-    history.push(`/charts/view/${testChart.id}`);
+    const router = createTestMemoryRouter('/charts/view/:chartId', `/charts/view/${testChart.id}`, <ChartView />);
 
     renderWithProviders(
-        <Router history={history}>
-            <Route path='/charts/view/:chartId'>
-                <ChartView />
-            </Route>
-        </Router>
-    )
+        <ChartView />,
+        {
+            router
+        }
+    );
 }
 
 const openChartInfoForm = async () => {

@@ -1,29 +1,14 @@
 import React from 'react';
 import PositionsTable from '../../components/tables/PositionsTable';
 import userEvent from '@testing-library/user-event';
-import { Router, Route } from 'react-router';
 import { testPortfolios, testPositions, testPositionStats } from '../mocks/testData';
 import { fireEvent, screen, waitForElementToBeRemoved, within } from '@testing-library/react';
-import { createMemoryHistory } from 'history';
 import { renderWithProviders, reformatDateTime } from '../utils';
 
 const testPortfolio = testPortfolios[0];
 const testPortfolioPositions = testPositions.filter(p => p.portfolioId === testPortfolio.id);
 const testPortfolioPositionStats =
     testPositionStats.filter(s => testPortfolioPositions.find(p => p.id === s.id) !== undefined);
-
-const renderTestPositionsTable = (preconfiguredHistory = null) => {
-    const history = preconfiguredHistory ?? createMemoryHistory();
-    history.push('/portfolios');
-
-    renderWithProviders(
-        <Router history={history}>
-            <Route>
-                <PositionsTable portfolioId={testPortfolio.id} />
-            </Route>            
-        </Router>
-    );
-}
 
 const openAddTransactionForm = async () => {
     const addButton = await screen.findAllByRole('button', { name: /add transaction/i });
@@ -41,7 +26,7 @@ const openEditPositionForm = async () => {
 
 describe('Positions table', () => {
     test('renders correct headers', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const headers =
             ['name', 'exchange', 'currency', 'size', 'profit', 'performance',
@@ -54,7 +39,7 @@ describe('Positions table', () => {
     });
 
     test('renders positions data', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const rows = await screen.findAllByTestId('datarow');
         testPortfolioPositions.forEach((position, index) => {
@@ -77,7 +62,7 @@ describe('Positions table', () => {
     });
 
     test('renders positions metrics', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const rows = await screen.findAllByTestId('datarow');
         testPortfolioPositions.forEach((position, index) => {
@@ -106,7 +91,7 @@ describe('Positions table', () => {
     });
 
     test('renders expanders', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const rows = await screen.findAllByTestId('datarow');
         rows.forEach(row => {
@@ -115,7 +100,7 @@ describe('Positions table', () => {
     });
 
     test('expander renders transactions table on click', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const rows = await screen.findAllByTestId('datarow');
         rows.forEach(row => {
@@ -130,7 +115,7 @@ describe('Positions table', () => {
     });
 
     test('remove button removes position on click', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const rows = await screen.findAllByTestId('datarow');
         const removeButton = within(rows[0]).getByRole('button', { name: /remove/i });
@@ -140,13 +125,13 @@ describe('Positions table', () => {
     });
 
     test('edit button renders position edit form', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         await openEditPositionForm();
     });
 
     test('position edit form renders disabled portfolio dropdown', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const form = await openEditPositionForm();
         const portfolioInput = within(form).getByRole('combobox', { name: /portfolio/i });
@@ -154,7 +139,7 @@ describe('Positions table', () => {
     });
 
     test('position edit form renders disabled instrument dropdown', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const form = await openEditPositionForm();
         const instrumentInput = within(form).getByRole('combobox', { name: /instrument/i });
@@ -162,7 +147,7 @@ describe('Positions table', () => {
     });
 
     test('position edit form renders editable note input', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const form = await openEditPositionForm();
         const noteInput = within(form).getByRole('textbox', { name: /note/i });
@@ -170,7 +155,7 @@ describe('Positions table', () => {
     });
 
     test('edited position changes in the table after position edit form is submitted', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const newNote = 'edited position note';
 
@@ -186,41 +171,41 @@ describe('Positions table', () => {
     });
 
     test('add transaction button opens add transaction form', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         await openAddTransactionForm();
     });
 
     test('add transaction form contains editable amount input', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const form = await openAddTransactionForm();
         within(form).getByRole('textbox', { name: /amount/i });
     });
 
     test('add transaction form contains editable price input', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const form = await openAddTransactionForm();
         within(form).getByRole('textbox', { name: /price/i });
     });
 
     test('add transaction form contains editable date input', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const form = await openAddTransactionForm();
         within(form).getByRole('textbox', { name: /date/i });
     });
 
     test('add transaction form contains editable note input', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const form = await openAddTransactionForm();
         within(form).getByRole('textbox', { name: /note/i });
     });
 
     test('new transaction appears in table after add transaction is submitted', async () => {
-        renderTestPositionsTable();
+        renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const newAmount = '0.33';
         const newPrice = '101.12';
@@ -258,12 +243,11 @@ describe('Positions table', () => {
     });
 
     test('chart button navigates to chart view', async () => {
-        const history = createMemoryHistory();
-        renderTestPositionsTable(history);
+        const { router } = renderWithProviders(<PositionsTable portfolioId={testPortfolio.id} />);
 
         const chartButtons = await screen.findAllByRole('button', { name: /chart/i });
         fireEvent.click(chartButtons[0]);
 
-        expect(history.location.pathname).toBe('/charts/view');
+        expect(router.state.location.pathname).toBe('/charts/view');
     });
 });

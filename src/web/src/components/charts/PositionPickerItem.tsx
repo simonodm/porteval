@@ -50,7 +50,7 @@ function PositionPickerItem(
             }
             <span className="picker-item-actions">
                 {
-                    line === undefined
+                    line
                         ?
                             <>
                                 <Button

@@ -1,25 +1,26 @@
 import React from 'react';
 import PortfolioView from '../../components/views/PortfolioView';
 import userEvent from '@testing-library/user-event';
+
 import { fireEvent, screen, within } from '@testing-library/react';
-import { renderWithProviders } from '../utils';
-import { Route, Router } from 'react-router-dom';
+import { createTestMemoryRouter, renderWithProviders } from '../utils';
 import { testInstruments, testPortfolios, testPortfoliosStats } from '../mocks/testData';
-import { createMemoryHistory } from 'history';
 
 const testPortfolio = testPortfolios[0];
 const testStats = testPortfoliosStats[0];
 
 const renderTestPortfolioView = () => {
-    const history = createMemoryHistory();
-    history.push(`/portfolios/${testPortfolio.id}`)
+    const router = createTestMemoryRouter(
+        '/portfolios/:portfolioId',
+        `/portfolios/${testPortfolio.id}`,
+        <PortfolioView />
+    );
 
     renderWithProviders(
-        <Router history={history}>
-            <Route path="/portfolios/:portfolioId">
-                <PortfolioView />
-            </Route>
-        </Router>
+        <PortfolioView />,
+        {
+            router
+        }
     );
 }
 

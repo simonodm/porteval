@@ -50,16 +50,8 @@ function InstrumentPickerItem(
             }
             <span className="picker-item-actions">
                 {
-                    line === undefined
+                    line
                         ? 
-                            <Button
-                                variant="primary"
-                                className="btn-xs"
-                                onClick={onLineAdd}
-                            >
-                                Add
-                            </Button>
-                        : 
                             <>
                                 <Button
                                     variant="danger"
@@ -76,6 +68,15 @@ function InstrumentPickerItem(
                                     Modify
                                 </Button>
                             </>
+                        : 
+                            <Button
+                                variant="primary"
+                                className="btn-xs"
+                                onClick={onLineAdd}
+                            >
+                                Add
+                            </Button>
+                            
                 }
             </span>
         </div>

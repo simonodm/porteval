@@ -2,23 +2,8 @@ import React from 'react';
 import CurrenciesView from '../../components/views/CurrenciesView';
 import userEvent from '@testing-library/user-event';
 import { screen, within } from '@testing-library/react';
-import { Route, Router } from 'react-router-dom';
 import { renderWithProviders } from '../utils';
-import { createMemoryHistory } from 'history';
 import { testCurrencies, testExchangeRates } from '../mocks/testData';
-
-const renderTestCurrenciesView = () => {
-    const history = createMemoryHistory();
-    history.push('/currencies');
-
-    renderWithProviders(
-        <Router history={history}>
-            <Route>
-                <CurrenciesView />
-            </Route>            
-        </Router>
-    );
-}
 
 const getLatestExchangeRates = (sourceCurrencyCode) => {
     const latestExchangeRates = {};
@@ -40,26 +25,26 @@ describe('Currencies view', () => {
     const defaultCurrency = testCurrencies.find(c => c.isDefault);
 
     test('renders currency selection', async () => {
-        renderTestCurrenciesView();
+        renderWithProviders(<CurrenciesView />);
 
         await screen.findByLabelText(/choose default currency/i);
     });
 
     test('currency selection has default currency selected', async () => {
-        renderTestCurrenciesView();
+        renderWithProviders(<CurrenciesView />);
 
         const currencySelect = await screen.findByLabelText(/choose default currency/i);
         expect(currencySelect.value).toBe(defaultCurrency.code);
     });
 
     test('renders exchange rates table', async () => {
-        renderTestCurrenciesView();
+        renderWithProviders(<CurrenciesView />);
 
         await screen.findByRole('table', { name: /Exchange rates table/i });
     });
 
     test('exchange rates table renders correct headers', async () => {
-        renderTestCurrenciesView();
+        renderWithProviders(<CurrenciesView />);
 
         const exchangeRatesTable = await screen.findByRole('table', { name: /exchange rates table/i });
 
@@ -68,7 +53,7 @@ describe('Currencies view', () => {
     });
 
     test('exchange rates table renders exchange rates from default currency', async () => {
-        renderTestCurrenciesView();
+        renderWithProviders(<CurrenciesView />);
 
         const latestExchangeRates = getLatestExchangeRates(defaultCurrency.code);
         const exchangeRatesTable = await screen.findByRole('table', { name: /exchange rates table/i });
@@ -80,7 +65,7 @@ describe('Currencies view', () => {
     });
 
     test('changing default currency displays exchange rates from the new default currency', async () => {
-        renderTestCurrenciesView();
+        renderWithProviders(<CurrenciesView />);
 
         const newDefaultCurrencyCode = 'EUR';
 

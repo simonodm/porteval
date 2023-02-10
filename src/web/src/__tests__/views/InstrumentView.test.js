@@ -3,14 +3,12 @@
 
 import React from 'react';
 import InstrumentView from '../../components/views/InstrumentView';
-import { renderWithProviders, reformatDateTime } from '../utils';
-import { Route, Router } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
+
+import { createTestMemoryRouter, renderWithProviders, reformatDateTime } from '../utils';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
 import { testInstruments, testInstrumentSplits,testPrices } from '../mocks/testData';
 import { parseISO } from 'date-fns';
-import { createMemoryHistory } from 'history';
-import userEvent from '@testing-library/user-event';
-
 const testInstrument = testInstruments[0];
 const testInstrumentPrices = testPrices.filter(p => p.instrumentId === testInstrument.id);
 const testSplits = testInstrumentSplits.filter(s => s.instrumentId === testInstrument.id);
@@ -20,15 +18,17 @@ const testInstrumentPrice = testPrices
     .find(p => p.instrumentId === testInstrument.id && parseISO(p.time) <= Date.now());
 
 const renderTestInstrumentView = () => {
-    const history = createMemoryHistory();
-    history.push(`/instruments/${testInstrument.id}`)
+    const router = createTestMemoryRouter(
+        '/instruments/:instrumentId',
+        `/instruments/${testInstrument.id}`,
+        <InstrumentView />
+    );
 
     renderWithProviders(
-        <Router history={history}>
-            <Route path="/instruments/:instrumentId">
-                <InstrumentView />
-            </Route>
-        </Router>
+        <InstrumentView />,
+        {
+            router
+        }
     );
 }
 
