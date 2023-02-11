@@ -1,6 +1,7 @@
-const { createProxyMiddleware } = require('http-proxy-middleware');
+/* eslint-disable no-undef */
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
-module.exports = function(app) {
+export default function(app) {
     if(process.env.API_PROXY_URL) {
         app.use(
             '/api',

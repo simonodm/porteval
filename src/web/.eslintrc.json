@@ -36,12 +36,15 @@
         "react/jsx-max-props-per-line": ["warn", {"maximum": 3}],
         "react/jsx-no-useless-fragment": "warn"
     },
-    "ignorePatterns": ["Dockerfile*", "*.md", "*.json"],
+    "ignorePatterns": ["Dockerfile*", "*.md", "*.json", "*.css"],
     "settings": {
         "import/resolver": {
             "node": {
                 "extensions": [".js", ".jsx", ".d.ts", ".ts", ".tsx"]
             }
+        },
+        "react": {
+            "version": "detect"
         }
     }
 }

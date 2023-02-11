@@ -55,7 +55,7 @@ function Sidebar({ onRouteChange }: Props): JSX.Element {
                     routes.map(route =>
                         <li key={route.url}>
                             <NavLink
-                                className={({ isActive }) => isActive ? "active" : ""}
+                                className={({ isActive }) => isActive ? 'active' : ''}
                                 to={route.url}
                                 onClick={() => onRouteChange && onRouteChange(route)}
                             >

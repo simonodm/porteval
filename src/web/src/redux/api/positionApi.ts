@@ -201,7 +201,8 @@ const positionApi = portEvalApi.injectEndpoints({
             query: (portfolioId) => `portfolios/${portfolioId}/positions/stats`,
             providesTags: (result, error, arg) =>
                 result
-                    ? [...result.map(({ id }) => ({ type: 'PositionCalculations' as const, id })), { type: 'Positions', id: arg}]
+                    ? [...result.map(({ id }) =>
+                        ({ type: 'PositionCalculations' as const, id })), { type: 'Positions', id: arg}]
                     : []
         }),
         getPositionStatistics: build.query<PositionStatistics, number>({

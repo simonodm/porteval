@@ -60,7 +60,7 @@ import {
         UseRowSelectOptions<D>,
         UseRowStateOptions<D>,
         UseSortByOptions<D>,
-        Record<string, any> {}
+        Record<string, unknown> {}
   
     export interface Hooks<D extends Record<string, unknown> = Record<string, unknown>>
       extends UseExpandedHooks<D>,
@@ -104,7 +104,8 @@ import {
         UseResizeColumnsColumnProps<D>,
         UseSortByColumnProps<D> {}
   
-    export interface Cell<D extends Record<string, unknown> = Record<string, unknown>, V = any>
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    export interface Cell<D extends Record<string, unknown> = Record<string, unknown>, V = unknown>
       extends UseGroupByCellProps<D>,
         UseRowStateCellProps<D> {}
   

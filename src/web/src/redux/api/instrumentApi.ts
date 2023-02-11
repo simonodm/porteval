@@ -1,7 +1,12 @@
 import { Instrument, InstrumentPrice, PaginatedResponse,
     EntityProfit, EntityPerformance, InstrumentPriceConfig, AggregationFrequency, InstrumentSplit } from '../../types';
 import { portEvalApi } from './portEvalApi';
-import { CreateInstrumentParameters, CreateInstrumentSplitParameters, DateRangeParameters, PaginationParameters } from './apiTypes';
+import {
+    CreateInstrumentParameters,
+    CreateInstrumentSplitParameters,
+    DateRangeParameters,
+    PaginationParameters
+} from './apiTypes';
 import { getAllPaginated, truncateEntityName, truncateEntityNote } from './apiUtils';
 
 /**
