@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PositionPickerItem from './PositionPickerItem';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
+import Button from 'react-bootstrap/Button';
 
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 import { useGetPositionsQuery } from '../../redux/api/positionApi';
@@ -42,12 +43,12 @@ function PositionPicker({ portfolio }: Props): JSX.Element {
         <div className="chart-picker" aria-label="Position picker">
             <h6>Positions</h6>
             <LoadingWrapper isError={isError} isLoaded={isLoaded}>
-                <button
-                    className="btn btn-primary"
+                <Button
+                    variant="primary"
+                    size="sm"
                     onClick={handleAddAllPositions}
-                    role="button"
                 >Add all positions
-                </button>
+                </Button>
                 {positions.data?.map(position => {
                     const line = context.chart?.lines.find(existingLine =>
                         existingLine.type === 'position'

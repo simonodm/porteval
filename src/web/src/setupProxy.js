@@ -1,12 +1,15 @@
 /* eslint-disable no-undef */
-import { createProxyMiddleware } from 'http-proxy-middleware';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
-export default function(app) {
-    if(process.env.API_PROXY_URL) {
+// This function sets up a reverse proxy when running the application using `react-scripts start`.
+// For other (static) deployments, this proxy needs to be set up in web server configuration.
+module.exports = function(app) {
+    if(process.env.PORTEVAL_API_URL) {
         app.use(
             '/api',
             createProxyMiddleware({
-                target: process.env.API_PROXY_URL,
+                target: process.env.PORTEVAL_API_URL,
                 changeOrigin: true,
                 pathRewrite: {
                     '^/api': '/'

@@ -4,6 +4,7 @@ import useUserSettings from '../../hooks/useUserSettings';
 import DateTimeSelector from './fields/DateTimeSelector';
 import NumberInput from './fields/NumberInput';
 import TextInput from './fields/TextInput';
+import useInstrumentPriceAutoFetchingState from '../../hooks/useInstrumentPriceAutoFetchingState';
 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -33,8 +34,8 @@ type Props = {
  */
 function EditTransactionForm({ transaction, onSuccess }: Props): JSX.Element {
     const [amount, setAmount] = useState(transaction.amount);
-    const [price, setPrice] = useState(transaction.price);
     const [time, setTime] = useState(new Date(transaction.time));
+    const [price, setPrice] = useInstrumentPriceAutoFetchingState(transaction.instrument.id, time, transaction.price);
     const [note, setNote] = useState(transaction.note);
     const [updateTransaction, mutationStatus] = useUpdateTransactionMutation();
 
@@ -43,6 +44,10 @@ function EditTransactionForm({ transaction, onSuccess }: Props): JSX.Element {
     const isLoaded = checkIsLoaded(mutationStatus);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        if(price === undefined) {
+            return;
+        }
+        
         updateTransaction({
             ...transaction,
             amount,

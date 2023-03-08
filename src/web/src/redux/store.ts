@@ -10,7 +10,7 @@ import { portEvalApi } from './api/portEvalApi';
  * @param preloadedState Initial state
  * @returns A Redux store representing PortEval's application state.
  */
-const setupStore = (preloadedState: object) => {
+const setupStore = (preloadedState: Record<string, unknown>) => {
     const store = configureStore({
         reducer: {
             [portEvalApi.reducerPath]: portEvalApi.reducer,

@@ -73,7 +73,7 @@ table.entity-data td:nth-child(2) {
     float: right;
 }
 
-.btn-xs {
+.btn.btn-xs {
     padding: .2rem .4rem;
     font-size: .7rem;
     line-height: 1.5;
@@ -142,4 +142,8 @@ table.entity-data td:nth-child(2) {
 
 .btn, button, input[type=button] {
     margin: 1px;
+}
+
+.float-right {
+    float: right;
 }

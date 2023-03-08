@@ -44,21 +44,31 @@ type AutoUpdateReturnType =
  * 
  * @category Hooks
  * @param initialInstrumentId ID of the initial instrument to store price of.
- * @param initialTime Time to fetch price at. 
+ * @param initialTime Time to fetch price at.
+ * @param initialValue Initial price to use.
+ * If this parameter is set, then the first auto-fetch will happen only after any of the other parameters change.
  * @returns {AutoUpdateReturnType} A collection of controls to change instrument, time, price, or toggle auto-update.
  */
 function useInstrumentPriceAutoFetchingState(
-    initialInstrumentId: number | undefined, initialTime: Date
+    initialInstrumentId: number | undefined, initialTime: Date, initialValue: number | undefined = undefined
 ): AutoUpdateReturnType {
     const [instrumentId, setInstrumentId] = useState(initialInstrumentId);
     const [time, setTime] = useState(initialTime);
-    const [price, setPrice] = useState<number | undefined>(undefined);
+    const [price, setPrice] = useState<number | undefined>(initialValue);
     const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(true);
+
+    const [newPropsReceived, setNewPropsReceived] = useState(false);
 
     const instrumentPrice =
         useGetInstrumentPriceAtQuery(
-            instrumentId && autoUpdateEnabled ? { instrumentId, time: time.toISOString() } : skipToken
+            instrumentId && autoUpdateEnabled && (initialValue === undefined || newPropsReceived)
+                ? { instrumentId, time: time.toISOString() }
+                : skipToken
         );
+
+    useEffect(() => {
+        setNewPropsReceived(true);
+    }, [initialInstrumentId, initialTime]);
 
     // update state if new price is received from query
     useEffect(() => {

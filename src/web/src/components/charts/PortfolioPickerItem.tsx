@@ -82,13 +82,13 @@ function PortfolioPickerItem(
                                 Add
                             </Button>
                 }
-                <button
-                    className="btn btn-primary btn-extra-sm"
+                <Button
+                    variant="primary"
+                    className="btn-xs"
                     onClick={onConfigurePositions}
-                    role="button"
                 >
                     Positions
-                </button>
+                </Button>
             </span>
         </div>
     )

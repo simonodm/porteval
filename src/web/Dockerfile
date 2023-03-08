@@ -1,5 +1,5 @@
 # pull official base image
-FROM node:19.6.0-alpine
+FROM node:16.19.1-alpine
 
 # set working directory
 WORKDIR /app
@@ -11,10 +11,14 @@ ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json ./
 COPY package-lock.json ./
 RUN npm install --silent
-RUN npm install react-scripts@5.0.1 -g 
+RUN npm install react-scripts@4.0.3 -g --silent
 
 # add app
 COPY . ./
 
-# start app
+# build & run app
+RUN npm run build
+
+# https://github.com/facebook/create-react-app/issues/11860
+# Due to this issue, `npm start` fails to properly start the dev server, which is why `serve` is used until this is fixed.
 CMD ["npm", "start"]

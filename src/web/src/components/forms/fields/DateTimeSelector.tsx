@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import Form from 'react-bootstrap/Form';
 import { FormFieldProps } from '../../../types';
+import 'react-datepicker/dist/react-datepicker.css';
 
 type Props = FormFieldProps<Date> & {
     /**

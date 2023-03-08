@@ -133,12 +133,13 @@ function Dashboard(): JSX.Element {
                             >
                                 <DashboardChart chart={chart} disabled={isEditable} />
                                 { isEditable && 
-                                    <button
-                                        className="btn btn-danger grid-remove-button"
+                                    <Button
+                                        variant="danger"
+                                        className="btn-xs grid-remove-button"
                                         onClick={() => onRemove(chart.id)}
                                     >
                                         X
-                                    </button>
+                                    </Button>
                                 }
                             </div>
                         )

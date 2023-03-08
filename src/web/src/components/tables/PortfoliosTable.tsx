@@ -221,7 +221,7 @@ function PortfoliosTable(): JSX.Element {
                     >Edit
                     </Button>
                     <NavLink
-                        className="btn btn-primary btn-extra-sm mr-1"
+                        className="btn btn-primary btn-xs mr-1"
                         state={{chart: generateDefaultPortfolioChart(data)}}
                         to="/charts/view"
                         role="button"
