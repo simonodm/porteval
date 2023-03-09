@@ -29,6 +29,11 @@ namespace PortEval.Application.Features.Services
                 throw new ItemNotFoundException($"Currency {options.CurrencyCode} does not exist.");
             }
 
+            if (await _instrumentRepository.ExistsAsync(options.Symbol))
+            {
+                throw new OperationNotAllowedException($"An instrument with symbol {options.Symbol} already exists.");
+            }
+
             await CreateExchangeIfDoesNotExist(options.Exchange);
 
             var instrument = Instrument.Create(options.Name, options.Symbol, string.IsNullOrEmpty(options.Exchange) ? null : options.Exchange,

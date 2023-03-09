@@ -11,8 +11,6 @@ namespace PortEval.Infrastructure.Configurations
             builder
                 .HasKey(e => e.Id);
             builder
-                .HasIndex(e => new { e.CurrencyFromCode, e.Time });
-            builder
                 .HasOne<Currency>()
                 .WithMany()
                 .HasForeignKey(er => er.CurrencyFromCode)
@@ -28,6 +26,11 @@ namespace PortEval.Infrastructure.Configurations
                 .Property(e => e.ExchangeRate)
                 .IsRequired()
                 .HasPrecision(19, 4);
+            builder
+                .HasIndex(e => new { e.CurrencyFromCode, e.Time });
+            builder
+                .HasIndex(e => new { e.CurrencyFromCode, e.CurrencyToCode, e.Time })
+                .IsUnique();
         }
     }
 }

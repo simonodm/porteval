@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Domain;
 
 namespace PortEval.BackgroundJobs
 {
@@ -54,17 +55,20 @@ namespace PortEval.BackgroundJobs
 
             foreach (var instrument in instruments)
             {
-                if (instrument.TrackingStatus != InstrumentTrackingStatus.Tracked) continue;
-
                 var missingRanges = await GetMissingRanges(instrument, currentTime);
+
                 foreach (var range in missingRanges)
                 {
-                    await ProcessMissingRange(instrument, range, currentTime);
+                    var processedPrices = await ProcessMissingRange(instrument, range, currentTime);
+                    AdjustInstrumentTrackingBasedOnProcessedPrices(instrument, processedPrices);
                 }
 
-                instrument.TrackingInfo.Update(currentTime);
-                instrument.IncreaseVersion();
-                _instrumentRepository.Update(instrument);
+                if (instrument.TrackingInfo != null)
+                {
+                    instrument.TrackingInfo.Update(currentTime);
+                    instrument.IncreaseVersion();
+                    _instrumentRepository.Update(instrument);
+                }
             }
 
             await _instrumentRepository.UnitOfWork.CommitAsync();
@@ -76,14 +80,14 @@ namespace PortEval.BackgroundJobs
         {
             var prices = await _priceRepository.ListInstrumentPricesAsync(instrument.Id);
             var priceTimes = prices
-                .Where(p => p.Time >= instrument.TrackingInfo.StartTime)
+                .Where(p => instrument.TrackingInfo == default || p.Time >= instrument.TrackingInfo.StartTime)
                 .OrderBy(p => p.Time)
                 .Select(p => p.Time);
 
             var missingRanges = PriceUtils.GetMissingPriceRanges(
                 priceTimes,
                 time => PriceUtils.GetInstrumentPriceInterval(baseTime, time),
-                instrument.TrackingInfo.StartTime,
+                PortEvalConstants.FinancialDataStartTime,
                 baseTime.RoundDown(PriceUtils.FiveMinutes)
             );
 
@@ -96,15 +100,20 @@ namespace PortEval.BackgroundJobs
         /// <param name="instrument">Instrument to retrieve prices for.</param>
         /// <param name="range">Time range of missing prices.</param>
         /// <param name="baseTime">Time used to determine the appropriate price intervals.</param>
-        /// <returns>A task representing the asynchronous retrieval and save operations.</returns>
-        private async Task ProcessMissingRange(Instrument instrument, TimeRange range, DateTime baseTime)
+        /// <returns>
+        /// A task representing the asynchronous retrieval and save operations.
+        /// Task result contains saved prices.
+        /// </returns>
+        private async Task<List<InstrumentPrice>> ProcessMissingRange(Instrument instrument, TimeRange range, DateTime baseTime)
         {
             var fetchResult = await FetchPricesInRange(instrument, range);
 
             var filledPrices = await FillMissingPrices(fetchResult, instrument, range, baseTime);
             var pricesToInsert = ProcessPricePoints(filledPrices, instrument, range);
 
-            await _priceRepository.BulkInsertAsync(pricesToInsert);
+            await _priceRepository.BulkUpsertAsync(pricesToInsert);
+
+            return pricesToInsert;
         }
 
         private async Task<IEnumerable<PricePoint>> FetchPricesInRange(Instrument instrument, TimeRange range)
@@ -124,18 +133,24 @@ namespace PortEval.BackgroundJobs
         private async Task<IEnumerable<PricePoint>> FillMissingPrices(IEnumerable<PricePoint> prices,
             Instrument instrument, TimeRange range, DateTime baseTime)
         {
+            var pricesWithStartingPricePrepended = prices;
             var priceAtRangeStart = await _priceRepository.FindPriceAtAsync(instrument.Id, range.From);
 
-            var rangeStartPricePoint = new PricePoint
+            if (priceAtRangeStart != null)
             {
-                Price = priceAtRangeStart.Price,
-                CurrencyCode = instrument.CurrencyCode,
-                Symbol = instrument.Symbol,
-                Time = range.From
-            };
+                var rangeStartPricePoint = new PricePoint
+                {
+                    Price = priceAtRangeStart.Price,
+                    CurrencyCode = instrument.CurrencyCode,
+                    Symbol = instrument.Symbol,
+                    Time = range.From
+                };
+                pricesWithStartingPricePrepended = prices.Prepend(rangeStartPricePoint);
+            }
+            
 
             var newPricePoints = PriceUtils.FillMissingRangePrices(
-                prices.Prepend(rangeStartPricePoint),
+                pricesWithStartingPricePrepended,
                 time => PriceUtils.GetInstrumentPriceInterval(baseTime, time),
                 range.From,
                 range.To);
@@ -158,6 +173,25 @@ namespace PortEval.BackgroundJobs
             }
 
             return pricesToAdd;
+        }
+
+        private void AdjustInstrumentTrackingBasedOnProcessedPrices(Instrument instrument,
+            List<InstrumentPrice> processedPrices)
+        {
+            if (processedPrices.Count == 0)
+            {
+                return;
+            }
+
+            if (instrument.TrackingInfo == null || instrument.TrackingInfo.StartTime > processedPrices[0].Time)
+            {
+                instrument.SetTrackingFrom(processedPrices[0].Time);
+            }
+
+            if (instrument.TrackingStatus != InstrumentTrackingStatus.Tracked)
+            {
+                instrument.SetTrackingStatus(InstrumentTrackingStatus.Tracked);
+            }
         }
     }
 }

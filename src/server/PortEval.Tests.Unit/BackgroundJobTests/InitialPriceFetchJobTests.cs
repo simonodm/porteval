@@ -53,7 +53,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run(instrument.Id);
 
-            instrumentPriceRepository.Verify(m => m.BulkInsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
+            instrumentPriceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddDays(-7), _expectedPriceTimePrecision) && p.Price == 100m) &&
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddDays(-6), _expectedPriceTimePrecision) && p.Price == 101m) &&
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddDays(-5), _expectedPriceTimePrecision) && p.Price == 102m)
@@ -89,7 +89,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run(instrument.Id);
 
-            instrumentPriceRepository.Verify(m => m.BulkInsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
+            instrumentPriceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddHours(-48), _expectedPriceTimePrecision) && p.Price == 100m) &&
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddHours(-47), _expectedPriceTimePrecision) && p.Price == 101m) &&
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddHours(-46), _expectedPriceTimePrecision) && p.Price == 102m)
@@ -125,7 +125,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run(instrument.Id);
 
-            instrumentPriceRepository.Verify(m => m.BulkInsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
+            instrumentPriceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddMinutes(-15), _expectedPriceTimePrecision) && p.Price == 100m) &&
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddMinutes(-10), _expectedPriceTimePrecision) && p.Price == 101m) &&
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddMinutes(-5), _expectedPriceTimePrecision) && p.Price == 102m)
@@ -160,7 +160,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run(instrument.Id);
 
-            instrumentPriceRepository.Verify(m => m.BulkInsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
+            instrumentPriceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddDays(-7), TimeSpan.FromDays(1)) && p.Price == 100m) &&
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddDays(-5), TimeSpan.FromDays(1)) && p.Price == 102m)
             )));
@@ -194,7 +194,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run(instrument.Id);
 
-            instrumentPriceRepository.Verify(m => m.BulkInsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
+            instrumentPriceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddHours(-47), TimeSpan.FromHours(1)) && p.Price == 100m) &&
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddHours(-1), TimeSpan.FromHours(1)) && p.Price == 102m)
             )));
@@ -227,7 +227,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run(instrument.Id);
 
-            instrumentPriceRepository.Verify(m => m.BulkInsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
+            instrumentPriceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddMinutes(-25), _expectedPriceTimePrecision) && p.Price == 100m) &&
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddMinutes(-15), _expectedPriceTimePrecision) && p.Price == 100m) &&
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddMinutes(-10), _expectedPriceTimePrecision) && p.Price == 100m)
@@ -270,7 +270,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         }
 
         [Fact]
-        public async Task Run_DoesNotChangeInstrumentTrackingInformation_WhenNoPricesAreDownloaded()
+        public async Task Run_SetsInstrumentTrackingStatusToUntracked_WhenNoPricesAreDownloaded()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -291,7 +291,10 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             await sut.Run(instrument.Id);
 
-            instrumentRepository.Verify(m => m.Update(It.IsAny<Instrument>()), Times.Never());
+            instrumentRepository.Verify(m => m.Update(It.Is<Instrument>(i =>
+                i.Id == instrument.Id &&
+                i.TrackingStatus == InstrumentTrackingStatus.Untracked
+            )));
         }
     }
 }

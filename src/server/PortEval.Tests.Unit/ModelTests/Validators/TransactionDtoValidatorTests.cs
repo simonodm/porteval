@@ -4,6 +4,7 @@ using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.Validators;
 using System;
 using System.Collections.Generic;
+using FluentValidation;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ModelTests.Validators
@@ -159,6 +160,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var sut = fixture.Create<TransactionDtoValidator>();
+            sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(transaction);
 

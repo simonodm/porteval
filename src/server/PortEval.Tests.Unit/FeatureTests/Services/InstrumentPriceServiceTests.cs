@@ -25,6 +25,9 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
             fixture.CreateDefaultInstrumentRepositoryMock();
             var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
+            priceRepository
+                .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Time))
+                .ReturnsAsync(false);
 
             var sut = fixture.Create<InstrumentPriceService>();
 
@@ -57,6 +60,25 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<InstrumentPriceService>();
 
             await Assert.ThrowsAsync<ItemNotFoundException>(async () => await sut.AddPricePointAsync(priceDto));
+        }
+
+        [Fact]
+        public async Task AddingPricePoint_ThrowsException_WhenPriceAlreadyExistsAtTime()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+
+            var priceDto = fixture.Create<InstrumentPriceDto>();
+
+            fixture.CreateDefaultInstrumentRepositoryMock();
+            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
+            priceRepository
+                .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Time))
+                .ReturnsAsync(true);
+
+            var sut = fixture.Create<InstrumentPriceService>();
+
+            await Assert.ThrowsAsync<OperationNotAllowedException>(async () => await sut.AddPricePointAsync(priceDto));
         }
 
         [Fact]

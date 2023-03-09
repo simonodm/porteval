@@ -79,8 +79,7 @@ namespace PortEval.Application.Features.Common.Calculators
             }
             catch (OverflowException)
             {
-                var simplifiedPerformance = Math.Pow((double)initialGuess, totalIntervalCount);
-                return (decimal)simplifiedPerformance - 1;
+                return initialGuess - 1;
             }
         }
 

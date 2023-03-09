@@ -10,16 +10,16 @@ namespace PortEval.Application.Features.Common.Calculators
         /// <inheritdoc />
         public decimal CalculatePositionBreakEvenPoint(IEnumerable<TransactionDto> transactions)
         {
-            decimal totalPositionBuyingPrice = 0m;
+            decimal realizedProfit = 0m;
             decimal positionAmount = 0m;
 
             foreach (var transaction in transactions)
             {
-                totalPositionBuyingPrice += transaction.Amount * transaction.Price;
+                realizedProfit += transaction.Amount * transaction.Price;
                 positionAmount += transaction.Amount;
             }
 
-            var bep = positionAmount != 0 ? totalPositionBuyingPrice / positionAmount : 0;
+            var bep = positionAmount != 0 ? realizedProfit / positionAmount : 0;
 
             return bep;
         }

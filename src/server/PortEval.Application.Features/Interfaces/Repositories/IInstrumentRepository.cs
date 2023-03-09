@@ -55,5 +55,12 @@ namespace PortEval.Application.Features.Interfaces.Repositories
         /// <param name="id">Instrument id.</param>
         /// <returns>true if a instrument with the supplied instrument id exists in the database, false otherwise</returns>
         public Task<bool> ExistsAsync(int id);
+
+        /// <summary>
+        /// Checks whether an instrument with the supplied symbol exists.
+        /// </summary>
+        /// <param name="symbol">Instrument symbol.</param>
+        /// <returns>true if a instrument with the supplied symbol exists in the database, false otherwise</returns>
+        public Task<bool> ExistsAsync(string symbol);
     }
 }

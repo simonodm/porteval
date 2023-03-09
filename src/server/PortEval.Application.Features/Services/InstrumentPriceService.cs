@@ -25,6 +25,11 @@ namespace PortEval.Application.Features.Services
         public async Task<InstrumentPrice> AddPricePointAsync(InstrumentPriceDto options)
         {
             var instrument = await FetchInstrument(options.InstrumentId);
+            if (await _instrumentPriceRepository.ExistsAsync(options.InstrumentId, options.Time))
+            {
+                throw new OperationNotAllowedException(
+                    $"{instrument.Symbol} already contains a price at {options.Time}.");
+            }
 
             var pricePoint = InstrumentPrice.Create(options.Time.RoundDown(TimeSpan.FromMinutes(1)), options.Price,
                 instrument);

@@ -1,4 +1,3 @@
-using FluentValidation.AspNetCore;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,6 +17,8 @@ using PortEval.Application.Models.Validators;
 using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure;
 using System.ComponentModel;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 namespace PortEval.Application
 {
@@ -58,44 +59,32 @@ namespace PortEval.Application
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
                     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                    options.SerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy(), false));
-                })
-                .AddFluentValidation(v => v.RegisterValidatorsFromAssemblyContaining<PortfolioDtoValidator>());
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy(),
+                        false));
+                });
 
+            services.AddFluentValidationAutoValidation();
+            services.AddValidatorsFromAssemblyContaining<PortfolioDtoValidator>();
             services.AddLogging();
-
             services.AddDomainServices();
-
             services.AddDomainEventHandlers();
-
             services.ConfigureDbContext(Configuration);
-
             services.ConfigurePriceFetcher(Configuration);
-
             services.ConfigureDapper();
-
             services.AddRepositories();
-
             services.AddBackgroundJobs();
-
             services.AddServices(Configuration);
-
             services.AddCalculators();
-
             services.AddChartGenerators();
-
             services.AddQueries();
 
             services.ConfigureHangfire(Configuration);
-
             services.AddAutoMapper(typeof(Startup), typeof(PortEvalDbContext), typeof(PortfolioDto));
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PortEvalAPI", Version = "v1" });
                 c.EnableAnnotations();
             });
-
             services.AddSwaggerGenNewtonsoftSupport();
         }
 

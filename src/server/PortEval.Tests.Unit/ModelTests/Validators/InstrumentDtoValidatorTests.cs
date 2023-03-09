@@ -1,8 +1,10 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
+using FluentValidation;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.Validators;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ModelTests.Validators
@@ -54,6 +56,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var sut = fixture.Create<InstrumentDtoValidator>();
+            sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(instrument);
 
@@ -75,6 +78,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var sut = fixture.Create<InstrumentDtoValidator>();
+            sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(instrument);
 
@@ -95,6 +99,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var sut = fixture.Create<InstrumentDtoValidator>();
+            sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(instrument);
 
@@ -113,6 +118,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var sut = fixture.Create<InstrumentDtoValidator>();
+            sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(instrument);
 
@@ -131,6 +137,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var sut = fixture.Create<InstrumentDtoValidator>();
+            sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(instrument);
 
@@ -149,6 +156,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var sut = fixture.Create<InstrumentDtoValidator>();
+            sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(instrument);
 

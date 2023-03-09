@@ -26,7 +26,9 @@ namespace PortEval.Tests.Integration
 
         public DockerDatabaseIntegrationTestFactory()
         {
-            _container = new TestcontainersBuilder<MsSqlTestcontainer>()
+            // Generic ContainerBuilder is being deprecated, however there is no specialized builder available for MSSQL as of Feb 2023
+            // Can possibly be solved using a custom builder/module, but currently it's not necessary
+            _container = new ContainerBuilder<MsSqlTestcontainer>()
                 .WithDatabase(new MsSqlTestcontainerConfiguration
                 {
                     Password = "localdevpassword#123",
@@ -63,6 +65,10 @@ namespace PortEval.Tests.Integration
 
         public async Task InitializeAsync() => await _container.StartAsync();
 
-        public async Task DisposeAsync() => await _container.DisposeAsync();
+        public new async Task DisposeAsync()
+        {
+            await _container.DisposeAsync();
+            await base.DisposeAsync();
+        }
     }
 }

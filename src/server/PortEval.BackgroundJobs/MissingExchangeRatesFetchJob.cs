@@ -104,7 +104,7 @@ namespace PortEval.BackgroundJobs
                 // limited to 1000 days per insert to preserve application memory
                 if (i < 1000) continue;
 
-                await _exchangeRateRepository.BulkInsertAsync(newExchangeRates);
+                await _exchangeRateRepository.BulkUpsertAsync(newExchangeRates);
                 newExchangeRates.Clear();
                 i = 0;
             }
@@ -120,7 +120,7 @@ namespace PortEval.BackgroundJobs
 
             if (newExchangeRates.Count > 0)
             {
-                await _exchangeRateRepository.BulkInsertAsync(newExchangeRates);
+                await _exchangeRateRepository.BulkUpsertAsync(newExchangeRates);
                 newExchangeRates.Clear();
             }
         }

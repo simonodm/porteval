@@ -23,6 +23,9 @@ namespace PortEval.Infrastructure.Configurations
                 .IsRequired()
                 .HasMaxLength(10);
             builder
+                .HasIndex(i => i.Symbol)
+                .IsUnique();
+            builder
                 .HasOne<Exchange>()
                 .WithMany()
                 .HasForeignKey(i => i.Exchange)

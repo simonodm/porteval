@@ -213,6 +213,7 @@ namespace PortEval.Application.Extensions
                 UseRecommendedIsolationLevel = true,
                 DisableGlobalLocks = true
             }));
+            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
             services.AddHangfireServer();
         }
 

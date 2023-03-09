@@ -139,7 +139,7 @@ namespace PortEval.BackgroundJobs
             instrument.IncreaseVersion();
             _instrumentRepository.Update(instrument);
             await _instrumentRepository.UnitOfWork.CommitAsync();
-            await _priceRepository.BulkInsertAsync(pricesToAdd);
+            await _priceRepository.BulkUpsertAsync(pricesToAdd);
         }
 
         private async Task<List<PricePoint>> FetchInstrumentPrices(Instrument instrument, DateTime endTime)

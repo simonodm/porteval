@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PortEval.Infrastructure;
 
@@ -11,9 +12,11 @@ using PortEval.Infrastructure;
 namespace PortEval.Infrastructure.Migrations
 {
     [DbContext(typeof(PortEvalDbContext))]
-    partial class PortEvalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230308204417_UniqueConstraintsAdded")]
+    partial class UniqueConstraintsAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

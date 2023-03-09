@@ -5,6 +5,7 @@ using PortEval.Application.Models.Validators;
 using PortEval.Domain;
 using System;
 using System.Collections.Generic;
+using FluentValidation;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ModelTests.Validators
@@ -55,6 +56,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            validator.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = validator.Validate(exchangeRate);
 
@@ -77,6 +79,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            validator.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = validator.Validate(exchangeRate);
 
@@ -95,6 +98,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            validator.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = validator.Validate(exchangeRate);
 
@@ -113,6 +117,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            validator.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = validator.Validate(exchangeRate);
 
@@ -131,6 +136,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            validator.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = validator.Validate(exchangeRate);
 
@@ -149,6 +155,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .Create();
 
             var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            validator.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = validator.Validate(exchangeRate);
 

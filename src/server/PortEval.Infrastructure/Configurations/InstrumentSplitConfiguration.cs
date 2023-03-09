@@ -31,6 +31,9 @@ namespace PortEval.Infrastructure.Configurations
             builder
                 .Property(s => s.Version)
                 .IsConcurrencyToken();
+            builder
+                .HasIndex(s => new { s.InstrumentId, s.Time })
+                .IsUnique();
         }
     }
 }

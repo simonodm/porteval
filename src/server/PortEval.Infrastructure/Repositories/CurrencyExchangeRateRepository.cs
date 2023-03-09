@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace PortEval.Infrastructure.Repositories
 {
+    /// <inheritdoc cref="ICurrencyExchangeRateRepository"/>
     public class CurrencyExchangeRateRepository : ICurrencyExchangeRateRepository
     {
         public IUnitOfWork UnitOfWork => _context;
@@ -19,6 +20,7 @@ namespace PortEval.Infrastructure.Repositories
             _context = context;
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<CurrencyExchangeRate>> ListExchangeRatesAsync(string currencyFrom)
         {
             return await _context.CurrencyExchangeRates
@@ -28,6 +30,7 @@ namespace PortEval.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        /// <inheritdoc />
         public async Task<CurrencyExchangeRate> GetExchangeRateAtAsync(string currencyFrom, string currencyTo, DateTime time)
         {
             return await _context.CurrencyExchangeRates
@@ -38,14 +41,27 @@ namespace PortEval.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        /// <inheritdoc />
         public CurrencyExchangeRate Add(CurrencyExchangeRate exchangeRate)
         {
             return _context.CurrencyExchangeRates.Add(exchangeRate).Entity;
         }
 
-        public async Task BulkInsertAsync(IList<CurrencyExchangeRate> rates)
+        /// <inheritdoc />
+        public async Task BulkUpsertAsync(IList<CurrencyExchangeRate> rates)
         {
-            await _context.BulkInsertAsync(rates);
+            var bulkConfig = new BulkConfig
+            {
+                UpdateByProperties = new List<string>
+                {
+                    nameof(CurrencyExchangeRate.CurrencyFromCode),
+                    nameof(CurrencyExchangeRate.CurrencyToCode),
+                    nameof(CurrencyExchangeRate.Time)
+                },
+                PropertiesToIncludeOnUpdate = new List<string> { nameof(CurrencyExchangeRate.Id) }
+            };
+
+            await _context.BulkInsertOrUpdateAsync(rates, bulkConfig);
         }
     }
 }

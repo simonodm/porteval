@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace PortEval.Infrastructure.Repositories
 {
+    /// <inheritdoc cref="IInstrumentPriceRepository" />
     public class InstrumentPriceRepository : IInstrumentPriceRepository
     {
         public IUnitOfWork UnitOfWork => _context;
@@ -19,6 +20,7 @@ namespace PortEval.Infrastructure.Repositories
             _context = context;
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<InstrumentPrice>> ListInstrumentPricesAsync(int instrumentId)
         {
             return await _context.InstrumentPrices
@@ -26,6 +28,7 @@ namespace PortEval.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        /// <inheritdoc />
         public async Task<InstrumentPrice> FindPriceByIdAsync(int instrumentId, int priceId)
         {
             return await _context.InstrumentPrices
@@ -33,6 +36,7 @@ namespace PortEval.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        /// <inheritdoc />
         public async Task<InstrumentPrice> FindPriceAtAsync(int instrumentId, DateTime time)
         {
             return await _context.InstrumentPrices
@@ -40,21 +44,31 @@ namespace PortEval.Infrastructure.Repositories
                 .FirstOrDefaultAsync(price => price.InstrumentId == instrumentId && price.Time <= time);
         }
 
+        /// <inheritdoc />
         public InstrumentPrice Add(InstrumentPrice price)
         {
             return _context.InstrumentPrices.Add(price).Entity;
         }
 
+        /// <inheritdoc />
         public InstrumentPrice Update(InstrumentPrice price)
         {
             return _context.InstrumentPrices.Update(price).Entity;
         }
 
-        public async Task BulkInsertAsync(IList<InstrumentPrice> prices)
+        /// <inheritdoc />
+        public async Task BulkUpsertAsync(IList<InstrumentPrice> prices)
         {
-            await _context.BulkInsertAsync(prices);
+            var bulkConfig = new BulkConfig
+            {
+                UpdateByProperties = new List<string> { nameof(InstrumentPrice.InstrumentId), nameof(InstrumentPrice.Time) },
+                PropertiesToIncludeOnUpdate = new List<string> { nameof(InstrumentPrice.Id) }
+            };
+
+            await _context.BulkInsertOrUpdateAsync(prices, bulkConfig);
         }
 
+        /// <inheritdoc />
         public async Task DeleteAsync(int instrumentId, int priceId)
         {
             var foundPrice = await _context.InstrumentPrices
@@ -66,17 +80,20 @@ namespace PortEval.Infrastructure.Repositories
             }
         }
 
+        /// <inheritdoc />
         public void Delete(InstrumentPrice price)
         {
             _context.InstrumentPrices.Remove(price);
         }
 
+        /// <inheritdoc />
         public async Task<bool> ExistsAsync(int instrumentId, int priceId)
         {
             return await _context.InstrumentPrices
                 .AnyAsync(price => price.Id == priceId && price.InstrumentId == instrumentId);
         }
 
+        /// <inheritdoc />
         public async Task<bool> ExistsAsync(int instrumentId, DateTime time)
         {
             return await _context.InstrumentPrices

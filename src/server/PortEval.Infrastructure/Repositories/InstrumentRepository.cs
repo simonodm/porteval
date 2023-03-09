@@ -34,7 +34,7 @@ namespace PortEval.Infrastructure.Repositories
             return instrumentEntity;
         }
 
-        /// <inheritdoc cref="IInstrumentRepository.Add("/>
+        /// <inheritdoc cref="IInstrumentRepository.Add"/>
         public Instrument Add(Instrument instrument)
         {
             var newInstrument = _context.Instruments.Add(instrument).Entity;
@@ -72,10 +72,16 @@ namespace PortEval.Infrastructure.Repositories
             _context.Instruments.Remove(instrument);
         }
 
-        /// <inheritdoc cref="IInstrumentRepository.ExistsAsync"/>
+        /// <inheritdoc cref="IInstrumentRepository.ExistsAsync(int)"/>
         public async Task<bool> ExistsAsync(int id)
         {
             return await _context.Instruments.AnyAsync(i => i.Id == id);
+        }
+
+        /// <inheritdoc cref="IInstrumentRepository.ExistsAsync(string)"/>
+        public async Task<bool> ExistsAsync(string symbol)
+        {
+            return await _context.Instruments.AnyAsync(i => i.Symbol == symbol);
         }
     }
 }

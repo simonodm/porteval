@@ -78,13 +78,13 @@ namespace PortEval.BackgroundJobs.Helpers
                 var intervalAtRangeStart = intervalFunction(range.From);
 
                 var currentTime = range.From.RoundUp(intervalAtRangeStart);
-                while (currentTime < range.To)
+                while (latestPrice != null && currentTime < range.To)
                 {
                     if (currentTime > range.From)
                     {
                         result.Add(new PricePoint
                         {
-                            CurrencyCode = latestPrice!.CurrencyCode,
+                            CurrencyCode = latestPrice.CurrencyCode,
                             Price = latestPrice.Price,
                             Symbol = latestPrice.Symbol,
                             Time = currentTime

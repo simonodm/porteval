@@ -55,7 +55,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             // MissingExchangeRatesFetchJob clears the list after doing bulk insert, which makes it impossible to verify the correct invokation
             // afterwards. Instead we register a callback which sets the correct flag on invokation and check that flag using Assert
             exchangeRateRepository
-                .Setup(m => m.BulkInsertAsync(It.Is<IList<CurrencyExchangeRate>>(list =>
+                .Setup(m => m.BulkUpsertAsync(It.Is<IList<CurrencyExchangeRate>>(list =>
                     list.Count == 2 &&
                     list.Any(er => er.Time == time && er.CurrencyToCode == firstTargetCurrency.Code && er.ExchangeRate == 1m) &&
                     list.Any(er => er.Time == time && er.CurrencyToCode == secondTargetCurrency.Code && er.ExchangeRate == 1m)

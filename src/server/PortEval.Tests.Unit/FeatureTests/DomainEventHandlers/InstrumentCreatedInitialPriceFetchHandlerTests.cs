@@ -9,6 +9,7 @@ using PortEval.Application.Features.DomainEventHandlers.InstrumentCreated;
 using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Domain.Events;
 using System.Threading.Tasks;
+using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
 
 namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
@@ -25,6 +26,7 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
             var domainEvent = fixture.Create<InstrumentCreatedDomainEvent>();
             var domainEventAdapter = new DomainEventNotificationAdapter<InstrumentCreatedDomainEvent>(domainEvent);
             var backgroundJobClient = fixture.Freeze<Mock<IBackgroundJobClient>>();
+            fixture.CreateDefaultInstrumentRepositoryMock();
 
             var sut = fixture.Create<StartInitialPriceFetchWhenInstrumentCreatedDomainEventHandler>();
 

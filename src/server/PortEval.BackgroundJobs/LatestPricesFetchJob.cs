@@ -20,17 +20,15 @@ namespace PortEval.BackgroundJobs
     {
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly IInstrumentPriceRepository _instrumentPriceRepository;
-        private readonly ICurrencyExchangeRateRepository _exchangeRateRepository;
         private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
 
         public LatestPricesFetchJob(IFinancialDataFetcher fetcher, IInstrumentRepository instrumentRepository,
-            IInstrumentPriceRepository instrumentPriceRepository, ICurrencyExchangeRateRepository exchangeRateRepository,
+            IInstrumentPriceRepository instrumentPriceRepository,
             INotificationService notificationService, ILoggerFactory loggerFactory) : base(fetcher)
         {
             _instrumentRepository = instrumentRepository;
             _instrumentPriceRepository = instrumentPriceRepository;
-            _exchangeRateRepository = exchangeRateRepository;
             _notificationService = notificationService;
             _logger = loggerFactory.CreateLogger(typeof(LatestPricesFetchJob));
         }
