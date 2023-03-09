@@ -35,13 +35,29 @@ type Props = {
 function EditTransactionForm({ transaction, onSuccess }: Props): JSX.Element {
     const [amount, setAmount] = useState(transaction.amount);
     const [time, setTime] = useState(new Date(transaction.time));
-    const [price, setPrice] = useInstrumentPriceAutoFetchingState(transaction.instrument.id, time, transaction.price);
+    const [
+        price,
+        , // set instrument - can be skipped
+        setPriceFetchTime,
+        setPrice,
+        setAutoUpdateEnabled
+    ] = useInstrumentPriceAutoFetchingState(transaction.instrument.id, time, transaction.price);
     const [note, setNote] = useState(transaction.note);
     const [updateTransaction, mutationStatus] = useUpdateTransactionMutation();
 
     const [userSettings] = useUserSettings();
 
     const isLoaded = checkIsLoaded(mutationStatus);
+
+    const handleTimeChange = (newTime: Date): void => {
+        setTime(newTime);
+        setPriceFetchTime(newTime);
+    }
+
+    const handlePriceChange = (newPrice: number): void => {
+        setPrice(newPrice);
+        setAutoUpdateEnabled(false);
+    }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         if(price === undefined) {
@@ -66,10 +82,10 @@ function EditTransactionForm({ transaction, onSuccess }: Props): JSX.Element {
                     label='Amount' onChange={setAmount} value={amount}
                 />
                 <NumberInput className="mb-3" allowFloat label='Price'
-                    onChange={setPrice} value={price}
+                    onChange={handlePriceChange} value={price}
                 />
                 <DateTimeSelector className="mb-3" dateFormat={userSettings.dateFormat} label='Date'
-                    onChange={setTime} timeFormat={userSettings.timeFormat}
+                    onChange={handleTimeChange} timeFormat={userSettings.timeFormat}
                     timeInterval={1} value={time} enableTime
                 />
                 <TextInput className="mb-3" label='Note' onChange={setNote}
