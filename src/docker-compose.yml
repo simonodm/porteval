@@ -45,7 +45,7 @@ services:
       - "3000:3000"
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - API_PROXY_URL=http://porteval-api/
+      - PORTEVAL_API_URL=http://porteval-api/
     stdin_open: true
     volumes:
     - ./web:/app
