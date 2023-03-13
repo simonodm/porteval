@@ -19,6 +19,8 @@ using PortEval.Infrastructure;
 using System.ComponentModel;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.HttpLogging;
+using Serilog;
 
 namespace PortEval.Application
 {
@@ -27,6 +29,10 @@ namespace PortEval.Application
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration)
+                .CreateLogger();
         }
 
         public IConfiguration Configuration { get; }
@@ -66,6 +72,11 @@ namespace PortEval.Application
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssemblyContaining<PortfolioDtoValidator>();
             services.AddLogging();
+            services.AddHttpLogging(logging =>
+            {
+                logging.LoggingFields = HttpLoggingFields.RequestMethod | HttpLoggingFields.RequestProtocol |
+                                        HttpLoggingFields.RequestPath | HttpLoggingFields.RequestQuery | HttpLoggingFields.ResponseStatusCode;
+            });
             services.AddDomainServices();
             services.AddDomainEventHandlers();
             services.ConfigureDbContext(Configuration);

@@ -56,6 +56,8 @@ namespace PortEval.BackgroundJobs
 
         public async Task Run(Guid importId, string inputFileName, string logPath)
         {
+            _logger.LogInformation($"Processing import {importId}.");
+
             var importEntry = await _importRepository.FindAsync(importId);
             if (importEntry == null)
             {

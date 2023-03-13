@@ -48,7 +48,7 @@ namespace PortEval.BackgroundJobs
         /// <returns>A task representing the asynchronous job processing operation.</returns>
         public async Task Run(int instrumentId)
         {
-            _logger.LogInformation($"First price fetch for instrument {instrumentId} at {DateTime.UtcNow}.");
+            _logger.LogInformation($"First price fetch for instrument {instrumentId}.");
             var instrument = await _instrumentRepository.FindAsync(instrumentId);
             if (instrument == null)
             {
@@ -76,7 +76,7 @@ namespace PortEval.BackgroundJobs
                 await _instrumentRepository.UnitOfWork.CommitAsync();
             }
 
-            _logger.LogInformation($"First price fetch for instrument {instrumentId} finished at {DateTime.UtcNow}.");
+            _logger.LogInformation($"First price fetch for instrument {instrumentId} finished.");
             if (prices.Count > 0)
             {
                 await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable, $"Price download finished for {instrument.Symbol}.");

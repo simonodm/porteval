@@ -33,7 +33,7 @@ namespace PortEval.BackgroundJobs
 
         public async Task Run()
         {
-            _logger.LogInformation($"Instrument split fetch job started at {DateTime.UtcNow}.");
+            _logger.LogInformation("Instrument split fetch job started.");
             var instruments = await _instrumentRepository.ListAllAsync();
 
             foreach (var instrument in instruments)
@@ -65,7 +65,7 @@ namespace PortEval.BackgroundJobs
                 }
             }
 
-            _logger.LogInformation($"Instrument split fetch job finished at {DateTime.UtcNow}.");
+            _logger.LogInformation("Instrument split fetch job finished.");
         }
     }
 }

@@ -19,22 +19,18 @@ namespace PortEval.Application.Controllers
         private readonly ITransactionService _transactionService;
         private readonly ITransactionQueries _transactionQueries;
         private readonly IMapper _mapper;
-        private readonly ILogger _logger;
 
-        public TransactionsController(ITransactionService transactionService, ITransactionQueries transactionQueries, IMapper mapper, ILoggerFactory loggerFactory)
+        public TransactionsController(ITransactionService transactionService, ITransactionQueries transactionQueries, IMapper mapper)
         {
             _transactionService = transactionService;
             _transactionQueries = transactionQueries;
             _mapper = mapper;
-            _logger = loggerFactory.CreateLogger(typeof(TransactionsController));
         }
 
         // GET: api/transactions
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TransactionDto>>> GetTransactions([FromQuery] TransactionFilters transactionFilters, [FromQuery] DateRangeParams dateRange)
         {
-            _logger.LogInformation($"Transactions (portfolio {transactionFilters.PortfolioId}, position {transactionFilters.PositionId}, instrument {transactionFilters.InstrumentId}) requested.");
-
             var transactions = await _transactionQueries.GetTransactions(transactionFilters, dateRange);
             if (transactions.Status == QueryStatus.NotFound)
             {
@@ -48,8 +44,6 @@ namespace PortEval.Application.Controllers
         [HttpGet("{transactionId}")]
         public async Task<ActionResult<TransactionDto>> GetTransaction(int transactionId)
         {
-            _logger.LogInformation($"Transaction {transactionId} requested.");
-
             var transaction = await _transactionQueries.GetTransaction(transactionId);
             if (transaction.Status == QueryStatus.NotFound)
             {
@@ -63,8 +57,6 @@ namespace PortEval.Application.Controllers
         [HttpPost]
         public async Task<ActionResult<TransactionDto>> PostTransaction([FromBody] TransactionDto createRequest)
         {
-            _logger.LogInformation($"Creating transaction for position {createRequest.PositionId}.");
-
             var createdTransaction = await _transactionService.AddTransactionAsync(createRequest);
 
             return CreatedAtAction("GetTransaction",
@@ -76,8 +68,6 @@ namespace PortEval.Application.Controllers
         [HttpPut("{transactionId}")]
         public async Task<ActionResult<TransactionDto>> PutTransaction(int transactionId, [FromBody] TransactionDto updateRequest)
         {
-            _logger.LogInformation($"Updating transaction {transactionId}.");
-
             if (transactionId != updateRequest.Id)
             {
                 return BadRequest("URL transaction id and request body transaction id don't match.");
@@ -92,8 +82,6 @@ namespace PortEval.Application.Controllers
         [HttpDelete("{transactionId}")]
         public async Task<IActionResult> DeleteTransaction(int transactionId)
         {
-            _logger.LogInformation($"Deleting transaction {transactionId}.");
-
             await _transactionService.DeleteTransactionAsync(transactionId);
             return Ok();
         }

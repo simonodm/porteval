@@ -39,7 +39,7 @@ namespace PortEval.BackgroundJobs
         public async Task Run()
         {
             var currentTime = DateTime.UtcNow;
-            _logger.LogInformation($"Missing exchange rates job started at {currentTime}.");
+            _logger.LogInformation("Missing exchange rates job started.");
 
             var currencies = await _currencyRepository.ListAllAsync();
             var defaultCurrency = currencies.FirstOrDefault(c => c.IsDefault);
@@ -66,7 +66,7 @@ namespace PortEval.BackgroundJobs
                 await ProcessCurrencyRange(currencies, defaultCurrency, range, currentTime);
             }
 
-            _logger.LogInformation($"Missing exchange rates job finished at {DateTime.UtcNow}.");
+            _logger.LogInformation("Missing exchange rates job finished.");
         }
 
         /// <summary>

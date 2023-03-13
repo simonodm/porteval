@@ -21,22 +21,18 @@ namespace PortEval.Application.Controllers
         private readonly IPositionService _positionService;
         private readonly IPositionQueries _positionQueries;
         private readonly IMapper _mapper;
-        private readonly ILogger _logger;
 
-        public PositionsController(IPositionService positionService, IPositionQueries positionQueries, IMapper mapper, ILoggerFactory loggerFactory)
+        public PositionsController(IPositionService positionService, IPositionQueries positionQueries, IMapper mapper)
         {
             _positionService = positionService;
             _positionQueries = positionQueries;
             _mapper = mapper;
-            _logger = loggerFactory.CreateLogger(typeof(PositionsController));
         }
 
         // GET api/positions/5
         [HttpGet("{positionId}")]
         public async Task<ActionResult<PositionDto>> GetPosition(int positionId)
         {
-            _logger.LogInformation($"Position {positionId} requested.");
-
             var position = await _positionQueries.GetPosition(positionId);
             if (position.Status == QueryStatus.NotFound)
             {
@@ -52,7 +48,6 @@ namespace PortEval.Application.Controllers
             [FromQuery] DateTime? at)
         {
             var time = at ?? DateTime.UtcNow;
-            _logger.LogInformation($"Position {positionId} value at {time} requested.");
 
             var value = await _positionQueries.GetPositionValue(positionId, time);
             if (value.Status == QueryStatus.NotFound)
@@ -67,8 +62,6 @@ namespace PortEval.Application.Controllers
         [HttpGet("{positionId}/profit")]
         public async Task<ActionResult<EntityProfitDto>> GetPositionProfit(int positionId, [FromQuery] DateRangeParams dateRange)
         {
-            _logger.LogInformation($"Position {positionId} profit between {dateRange.From} and {dateRange.To} requested.");
-
             var profit = await _positionQueries.GetPositionProfit(positionId, dateRange);
             if (profit.Status == QueryStatus.NotFound)
             {
@@ -82,8 +75,6 @@ namespace PortEval.Application.Controllers
         [HttpGet("{positionId}/performance")]
         public async Task<ActionResult<EntityPerformanceDto>> GetPositionPerformance(int positionId, [FromQuery] DateRangeParams dateRange)
         {
-            _logger.LogInformation($"Position {positionId} performance between {dateRange.From} and {dateRange.To} requested.");
-
             var performance = await _positionQueries.GetPositionPerformance(positionId, dateRange);
             if (performance.Status == QueryStatus.NotFound)
             {
@@ -98,7 +89,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<PositionBreakEvenPointDto>> GetPositionBreakEvenPoint(int positionId, [FromQuery] DateTime? at)
         {
             var time = at ?? DateTime.UtcNow;
-            _logger.LogInformation($"Position {positionId} break-even point at {time} requested.");
 
             var breakEvenPoint = await _positionQueries.GetPositionBreakEvenPoint(positionId, time);
             if (breakEvenPoint.Status == QueryStatus.NotFound)
@@ -114,8 +104,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetPositionChartedValue(int positionId,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency, [FromQuery] string currency = null)
         {
-            _logger.LogInformation($"Position {positionId} value chart between {dateRange.From} and {dateRange.To} with interval {frequency} requested.");
-
             var result = await _positionQueries.ChartPositionValue(positionId, dateRange, frequency, currency);
             if (result.Status == QueryStatus.NotFound)
             {
@@ -130,8 +118,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetPositionChartedProfit(int positionId,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency, [FromQuery] string currency = null)
         {
-            _logger.LogInformation($"Position {positionId} profit chart between {dateRange.From} and {dateRange.To} with interval {frequency} requested.");
-
             var result = await _positionQueries.ChartPositionProfit(positionId, dateRange, frequency, currency);
             if (result.Status == QueryStatus.NotFound)
             {
@@ -146,8 +132,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetPositionChartedPerformance(int positionId,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency)
         {
-            _logger.LogInformation($"Position {positionId} performance chart between {dateRange.From} and {dateRange.To} with interval {frequency} requested.");
-
             var result = await _positionQueries.ChartPositionPerformance(positionId, dateRange, frequency);
             if (result.Status == QueryStatus.NotFound)
             {
@@ -162,8 +146,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetPositionAggregatedProfit(int positionId,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency, [FromQuery] string currency = null)
         {
-            _logger.LogInformation($"Position {positionId} aggregated profit chart between {dateRange.From} and {dateRange.To} with interval {frequency} requested.");
-
             var result = await _positionQueries.ChartPositionProfitAggregated(positionId, dateRange, frequency, currency);
             if (result.Status == QueryStatus.NotFound)
             {
@@ -178,8 +160,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetPositionAggregatedPerformance(int positionId,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency)
         {
-            _logger.LogInformation($"Position {positionId} aggregated performance chart between {dateRange.From} and {dateRange.To} with interval {frequency} requested.");
-
             var result = await _positionQueries.ChartPositionPerformanceAggregated(positionId, dateRange, frequency);
             if (result.Status == QueryStatus.NotFound)
             {
@@ -192,8 +172,6 @@ namespace PortEval.Application.Controllers
         [HttpGet("{positionId}/stats")]
         public async Task<ActionResult<PositionStatisticsDto>> GetPositionStatistics(int positionId)
         {
-            _logger.LogInformation($"Position {positionId} statistics requested.");
-
             var result = await _positionQueries.GetPositionStatistics(positionId);
             if (result.Status == QueryStatus.NotFound)
             {
@@ -207,8 +185,6 @@ namespace PortEval.Application.Controllers
         [HttpPost]
         public async Task<ActionResult<PositionDto>> PostPosition([FromBody] PositionDto createRequest)
         {
-            _logger.LogInformation($"Creating position for portfolio {createRequest.PortfolioId}.");
-
             var createdPosition =
                 await _positionService.OpenPositionAsync(createRequest);
             return CreatedAtAction("GetPosition", new { positionId = createdPosition.Id },
@@ -219,8 +195,6 @@ namespace PortEval.Application.Controllers
         [HttpPut("{positionId}")]
         public async Task<ActionResult<PositionDto>> PutPosition(int positionId, [FromBody] PositionDto updateRequest)
         {
-            _logger.LogInformation($"Updating position {positionId}.");
-
             if (updateRequest.Id != positionId)
             {
                 return BadRequest("URL position id and request body position id don't match.");
@@ -236,8 +210,6 @@ namespace PortEval.Application.Controllers
         [HttpDelete("{positionId}")]
         public async Task<IActionResult> DeletePosition(int positionId)
         {
-            _logger.LogInformation($"Deleting position {positionId}.");
-
             await _positionService.RemovePositionAsync(positionId);
             return Ok();
         }

@@ -38,7 +38,7 @@ namespace PortEval.BackgroundJobs
         public async Task Run()
         {
             var startTime = DateTime.UtcNow;
-            _logger.LogInformation($"Instrument price cleanup started at {startTime}.");
+            _logger.LogInformation("Instrument price cleanup started.");
 
             var instruments = await _instrumentRepository.ListAllAsync();
             foreach (var instrument in instruments)
@@ -48,7 +48,7 @@ namespace PortEval.BackgroundJobs
             }
             await _instrumentPriceRepository.UnitOfWork.CommitAsync();
 
-            _logger.LogInformation($"Instrument price cleanup finished at {DateTime.UtcNow}.");
+            _logger.LogInformation("Instrument price cleanup finished.");
         }
 
         /// <summary>

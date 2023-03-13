@@ -40,7 +40,7 @@ namespace PortEval.BackgroundJobs
         public async Task Run()
         {
             var startTime = DateTime.UtcNow;
-            _logger.LogInformation($"Running latest price fetch job at {startTime}.");
+            _logger.LogInformation("Running latest price fetch job.");
             var instruments = await _instrumentRepository.ListAllAsync();
 
             foreach (var instrument in instruments)
@@ -74,7 +74,7 @@ namespace PortEval.BackgroundJobs
             }
 
             await _instrumentRepository.UnitOfWork.CommitAsync();
-            _logger.LogInformation($"Finished latest price fetch job at {DateTime.UtcNow}.");
+            _logger.LogInformation("Finished latest price fetch job.");
             await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable);
         }
     }

@@ -8,6 +8,7 @@ using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Infrastructure;
 using System;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace PortEval.Application
 {
@@ -61,6 +62,7 @@ namespace PortEval.Application
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

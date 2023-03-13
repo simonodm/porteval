@@ -49,7 +49,7 @@ namespace PortEval.BackgroundJobs
         public async Task Run()
         {
             var currentTime = DateTime.UtcNow;
-            _logger.LogInformation($"Starting missing prices fetch at {currentTime}.");
+            _logger.LogInformation("Starting missing prices fetch.");
 
             var instruments = await _instrumentRepository.ListAllAsync();
 
@@ -72,7 +72,7 @@ namespace PortEval.BackgroundJobs
             }
 
             await _instrumentRepository.UnitOfWork.CommitAsync();
-            _logger.LogInformation($"Missing prices fetch finished at {DateTime.UtcNow}.");
+            _logger.LogInformation("Missing prices fetch finished.");
             await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable);
         }
 

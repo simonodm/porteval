@@ -13,21 +13,17 @@ namespace PortEval.Application.Controllers
     {
         private readonly IDashboardService _dashboardService;
         private readonly IDashboardLayoutQueries _dashboardQueries;
-        private readonly ILogger _logger;
 
 
-        public DashboardController(IDashboardLayoutQueries dashboardQueries, ILoggerFactory loggerFactory, IDashboardService dashboardService)
+        public DashboardController(IDashboardLayoutQueries dashboardQueries, IDashboardService dashboardService)
         {
             _dashboardQueries = dashboardQueries;
             _dashboardService = dashboardService;
-            _logger = loggerFactory.CreateLogger(typeof(DashboardController));
         }
 
         [HttpGet]
         public async Task<ActionResult<DashboardLayoutDto>> GetDashboardLayout()
         {
-            _logger.LogInformation("Requesting dashboard configuration.");
-
             var dashboardLayout = await _dashboardQueries.GetDashboardLayout();
 
             return dashboardLayout.Response;
@@ -36,8 +32,6 @@ namespace PortEval.Application.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateDashboardLayout([FromBody] DashboardLayoutDto layout)
         {
-            _logger.LogInformation("Updating dashboard layout.");
-
             await _dashboardService.UpdateDashboardLayout(layout.Items);
 
             return Ok();

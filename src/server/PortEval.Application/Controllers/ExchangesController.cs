@@ -13,19 +13,15 @@ namespace PortEval.Application.Controllers
     public class ExchangesController : ControllerBase
     {
         private readonly IExchangeQueries _exchangeQueries;
-        private readonly ILogger _logger;
 
-        public ExchangesController(IExchangeQueries exchangeQueries, ILoggerFactory loggerFactory)
+        public ExchangesController(IExchangeQueries exchangeQueries)
         {
             _exchangeQueries = exchangeQueries;
-            _logger = loggerFactory.CreateLogger(typeof(ExchangesController));
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExchangeDto>>> GetKnownExchanges()
         {
-            _logger.LogInformation("Known exchanges requested.");
-
             var result = await _exchangeQueries.GetKnownExchanges();
 
             return result.Response.ToList();

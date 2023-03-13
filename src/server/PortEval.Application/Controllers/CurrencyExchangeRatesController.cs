@@ -15,20 +15,16 @@ namespace PortEval.Application.Controllers
     public class CurrencyExchangeRatesController : ControllerBase
     {
         private readonly ICurrencyExchangeRateQueries _exchangeRateQueries;
-        private readonly ILogger _logger;
 
-        public CurrencyExchangeRatesController(ICurrencyExchangeRateQueries exchangeRateQueries, ILoggerFactory loggerFactory)
+        public CurrencyExchangeRatesController(ICurrencyExchangeRateQueries exchangeRateQueries)
         {
             _exchangeRateQueries = exchangeRateQueries;
-            _logger = loggerFactory.CreateLogger(typeof(CurrencyExchangeRatesController));
         }
 
         // GET: api/currencies/USD/exchange_rates?time=2021-01-01T12:00:00Z
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CurrencyExchangeRateDto>>> GetExchangeRates(string codeFrom, [FromQuery] DateTime? time)
         {
-            _logger.LogInformation($"Requesting {codeFrom} exchange rates at {time}.");
-
             var exchangeRates = await _exchangeRateQueries.GetExchangeRates(codeFrom, time ?? DateTime.UtcNow);
             if (exchangeRates.Status == QueryStatus.NotFound)
             {
@@ -41,8 +37,6 @@ namespace PortEval.Application.Controllers
         [HttpGet("latest")]
         public async Task<ActionResult<IEnumerable<CurrencyExchangeRateDto>>> GetLatestExchangeRates(string codeFrom)
         {
-            _logger.LogInformation($"Requesting latest {codeFrom} exchange rates.");
-
             var exchangeRates = await _exchangeRateQueries.GetExchangeRates(codeFrom, DateTime.UtcNow);
             if (exchangeRates.Status == QueryStatus.NotFound)
             {
@@ -56,8 +50,6 @@ namespace PortEval.Application.Controllers
         [HttpGet("{codeTo}/latest")]
         public async Task<ActionResult<CurrencyExchangeRateDto>> GetLatestExchangeRate(string codeFrom, string codeTo)
         {
-            _logger.LogInformation($"Latest exchange rate from {codeFrom} to {codeTo} requested.");
-
             var exchangeRate = await _exchangeRateQueries.GetExchangeRateAt(codeFrom, codeTo, DateTime.UtcNow);
             if (exchangeRate.Status == QueryStatus.NotFound)
             {
@@ -70,8 +62,6 @@ namespace PortEval.Application.Controllers
         [HttpGet("{codeTo}/at")]
         public async Task<ActionResult<CurrencyExchangeRateDto>> GetExchangeRateAt(string codeFrom, string codeTo, [FromQuery] DateTime time)
         {
-            _logger.LogInformation($"Exchange rate between {codeFrom} to {codeTo} at {time} requested.");
-
             var exchangeRate = await _exchangeRateQueries.GetExchangeRateAt(codeFrom, codeTo, time);
             if (exchangeRate.Status == QueryStatus.NotFound)
             {

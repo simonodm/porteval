@@ -20,14 +20,12 @@ namespace PortEval.Application.Controllers
         private readonly IChartService _chartService;
         private readonly IChartQueries _chartQueries;
         private readonly IMapper _mapper;
-        private readonly ILogger _logger;
 
-        public ChartsController(IChartService chartService, IChartQueries chartQueries, IMapper mapper, ILoggerFactory loggerFactory)
+        public ChartsController(IChartService chartService, IChartQueries chartQueries, IMapper mapper)
         {
             _chartService = chartService;
             _chartQueries = chartQueries;
             _mapper = mapper;
-            _logger = loggerFactory.CreateLogger(typeof(ChartsController));
         }
 
 
@@ -35,8 +33,6 @@ namespace PortEval.Application.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ChartDto>>> GetAllCharts()
         {
-            _logger.LogInformation("All charts requested.");
-
             var charts = await _chartQueries.GetCharts();
             return charts.Response.ToList();
         }
@@ -45,8 +41,6 @@ namespace PortEval.Application.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ChartDto>> GetChart(int id)
         {
-            _logger.LogInformation($"Chart {id} requested.");
-
             var chart = await _chartQueries.GetChart(id);
             if (chart.Status == QueryStatus.NotFound)
             {
@@ -60,8 +54,6 @@ namespace PortEval.Application.Controllers
         [HttpPost]
         public async Task<ActionResult<ChartDto>> PostChart([FromBody] ChartDto createRequest)
         {
-            _logger.LogInformation("Creating chart.");
-
             var createdChart = await _chartService.CreateChartAsync(createRequest);
             return CreatedAtAction("GetChart", new { id = createdChart.Id },
                 _mapper.Map<ChartDto>(createdChart));
@@ -71,8 +63,6 @@ namespace PortEval.Application.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ChartDto>> PutChart(int id, [FromBody] ChartDto updateRequest)
         {
-            _logger.LogInformation($"Updating chart {id}.");
-
             if (id != updateRequest.Id)
             {
                 return BadRequest("URL chart id and request body chart id don't match.");
@@ -86,8 +76,6 @@ namespace PortEval.Application.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteChart(int id)
         {
-            _logger.LogInformation($"Deleting chart {id}.");
-
             await _chartService.DeleteChartAsync(id);
             return Ok();
         }

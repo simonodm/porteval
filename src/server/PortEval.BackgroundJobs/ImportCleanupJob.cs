@@ -22,7 +22,7 @@ namespace PortEval.BackgroundJobs
 
         public async Task Run()
         {
-            _logger.LogInformation($"Import cleanup started at {DateTime.UtcNow}.");
+            _logger.LogInformation($"Import cleanup started.");
 
             var imports = await _importRepository.ListAllAsync();
             foreach (var import in imports)
@@ -35,7 +35,7 @@ namespace PortEval.BackgroundJobs
 
             await _importRepository.UnitOfWork.CommitAsync();
 
-            _logger.LogInformation($"Import cleanup finished at {DateTime.UtcNow}.");
+            _logger.LogInformation($"Import cleanup finished.");
         }
 
         private async Task DeleteImport(Domain.Models.Entities.DataImport import)

@@ -19,20 +19,16 @@ namespace PortEval.Application.Controllers
     {
         private readonly ICsvImportService _importService;
         private readonly IDataImportQueries _importQueries;
-        private readonly ILogger _logger;
 
-        public CsvImportController(ICsvImportService importService, IDataImportQueries importQueries, ILoggerFactory loggerFactory)
+        public CsvImportController(ICsvImportService importService, IDataImportQueries importQueries)
         {
             _importService = importService;
             _importQueries = importQueries;
-            _logger = loggerFactory.CreateLogger(typeof(CsvImportController));
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CsvTemplateImportDto>>> GetAllImports()
         {
-            _logger.LogInformation("Imports requested.");
-
             var result = await _importQueries.GetAllImports();
 
             return result.Response.ToList();
@@ -41,8 +37,6 @@ namespace PortEval.Application.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<CsvTemplateImportDto>> GetImport(string id)
         {
-            _logger.LogInformation($"Import {id} requested.");
-
             if (!Guid.TryParse(id, out Guid guid))
             {
                 return BadRequest("Invalid import log id provided.");

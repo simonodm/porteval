@@ -17,14 +17,12 @@ namespace PortEval.Application.Controllers
     {
         private readonly IInstrumentQueries _instrumentQueries;
         private readonly IInstrumentSplitService _splitService;
-        private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
-        public InstrumentSplitsController(IInstrumentQueries instrumentQueries, IInstrumentSplitService splitService, ILoggerFactory loggerFactory, IMapper mapper)
+        public InstrumentSplitsController(IInstrumentQueries instrumentQueries, IInstrumentSplitService splitService, IMapper mapper)
         {
             _instrumentQueries = instrumentQueries;
             _splitService = splitService;
-            _logger = loggerFactory.CreateLogger<InstrumentSplitsController>();
             _mapper = mapper;
         }
 
@@ -32,8 +30,6 @@ namespace PortEval.Application.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<InstrumentSplitDto>>> GetInstrumentSplits(int instrumentId)
         {
-            _logger.LogInformation($"Instrument {instrumentId} splits requested.");
-
             var result = await _instrumentQueries.GetInstrumentSplits(instrumentId);
             if (result.Status == QueryStatus.NotFound)
             {
@@ -47,8 +43,6 @@ namespace PortEval.Application.Controllers
         [HttpPost]
         public async Task<ActionResult<InstrumentSplitDto>> PostInstrumentSplit(int instrumentId, [FromBody] InstrumentSplitDto splitData)
         {
-            _logger.LogInformation($"Creating {splitData.SplitRatioNumerator}:{splitData.SplitRatioDenominator} split for instrument {instrumentId} at {splitData.Time}.");
-
             if (instrumentId != splitData.InstrumentId)
             {
                 return BadRequest($"Query parameter {nameof(instrumentId)} and body instrument ID don't match.");
@@ -64,8 +58,6 @@ namespace PortEval.Application.Controllers
         [HttpPut("{splitId}")]
         public async Task<ActionResult<InstrumentSplitDto>> PutInstrumentSplit(int instrumentId, [FromBody] InstrumentSplitDto splitData)
         {
-            _logger.LogInformation($"Updating instrument split {splitData.Id}.");
-
             if (instrumentId != splitData.InstrumentId)
             {
                 return BadRequest($"Query parameter {nameof(instrumentId)} and body instrument ID don't match.");

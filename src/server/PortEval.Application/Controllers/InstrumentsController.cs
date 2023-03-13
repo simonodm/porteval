@@ -21,22 +21,18 @@ namespace PortEval.Application.Controllers
         private readonly IInstrumentService _instrumentService;
         private readonly IInstrumentQueries _instrumentQueries;
         private readonly IMapper _mapper;
-        private readonly ILogger _logger;
 
-        public InstrumentsController(IInstrumentService instrumentService, IInstrumentQueries instrumentQueries, IMapper mapper, ILoggerFactory loggerFactory)
+        public InstrumentsController(IInstrumentService instrumentService, IInstrumentQueries instrumentQueries, IMapper mapper)
         {
             _instrumentService = instrumentService;
             _instrumentQueries = instrumentQueries;
             _mapper = mapper;
-            _logger = loggerFactory.CreateLogger(typeof(InstrumentsController));
         }
 
         // GET: api/instruments
         [HttpGet]
         public async Task<ActionResult<PaginatedResponse<InstrumentDto>>> GetAllInstruments([FromQuery] PaginationParams pagination)
         {
-            _logger.LogInformation($"Instruments requested (page {pagination.Page}, limit {pagination.Limit}.");
-
             var instruments = await _instrumentQueries.GetInstrumentsPage(pagination);
             return instruments.Response;
         }
@@ -45,8 +41,6 @@ namespace PortEval.Application.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<InstrumentDto>> GetInstrument(int id)
         {
-            _logger.LogInformation($"Instrument {id} requested.");
-
             var instrument = await _instrumentQueries.GetInstrument(id);
             if (instrument.Status == QueryStatus.NotFound)
             {
@@ -61,8 +55,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<EntityProfitDto>> GetInstrumentProfit(int id,
             [FromQuery] DateRangeParams dateRange)
         {
-            _logger.LogInformation($"Instrument {id} profit between {dateRange.From} and {dateRange.To} requested.");
-
             var profit = await _instrumentQueries.GetInstrumentProfit(id, dateRange);
             if (profit.Status == QueryStatus.NotFound)
             {
@@ -77,8 +69,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<EntityPerformanceDto>> GetInstrumentPerformance(int id,
             [FromQuery] DateRangeParams dateRange)
         {
-            _logger.LogInformation($"Instrument {id} performance between {dateRange.From} and {dateRange.To} requested.");
-
             var performance = await _instrumentQueries.GetInstrumentPerformance(id, dateRange);
             if (performance.Status == QueryStatus.NotFound)
             {
@@ -93,8 +83,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetInstrumentChartedPrices(int id,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency, [FromQuery] string currency = null)
         {
-            _logger.LogInformation($"Instrument {id} price chart between {dateRange.From} and {dateRange.To} with {frequency} interval requested.");
-
             var result = await _instrumentQueries.ChartInstrumentPrices(id, dateRange, frequency, currency);
             if (result.Status == QueryStatus.NotFound)
             {
@@ -109,8 +97,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetInstrumentChartedProfit(int id,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency, [FromQuery] string currency = null)
         {
-            _logger.LogInformation($"Instrument {id} profit chart between {dateRange.From} and {dateRange.To} with {frequency} interval requested.");
-
             var result = await _instrumentQueries.ChartInstrumentProfit(id, dateRange, frequency, currency);
             if (result.Status == QueryStatus.NotFound)
             {
@@ -125,8 +111,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetInstrumentChartedPerformance(int id,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency)
         {
-            _logger.LogInformation($"Instrument {id} performance chart between {dateRange.From} and {dateRange.To} with {frequency} interval requested.");
-
             var result = await _instrumentQueries.ChartInstrumentPerformance(id, dateRange, frequency);
             if (result.Status == QueryStatus.NotFound)
             {
@@ -141,8 +125,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetInstrumentAggregatedProfit(int id,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency, [FromQuery] string currency = null)
         {
-            _logger.LogInformation($"Instrument {id} aggregated profit chart between {dateRange.From} and {dateRange.To} with {frequency} interval requested.");
-
             var result = await _instrumentQueries.ChartInstrumentProfitAggregated(id, dateRange, frequency, currency);
             if (result.Status == QueryStatus.NotFound)
             {
@@ -157,8 +139,6 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetInstrumentAggregatedPerformance(int id,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency)
         {
-            _logger.LogInformation($"Instrument {id} aggregated performance chart between {dateRange.From} and {dateRange.To} with {frequency} interval requested.");
-
             var result = await _instrumentQueries.ChartInstrumentPerformanceAggregated(id, dateRange, frequency);
             if (result.Status == QueryStatus.NotFound)
             {
@@ -172,8 +152,6 @@ namespace PortEval.Application.Controllers
         [HttpPost]
         public async Task<ActionResult<InstrumentDto>> PostInstrument([FromBody] InstrumentDto createRequest)
         {
-            _logger.LogInformation($"Creating instrument {createRequest.Name}.");
-
             var instrument = await _instrumentService.CreateInstrumentAsync(createRequest);
 
             return CreatedAtAction("GetInstrument", new { id = instrument.Id },
@@ -184,8 +162,6 @@ namespace PortEval.Application.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<InstrumentDto>> PutInstrument(int id, [FromBody] InstrumentDto updateRequest)
         {
-            _logger.LogInformation($"Updating instrument {updateRequest.Id}.");
-
             if (id != updateRequest.Id)
             {
                 return BadRequest("URL id and request body id don't match.");
@@ -199,8 +175,6 @@ namespace PortEval.Application.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteInstrument(int id)
         {
-            _logger.LogInformation($"Deleting instrument {id}.");
-
             await _instrumentService.DeleteAsync(id);
             return Ok();
         }

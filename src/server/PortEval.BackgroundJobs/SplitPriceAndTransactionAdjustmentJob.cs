@@ -31,7 +31,7 @@ namespace PortEval.BackgroundJobs
 
         public async Task Run()
         {
-            _logger.LogInformation($"Split price and transaction adjustment job started at {DateTime.UtcNow}.");
+            _logger.LogInformation("Split price and transaction adjustment job started.");
             var nonProcessedSplits = await _splitRepository.ListNonProcessedSplitsAsync();
             var rolledBackSplits = await _splitRepository.ListRollbackRequestedSplitsAsync();
 
