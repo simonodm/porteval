@@ -40,7 +40,7 @@ namespace PortEval.Application.Features.Services
             var dateRange = GenerateDateRange(options);
             var typeConfig = GenerateTypeConfiguration(options);
 
-            var chart = new Chart(options.Name, dateRange, typeConfig);
+            var chart = Chart.Create(options.Name, dateRange, typeConfig);
             chart.ReplaceLines(await ConvertLineDtosToLineEntities(chart, options.Lines));
             _chartRepository.Add(chart);
 

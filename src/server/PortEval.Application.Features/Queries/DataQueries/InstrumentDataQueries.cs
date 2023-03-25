@@ -224,6 +224,17 @@ namespace PortEval.Application.Features.Queries.DataQueries
             };
         }
 
+        public static QueryWrapper<InstrumentSplitDto> GetInstrumentSplit(int instrumentId, int splitId)
+        {
+            return new QueryWrapper<InstrumentSplitDto>
+            {
+                Query =
+                    @"SELECT Id, InstrumentId, Time, SplitRatioDenominator, SplitRatioNumerator, ProcessingStatus AS Status FROM [dbo].[InstrumentSplits]
+                      WHERE InstrumentId = @InstrumentId AND Id = @SplitId",
+                Params = new { InstrumentId = instrumentId, SplitId = splitId }
+            };
+        }
+
         private static string GetInstrumentPriceIntervalPartitionCalc(AggregationFrequency? frequency)
         {
             return frequency switch

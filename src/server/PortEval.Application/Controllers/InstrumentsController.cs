@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Features.Queries;
@@ -20,13 +18,11 @@ namespace PortEval.Application.Controllers
     {
         private readonly IInstrumentService _instrumentService;
         private readonly IInstrumentQueries _instrumentQueries;
-        private readonly IMapper _mapper;
 
-        public InstrumentsController(IInstrumentService instrumentService, IInstrumentQueries instrumentQueries, IMapper mapper)
+        public InstrumentsController(IInstrumentService instrumentService, IInstrumentQueries instrumentQueries)
         {
             _instrumentService = instrumentService;
             _instrumentQueries = instrumentQueries;
-            _mapper = mapper;
         }
 
         // GET: api/instruments
@@ -150,25 +146,24 @@ namespace PortEval.Application.Controllers
 
         // POST api/instruments
         [HttpPost]
-        public async Task<ActionResult<InstrumentDto>> PostInstrument([FromBody] InstrumentDto createRequest)
+        public async Task<IActionResult> PostInstrument([FromBody] InstrumentDto createRequest)
         {
             var instrument = await _instrumentService.CreateInstrumentAsync(createRequest);
 
-            return CreatedAtAction("GetInstrument", new { id = instrument.Id },
-                _mapper.Map<InstrumentDto>(instrument));
+            return CreatedAtAction(nameof(GetInstrument), new { id = instrument.Id });
         }
 
         // PUT api/instruments/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<InstrumentDto>> PutInstrument(int id, [FromBody] InstrumentDto updateRequest)
+        public async Task<IActionResult> PutInstrument(int id, [FromBody] InstrumentDto updateRequest)
         {
             if (id != updateRequest.Id)
             {
                 return BadRequest("URL id and request body id don't match.");
             }
 
-            var updatedInstrument = await _instrumentService.UpdateInstrumentAsync(updateRequest);
-            return _mapper.Map<InstrumentDto>(updatedInstrument);
+            await _instrumentService.UpdateInstrumentAsync(updateRequest);
+            return Ok();
         }
 
         // DELETE api/instruments/5

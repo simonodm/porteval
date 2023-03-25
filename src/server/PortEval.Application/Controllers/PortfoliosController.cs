@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Features.Queries;
@@ -18,15 +16,12 @@ namespace PortEval.Application.Controllers
     [ApiController]
     public class PortfoliosController : ControllerBase
     {
-        private readonly IMapper _mapper;
         private readonly IPortfolioService _portfolioService;
         private readonly IPortfolioQueries _portfolioQueries;
         private readonly IPositionQueries _positionQueries;
 
-        public PortfoliosController(IMapper mapper,
-            IPortfolioService portfolioService, IPortfolioQueries portfolioQueries, IPositionQueries positionQueries)
+        public PortfoliosController(IPortfolioService portfolioService, IPortfolioQueries portfolioQueries, IPositionQueries positionQueries)
         {
-            _mapper = mapper;
             _portfolioService = portfolioService;
             _portfolioQueries = portfolioQueries;
             _positionQueries = positionQueries;
@@ -215,24 +210,23 @@ namespace PortEval.Application.Controllers
 
         // POST api/portfolios
         [HttpPost]
-        public async Task<ActionResult<PortfolioDto>> PostPortfolio([FromBody] PortfolioDto createRequest)
+        public async Task<IActionResult> PostPortfolio([FromBody] PortfolioDto createRequest)
         {
             var createdPortfolio = await _portfolioService.CreatePortfolioAsync(createRequest);
-            return CreatedAtAction("GetPortfolio", new { id = createdPortfolio.Id }, _mapper.Map<PortfolioDto>(createdPortfolio));
+            return CreatedAtAction(nameof(GetPortfolio), new { id = createdPortfolio.Id });
         }
 
         // PUT api/portfolios/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<PortfolioDto>> PutPortfolio(int id, [FromBody] PortfolioDto updateRequest)
+        public async Task<IActionResult> PutPortfolio(int id, [FromBody] PortfolioDto updateRequest)
         {
             if (id != updateRequest.Id)
             {
                 return BadRequest("URL portfolio id and request body id don't match.");
             }
 
-            var updatedPortfolio = await _portfolioService.UpdatePortfolioAsync(updateRequest);
-
-            return _mapper.Map<PortfolioDto>(updatedPortfolio);
+            await _portfolioService.UpdatePortfolioAsync(updateRequest);
+            return Ok();
         }
 
         // DELETE api/portfolios/5

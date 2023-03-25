@@ -90,10 +90,9 @@ namespace PortEval.Application
             services.AddQueries();
 
             services.ConfigureHangfire(Configuration);
-            services.AddAutoMapper(typeof(Startup), typeof(PortEvalDbContext), typeof(PortfolioDto));
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "PortEvalAPI", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "PortEval API", Version = "v1" });
                 c.EnableAnnotations();
             });
             services.AddSwaggerGenNewtonsoftSupport();

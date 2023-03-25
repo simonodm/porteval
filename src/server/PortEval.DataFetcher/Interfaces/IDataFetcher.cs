@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace PortEval.DataFetcher.Interfaces
 {
     /// <summary>
-    /// Aggregates multiple API clients supporting retrieval of instrument prices and currency exchange rates.
+    /// Aggregates multiple API clients supporting retrieval of homogenous data.
     /// </summary>
     public interface IDataFetcher
     {

@@ -172,6 +172,29 @@ namespace PortEval.Application.Features.Queries
             };
         }
 
+        /// <inheritdoc cref="IInstrumentQueries.GetInstrumentSplit"/>
+        public async Task<QueryResponse<InstrumentSplitDto>> GetInstrumentSplit(int instrumentId, int splitId)
+        {
+            var instrument = await GetInstrument(instrumentId);
+            if (instrument.Status != QueryStatus.Ok)
+            {
+                return new QueryResponse<InstrumentSplitDto>
+                {
+                    Status = instrument.Status
+                };
+            }
+
+            var query = InstrumentDataQueries.GetInstrumentSplit(instrumentId, splitId);
+            using var connection = _connectionCreator.CreateConnection();
+            var split = await connection.QueryFirstOrDefaultAsync<InstrumentSplitDto>(query.Query, query.Params);
+
+            return new QueryResponse<InstrumentSplitDto>
+            {
+                Status = split != null ? QueryStatus.Ok : QueryStatus.NotFound,
+                Response = split
+            };
+        }
+
         /// <inheritdoc cref="IInstrumentQueries.GetInstrumentPrice"/>
         public async Task<QueryResponse<InstrumentPriceDto>> GetInstrumentPrice(int instrumentId, DateTime time)
         {

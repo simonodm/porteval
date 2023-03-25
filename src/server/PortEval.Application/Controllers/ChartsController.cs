@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Features.Queries;
@@ -19,13 +17,11 @@ namespace PortEval.Application.Controllers
     {
         private readonly IChartService _chartService;
         private readonly IChartQueries _chartQueries;
-        private readonly IMapper _mapper;
 
-        public ChartsController(IChartService chartService, IChartQueries chartQueries, IMapper mapper)
+        public ChartsController(IChartService chartService, IChartQueries chartQueries)
         {
             _chartService = chartService;
             _chartQueries = chartQueries;
-            _mapper = mapper;
         }
 
 
@@ -52,24 +48,23 @@ namespace PortEval.Application.Controllers
 
         // POST api/<ChartsController>
         [HttpPost]
-        public async Task<ActionResult<ChartDto>> PostChart([FromBody] ChartDto createRequest)
+        public async Task<IActionResult> PostChart([FromBody] ChartDto createRequest)
         {
             var createdChart = await _chartService.CreateChartAsync(createRequest);
-            return CreatedAtAction("GetChart", new { id = createdChart.Id },
-                _mapper.Map<ChartDto>(createdChart));
+            return CreatedAtAction(nameof(GetChart), new { id = createdChart.Id });
         }
 
         // PUT api/<ChartsController>/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ChartDto>> PutChart(int id, [FromBody] ChartDto updateRequest)
+        public async Task<IActionResult> PutChart(int id, [FromBody] ChartDto updateRequest)
         {
             if (id != updateRequest.Id)
             {
                 return BadRequest("URL chart id and request body chart id don't match.");
             }
 
-            var updatedChart = await _chartService.UpdateChartAsync(updateRequest);
-            return _mapper.Map<ChartDto>(updatedChart);
+            await _chartService.UpdateChartAsync(updateRequest);
+            return Ok();
         }
 
         // DELETE api/<ChartsController>/5

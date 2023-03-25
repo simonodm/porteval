@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Features.Queries;
@@ -18,13 +16,11 @@ namespace PortEval.Application.Controllers
     {
         private readonly ITransactionService _transactionService;
         private readonly ITransactionQueries _transactionQueries;
-        private readonly IMapper _mapper;
 
-        public TransactionsController(ITransactionService transactionService, ITransactionQueries transactionQueries, IMapper mapper)
+        public TransactionsController(ITransactionService transactionService, ITransactionQueries transactionQueries)
         {
             _transactionService = transactionService;
             _transactionQueries = transactionQueries;
-            _mapper = mapper;
         }
 
         // GET: api/transactions
@@ -55,27 +51,25 @@ namespace PortEval.Application.Controllers
 
         // POST api/transactions
         [HttpPost]
-        public async Task<ActionResult<TransactionDto>> PostTransaction([FromBody] TransactionDto createRequest)
+        public async Task<IActionResult> PostTransaction([FromBody] TransactionDto createRequest)
         {
             var createdTransaction = await _transactionService.AddTransactionAsync(createRequest);
 
-            return CreatedAtAction("GetTransaction",
-                new { transactionId = createdTransaction.Id },
-                _mapper.Map<TransactionDto>(createdTransaction));
+            return CreatedAtAction(nameof(GetTransaction), new { transactionId = createdTransaction.Id });
         }
 
         // PUT api/transactions/3
         [HttpPut("{transactionId}")]
-        public async Task<ActionResult<TransactionDto>> PutTransaction(int transactionId, [FromBody] TransactionDto updateRequest)
+        public async Task<IActionResult> PutTransaction(int transactionId, [FromBody] TransactionDto updateRequest)
         {
             if (transactionId != updateRequest.Id)
             {
                 return BadRequest("URL transaction id and request body transaction id don't match.");
             }
 
-            var updatedTransaction = await _transactionService.UpdateTransactionAsync(updateRequest);
+            await _transactionService.UpdateTransactionAsync(updateRequest);
 
-            return _mapper.Map<TransactionDto>(updatedTransaction);
+            return Ok();
         }
 
         // DELETE api/transactions/3

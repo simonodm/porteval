@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Features.Queries;
@@ -19,13 +17,11 @@ namespace PortEval.Application.Controllers
     {
         private readonly IInstrumentPriceService _priceService;
         private readonly IInstrumentQueries _instrumentQueries;
-        private readonly IMapper _mapper;
 
-        public InstrumentPricesController(IInstrumentPriceService priceService, IInstrumentQueries instrumentQueries, IMapper mapper)
+        public InstrumentPricesController(IInstrumentPriceService priceService, IInstrumentQueries instrumentQueries)
         {
             _priceService = priceService;
             _instrumentQueries = instrumentQueries;
-            _mapper = mapper;
         }
 
         // GET: api/instruments/1/prices
@@ -71,7 +67,7 @@ namespace PortEval.Application.Controllers
 
         // POST api/instruments/1/prices
         [HttpPost]
-        public async Task<ActionResult<InstrumentPriceDto>> PostPricePoint(int instrumentId, [FromBody] InstrumentPriceDto createRequest)
+        public async Task<IActionResult> PostPricePoint(int instrumentId, [FromBody] InstrumentPriceDto createRequest)
         {
             if (instrumentId != createRequest.InstrumentId)
             {
@@ -79,7 +75,7 @@ namespace PortEval.Application.Controllers
             }
 
             var price = await _priceService.AddPricePointAsync(createRequest);
-            return CreatedAtAction("GetInstrumentPriceAt", new { instrumentId = price.Id, time = price.Time }, _mapper.Map<InstrumentPriceDto>(price));
+            return CreatedAtAction(nameof(GetInstrumentPriceAt), new { instrumentId = price.Id, time = price.Time });
         }
 
         // DELETE api/instruments/1/prices/5

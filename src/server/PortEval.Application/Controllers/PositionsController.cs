@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Features.Queries;
@@ -20,13 +18,11 @@ namespace PortEval.Application.Controllers
     {
         private readonly IPositionService _positionService;
         private readonly IPositionQueries _positionQueries;
-        private readonly IMapper _mapper;
 
-        public PositionsController(IPositionService positionService, IPositionQueries positionQueries, IMapper mapper)
+        public PositionsController(IPositionService positionService, IPositionQueries positionQueries)
         {
             _positionService = positionService;
             _positionQueries = positionQueries;
-            _mapper = mapper;
         }
 
         // GET api/positions/5
@@ -183,27 +179,25 @@ namespace PortEval.Application.Controllers
 
         // POST api/positions
         [HttpPost]
-        public async Task<ActionResult<PositionDto>> PostPosition([FromBody] PositionDto createRequest)
+        public async Task<IActionResult> PostPosition([FromBody] PositionDto createRequest)
         {
             var createdPosition =
                 await _positionService.OpenPositionAsync(createRequest);
-            return CreatedAtAction("GetPosition", new { positionId = createdPosition.Id },
-                _mapper.Map<PositionDto>(createdPosition));
+            return CreatedAtAction(nameof(GetPosition), new { positionId = createdPosition.Id });
         }
 
         // PUT api/positions/5
         [HttpPut("{positionId}")]
-        public async Task<ActionResult<PositionDto>> PutPosition(int positionId, [FromBody] PositionDto updateRequest)
+        public async Task<IActionResult> PutPosition(int positionId, [FromBody] PositionDto updateRequest)
         {
             if (updateRequest.Id != positionId)
             {
                 return BadRequest("URL position id and request body position id don't match.");
             }
 
-            var updatedPosition =
-                await _positionService.UpdatePositionAsync(updateRequest);
+            await _positionService.UpdatePositionAsync(updateRequest);
 
-            return _mapper.Map<PositionDto>(updatedPosition);
+            return Ok();
         }
 
         // DELETE api/positions/5

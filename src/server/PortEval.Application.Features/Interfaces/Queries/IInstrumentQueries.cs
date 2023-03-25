@@ -69,6 +69,14 @@ namespace PortEval.Application.Features.Interfaces.Queries
         Task<QueryResponse<IEnumerable<InstrumentSplitDto>>> GetInstrumentSplits(int instrumentId);
 
         /// <summary>
+        /// Retrieves a single split of an instrument.
+        /// </summary>
+        /// <param name="instrumentId">ID of the parent instrument.</param>
+        /// <param name="splitId">ID of the split.</param>
+        /// <returns>A task representing the asynchronous database query. Task result contains a split DTO.</returns>
+        Task<QueryResponse<InstrumentSplitDto>> GetInstrumentSplit(int instrumentId, int splitId);
+
+        /// <summary>
         /// Retrieves the last available price of the instrument before or equal to the specified time.
         /// </summary>
         /// <param name="instrumentId">ID of the instrument to retrieve price of.</param>

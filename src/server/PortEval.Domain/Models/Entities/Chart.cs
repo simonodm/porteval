@@ -19,24 +19,24 @@ namespace PortEval.Domain.Models.Entities
         }
         private List<ChartLine> _lines = new List<ChartLine>();
 
-        public Chart(int id, string name, ChartDateRange dateRange, ChartTypeSettings typeConfig) : this(name, dateRange, typeConfig)
+        internal Chart(int id, string name, ChartDateRange dateRange, ChartTypeSettings typeConfig) : this(name, dateRange, typeConfig)
         {
             Id = id;
         }
 
-        public Chart(string name, ChartDateRange dateRange, ChartTypeSettings typeConfig)
+        internal Chart(string name, ChartDateRange dateRange, ChartTypeSettings typeConfig)
         {
             Name = name;
             DateRange = dateRange;
             TypeConfiguration = typeConfig;
         }
 
-        public Chart(int id, string name) : this(name)
+        internal Chart(int id, string name) : this(name)
         {
             Id = id;
         }
 
-        public Chart(string name)
+        internal Chart(string name)
         {
             Name = name;
             DateRange = new ChartDateRange(new ToDateRange(DateRangeUnit.YEAR, 1));
