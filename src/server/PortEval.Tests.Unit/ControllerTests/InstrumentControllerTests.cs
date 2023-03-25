@@ -462,7 +462,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PutInstrument(instrument.Id + 1, instrument);
 
             instrumentService.Verify(m => m.UpdateInstrumentAsync(instrument), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
         }
 
         [Fact]

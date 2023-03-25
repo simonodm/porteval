@@ -64,6 +64,27 @@ namespace PortEval.Tests.Unit.ControllerTests
         }
 
         [Fact]
+        public async Task GetInstrumentSplit_ReturnsInstrumentSplit_WhenItExists()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            
+            var split = fixture.Create<InstrumentSplitDto>();
+
+            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            instrumentQueries
+                .Setup(m => m.GetInstrumentSplit(split.InstrumentId, split.Id))
+                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(split));
+
+            var sut = fixture.Build<InstrumentSplitsController>().OmitAutoProperties().Create();
+
+            var result = await sut.GetInstrumentSplit(split.InstrumentId, split.Id);
+
+            instrumentQueries.Verify(m => m.GetInstrumentSplit(split.InstrumentId, split.Id));
+            Assert.Equal(split, result.Value);
+        }
+
+        [Fact]
         public async Task PostInstrumentSplit_CreatesSplit()
         {
             var fixture = new Fixture()
@@ -97,7 +118,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PostInstrumentSplit(split.InstrumentId + 1, split);
 
             instrumentSplitService.Verify(m => m.CreateSplitAsync(It.IsAny<InstrumentSplitDto>()), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
         }
 
         [Fact]
@@ -134,7 +155,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PutInstrumentSplit(split.InstrumentId + 1, split);
 
             instrumentSplitService.Verify(m => m.UpdateSplitAsync(It.IsAny<int>(), It.IsAny<InstrumentSplitDto>()), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
         }
     }
 }

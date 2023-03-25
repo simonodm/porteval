@@ -677,7 +677,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PutPortfolio(portfolio.Id + 1, portfolio);
 
             portfolioService.Verify(m => m.UpdatePortfolioAsync(portfolio), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
         }
 
         [Fact]

@@ -157,7 +157,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PutTransaction(transaction.Id + 1, transaction);
 
             transactionService.Verify(m => m.UpdateTransactionAsync(transaction), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
         }
 
         [Fact]

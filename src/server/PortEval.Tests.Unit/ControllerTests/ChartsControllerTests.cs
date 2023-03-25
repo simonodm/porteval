@@ -126,7 +126,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PutChart(chart.Id + 1, chart);
 
             chartService.Verify(m => m.UpdateChartAsync(chart), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
         }
 
         [Fact]

@@ -618,7 +618,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PutPosition(position.Id + 1, position);
 
             positionService.Verify(m => m.UpdatePositionAsync(position), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
         }
 
         [Fact]

@@ -143,7 +143,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PostPricePoint(price.InstrumentId + 1, price);
 
             instrumentPriceService.Verify(m => m.AddPricePointAsync(price), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
         }
 
         [Fact]
