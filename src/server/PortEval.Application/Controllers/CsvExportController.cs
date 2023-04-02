@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PortEval.Application.Features.Interfaces.Queries;
-using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.QueryParams;
 using System;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Services;
 
 namespace PortEval.Application.Controllers
 {

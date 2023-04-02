@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PortEval.Application.Features.Interfaces.Queries;
-using PortEval.Application.Features.Interfaces.Services;
-using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
@@ -9,10 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Services;
+using PortEval.Application.Core.Queries;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("[controller]")]
+    [Route("positions")]
     [ApiController]
     public class PositionsController : ControllerBase
     {
@@ -183,7 +183,7 @@ namespace PortEval.Application.Controllers
         {
             var createdPosition =
                 await _positionService.OpenPositionAsync(createRequest);
-            return CreatedAtAction(nameof(GetPosition), new { positionId = createdPosition.Id });
+            return CreatedAtAction(nameof(GetPosition), new { positionId = createdPosition.Id }, null);
         }
 
         // PUT api/positions/5

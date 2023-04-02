@@ -33,7 +33,7 @@
     <ProjectReference Include="..\PortEval.Application.Models\PortEval.Application.Models.csproj" />
     <ProjectReference Include="..\PortEval.DataFetcher\PortEval.DataFetcher.csproj" />
     <ProjectReference Include="..\PortEval.Domain\PortEval.Domain.csproj" />
-    <ProjectReference Include="..\PortEval.Application.Features\PortEval.Application.Features.csproj" />
+    <ProjectReference Include="..\PortEval.Application.Core\PortEval.Application.Core.csproj" />
   </ItemGroup>
 
 </Project>

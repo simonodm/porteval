@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using PortEval.Application.Features.Interfaces.Repositories;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;

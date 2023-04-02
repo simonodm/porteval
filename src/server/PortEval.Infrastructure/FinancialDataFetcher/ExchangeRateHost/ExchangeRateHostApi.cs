@@ -1,5 +1,4 @@
-﻿using PortEval.Application.Models.PriceFetcher;
-using PortEval.DataFetcher;
+﻿using PortEval.DataFetcher;
 using PortEval.DataFetcher.Models;
 using PortEval.DataFetcher.Responses;
 using PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost.Models;
@@ -9,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Models.FinancialDataFetcher;
 
 namespace PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost
 {

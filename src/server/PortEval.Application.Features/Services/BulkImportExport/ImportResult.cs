@@ -1,9 +1,0 @@
-﻿using System.Collections.Generic;
-
-namespace PortEval.Application.Features.Services.BulkImportExport
-{
-    public class ImportResult<T>
-    {
-        public IEnumerable<ProcessedRowErrorLogEntry<T>> ErrorLog { get; set; }
-    }
-}

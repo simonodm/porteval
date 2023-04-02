@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PortEval.Application.Features.Interfaces.Queries;
-using PortEval.Application.Features.Interfaces.Services;
-using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Services;
+using PortEval.Application.Core.Queries;
 
 namespace PortEval.Application.Controllers
 {
@@ -55,7 +55,7 @@ namespace PortEval.Application.Controllers
         {
             var createdTransaction = await _transactionService.AddTransactionAsync(createRequest);
 
-            return CreatedAtAction(nameof(GetTransaction), new { transactionId = createdTransaction.Id });
+            return CreatedAtAction(nameof(GetTransaction), new { transactionId = createdTransaction.Id }, null);
         }
 
         // PUT api/transactions/3

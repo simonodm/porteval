@@ -1,12 +1,6 @@
 ﻿using AutoFixture;
 using Moq;
-using PortEval.Application.Features.Common;
-using PortEval.Application.Features.Interfaces;
-using PortEval.Application.Features.Interfaces.Calculators;
-using PortEval.Application.Features.Interfaces.Repositories;
-using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
-using PortEval.Application.Models.PriceFetcher;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
@@ -14,6 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Common;
+using PortEval.Application.Core.Interfaces;
+using PortEval.Application.Core.Interfaces.Calculators;
+using PortEval.Application.Core.Interfaces.Repositories;
+using PortEval.Application.Core.Interfaces.Services;
+using PortEval.Application.Models.FinancialDataFetcher;
 
 namespace PortEval.Tests.Unit.Helpers.Extensions
 {

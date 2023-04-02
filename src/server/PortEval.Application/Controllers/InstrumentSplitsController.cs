@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PortEval.Application.Features.Interfaces.Queries;
-using PortEval.Application.Features.Interfaces.Services;
-using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Services;
+using PortEval.Application.Core.Queries;
 
 namespace PortEval.Application.Controllers
 {
@@ -59,7 +59,7 @@ namespace PortEval.Application.Controllers
 
             var createdSplit = await _splitService.CreateSplitAsync(splitData);
 
-            return CreatedAtAction(nameof(GetInstrumentSplit), new { instrumentId, splitId = createdSplit.Id });
+            return CreatedAtAction(nameof(GetInstrumentSplit), new { instrumentId, splitId = createdSplit.Id }, null);
         }
 
         // PUT instruments/5/splits/3

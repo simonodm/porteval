@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using PortEval.Application.Extensions;
-using PortEval.Application.Features.Hubs;
 using PortEval.Application.Filters;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Converters;
@@ -20,6 +19,7 @@ using System.ComponentModel;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.HttpLogging;
+using PortEval.Application.Core.Hubs;
 using Serilog;
 
 namespace PortEval.Application

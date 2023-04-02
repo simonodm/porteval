@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-	<?define HostingBundleDownloadUrl=https://download.visualstudio.microsoft.com/download/pr/eaa3eab9-cc21-44b5-a4e4-af31ee73b9fa/d8ad75d525dec0a30b52adc990796b11/dotnet-hosting-6.0.9-win.exe ?>
+	<?define HostingBundleDownloadUrl=https://download.visualstudio.microsoft.com/download/pr/d97e0776-b316-4c41-a067-202eb027b968/e9694b0aa94e4b814f980f9ec3d3f400/dotnet-hosting-7.0.4-win.exe ?>
 	
 	<Fragment>
 		<util:RegistrySearch
 			  Id="InstallationFound"
 			  Root="HKLM"
-			  Key="SOFTWARE\WOW6432Node\Microsoft\Updates\.NET\Microsoft .NET 6.0.9 - Windows Server Hosting (x86)"
+			  Key="SOFTWARE\WOW6432Node\Microsoft\Updates\.NET\Microsoft .NET 7.0.4 - Windows Server Hosting (x86)"
 			  Result="exists"
 			  Variable="InstallationFound"
 			  Win64="yes" />
@@ -17,7 +17,7 @@
 			  Id="DOTNETHBREPAIR"
 			  DownloadUrl="$(var.HostingBundleDownloadUrl)"
 			  DetectCondition="NOT InstallationFound OR (WebServerInstalled AND StaticContentInstalled AND DefaultDocumentInstalled AND DirectoryBrowsingInstalled AND HttpErrorsInstalled AND HttpRedirectInstalled AND ASPInstalled AND ASPNETInstalled AND ASPNET45Installed AND NetFxExtensibilityInstalled AND NetFxExtensibility45Installed AND ISAPIExtensionsInstalled AND ISAPIFilterInstalled AND HttpLoggingInstalled AND LoggingLibrariesInstalled AND RequestMonitorInstalled AND HttpTracingInstalled AND CustomLoggingInstalled AND RequestFilteringInstalled AND IPSecurityInstalled AND HttpCompressionStaticInstalled AND ManagementConsoleInstalled AND ManagementScriptingToolsInstalled AND AdminServiceInstalled AND NetFxEnvironmentInstalled AND WASConfigurationAPIInstalled)"
-			  Name="dotnet-hosting-6.0.9-win.exe"
+			  Name="dotnet-hosting-7.0.4-win.exe"
 			  Compressed="no"
 			  Permanent="yes"
 			  InstallCommand="/quiet /repair"
@@ -28,15 +28,15 @@
 				<RemotePayload
 					Description=".NET Hosting Bundle"
 					ProductName=".NET Hosting Bundle"
-					Version="6.0.9.0"
-					Size="72079520"
-					Hash="432EA5B82B83E2D4D5D1A7A5E71507DACC3A4FE4" />
+					Version="7.0.4.0"
+					Size="110205440"
+					Hash="0C09A7B393C3EBDA908A2AC73056FC521F2F987C" />
 			</ExePackage>
 			<ExePackage
 			  Id="DOTNETHB"
 			  DownloadUrl="$(var.HostingBundleDownloadUrl)"
 			  DetectCondition="InstallationFound"
-			  Name="dotnet-hosting-6.0.9-win.exe"
+			  Name="dotnet-hosting-7.0.4-win.exe"
 			  Compressed="no"
 			  Permanent="yes"
 			  InstallCommand="/quiet"
@@ -46,9 +46,9 @@
 				<RemotePayload
 					Description=".NET Hosting Bundle"
 					ProductName=".NET Hosting Bundle"
-					Version="6.0.9.0"
-					Size="72079520"
-					Hash="432EA5B82B83E2D4D5D1A7A5E71507DACC3A4FE4" />
+					Version="7.0.4.0"
+					Size="110205440"
+					Hash="0C09A7B393C3EBDA908A2AC73056FC521F2F987C" />
 			</ExePackage>
 		</PackageGroup>
 	</Fragment>

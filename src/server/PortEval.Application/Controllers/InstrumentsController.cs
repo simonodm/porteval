@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PortEval.Application.Features.Interfaces.Queries;
-using PortEval.Application.Features.Interfaces.Services;
-using PortEval.Application.Features.Queries;
 using PortEval.Application.Models;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
@@ -9,10 +6,13 @@ using PortEval.Domain.Models.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Services;
+using PortEval.Application.Core.Queries;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("[controller]")]
+    [Route("instruments")]
     [ApiController]
     public class InstrumentsController : ControllerBase
     {
@@ -150,7 +150,7 @@ namespace PortEval.Application.Controllers
         {
             var instrument = await _instrumentService.CreateInstrumentAsync(createRequest);
 
-            return CreatedAtAction(nameof(GetInstrument), new { id = instrument.Id });
+            return CreatedAtAction(nameof(GetInstrument), new { id = instrument.Id }, null);
         }
 
         // PUT api/instruments/5

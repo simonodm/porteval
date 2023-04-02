@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Models.DTOs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("[controller]")]
+    [Route("exchanges")]
     [ApiController]
     public class ExchangesController : ControllerBase
     {

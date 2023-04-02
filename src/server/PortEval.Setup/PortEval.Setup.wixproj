@@ -32,7 +32,7 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>APIINSTALLFOLDER</RefTargetDir>
       <IsDotnetSDKProject>True</IsDotnetSDKProject>
-      <TargetFrameworkIdentifier>net5.0</TargetFrameworkIdentifier>
+      <TargetFrameworkIdentifier>net7.0</TargetFrameworkIdentifier>
       <Runtime>win-x64</Runtime>
     </ProjectReference>
   </ItemGroup>

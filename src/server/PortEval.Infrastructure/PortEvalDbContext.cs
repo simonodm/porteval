@@ -1,12 +1,15 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using PortEval.Application.Features.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Infrastructure.Configurations;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Repositories;
 
 namespace PortEval.Infrastructure
 {
+    /// <summary>
+    /// Represents an Entity Framework context for the application's database.
+    /// </summary>
     public class PortEvalDbContext : DbContext, IUnitOfWork
     {
         private readonly IMediator _mediator;
@@ -37,12 +40,14 @@ namespace PortEval.Infrastructure
             new ExchangeConfiguration().Configure(modelBuilder.Entity<Exchange>());
         }
 
+        /// <inheritdoc cref="IUnitOfWork.Commit"/>
         public void Commit()
         {
             SaveChanges();
             _mediator.DispatchDomainEventsAsync(this).Wait();
         }
 
+        /// <inheritdoc cref="IUnitOfWork.CommitAsync"/>
         public async Task CommitAsync()
         {
             await SaveChangesAsync();

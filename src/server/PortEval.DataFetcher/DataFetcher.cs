@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace PortEval.DataFetcher
 {
+    /// <inheritdoc />
     public class DataFetcher : IDataFetcher
     {
         private readonly HttpClient _httpClient;
@@ -53,6 +54,11 @@ namespace PortEval.DataFetcher
             _retryPolicy = retryPolicy;
         }
 
+        /// <summary>
+        /// Registers a data source to be used for request processing.
+        /// </summary>
+        /// <typeparam name="TDataSource">Type of the data source.</typeparam>
+        /// <param name="configuration">An optional configuration object.</param>
         public void RegisterDataSource<TDataSource>(DataSourceConfiguration configuration = null)
             where TDataSource : DataSource, new()
         {
@@ -80,6 +86,7 @@ namespace PortEval.DataFetcher
             _registeredClients.Add(api);
         }
 
+        /// <inheritdoc />
         public async Task<Response<TResult>> ProcessRequest<TRequest, TResult>(TRequest request)
             where TRequest : class, IRequest
         {

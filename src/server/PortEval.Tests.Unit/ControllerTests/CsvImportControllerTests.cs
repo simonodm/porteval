@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PortEval.Application.Controllers;
-using PortEval.Application.Features.Interfaces.Queries;
-using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Models.Enums;
 using PortEval.Tests.Unit.Helpers;
@@ -13,6 +11,8 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Services;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests

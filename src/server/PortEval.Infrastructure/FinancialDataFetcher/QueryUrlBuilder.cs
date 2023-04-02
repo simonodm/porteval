@@ -2,6 +2,9 @@
 
 namespace PortEval.Infrastructure.FinancialDataFetcher
 {
+    /// <summary>
+    /// A URL builder allowing addition of query parameters.
+    /// </summary>
     public class QueryUrlBuilder
     {
         private readonly StringBuilder _urlBuilder = new StringBuilder();
@@ -12,6 +15,11 @@ namespace PortEval.Infrastructure.FinancialDataFetcher
             _urlBuilder.Append(baseUrl);
         }
 
+        /// <summary>
+        /// Adds a query parameter to the URL with the specified key and value.
+        /// </summary>
+        /// <param name="name">Name of the parameter.</param>
+        /// <param name="value">Value of the parameter.</param>
         public void AddQueryParam(string name, string value)
         {
             if (name == null || value == null) return;
@@ -22,6 +30,10 @@ namespace PortEval.Infrastructure.FinancialDataFetcher
             _queryParamsExist = true;
         }
 
+        /// <summary>
+        /// Converts the builder to a URL string containing all added query parameters.
+        /// </summary>
+        /// <returns>A URL string.</returns>
         public override string ToString()
         {
             return _urlBuilder.ToString();

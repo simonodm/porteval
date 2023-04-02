@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using PortEval.Application.Features.Interfaces.BackgroundJobs;
 using PortEval.Infrastructure;
 using System;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.BackgroundJobs;
 using Serilog;
 
 namespace PortEval.Application

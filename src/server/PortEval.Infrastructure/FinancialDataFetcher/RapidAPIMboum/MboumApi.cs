@@ -1,5 +1,4 @@
-﻿using PortEval.Application.Models.PriceFetcher;
-using PortEval.DataFetcher;
+﻿using PortEval.DataFetcher;
 using PortEval.DataFetcher.Responses;
 using PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum.Models;
 using PortEval.Infrastructure.FinancialDataFetcher.Requests;
@@ -7,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.Infrastructure.FinancialDataFetcher.Extensions;
 
 namespace PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum
@@ -25,7 +25,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum
             {
                 StatusCode = response.StatusCode,
                 ErrorMessage = response.ErrorMessage,
-                Result = response.Result.Items?
+                Result = response.Result?.Items?
                     .Where(kv =>
                     {
                         var time = DateTimeOffset.FromUnixTimeSeconds(kv.Value.DateUtc).UtcDateTime;
@@ -45,7 +45,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum
             {
                 StatusCode = response.StatusCode,
                 ErrorMessage = response.ErrorMessage,
-                Result = response.Result.Items?
+                Result = response.Result?.Items?
                     .Where(kv =>
                     {
                         var time = DateTimeOffset.FromUnixTimeSeconds(kv.Value.DateUtc).UtcDateTime;
@@ -63,7 +63,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum
             {
                 StatusCode = response.StatusCode,
                 ErrorMessage = response.ErrorMessage,
-                Result = response.Result.Any() ? new PricePoint
+                Result = response.Result != null && response.Result.Any() ? new PricePoint
                 {
                     CurrencyCode = response.Result.First().Currency,
                     Price = response.Result.First().RegularMarketPrice,

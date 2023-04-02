@@ -2,8 +2,6 @@
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
 using Moq;
-using PortEval.Application.Features.Interfaces.Repositories;
-using PortEval.BackgroundJobs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using System;
@@ -12,6 +10,8 @@ using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Threading.Tasks;
+using PortEval.Application.Core.BackgroundJobs;
+using PortEval.Application.Core.Interfaces.Repositories;
 using Xunit;
 
 namespace PortEval.Tests.Unit.BackgroundJobTests

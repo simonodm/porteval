@@ -10,10 +10,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using PortEval.Application.Extensions;
-using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Infrastructure;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
 using Xunit;
 
 namespace PortEval.Tests.Integration

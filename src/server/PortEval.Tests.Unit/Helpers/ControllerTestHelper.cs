@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PortEval.Application.Features.Queries;
 using System.IO;
 using System.Text;
+using PortEval.Application.Core.Queries;
 using Xunit;
 
 namespace PortEval.Tests.Unit.Helpers

@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PortEval.Application.Features.Interfaces.Queries;
-using PortEval.Application.Features.Interfaces.Services;
-using PortEval.Application.Features.Queries;
 using PortEval.Application.Models;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Services;
+using PortEval.Application.Core.Queries;
 
 namespace PortEval.Application.Controllers
 {
@@ -75,7 +75,7 @@ namespace PortEval.Application.Controllers
             }
 
             var price = await _priceService.AddPricePointAsync(createRequest);
-            return CreatedAtAction(nameof(GetInstrumentPriceAt), new { instrumentId = price.Id, time = price.Time });
+            return CreatedAtAction(nameof(GetInstrumentPriceAt), new { instrumentId = price.Id, time = price.Time }, null);
         }
 
         // DELETE api/instruments/1/prices/5

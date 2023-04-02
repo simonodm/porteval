@@ -1,13 +1,14 @@
-﻿using PortEval.Application.Features.Interfaces;
-using PortEval.Application.Models.PriceFetcher;
-using PortEval.DataFetcher.Interfaces;
+﻿using PortEval.DataFetcher.Interfaces;
 using PortEval.Infrastructure.FinancialDataFetcher.Requests;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces;
+using PortEval.Application.Models.FinancialDataFetcher;
 
 namespace PortEval.Infrastructure.FinancialDataFetcher
 {
+    /// <inheritdoc />
     public class FinancialDataFetcher : IFinancialDataFetcher
     {
         private readonly IDataFetcher _fetcher;

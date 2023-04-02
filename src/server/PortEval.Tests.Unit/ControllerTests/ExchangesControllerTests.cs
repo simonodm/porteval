@@ -2,10 +2,10 @@
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Controllers;
-using PortEval.Application.Features.Interfaces.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Tests.Unit.Helpers;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests

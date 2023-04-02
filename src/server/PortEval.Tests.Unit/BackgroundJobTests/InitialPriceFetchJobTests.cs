@@ -1,9 +1,6 @@
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
-using PortEval.Application.Features.Interfaces.Repositories;
-using PortEval.Application.Models.PriceFetcher;
-using PortEval.BackgroundJobs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Tests.Unit.Helpers.Extensions;
@@ -11,6 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Core.BackgroundJobs;
+using PortEval.Application.Core.Interfaces.Repositories;
+using PortEval.Application.Models.FinancialDataFetcher;
 using Xunit;
 
 namespace PortEval.Tests.Unit.BackgroundJobTests

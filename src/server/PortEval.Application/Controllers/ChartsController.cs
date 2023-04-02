@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PortEval.Application.Features.Interfaces.Queries;
-using PortEval.Application.Features.Interfaces.Services;
-using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Services;
+using PortEval.Application.Core.Queries;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace PortEval.Application.Controllers
 {
-    [Route("[controller]")]
+    [Route("charts")]
     [ApiController]
     public class ChartsController : ControllerBase
     {
@@ -51,7 +51,8 @@ namespace PortEval.Application.Controllers
         public async Task<IActionResult> PostChart([FromBody] ChartDto createRequest)
         {
             var createdChart = await _chartService.CreateChartAsync(createRequest);
-            return CreatedAtAction(nameof(GetChart), new { id = createdChart.Id });
+
+            return CreatedAtAction(nameof(GetChart), new { id = createdChart.Id }, null);
         }
 
         // PUT api/<ChartsController>/5

@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PortEval.Application.Features.Interfaces.Queries;
-using PortEval.Application.Features.Interfaces.Services;
-using PortEval.Application.Features.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
@@ -9,10 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Services;
+using PortEval.Application.Core.Queries;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("[controller]")]
+    [Route("portfolios")]
     [ApiController]
     public class PortfoliosController : ControllerBase
     {
@@ -213,7 +213,7 @@ namespace PortEval.Application.Controllers
         public async Task<IActionResult> PostPortfolio([FromBody] PortfolioDto createRequest)
         {
             var createdPortfolio = await _portfolioService.CreatePortfolioAsync(createRequest);
-            return CreatedAtAction(nameof(GetPortfolio), new { id = createdPortfolio.Id });
+            return CreatedAtAction(nameof(GetPortfolio), new { id = createdPortfolio.Id }, null);
         }
 
         // PUT api/portfolios/5

@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PortEval.Application.Features.Interfaces.Queries;
-using PortEval.Application.Features.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Services;
 
 namespace PortEval.Application.Controllers
 {
-    [Route("[controller]")]
+    [Route("dashboard")]
     [ApiController]
     public class DashboardController : ControllerBase
     {
