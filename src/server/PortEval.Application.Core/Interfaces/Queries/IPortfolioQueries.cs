@@ -18,7 +18,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// </summary>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> containing the retrieved portfolio DTOs.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> containing the retrieved portfolio DTOs.
         /// </returns>
         Task<QueryResponse<IEnumerable<PortfolioDto>>> GetPortfolios();
 
@@ -26,7 +26,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// Retrieves a portfolio by ID.
         /// </summary>
         /// <param name="portfolioId">ID of the portfolio to retrieve.</param>
-        /// <returns>A task representing the asynchronous database query. Task result contains the desired portfolio DTO if it exists, null otherwise.</returns>
+        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over  the desired portfolio DTO if it exists, null otherwise.</returns>
         Task<QueryResponse<PortfolioDto>> GetPortfolio(int portfolioId);
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="time">Value time.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains the latest portfolio value DTO before the specified time if such exists, null otherwise.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over the latest portfolio value DTO before the specified time if such exists, null otherwise.
         /// </returns>
         Task<QueryResponse<EntityValueDto>> GetPortfolioValue(int portfolioId, DateTime time);
 
@@ -47,7 +47,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="dateRange">Date range to calculate profit in.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <see cref="EntityProfitDto">EntityProfitDto</see> containing the portfolio's profit.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <see cref="EntityProfitDto">EntityProfitDto</see> containing the portfolio's profit.
         /// </returns>
         Task<QueryResponse<EntityProfitDto>> GetPortfolioProfit(int portfolioId, DateRangeParams dateRange);
 
@@ -58,7 +58,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="dateRange">Date range to calculate performance in.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <see cref="EntityPerformanceDto">EntityPerformanceDto</see> containing the portfolio's performance.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <see cref="EntityPerformanceDto">EntityPerformanceDto</see> containing the portfolio's performance.
         /// </returns>
         Task<QueryResponse<EntityPerformanceDto>> GetPortfolioPerformance(int portfolioId, DateRangeParams dateRange);
 
@@ -71,7 +71,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="targetCurrencyCode">Currency to chart portfolio values in.</param>
         /// /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
         /// containing the portfolio's value at the end of individual intervals.
         /// </returns>
         Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartPortfolioValue(int portfolioId,
@@ -86,7 +86,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="targetCurrencyCode">Currency to chart portfolio profits in.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
         /// containing the portfolio's profit between the range start and ends of individual intervals.
         /// </returns>
         Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartPortfolioProfit(int portfolioId,
@@ -100,7 +100,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="frequency">Aggregation frequency.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
         /// containing the portfolio's performance between the range start and ends of individual intervals.
         /// </returns>
         Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartPortfolioPerformance(int portfolioId,
@@ -115,7 +115,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="targetCurrencyCode">Currency to chart portfolio profits in.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s containing the portfolio's profit in individual intervals.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s containing the portfolio's profit in individual intervals.
         /// </returns>
         Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartPortfolioProfitAggregated(int portfolioId,
             DateRangeParams dateRange, AggregationFrequency frequency, string targetCurrencyCode = null);
@@ -128,7 +128,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="frequency">Aggregation frequency.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
         /// containing the portfolio's performance in individual intervals.
         /// </returns>
         Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartPortfolioPerformanceAggregated(int portfolioId,
@@ -139,7 +139,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// </summary>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> off <see cref="EntityStatisticsDto"/>
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> off <see cref="EntityStatisticsDto"/>
         /// containing the portfolios' statistics.
         /// </returns>
         Task<QueryResponse<IEnumerable<EntityStatisticsDto>>> GetAllPortfoliosStatistics();
@@ -150,7 +150,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="id">Portfolio ID</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains <see cref="EntityStatisticsDto"/> containing the portfolio's statistics.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <see cref="EntityStatisticsDto"/> containing the portfolio's statistics.
         /// </returns>
         Task<QueryResponse<EntityStatisticsDto>> GetPortfolioStatistics(int id);
     }

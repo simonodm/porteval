@@ -13,14 +13,14 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <summary>
         /// Retrieves all known currencies.
         /// </summary>
-        /// <returns>A task representing the asynchronous database query. Task result contains an <c>IEnumerable</c> of stored currencies.</returns>
+        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of stored currencies.</returns>
         public Task<QueryResponse<IEnumerable<CurrencyDto>>> GetAllCurrencies();
 
         /// <summary>
         /// Retrieves the specified currency.
         /// </summary>
         /// <param name="currencyCode">Code of the currency to retrieve.</param>
-        /// <returns>A task representing the asynchronous database query. Task result contains the currency DTO with the specified code if it exists, null otherwise.</returns>
+        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over the currency DTO with the specified code if it exists, null otherwise.</returns>
         public Task<QueryResponse<CurrencyDto>> GetCurrency(string currencyCode);
     }
 }

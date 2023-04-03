@@ -13,7 +13,10 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <summary>
         /// Retrieves all charts.
         /// </summary>
-        /// <returns>A task representing the asynchronous database query. Task result contains an <c>IEnumerable</c> of chart DTOs.</returns>
+        /// <returns>
+        /// A task representing the asynchronous database query.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of chart DTOs.
+        /// </returns>
         public Task<QueryResponse<IEnumerable<ChartDto>>> GetCharts();
 
         /// <summary>
@@ -21,7 +24,8 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// </summary>
         /// <param name="chartId">Parent chart ID.</param>
         /// <returns>
-        /// A task representing the asynchronous database query. Task result contains a chart DTO with the specified ID if it exists, <c>null</c> otherwise.
+        /// A task representing the asynchronous database query.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over a chart DTO with the specified ID if it exists, <c>null</c> otherwise.
         /// </returns>
         public Task<QueryResponse<ChartDto>> GetChart(int chartId);
     }

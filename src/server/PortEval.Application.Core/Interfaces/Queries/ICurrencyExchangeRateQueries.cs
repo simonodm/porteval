@@ -19,7 +19,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="time">Time to retrieve exchange rates at.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> containing the exchange rate DTOs.</returns>
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> containing the exchange rate DTOs.</returns>
         public Task<QueryResponse<IEnumerable<CurrencyExchangeRateDto>>> GetExchangeRates(string currencyCode, DateTime time);
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="baseCurrencyCode">Base currency code.</param>
         /// <param name="targetCurrencyCode">Target currency code.</param>
         /// <param name="dateRange">Date range in which the exchange rates should be retrieved.</param>
-        /// <returns>A task representing the asynchronous database query. Task result contains an <c>IEnumerable</c> containing exchange rate DTOs.</returns>
+        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> containing exchange rate DTOs.</returns>
         public Task<QueryResponse<IEnumerable<CurrencyExchangeRateDto>>> GetExchangeRates(string baseCurrencyCode,
             string targetCurrencyCode, DateRangeParams dateRange);
 
@@ -38,7 +38,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="baseCurrencyCode">Base currency code.</param>
         /// <param name="targetCurrencyCode">Target currency code.</param>
         /// <param name="time">Exchange rate time.</param>
-        /// <returns>A task representing the asynchronous database query. Task result contains the latest currency exchange rate DTO before the specified time.</returns>
+        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over the latest currency exchange rate DTO before the specified time.</returns>
         public Task<QueryResponse<CurrencyExchangeRateDto>> GetExchangeRateAt(string baseCurrencyCode, string targetCurrencyCode,
             DateTime time);
     }

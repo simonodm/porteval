@@ -19,7 +19,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// </summary>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> containing the retrieved instrument DTOs.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <see cref="IEnumerable{T}"/> containing the retrieved instrument DTOs.
         /// </returns>
         Task<QueryResponse<IEnumerable<InstrumentDto>>> GetAllInstruments();
 
@@ -29,7 +29,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="pagination">Pagination parameters.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains a <see cref="PaginatedResponse{TPayload}">PaginatedResponse</see> containing the retrieved instrument DTOs.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over a <see cref="PaginatedResponse{TPayload}">PaginatedResponse</see> containing the retrieved instrument DTOs.
         /// </returns>
         Task<QueryResponse<PaginatedResponse<InstrumentDto>>> GetInstrumentsPage(PaginationParams pagination);
 
@@ -37,7 +37,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// Retrieves an instrument by ID.
         /// </summary>
         /// <param name="instrumentId">ID of the instrument to retrieve.</param>
-        /// <returns>A task representing the asynchronous database query. Task result contains the desired instrument DTO if it exists, null otherwise.</returns>
+        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over the desired instrument DTO.</returns>
         Task<QueryResponse<InstrumentDto>> GetInstrument(int instrumentId);
 
         /// <summary>
@@ -45,8 +45,18 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// </summary>
         /// <param name="instrumentId">ID of the instrument to retrieve prices of.</param>
         /// <param name="dateRange">Date range to retrieve prices for.</param>
-        /// <returns>A task representing the asynchronous database query. Task result contains an <c>IEnumerable</c> of price DTOs.</returns>
+        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of price DTOs.</returns>
         Task<QueryResponse<IEnumerable<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId,
+            DateRangeParams dateRange);
+
+        /// <summary>
+        /// Retrieves all instrument prices in the specified date range ordered by price time descending.
+        /// </summary>
+        /// <param name="instrument">Instrument to retrieve prices of.</param>
+        /// <param name="dateRange">Date range to retrieve prices for.</param>
+        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of price DTOs.</returns>
+        /// <remarks>Using this overload instead of <see cref="GetInstrumentPrices(int,DateRangeParams)"/> allows the caller to avoid an instrument existence check inherent to that method.</remarks>
+        Task<QueryResponse<IEnumerable<InstrumentPriceDto>>> GetInstrumentPrices(InstrumentDto instrument,
             DateRangeParams dateRange);
 
         /// <summary>
@@ -57,7 +67,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="dateRange">Date range to retrieve prices for.</param>
         /// <param name="compressed">Determines whether repeated prices should be excluded.</param>
         /// <param name="frequency">Desired interval between prices.</param>
-        /// <returns>A task representing the asynchronous database query. Task result contains an <c>IEnumerable</c> of price DTOs.</returns>
+        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of price DTOs.</returns>
         Task<QueryResponse<PaginatedResponse<InstrumentPriceDto>>> GetInstrumentPricesPage(int instrumentId, PaginationParams pagination,
             DateRangeParams dateRange, bool compressed = false, AggregationFrequency? frequency = null);
 
@@ -65,7 +75,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// Retrieves splits of an instrument ordered by their time descending.
         /// </summary>
         /// <param name="instrumentId">ID of the instrument to retrieve splits of.</param>
-        /// <returns>A task representing the asynchronous database query. Task result contains an <c>IEnumerable</c> of instrument split DTOs.</returns>
+        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of instrument split DTOs.</returns>
         Task<QueryResponse<IEnumerable<InstrumentSplitDto>>> GetInstrumentSplits(int instrumentId);
 
         /// <summary>
@@ -73,7 +83,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// </summary>
         /// <param name="instrumentId">ID of the parent instrument.</param>
         /// <param name="splitId">ID of the split.</param>
-        /// <returns>A task representing the asynchronous database query. Task result contains a split DTO.</returns>
+        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over a split DTO.</returns>
         Task<QueryResponse<InstrumentSplitDto>> GetInstrumentSplit(int instrumentId, int splitId);
 
         /// <summary>
@@ -83,7 +93,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="time">Price time.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains the latest instrument price DTO before the specified time if such exists, null otherwise.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over the latest instrument price DTO before the specified time.
         /// </returns>
         Task<QueryResponse<InstrumentPriceDto>> GetInstrumentPrice(int instrumentId, DateTime time);
 
@@ -94,7 +104,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="dateRange">Date range to calculate profit in.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <see cref="EntityProfitDto">EntityProfitDto</see> containing the instrument's profit.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <see cref="EntityProfitDto">EntityProfitDto</see> containing the instrument's profit.
         /// </returns>
         Task<QueryResponse<EntityProfitDto>> GetInstrumentProfit(int instrumentId, DateRangeParams dateRange);
 
@@ -105,7 +115,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="dateRange">Date range to calculate performance in.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <see cref="EntityPerformanceDto">EntityPerformanceDto</see> containing the instrument's performance.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <see cref="EntityPerformanceDto">EntityPerformanceDto</see> containing the instrument's performance.
         /// </returns>
         Task<QueryResponse<EntityPerformanceDto>> GetInstrumentPerformance(int instrumentId, DateRangeParams dateRange);
 
@@ -118,7 +128,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="targetCurrencyCode">Currency to convert prices to.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
         /// containing the instrument's prices from the date range start until the end of individual intervals.
         /// </returns>
         Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartInstrumentPrices(int instrumentId,
@@ -133,7 +143,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="targetCurrencyCode">Currency to convert profits to.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
         /// containing the instrument's profit from the date range start until the end of individual intervals.
         /// </returns>
         Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartInstrumentProfit(int instrumentId,
@@ -147,7 +157,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="frequency">Aggregation frequency.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s
         /// containing the instrument's performance from the date range start until the end of individual intervals.
         /// </returns>
         Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartInstrumentPerformance(int instrumentId,
@@ -162,7 +172,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="targetCurrencyCode">Currency to convert profits to.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s containing the instrument's profit in individual intervals.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s containing the instrument's profit in individual intervals.
         /// </returns>
         Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartInstrumentProfitAggregated(int instrumentId,
             DateRangeParams dateRange, AggregationFrequency frequency, string targetCurrencyCode = null);
@@ -175,7 +185,7 @@ namespace PortEval.Application.Core.Interfaces.Queries
         /// <param name="frequency">Aggregation frequency.</param>
         /// <returns>
         /// A task representing the asynchronous database query.
-        /// Task result contains an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s containing the instrument's performance in individual intervals.
+        /// Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of <see cref="EntityChartPointDto">EntityChartPointDto</see>s containing the instrument's performance in individual intervals.
         /// </returns>
         Task<QueryResponse<IEnumerable<EntityChartPointDto>>> ChartInstrumentPerformanceAggregated(int instrumentId,
             DateRangeParams dateRange, AggregationFrequency frequency);
