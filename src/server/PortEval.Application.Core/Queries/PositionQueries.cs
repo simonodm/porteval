@@ -74,12 +74,11 @@ namespace PortEval.Application.Core.Queries
             };
         }
 
-        /// <inheritdoc cref="IPositionQueries.GetPortfolioPositions"/>
+        /// <inheritdoc cref="IPositionQueries.GetPortfolioPositions(int)"/>
         public async Task<QueryResponse<IEnumerable<PositionDto>>> GetPortfolioPositions(int portfolioId)
         {
             // The portfolio query has to be done manually (and not through IPortfolioQueries) to prevent DI circular dependency.
             var portfolioQuery = PortfolioDataQueries.GetPortfolio(portfolioId);
-            var positionsQuery = PositionDataQueries.GetPortfolioPositions(portfolioId);
 
             using var connection = _connectionCreator.CreateConnection();
             var portfolio =
@@ -91,6 +90,16 @@ namespace PortEval.Application.Core.Queries
                     Status = QueryStatus.NotFound
                 };
             }
+
+            return await GetPortfolioPositions(portfolio);
+        }
+
+        /// <inheritdoc cref="IPositionQueries.GetPortfolioPositions(PortfolioDto)"/>
+        public async Task<QueryResponse<IEnumerable<PositionDto>>> GetPortfolioPositions(PortfolioDto portfolio)
+        {
+            var positionsQuery = PositionDataQueries.GetPortfolioPositions(portfolio.Id);
+
+            using var connection = _connectionCreator.CreateConnection();
 
             var positions = await connection.QueryAsync<PositionDto, InstrumentDto, PositionDto>(positionsQuery.Query, (p, i) =>
             {
@@ -445,7 +454,7 @@ namespace PortEval.Application.Core.Queries
         /// <inheritdoc />
         public async Task<PositionPriceListData> GetPositionPriceListData(PositionDto position, DateRangeParams dateRange)
         {
-            var prices = await _instrumentQueries.GetInstrumentPrices(position.InstrumentId, dateRange);
+            var prices = await _instrumentQueries.GetInstrumentPrices(position.Instrument, dateRange);
             var transactions =
                 await _transactionQueries.GetTransactions(TransactionFilters.FromPositionId(position.Id), dateRange);
 

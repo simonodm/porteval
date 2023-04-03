@@ -89,7 +89,7 @@ namespace PortEval.Application.Core.Queries
             };
         }
 
-        /// <inheritdoc cref="IInstrumentQueries.GetInstrumentPrices"/>
+        /// <inheritdoc cref="IInstrumentQueries.GetInstrumentPrices(int, DateRangeParams)"/>
         public async Task<QueryResponse<IEnumerable<InstrumentPriceDto>>> GetInstrumentPrices(int instrumentId,
             DateRangeParams dateRange)
         {
@@ -102,7 +102,14 @@ namespace PortEval.Application.Core.Queries
                 };
             }
 
-            var query = InstrumentDataQueries.GetInstrumentPrices(instrumentId, dateRange.From, dateRange.To);
+            return await GetInstrumentPrices(instrument.Response, dateRange);
+        }
+
+        /// <inheritdoc cref="IInstrumentQueries.GetInstrumentPrices(InstrumentDto, DateRangeParams)"/>
+        public async Task<QueryResponse<IEnumerable<InstrumentPriceDto>>> GetInstrumentPrices(InstrumentDto instrument,
+            DateRangeParams dateRange)
+        {
+            var query = InstrumentDataQueries.GetInstrumentPrices(instrument.Id, dateRange.From, dateRange.To);
 
             using var connection = _connectionCreator.CreateConnection();
             var prices = await connection.QueryAsync<InstrumentPriceDto>(query.Query, query.Params);
@@ -175,15 +182,6 @@ namespace PortEval.Application.Core.Queries
         /// <inheritdoc cref="IInstrumentQueries.GetInstrumentSplit"/>
         public async Task<QueryResponse<InstrumentSplitDto>> GetInstrumentSplit(int instrumentId, int splitId)
         {
-            var instrument = await GetInstrument(instrumentId);
-            if (instrument.Status != QueryStatus.Ok)
-            {
-                return new QueryResponse<InstrumentSplitDto>
-                {
-                    Status = instrument.Status
-                };
-            }
-
             var query = InstrumentDataQueries.GetInstrumentSplit(instrumentId, splitId);
             using var connection = _connectionCreator.CreateConnection();
             var split = await connection.QueryFirstOrDefaultAsync<InstrumentSplitDto>(query.Query, query.Params);
@@ -198,14 +196,6 @@ namespace PortEval.Application.Core.Queries
         /// <inheritdoc cref="IInstrumentQueries.GetInstrumentPrice"/>
         public async Task<QueryResponse<InstrumentPriceDto>> GetInstrumentPrice(int instrumentId, DateTime time)
         {
-            var instrument = await GetInstrument(instrumentId);
-            if (instrument.Status == QueryStatus.NotFound)
-            {
-                return new QueryResponse<InstrumentPriceDto>
-                {
-                    Status = QueryStatus.NotFound
-                };
-            }
             var query = InstrumentDataQueries.GetInstrumentPrice(instrumentId, time);
 
             using var connection = _connectionCreator.CreateConnection();
@@ -292,7 +282,7 @@ namespace PortEval.Application.Core.Queries
                 };
             }
 
-            var pricesResponse = await GetInstrumentPrices(instrumentId, dateRange.SetFrom(DateTime.MinValue));
+            var pricesResponse = await GetInstrumentPrices(instrumentResponse.Response, dateRange.SetFrom(DateTime.MinValue));
             var result = _chartGenerator.ChartPrices(pricesResponse.Response, dateRange, frequency);
 
             if (!string.Equals(instrumentResponse.Response.CurrencyCode, currencyCode, StringComparison.CurrentCultureIgnoreCase))
@@ -322,7 +312,7 @@ namespace PortEval.Application.Core.Queries
                 };
             }
 
-            var pricesResponse = await GetInstrumentPrices(instrumentId, dateRange.SetFrom(DateTime.MinValue));
+            var pricesResponse = await GetInstrumentPrices(instrumentResponse.Response, dateRange.SetFrom(DateTime.MinValue));
             var result = _chartGenerator.ChartProfit(pricesResponse.Response, dateRange, frequency);
 
             if (!string.Equals(instrumentResponse.Response.CurrencyCode, currencyCode, StringComparison.CurrentCultureIgnoreCase))
@@ -352,7 +342,7 @@ namespace PortEval.Application.Core.Queries
                 };
             }
 
-            var pricesResponse = await GetInstrumentPrices(instrumentId, dateRange.SetFrom(DateTime.MinValue));
+            var pricesResponse = await GetInstrumentPrices(instrumentResponse.Response, dateRange.SetFrom(DateTime.MinValue));
             var result = _chartGenerator.ChartPerformance(pricesResponse.Response, dateRange, frequency);
 
             return new QueryResponse<IEnumerable<EntityChartPointDto>>
@@ -375,7 +365,7 @@ namespace PortEval.Application.Core.Queries
                 };
             }
 
-            var pricesResponse = await GetInstrumentPrices(instrumentId, dateRange.SetFrom(DateTime.MinValue));
+            var pricesResponse = await GetInstrumentPrices(instrumentResponse.Response, dateRange.SetFrom(DateTime.MinValue));
             var result = _chartGenerator.ChartAggregatedProfit(pricesResponse.Response, dateRange, frequency);
 
             if (!string.Equals(instrumentResponse.Response.CurrencyCode, currencyCode, StringComparison.CurrentCultureIgnoreCase))
@@ -404,7 +394,7 @@ namespace PortEval.Application.Core.Queries
                 };
             }
 
-            var pricesResponse = await GetInstrumentPrices(instrumentId, dateRange.SetFrom(DateTime.MinValue));
+            var pricesResponse = await GetInstrumentPrices(instrumentResponse.Response, dateRange.SetFrom(DateTime.MinValue));
             var result = _chartGenerator.ChartAggregatedPerformance(pricesResponse.Response, dateRange, frequency);
 
             return new QueryResponse<IEnumerable<EntityChartPointDto>>
@@ -413,5 +403,6 @@ namespace PortEval.Application.Core.Queries
                 Response = result
             };
         }
+
     }
 }

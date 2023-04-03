@@ -343,7 +343,7 @@ namespace PortEval.Application.Core.Queries
         private async Task<PortfolioPositionsPriceRangeData> GetPositionsPriceRangeData(PortfolioDto portfolio,
             DateRangeParams dateRange)
         {
-            var positions = await _positionQueries.GetPortfolioPositions(portfolio.Id);
+            var positions = await _positionQueries.GetPortfolioPositions(portfolio);
 
             var positionsPriceData = new List<PositionPriceRangeData>();
 
@@ -378,7 +378,7 @@ namespace PortEval.Application.Core.Queries
         private async Task<PortfolioPositionsPriceListData> GetPositionsPriceListData(PortfolioDto portfolio,
             DateRangeParams dateRange)
         {
-            var positions = await _positionQueries.GetPortfolioPositions(portfolio.Id);
+            var positions = await _positionQueries.GetPortfolioPositions(portfolio);
 
             var positionsPriceListData = new List<PositionPriceListData>();
 
