@@ -16,9 +16,4 @@ RUN npm install react-scripts@4.0.3 -g --silent
 # add app
 COPY . ./
 
-# build & run app
-RUN npm run build
-
-# https://github.com/facebook/create-react-app/issues/11860
-# Due to this issue, `npm start` fails to properly start the dev server, which is why `serve` is used until this is fixed.
 CMD ["npm", "start"]
