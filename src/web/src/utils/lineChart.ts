@@ -103,6 +103,29 @@ export type TooltipCallback = (from: string | undefined, to: string | undefined)
  */
 export type RenderCallback = (dataPoint: RenderedLineChartLineDataPoint) => SVGElement;
 
+const twoArgumentMemo = <TFirstArg, TSecondArg, TResult>(
+    fn: (a: TFirstArg, b: TSecondArg) => TResult,
+): (a: TFirstArg, b: TSecondArg) => TResult => {
+    const cache = new Map<TFirstArg, Map<TSecondArg, TResult>>();
+    
+    return (firstArg, secondArg) => {
+        let first = cache.get(firstArg);
+        const second = first?.get(secondArg);
+        if(second !== undefined) {
+            return second;
+        }
+
+        const value = fn(firstArg, secondArg);
+
+        if(first === undefined) {
+            first = new Map<TSecondArg, TResult>();
+            cache.set(firstArg, first);
+        }
+        first.set(secondArg, value);
+        return value;
+    }
+}
+
 /**
  * Creates an empty line chart.
  * 
@@ -110,8 +133,8 @@ export type RenderCallback = (dataPoint: RenderedLineChartLineDataPoint) => SVGE
  * @subcategory LineChart
  * @returns An empty line chart.
  */
-export default function createChart(): D3LineChart {
-    return new D3LineChart();
+export default function createChart(): SVGLineChart {
+    return new SVGLineChart();
 }
 
 /**
@@ -120,7 +143,7 @@ export default function createChart(): D3LineChart {
  * @category Chart
  * @subcategory LineChart
  */
-class D3LineChart {
+class SVGLineChart {
     _lines: Array<LineChartLine> = [];
     _svg: d3.Selection<SVGGElement, unknown, null, undefined> | null = null;
 
@@ -154,7 +177,7 @@ class D3LineChart {
      * Specifies lines to be rendered in the chart.
      * 
      * @param lines Lines to render in the chart.
-     * @returns An updated {@link D3LineChart}.
+     * @returns An updated {@link SVGLineChart}.
      */
     withLines(lines: typeof this._lines) {
         this._lines = lines;
@@ -165,7 +188,7 @@ class D3LineChart {
      * Specifies X axis format to be used in the chart.
      * 
      * @param xFormat Date format function.
-     * @returns An updated {@link D3LineChart}.
+     * @returns An updated {@link SVGLineChart}.
      */
     withXFormat(xFormat: typeof this._xFormat) {
         this._xFormat = xFormat;
@@ -176,7 +199,7 @@ class D3LineChart {
      * Specifies tooltip date format to be used in the chart.
      * 
      * @param xTooltipFormat Date format function.
-     * @returns An updated {@link D3LineChart}.
+     * @returns An updated {@link SVGLineChart}.
      */
     withXTooltipFormat(xTooltipFormat: typeof this._xTooltipFormat) {
         this._xTooltipFormat = xTooltipFormat;
@@ -187,7 +210,7 @@ class D3LineChart {
      * Specifies Y axis format to be used in the chart.
      * 
      * @param yFormat Number format function.
-     * @returns An updated {@link D3LineChart}.
+     * @returns An updated {@link SVGLineChart}.
      */
     withYFormat(yFormat: typeof this._yFormat) {
         this._yFormat = yFormat;
@@ -198,7 +221,7 @@ class D3LineChart {
      * Specifies `d3` time interval function to be used in the chart.
      * 
      * @param intervalFunction `d3` time interval function.
-     * @returns An updated {@link D3LineChart}.
+     * @returns An updated {@link SVGLineChart}.
      */
     withInterval(intervalFunction: typeof this._xInterval) {
         this._xInterval = intervalFunction;
@@ -210,7 +233,7 @@ class D3LineChart {
      * The result of this method is appended to the base tooltip.
      * 
      * @param tooltipCallback Tooltip render callback.
-     * @returns An updated {@link D3LineChart}.
+     * @returns An updated {@link SVGLineChart}.
      */
     withTooltipCallback(tooltipCallback: typeof this._tooltipCallback) {
         this._tooltipCallback = tooltipCallback;
@@ -222,7 +245,7 @@ class D3LineChart {
      * The result of this method is rendered on top of the data point provided in callback parameter.
      * 
      * @param renderCallback SVG render callback.
-     * @returns An updated {@link D3LineChart}.
+     * @returns An updated {@link SVGLineChart}.
      */
     withAdditionalRenderCallback(renderCallback: typeof this._renderCallback) {
         this._renderCallback = renderCallback;
@@ -232,7 +255,7 @@ class D3LineChart {
     /**
      * Configures the chart to render the Y axis on the right side instead of left.
      * 
-     * @returns An updated {@link D3LineChart}
+     * @returns An updated {@link SVGLineChart}
      */
     withRightSideYAxis() {
         this._rightSideYAxis = true;
@@ -436,7 +459,30 @@ class D3LineChart {
     }
 
     _setupTooltip() {
-        if(!this._container || !this._svg) return;
+        const overlay = this._prepareTooltipContainer();
+        if(overlay === undefined) {
+            return;
+        }
+
+        const memoizedFindClosestPoints = twoArgumentMemo(this._findClosestDataPoints);
+        const memoizedTooltipCallback = twoArgumentMemo(this._tooltipCallback);
+
+        overlay.on(
+            'mousemove',
+            (e) => this._handleTooltipMouseMove(e, memoizedFindClosestPoints, memoizedTooltipCallback)
+        );
+        overlay.on('mouseout', this._clearTooltip);
+    }
+
+    _getContainerOffset(): [number, number] {
+        if(!this._container) throw new Error('Chart container has not been initialized.');
+        const containerRect = this._container.getBoundingClientRect();
+
+        return [containerRect.top, containerRect.left];
+    }
+
+    _prepareTooltipContainer(): d3.Selection<SVGRectElement, unknown, null, unknown> | undefined {
+        if(!this._container || !this._svg) return undefined;
         this._tooltip = d3.select(this._container).append('div')
             .style('position', 'absolute')
             .style('background-color', '#fff')
@@ -448,124 +494,121 @@ class D3LineChart {
         const overlay = this._svg.append('rect')
             .attr('width', this._width)
             .attr('height', this._height)
-            .attr('opacity', 0)
+            .attr('opacity', 0);
 
-        const findClosestDataPoints = (
-            data: LineChartLineDataPoint[], time: number
-        ): [LineChartLineDataPoint?, LineChartLineDataPoint?, LineChartLineDataPoint?] => {
-            if(data.length === 0) {
-                return [undefined, undefined, undefined];
-            }
-            let previous, current, next;
-
-            const firstAfterIndex = data.findIndex(dataPoint => new Date(dataPoint.time).getTime() >= time);
-            if(firstAfterIndex === -1) {
-                previous = data.length > 1 ? data[data.length - 1] : undefined;
-                current = data[data.length - 1];
-                next = undefined;
-            } else if(firstAfterIndex === 0) {
-                previous = undefined;
-                current = new Date(data[0].time).getTime() > time ? undefined : data[0];
-                next = data.length > 1 ? data[1] : undefined;
-            } else {
-                const before = data[firstAfterIndex - 1];
-                const after = data[firstAfterIndex];
-                const beforeTime = new Date(before.time).getTime();
-                const afterTime = new Date(after.time).getTime();
-                if(time - beforeTime <= afterTime - time) {
-                    previous = firstAfterIndex >= 2 ? data[firstAfterIndex - 2] : undefined;
-                    current = before;
-                    next = data[firstAfterIndex];
-                } else {
-                    previous = before;
-                    current = after;
-                    next = data.length > firstAfterIndex + 1 ? data[firstAfterIndex + 1] : undefined;
-                }
-            }
-            
-            return [previous, current, next];
-        }
-
-        const drawTooltip = (event: MouseEvent) => {
-            if(!this._xScale || !this._container || !this._tooltip || !this._tooltipLine) return;
-            if(this._lines.length > 0) {
-                const longestLine = this._lines.reduce<Array<LineChartLineDataPoint>>(
-                    (prev, curr) => curr.data.length >= prev.length ? curr.data : prev, []
-                );
-                const time = Math.floor(this._xScale.invert(d3.pointer(event)[0]).getTime());
-                const [, currDataPoint, nextDataPoint] = findClosestDataPoints(longestLine, time);
-
-                if(!currDataPoint) return;
-
-                const x = new Date(currDataPoint.time);
-
-                this._tooltipLine.attr('stroke', 'black')
-                    .attr('x1', this._xScale(x))
-                    .attr('x2', this._xScale(x))
-                    .attr('y1', 0)
-                    .attr('y2', this._height);
-                this._tooltip.html(this._xTooltipFormat(new Date(currDataPoint.time)))
-                    .style('display', 'block')
-                    .selectAll()
-                    .data(this._lines).enter()
-                    .append('div')
-                    .style('color', d => d.color)
-                    .html(d => {
-                        const [, point] = findClosestDataPoints(d.data, time);
-                        return point
-                            ? `${d.name}: ${this._yFormat(point ? point.value : 0)}`
-                            : '';
-                    });
-
-                if(this._tooltipCallback) {
-                    const from = currDataPoint.time;
-                    const to = nextDataPoint ? nextDataPoint.time : undefined;
-                    const element = this._tooltipCallback(from, to);
-
-                    if(element) {
-                        this._tooltip.node()?.appendChild(element);
-                    }
-                }
-
-                const tooltipWidth = this._tooltip.node()?.getBoundingClientRect()['width'] ?? 0;
-                const tooltipHeight = this._tooltip.node()?.getBoundingClientRect()['height'] ?? 0;
-
-                const [chartTopBound, chartLeftBound] = this._getContainerOffset();
-
-                const offsetXToParent = event.clientX - chartLeftBound;
-                const offsetYToParent = event.clientY - chartTopBound;
-
-                const posX = offsetXToParent + tooltipWidth >= this._width
-                    ? offsetXToParent - tooltipWidth - 5
-                    : offsetXToParent + 5;
-                const posY = offsetYToParent + tooltipHeight >= this._height
-                    ? offsetYToParent - tooltipHeight - 5
-                    : offsetYToParent + 5;
-
-                this._tooltip
-                    .style('top', posY + 'px')
-                    .style('left', posX + 'px');
-            }
-
-        }
-
-        const removeTooltip = () => {
-            if(this._tooltip) {
-                this._tooltip.style('display', 'none');
-            }
-            if(this._tooltipLine) {
-                this._tooltipLine.attr('stroke', 'none');
-            }
-        }
-
-        overlay.on('mousemove', drawTooltip);
-        overlay.on('mouseout', removeTooltip);
+        return overlay;
     }
 
-    _getContainerOffset(): [number, number] {
-        if(!this._container) throw new Error('Chart container has not been initialized.');
-        const containerRect = this._container.getBoundingClientRect();
+    _handleTooltipMouseMove(
+        event: MouseEvent,
+        memoizedFindClosestPoints: typeof this._findClosestDataPoints,
+        memoizedTooltipCallback: typeof this._tooltipCallback
+    ): void {
+        if(!this._xScale || !this._container || !this._tooltip || !this._tooltipLine) return;
+        if(this._lines.length > 0) {
+            const longestLineIndex = this._lines.reduce<number>(
+                (prev, curr, idx) => this._lines[idx].data.length >= this._lines[prev].data.length ? idx : prev, 0
+            );
+            const time = Math.floor(this._xScale.invert(d3.pointer(event)[0]).getTime());
 
-        return [containerRect.top, containerRect.left];
+            const [, currDataPoint, nextDataPoint] = memoizedFindClosestPoints(longestLineIndex, time);
+
+            if(!currDataPoint) return;
+
+            const x = new Date(currDataPoint.time);
+
+            this._tooltipLine.attr('stroke', 'black')
+                .attr('x1', this._xScale(x))
+                .attr('x2', this._xScale(x))
+                .attr('y1', 0)
+                .attr('y2', this._height);
+            this._tooltip.html(this._xTooltipFormat(new Date(currDataPoint.time)))
+                .style('display', 'block')
+                .selectAll()
+                .data(this._lines).enter()
+                .append('div')
+                .style('color', d => d.color)
+                .html((d, i) => {
+                    const [, point] = memoizedFindClosestPoints(i, time);
+                    return point
+                        ? `${d.name}: ${this._yFormat(point ? point.value : 0)}`
+                        : '';
+                });
+
+            const from = currDataPoint.time;
+            const to = nextDataPoint ? nextDataPoint.time : undefined;
+            const element = memoizedTooltipCallback(from, to);
+
+            if(element) {
+                this._tooltip.node()?.appendChild(element);
+            }
+
+            const tooltipWidth = this._tooltip.node()?.getBoundingClientRect()['width'] ?? 0;
+            const tooltipHeight = this._tooltip.node()?.getBoundingClientRect()['height'] ?? 0;
+
+            const [chartTopBound, chartLeftBound] = this._getContainerOffset();
+
+            const offsetXToParent = event.clientX - chartLeftBound;
+            const offsetYToParent = event.clientY - chartTopBound;
+
+            const posX = offsetXToParent + tooltipWidth >= this._width
+                ? offsetXToParent - tooltipWidth - 5
+                : offsetXToParent + 5;
+            const posY = offsetYToParent + tooltipHeight >= this._height
+                ? offsetYToParent - tooltipHeight - 5
+                : offsetYToParent + 5;
+
+            this._tooltip
+                .style('top', posY + 'px')
+                .style('left', posX + 'px');
+        }
+    }
+
+    _clearTooltip(): void {
+        if(this._tooltip) {
+            this._tooltip.style('display', 'none');
+        }
+        if(this._tooltipLine) {
+            this._tooltipLine.attr('stroke', 'none');
+        }
+    }
+
+    _findClosestDataPoints = (
+        lineIndex: number, time: number
+    ): [LineChartLineDataPoint?, LineChartLineDataPoint?, LineChartLineDataPoint?] => {
+        const data = this._lines[lineIndex].data;
+
+        if(data.length === 0) {
+            return [undefined, undefined, undefined];
+        }
+
+        let previous, current, next;
+
+        const firstAfterIndex = data.findIndex(dataPoint => new Date(dataPoint.time).getTime() >= time);
+        if(firstAfterIndex === -1) {
+            previous = data.length > 1 ? data[data.length - 1] : undefined;
+            current = data[data.length - 1];
+            next = undefined;
+        } else if(firstAfterIndex === 0) {
+            previous = undefined;
+            current = new Date(data[0].time).getTime() > time ? undefined : data[0];
+            next = data.length > 1 ? data[1] : undefined;
+        } else {
+            const before = data[firstAfterIndex - 1];
+            const after = data[firstAfterIndex];
+            const beforeTime = new Date(before.time).getTime();
+            const afterTime = new Date(after.time).getTime();
+            if(time - beforeTime <= afterTime - time) {
+                previous = firstAfterIndex >= 2 ? data[firstAfterIndex - 2] : undefined;
+                current = before;
+                next = data[firstAfterIndex];
+            } else {
+                previous = before;
+                current = after;
+                next = data.length > firstAfterIndex + 1 ? data[firstAfterIndex + 1] : undefined;
+            }
+        }
+
+        return [previous, current, next];
     }
 }
