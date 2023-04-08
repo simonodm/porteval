@@ -9,6 +9,7 @@ namespace PortEval.Infrastructure
     public class PortEvalDbConnection : IDbConnectionCreator
     {
         private readonly string _connectionString;
+        private IDbConnection _connection;
 
         public PortEvalDbConnection(IConfiguration configuration)
         {
@@ -16,6 +17,6 @@ namespace PortEval.Infrastructure
         }
 
         /// <inheritdoc />
-        public IDbConnection CreateConnection() => new SqlConnection(_connectionString);
+        public IDbConnection CreateConnection() => _connection ??= new SqlConnection(_connectionString);
     }
 }

@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.QueryParams;
+
+namespace PortEval.Application.Core.Interfaces.DataQueries
+{
+    public interface ITransactionDataQueries
+    {
+        Task<IEnumerable<TransactionDto>> GetTransactionsAsync(TransactionFilters filters, DateTime from,
+            DateTime to);
+
+        Task<TransactionDto> GetTransactionAsync(int transactionId);
+    }
+}
