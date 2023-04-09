@@ -16,6 +16,6 @@ namespace PortEval.Application.Core.Interfaces.Services
         /// <returns>
         /// A task representing the asynchronous emission operation.
         /// </returns>
-        public Task SendNotificationAsync(NotificationType type, string message = null);
+        public Task<OperationResponse> SendNotificationAsync(NotificationType type, string message = null);
     }
 }

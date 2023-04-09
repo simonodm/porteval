@@ -20,7 +20,7 @@ namespace PortEval.Application.Core.BackgroundJobs
             _logger = loggerFactory.CreateLogger(typeof(ImportCleanupJob));
         }
 
-        public async Task Run()
+        public async Task RunAsync()
         {
             _logger.LogInformation($"Import cleanup started.");
 

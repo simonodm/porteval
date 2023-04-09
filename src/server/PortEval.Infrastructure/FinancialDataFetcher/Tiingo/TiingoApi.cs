@@ -22,38 +22,38 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Tiingo
         private const string TIINGO_CRYPTO_BASE_URL = "https://api.tiingo.com/tiingo/crypto";
 
         [RequestProcessor(typeof(HistoricalDailyInstrumentPricesRequest), typeof(IEnumerable<PricePoint>))]
-        public Task<Response<IEnumerable<PricePoint>>> Process(HistoricalDailyInstrumentPricesRequest request)
+        public Task<Response<IEnumerable<PricePoint>>> ProcessAsync(HistoricalDailyInstrumentPricesRequest request)
         {
-            return GetTiingoEndOfDayPrices(request.Symbol, request.From, request.To);
+            return GetTiingoEndOfDayPricesAsync(request.Symbol, request.From, request.To);
         }
 
         [RequestProcessor(typeof(LatestInstrumentPriceRequest), typeof(PricePoint))]
-        public Task<Response<PricePoint>> Process(LatestInstrumentPriceRequest request)
+        public Task<Response<PricePoint>> ProcessAsync(LatestInstrumentPriceRequest request)
         {
-            return GetTiingoIexTopOfBook(request.Symbol);
+            return GetTiingoIexTopOfBookAsync(request.Symbol);
         }
 
         [RequestProcessor(typeof(HistoricalDailyCryptoPricesRequest), typeof(IEnumerable<PricePoint>))]
-        public Task<Response<IEnumerable<PricePoint>>> Process(HistoricalDailyCryptoPricesRequest request)
+        public Task<Response<IEnumerable<PricePoint>>> ProcessAsync(HistoricalDailyCryptoPricesRequest request)
         {
-            return GetTiingoCryptoHistoricalPrices(request.Symbol, request.CurrencyCode, request.From,
+            return GetTiingoCryptoHistoricalPricesAsync(request.Symbol, request.CurrencyCode, request.From,
                 request.To);
         }
 
         [RequestProcessor(typeof(IntradayCryptoPricesRequest), typeof(IEnumerable<PricePoint>))]
-        public Task<Response<IEnumerable<PricePoint>>> Process(IntradayCryptoPricesRequest request)
+        public Task<Response<IEnumerable<PricePoint>>> ProcessAsync(IntradayCryptoPricesRequest request)
         {
-            return GetTiingoCryptoHistoricalPrices(request.Symbol, request.CurrencyCode, request.From,
+            return GetTiingoCryptoHistoricalPricesAsync(request.Symbol, request.CurrencyCode, request.From,
                 request.To, request.Interval);
         }
 
         [RequestProcessor(typeof(LatestCryptoPriceRequest), typeof(PricePoint))]
-        public Task<Response<PricePoint>> Process(LatestCryptoPriceRequest request)
+        public Task<Response<PricePoint>> ProcessAsync(LatestCryptoPriceRequest request)
         {
-            return GetTiingoCryptoTopOfBook(request.Symbol, request.CurrencyCode);
+            return GetTiingoCryptoTopOfBookAsync(request.Symbol, request.CurrencyCode);
         }
 
-        private async Task<Response<IEnumerable<PricePoint>>> GetTiingoEndOfDayPrices(string symbol, DateTime from, DateTime to)
+        private async Task<Response<IEnumerable<PricePoint>>> GetTiingoEndOfDayPricesAsync(string symbol, DateTime from, DateTime to)
         {
             var startDate = from.ToString("yyyy-M-d");
 
@@ -61,7 +61,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Tiingo
             urlBuilder.AddQueryParam("token", Configuration.Credentials.Token);
             urlBuilder.AddQueryParam("startDate", startDate);
 
-            var result = await HttpClient.GetJson<IEnumerable<TiingoPriceResponseModel>>(urlBuilder.ToString(), Configuration.RateLimiter);
+            var result = await HttpClient.GetJsonAsync<IEnumerable<TiingoPriceResponseModel>>(urlBuilder.ToString(), Configuration.RateLimiter);
 
             var sortedPrices = result.Result?.OrderByDescending(price => price.Time) ??
                                Enumerable.Empty<TiingoPriceResponseModel>();
@@ -99,12 +99,12 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Tiingo
             };
         }
 
-        private async Task<Response<PricePoint>> GetTiingoIexTopOfBook(string symbol)
+        private async Task<Response<PricePoint>> GetTiingoIexTopOfBookAsync(string symbol)
         {
             var urlBuilder = new QueryUrlBuilder($"{TIINGO_IEX_BASE_URL}/{symbol}");
             urlBuilder.AddQueryParam("token", Configuration.Credentials.Token);
 
-            var result = await HttpClient.GetJson<IEnumerable<TiingoIexTopPriceResponseModel>>(urlBuilder.ToString(), Configuration.RateLimiter);
+            var result = await HttpClient.GetJsonAsync<IEnumerable<TiingoIexTopPriceResponseModel>>(urlBuilder.ToString(), Configuration.RateLimiter);
 
             return new Response<PricePoint>
             {
@@ -123,13 +123,13 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Tiingo
             };
         }
 
-        private async Task<Response<PricePoint>> GetTiingoCryptoTopOfBook(string ticker, string currency)
+        private async Task<Response<PricePoint>> GetTiingoCryptoTopOfBookAsync(string ticker, string currency)
         {
             var urlBuilder = new QueryUrlBuilder($"{TIINGO_CRYPTO_BASE_URL}/top");
             urlBuilder.AddQueryParam("tickers", GetCryptoTicker(ticker, currency));
             urlBuilder.AddQueryParam("token", Configuration.Credentials.Token);
 
-            var result = await HttpClient.GetJson<IEnumerable<TiingoCryptoTopPriceResponseModel>>(urlBuilder.ToString(), Configuration.RateLimiter);
+            var result = await HttpClient.GetJsonAsync<IEnumerable<TiingoCryptoTopPriceResponseModel>>(urlBuilder.ToString(), Configuration.RateLimiter);
 
             return new Response<PricePoint>
             {
@@ -147,7 +147,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Tiingo
             };
         }
 
-        private async Task<Response<IEnumerable<PricePoint>>> GetTiingoCryptoHistoricalPrices(string ticker, string currency,
+        private async Task<Response<IEnumerable<PricePoint>>> GetTiingoCryptoHistoricalPricesAsync(string ticker, string currency,
             DateTime from, DateTime to, IntradayInterval? interval = null)
         {
             // Tiingo crypto endpoint returns prices only in range startDate + (approximately) 5730 days, so multiple downloads need to be done in case
@@ -187,7 +187,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Tiingo
                 urlBuilder.AddQueryParam("resampleFreq", resampleFreq);
                 urlBuilder.AddQueryParam("token", Configuration.Credentials.Token);
 
-                var result = await HttpClient.GetJson<IEnumerable<TiingoCryptoPriceResponseModel>>(urlBuilder.ToString(), Configuration.RateLimiter);
+                var result = await HttpClient.GetJsonAsync<IEnumerable<TiingoCryptoPriceResponseModel>>(urlBuilder.ToString(), Configuration.RateLimiter);
 
                 if (result.StatusCode == StatusCode.Ok)
                 {

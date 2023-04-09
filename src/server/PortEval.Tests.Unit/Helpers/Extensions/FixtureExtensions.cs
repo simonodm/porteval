@@ -353,15 +353,15 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
         {
             var priceFetcher = fixture.Freeze<Mock<IFinancialDataFetcher>>();
             priceFetcher
-                .Setup(m => m.GetHistoricalDailyPrices(instrument.Symbol,
+                .Setup(m => m.GetHistoricalDailyPricesAsync(instrument.Symbol,
                     instrument.CurrencyCode, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(dailyPrices ?? Enumerable.Empty<PricePoint>());
             priceFetcher
-                .Setup(m => m.GetIntradayPrices(instrument.Symbol,
+                .Setup(m => m.GetIntradayPricesAsync(instrument.Symbol,
                     instrument.CurrencyCode, It.IsAny<DateTime>(), It.IsAny<DateTime>(), IntradayInterval.OneHour))
                 .ReturnsAsync(hourlyPrices ?? Enumerable.Empty<PricePoint>());
             priceFetcher
-                .Setup(m => m.GetIntradayPrices(instrument.Symbol,
+                .Setup(m => m.GetIntradayPricesAsync(instrument.Symbol,
                     instrument.CurrencyCode, It.IsAny<DateTime>(), It.IsAny<DateTime>(), IntradayInterval.FiveMinutes))
                 .ReturnsAsync(fiveMinPrices ?? Enumerable.Empty<PricePoint>());
 

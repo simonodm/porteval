@@ -20,7 +20,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Extensions
         /// <param name="rateLimiter">Request rate limiter</param>
         /// <typeparam name="TResult">Target response type after parsing.</typeparam>
         /// <returns>A Response object containing the operation status and parsed data if the operation was successful.</returns>
-        public static async Task<Response<TResult>> GetJson<TResult>(this HttpClient httpClient, string queryUrl, RateLimiter rateLimiter = null, Dictionary<string, string> headers = null)
+        public static async Task<Response<TResult>> GetJsonAsync<TResult>(this HttpClient httpClient, string queryUrl, RateLimiter rateLimiter = null, Dictionary<string, string> headers = null)
         {
             try
             {

@@ -48,7 +48,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             priceRepository
                 .Verify(r => r.Update(It.Is<InstrumentPrice>(price =>
@@ -92,7 +92,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             Assert.Equal(position.Transactions.First().Amount, firstAmount * 5);
             Assert.Equal(position.Transactions.Last().Amount, secondAmount * 5);
@@ -131,7 +131,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             Assert.Equal(position.Transactions.First().Price, firstPrice / 5);
             Assert.Equal(position.Transactions.Last().Price, secondPrice / 5);
@@ -175,7 +175,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             priceRepository
                 .Verify(r => r.Update(It.Is<InstrumentPrice>(price =>
@@ -222,7 +222,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             Assert.Equal(position.Transactions.First().Amount, firstAmount / 5);
             Assert.Equal(position.Transactions.Last().Amount, secondAmount / 5);
@@ -264,7 +264,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             Assert.Equal(position.Transactions.First().Price, firstPrice * 5);
             Assert.Equal(position.Transactions.Last().Price, secondPrice * 5);

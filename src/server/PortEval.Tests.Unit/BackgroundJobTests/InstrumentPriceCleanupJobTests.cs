@@ -47,7 +47,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<InstrumentPriceCleanupJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 1)), Times.Never());
             priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 2)), Times.Once());
@@ -90,7 +90,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<InstrumentPriceCleanupJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 1)), Times.Never());
             priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 2)), Times.Once());
@@ -135,7 +135,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<InstrumentPriceCleanupJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 1)), Times.Never());
             priceRepository.Verify(c => c.Delete(It.Is<InstrumentPrice>(p => p.InstrumentId == instruments[0].Id && p.Id == 2)), Times.Never());

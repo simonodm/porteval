@@ -1,9 +1,0 @@
-﻿namespace PortEval.Infrastructure.DataQueries.Models
-{
-    public class ChartLineNameModel
-    {
-        public string PortfolioName { get; set; }
-        public string PositionName { get; set; }
-        public string InstrumentName { get; set; }
-    }
-}

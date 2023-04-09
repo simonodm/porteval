@@ -1,27 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Interfaces.Services;
-using PortEval.Application.Core.Queries;
 
 namespace PortEval.Application.Controllers
 {
     [Route("instruments/{instrumentId}/prices")]
     [ApiController]
-    public class InstrumentPricesController : ControllerBase
+    public class InstrumentPricesController : PortEvalControllerBase
     {
         private readonly IInstrumentPriceService _priceService;
-        private readonly IInstrumentQueries _instrumentQueries;
 
-        public InstrumentPricesController(IInstrumentPriceService priceService, IInstrumentQueries instrumentQueries)
+        public InstrumentPricesController(IInstrumentPriceService priceService)
         {
             _priceService = priceService;
-            _instrumentQueries = instrumentQueries;
         }
 
         // GET: api/instruments/1/prices
@@ -30,44 +26,29 @@ namespace PortEval.Application.Controllers
             [FromQuery] DateRangeParams dateRange, [FromQuery] PaginationParams pagination, [FromQuery] AggregationFrequency? frequency = null,
             [FromQuery] bool compressed = false)
         {
-            var prices = await _instrumentQueries.GetInstrumentPricesPage(instrumentId, pagination, dateRange, compressed, frequency);
-            if (prices.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Instrument {instrumentId} not found.");
-            }
-
-            return prices.Response;
+            var prices = await _priceService.GetInstrumentPricesPageAsync(instrumentId, pagination, dateRange, compressed, frequency);
+            return GenerateActionResult(prices);
         }
 
         // GET: api/instruments/1/prices/at?time=2021-01-01T00:00:00
         [HttpGet("at")]
         public async Task<ActionResult<InstrumentPriceDto>> GetInstrumentPriceAt(int instrumentId, [FromQuery] DateTime time)
         {
-            var price = await _instrumentQueries.GetInstrumentPrice(instrumentId, time);
-            if (price.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Instrument {instrumentId} not found.");
-            }
-
-            return price.Response;
+            var price = await _priceService.GetInstrumentPriceAsync(instrumentId, time);
+            return GenerateActionResult(price);
         }
 
         // GET: api/instruments/1/prices/latest
         [HttpGet("latest")]
         public async Task<ActionResult<InstrumentPriceDto>> GetLatestInstrumentPrice(int instrumentId)
         {
-            var price = await _instrumentQueries.GetInstrumentPrice(instrumentId, DateTime.UtcNow);
-            if (price.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Instrument {instrumentId} not found.");
-            }
-
-            return price.Response;
+            var price = await _priceService.GetInstrumentPriceAsync(instrumentId, DateTime.UtcNow);
+            return GenerateActionResult(price);
         }
 
         // POST api/instruments/1/prices
         [HttpPost]
-        public async Task<IActionResult> PostPricePoint(int instrumentId, [FromBody] InstrumentPriceDto createRequest)
+        public async Task<ActionResult<InstrumentPriceDto>> PostPricePoint(int instrumentId, [FromBody] InstrumentPriceDto createRequest)
         {
             if (instrumentId != createRequest.InstrumentId)
             {
@@ -75,15 +56,16 @@ namespace PortEval.Application.Controllers
             }
 
             var price = await _priceService.AddPricePointAsync(createRequest);
-            return CreatedAtAction(nameof(GetInstrumentPriceAt), new { instrumentId = price.Id, time = price.Time }, null);
+            return GenerateActionResult(price, nameof(GetInstrumentPriceAt),
+                new { instrumentId = price.Response.InstrumentId, time = price.Response.Time });
         }
 
         // DELETE api/instruments/1/prices/5
         [HttpDelete("{priceId}")]
         public async Task<IActionResult> DeletePricePoint(int instrumentId, int priceId)
         {
-            await _priceService.DeletePricePointByIdAsync(instrumentId, priceId);
-            return Ok();
+            var response = await _priceService.DeletePricePointByIdAsync(instrumentId, priceId);
+            return GenerateActionResult(response);
         }
 
     }

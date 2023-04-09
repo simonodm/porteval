@@ -51,7 +51,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<InitialPriceFetchJob>();
 
-            await sut.Run(instrument.Id);
+            await sut.RunAsync(instrument.Id);
 
             instrumentPriceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddDays(-7), _expectedPriceTimePrecision) && p.Price == 100m) &&
@@ -87,7 +87,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<InitialPriceFetchJob>();
 
-            await sut.Run(instrument.Id);
+            await sut.RunAsync(instrument.Id);
 
             instrumentPriceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddHours(-48), _expectedPriceTimePrecision) && p.Price == 100m) &&
@@ -123,7 +123,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<InitialPriceFetchJob>();
 
-            await sut.Run(instrument.Id);
+            await sut.RunAsync(instrument.Id);
 
             instrumentPriceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddMinutes(-15), _expectedPriceTimePrecision) && p.Price == 100m) &&
@@ -158,7 +158,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<InitialPriceFetchJob>();
 
-            await sut.Run(instrument.Id);
+            await sut.RunAsync(instrument.Id);
 
             instrumentPriceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddDays(-7), TimeSpan.FromDays(1)) && p.Price == 100m) &&
@@ -192,7 +192,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<InitialPriceFetchJob>();
 
-            await sut.Run(instrument.Id);
+            await sut.RunAsync(instrument.Id);
 
             instrumentPriceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddHours(-47), TimeSpan.FromHours(1)) && p.Price == 100m) &&
@@ -225,7 +225,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<InitialPriceFetchJob>();
 
-            await sut.Run(instrument.Id);
+            await sut.RunAsync(instrument.Id);
 
             instrumentPriceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(prices =>
                 prices.Any(p => p.InstrumentId == instrument.Id && p.Time.InRange(now.AddMinutes(-25), _expectedPriceTimePrecision) && p.Price == 100m) &&
@@ -259,7 +259,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<InitialPriceFetchJob>();
 
-            await sut.Run(instrument.Id);
+            await sut.RunAsync(instrument.Id);
 
             instrumentRepository.Verify(m => m.Update(It.Is<Instrument>(i =>
                 i.Id == instrument.Id &&
@@ -289,7 +289,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<InitialPriceFetchJob>();
 
-            await sut.Run(instrument.Id);
+            await sut.RunAsync(instrument.Id);
 
             instrumentRepository.Verify(m => m.Update(It.Is<Instrument>(i =>
                 i.Id == instrument.Id &&

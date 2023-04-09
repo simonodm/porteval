@@ -25,7 +25,7 @@ namespace PortEval.Application.Core.DomainEventHandlers.InstrumentSplitRollbackR
 
         public Task Handle(DomainEventNotificationAdapter<InstrumentSplitRollbackRequestedDomainEvent> notification, CancellationToken cancellationToken)
         {
-            _jobClient.Enqueue<ISplitPriceAndTransactionAdjustmentJob>(job => job.Run());
+            _jobClient.Enqueue<ISplitPriceAndTransactionAdjustmentJob>(job => job.RunAsync());
             _logger.LogInformation("Split price and transaction adjustment job enqueued.");
 
             return Task.CompletedTask;

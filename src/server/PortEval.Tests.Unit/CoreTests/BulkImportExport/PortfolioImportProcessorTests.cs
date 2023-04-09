@@ -26,7 +26,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var portfolioService = fixture.CreateDefaultPortfolioServiceMock();
             var sut = fixture.Create<PortfolioImportProcessor>();
 
-            await sut.ImportRecords(new List<PortfolioDto> { portfolio });
+            await sut.ImportRecordsAsync(new List<PortfolioDto> { portfolio });
 
             portfolioService.Verify(s => s.CreatePortfolioAsync(It.Is<PortfolioDto>(p =>
                 p.Id == default &&
@@ -49,7 +49,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var portfolioService = fixture.CreateDefaultPortfolioServiceMock();
             var sut = fixture.Create<PortfolioImportProcessor>();
 
-            await sut.ImportRecords(new List<PortfolioDto> { portfolio });
+            await sut.ImportRecordsAsync(new List<PortfolioDto> { portfolio });
 
             portfolioService.Verify(s => s.UpdatePortfolioAsync(It.Is<PortfolioDto>(p =>
                 p.Id == portfolio.Id &&
@@ -69,7 +69,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var portfolioService = fixture.CreateDefaultPortfolioServiceMock();
             var sut = fixture.Create<PortfolioImportProcessor>();
 
-            await sut.ImportRecords(new List<PortfolioDto> { portfolio });
+            await sut.ImportRecordsAsync(new List<PortfolioDto> { portfolio });
 
             portfolioService.Verify(s => s.CreatePortfolioAsync(It.IsAny<PortfolioDto>()), Times.Never());
             portfolioService.Verify(s => s.UpdatePortfolioAsync(It.IsAny<PortfolioDto>()), Times.Never());

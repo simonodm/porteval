@@ -69,7 +69,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var data = fixture.CreateMany<TestRow>(5);
             var sut = fixture.Create<TestImportProcessor>();
 
-            await sut.ImportRecords(data);
+            await sut.ImportRecordsAsync(data);
 
             Assert.Equal(5, sut.ItemsProcessed);
         }
@@ -83,7 +83,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var data = fixture.CreateMany<TestRow>(5);
             var sut = fixture.Create<TestImportProcessor>();
 
-            await sut.ImportRecords(data);
+            await sut.ImportRecordsAsync(data);
 
             Assert.True(sut.ImportFinished);
         }
@@ -97,7 +97,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var data = fixture.CreateMany<TestRow>(5);
             var sut = fixture.Create<TestImportProcessor>();
 
-            await sut.ImportRecords(data);
+            await sut.ImportRecordsAsync(data);
 
             Assert.True(sut.AsyncImportFinished);
         }
@@ -111,7 +111,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var data = fixture.CreateMany<TestRow>(5);
             var sut = fixture.Create<TestImportProcessor>();
 
-            var result = await sut.ImportRecords(data);
+            var result = await sut.ImportRecordsAsync(data);
 
             Assert.All(result.ErrorLog, entry => Assert.False(entry.IsError));
         }
@@ -128,7 +128,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
                 .Create();
             var sut = fixture.Create<TestImportProcessor>();
 
-            var result = await sut.ImportRecords(new List<TestRow> { invalidRow });
+            var result = await sut.ImportRecordsAsync(new List<TestRow> { invalidRow });
 
             Assert.True(result.ErrorLog.First().IsError);
         }
@@ -142,7 +142,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var data = fixture.CreateMany<TestRow>(5);
             var sut = fixture.Create<TestThrowingImportProcessor>();
 
-            var result = await sut.ImportRecords(data);
+            var result = await sut.ImportRecordsAsync(data);
 
             Assert.All(result.ErrorLog, entry => Assert.True(entry.IsError));
         }

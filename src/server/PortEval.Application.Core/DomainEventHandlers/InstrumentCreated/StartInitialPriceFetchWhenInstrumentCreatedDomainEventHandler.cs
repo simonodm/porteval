@@ -33,7 +33,7 @@ namespace PortEval.Application.Core.DomainEventHandlers.InstrumentCreated
             _instrumentRepository.Update(domainEvent.Instrument);
             await _instrumentRepository.UnitOfWork.CommitAsync();
 
-            _jobClient.Enqueue<IInitialPriceFetchJob>(job => job.Run(domainEvent.Instrument.Id));
+            _jobClient.Enqueue<IInitialPriceFetchJob>(job => job.RunAsync(domainEvent.Instrument.Id));
 
             _logger.LogInformation($"Initial price fetch job enqueued for instrument {domainEvent.Instrument.Symbol}, ID {domainEvent.Instrument.Id}.");
         }

@@ -36,7 +36,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<LatestPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             instrumentPriceRepository.Verify(m => m.Add(It.Is<InstrumentPrice>(p => p.Price == price.Price)));
         }
@@ -61,7 +61,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<LatestPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             instrumentRepository.Verify(m => m.Update(It.Is<Instrument>(i => i.Id == instrument.Id && i.TrackingInfo.LastUpdate >= price.Time)));
         }
@@ -85,7 +85,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<LatestPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             instrumentRepository.Verify(m => m.Update(It.Is<Instrument>(i => i.Id == instrument.Id)), Times.Never());
         }
@@ -94,7 +94,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         {
             var priceFetcher = fixture.Freeze<Mock<IFinancialDataFetcher>>();
             priceFetcher
-                .Setup(m => m.GetLatestInstrumentPrice(instrument.Symbol, instrument.CurrencyCode))
+                .Setup(m => m.GetLatestInstrumentPriceAsync(instrument.Symbol, instrument.CurrencyCode))
                 .ReturnsAsync(price);
 
             return priceFetcher;

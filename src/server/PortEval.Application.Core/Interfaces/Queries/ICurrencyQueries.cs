@@ -1,26 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Queries;
 using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.QueryParams;
 
 namespace PortEval.Application.Core.Interfaces.Queries
 {
-    /// <summary>
-    /// Implements high performance read-only currency queries.
-    /// </summary>
     public interface ICurrencyQueries
     {
-        /// <summary>
-        /// Retrieves all known currencies.
-        /// </summary>
-        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over an <c>IEnumerable</c> of stored currencies.</returns>
-        public Task<QueryResponse<IEnumerable<CurrencyDto>>> GetAllCurrencies();
+        Task<IEnumerable<CurrencyDto>> GetAllCurrenciesAsync();
+        Task<CurrencyDto> GetCurrencyAsync(string currencyCode);
+        Task<CurrencyDto> GetDefaultCurrencyAsync();
 
-        /// <summary>
-        /// Retrieves the specified currency.
-        /// </summary>
-        /// <param name="currencyCode">Code of the currency to retrieve.</param>
-        /// <returns>A task representing the asynchronous database query. Task result contains a <see cref="QueryResponse{T}"/> wrapper over the currency DTO with the specified code if it exists, null otherwise.</returns>
-        public Task<QueryResponse<CurrencyDto>> GetCurrency(string currencyCode);
+        Task<CurrencyExchangeRateDto> GetCurrencyExchangeRateAsync(string currencyFrom, string currencyTo,
+            DateTime time);
+
+        Task<IEnumerable<CurrencyDto>> GetExchangeableCurrenciesAsync(string baseCurrencyCode,
+            DateTime time);
+
+        Task<IEnumerable<CurrencyExchangeRateDto>> GetDirectExchangeRatesAsync(string currencyCode,
+            DateTime time);
+
+        Task<IEnumerable<CurrencyExchangeRateDto>> GetDirectExchangeRatesAsync(string baseCurrencyCode,
+            string targetCurrencyCode, DateRangeParams dateRange);
+
+        Task<IEnumerable<CurrencyExchangeRateDto>> GetInversedExchangeRatesAsync(string baseCurrencyCode,
+            string targetCurrencyCode, DateRangeParams dateRange);
     }
 }

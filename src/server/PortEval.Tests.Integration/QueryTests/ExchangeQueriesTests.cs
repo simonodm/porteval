@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Queries;
 using Xunit;
+using PortEval.Application.Core;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
@@ -22,7 +22,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _exchangeQueries.GetKnownExchanges();
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, e =>
             {
                 Assert.Equal("NASDAQ", e.Symbol);

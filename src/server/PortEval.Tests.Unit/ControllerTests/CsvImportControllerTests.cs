@@ -225,7 +225,7 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var result = sut.UploadFile(formFile, templateType);
 
-            importService.Verify(m => m.StartImport(It.IsAny<Stream>(), templateType), Times.Once());
+            importService.Verify(m => m.StartImportAsync(It.IsAny<Stream>(), templateType), Times.Once());
         }
     }
 }

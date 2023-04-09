@@ -13,6 +13,6 @@ namespace PortEval.Application.Core.Interfaces.BackgroundJobs
         /// </summary>
         /// <returns>A task representing the asynchronous price download and import operations.</returns>
         [AutomaticRetry(Attempts = 0)]
-        Task Run();
+        public Task RunAsync();
     }
 }

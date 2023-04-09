@@ -65,7 +65,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<MissingExchangeRatesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             Assert.True(correctListSaved);
         }
@@ -111,14 +111,14 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<MissingExchangeRatesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            priceFetcher.Verify(m => m.GetHistoricalDailyExchangeRates(
+            priceFetcher.Verify(m => m.GetHistoricalDailyExchangeRatesAsync(
                 currency.Code,
                 It.Is<DateTime>(dt => dt >= trackingStart),
                 It.Is<DateTime>(dt => dt <= existingExchangeRateTime)
             ));
-            priceFetcher.Verify(m => m.GetHistoricalDailyExchangeRates(
+            priceFetcher.Verify(m => m.GetHistoricalDailyExchangeRatesAsync(
                 currency.Code,
                 It.Is<DateTime>(dt => dt >= trackingStart),
                 It.IsAny<DateTime>()
@@ -142,14 +142,14 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<MissingExchangeRatesFetchJob>();
 
-            await Assert.ThrowsAsync<OperationNotAllowedException>(sut.Run);
+            await Assert.ThrowsAsync<OperationNotAllowedException>(sut.RunAsync);
         }
 
         private Mock<IFinancialDataFetcher> CreatePriceFetcherReturningExchangeRates(IFixture fixture, IEnumerable<ExchangeRates> exchangeRates)
         {
             var priceFetcher = fixture.Freeze<Mock<IFinancialDataFetcher>>();
             priceFetcher
-                .Setup(m => m.GetHistoricalDailyExchangeRates(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .Setup(m => m.GetHistoricalDailyExchangeRatesAsync(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(exchangeRates);
 
             return priceFetcher;

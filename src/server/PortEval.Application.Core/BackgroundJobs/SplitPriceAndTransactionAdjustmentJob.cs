@@ -28,7 +28,7 @@ namespace PortEval.Application.Core.BackgroundJobs
             _logger = loggerFactory.CreateLogger<SplitPriceAndTransactionAdjustmentJob>();
         }
 
-        public async Task Run()
+        public async Task RunAsync()
         {
             _logger.LogInformation("Split price and transaction adjustment job started.");
             var nonProcessedSplits = await _splitRepository.ListNonProcessedSplitsAsync();

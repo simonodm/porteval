@@ -27,7 +27,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var instrumentService = fixture.CreateDefaultInstrumentServiceMock();
             var sut = fixture.Create<InstrumentImportProcessor>();
 
-            await sut.ImportRecords(new List<InstrumentDto> { instrument });
+            await sut.ImportRecordsAsync(new List<InstrumentDto> { instrument });
 
             instrumentService.Verify(s => s.CreateInstrumentAsync(It.Is<InstrumentDto>(i =>
                 i.Id == default &&
@@ -53,7 +53,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var instrumentService = fixture.CreateDefaultInstrumentServiceMock();
             var sut = fixture.Create<InstrumentImportProcessor>();
 
-            await sut.ImportRecords(new List<InstrumentDto> { instrument });
+            await sut.ImportRecordsAsync(new List<InstrumentDto> { instrument });
 
             instrumentService.Verify(s => s.UpdateInstrumentAsync(It.Is<InstrumentDto>(i =>
                 i.Id == instrument.Id &&
@@ -78,7 +78,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var instrumentService = fixture.CreateDefaultInstrumentServiceMock();
             var sut = fixture.Create<InstrumentImportProcessor>();
 
-            await sut.ImportRecords(new List<InstrumentDto> { instrument });
+            await sut.ImportRecordsAsync(new List<InstrumentDto> { instrument });
 
             instrumentService.Verify(s => s.CreateInstrumentAsync(It.IsAny<InstrumentDto>()), Times.Never());
             instrumentService.Verify(s => s.UpdateInstrumentAsync(It.IsAny<InstrumentDto>()), Times.Never());

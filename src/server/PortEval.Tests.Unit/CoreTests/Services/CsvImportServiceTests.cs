@@ -79,7 +79,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<CsvImportService>();
 
             await using var stream = GenerateStreamFromString(data);
-            await sut.StartImport(stream, templateType);
+            await sut.StartImportAsync(stream, templateType);
 
             importRepository.Verify(r => r.Add(It.Is<DataImport>(i => i.TemplateType == templateType)));
         }
@@ -97,7 +97,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<CsvImportService>();
 
             await using var stream = GenerateStreamFromString(data);
-            var importEntry = await sut.StartImport(stream, templateType);
+            var importEntry = await sut.StartImportAsync(stream, templateType);
 
             Assert.Equal(templateType, importEntry.TemplateType);
             Assert.Equal(ImportStatus.Pending, importEntry.Status);
@@ -117,7 +117,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<CsvImportService>();
 
             await using var stream = GenerateStreamFromString(data);
-            var importEntry = await sut.StartImport(stream, templateType);
+            var importEntry = await sut.StartImportAsync(stream, templateType);
 
             jobClient.Verify(c => c.Create(
                 It.Is<Job>(job =>

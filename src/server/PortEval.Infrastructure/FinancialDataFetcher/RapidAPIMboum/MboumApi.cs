@@ -17,9 +17,9 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum
         private const string LATEST_DATA_BASE_URL = @"https://mboum-finance.p.rapidapi.com/qu/quote";
 
         [RequestProcessor(typeof(HistoricalDailyInstrumentPricesRequest), typeof(IEnumerable<PricePoint>))]
-        public async Task<Response<IEnumerable<PricePoint>>> Process(HistoricalDailyInstrumentPricesRequest request)
+        public async Task<Response<IEnumerable<PricePoint>>> ProcessAsync(HistoricalDailyInstrumentPricesRequest request)
         {
-            var response = await GetHistoricalData(request.Symbol, "1d");
+            var response = await GetHistoricalDataAsync(request.Symbol, "1d");
 
             return new Response<IEnumerable<PricePoint>>
             {
@@ -36,10 +36,10 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum
         }
 
         [RequestProcessor(typeof(IntradayInstrumentPricesRequest), typeof(IEnumerable<PricePoint>))]
-        public async Task<Response<IEnumerable<PricePoint>>> Process(IntradayInstrumentPricesRequest request)
+        public async Task<Response<IEnumerable<PricePoint>>> ProcessAsync(IntradayInstrumentPricesRequest request)
         {
             var intervalStr = request.Interval == IntradayInterval.FiveMinutes ? "5m" : "1h";
-            var response = await GetHistoricalData(request.Symbol, intervalStr);
+            var response = await GetHistoricalDataAsync(request.Symbol, intervalStr);
 
             return new Response<IEnumerable<PricePoint>>
             {
@@ -56,7 +56,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum
         }
 
         [RequestProcessor(typeof(LatestInstrumentPriceRequest), typeof(PricePoint))]
-        public async Task<Response<PricePoint>> Process(LatestInstrumentPriceRequest request)
+        public async Task<Response<PricePoint>> ProcessAsync(LatestInstrumentPriceRequest request)
         {
             var response = await GetQuoteData(request.Symbol);
             return new Response<PricePoint>
@@ -74,9 +74,9 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum
         }
 
         [RequestProcessor(typeof(InstrumentSplitsRequest), typeof(IEnumerable<InstrumentSplitData>))]
-        public async Task<Response<IEnumerable<InstrumentSplitData>>> Process(InstrumentSplitsRequest request)
+        public async Task<Response<IEnumerable<InstrumentSplitData>>> ProcessAsync(InstrumentSplitsRequest request)
         {
-            var response = await GetHistoricalData(request.Symbol, "3mo", downloadSplits: true);
+            var response = await GetHistoricalDataAsync(request.Symbol, "3mo", downloadSplits: true);
             return new Response<IEnumerable<InstrumentSplitData>>
             {
                 StatusCode = response.StatusCode,
@@ -91,7 +91,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum
             };
         }
 
-        private async Task<Response<MboumHistoricalDataResponse>> GetHistoricalData(string ticker, string interval, bool downloadSplits = false)
+        private async Task<Response<MboumHistoricalDataResponse>> GetHistoricalDataAsync(string ticker, string interval, bool downloadSplits = false)
         {
             var urlBuilder = new QueryUrlBuilder(HISTORICAL_DATA_BASE_URL);
             urlBuilder.AddQueryParam("symbol", ticker);
@@ -104,7 +104,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum
                 { "X-RapidAPI-Host", new Uri(HISTORICAL_DATA_BASE_URL).Host }
             };
 
-            var result = await HttpClient.GetJson<MboumHistoricalDataResponse>(urlBuilder.ToString(), Configuration.RateLimiter, headers);
+            var result = await HttpClient.GetJsonAsync<MboumHistoricalDataResponse>(urlBuilder.ToString(), Configuration.RateLimiter, headers);
 
             return result;
         }
@@ -147,7 +147,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum
             };
 
             var result =
-                await HttpClient.GetJson<IEnumerable<MboumQuoteDataResponse>>(urlBuilder.ToString(), Configuration.RateLimiter, headers);
+                await HttpClient.GetJsonAsync<IEnumerable<MboumQuoteDataResponse>>(urlBuilder.ToString(), Configuration.RateLimiter, headers);
 
             return result;
         }

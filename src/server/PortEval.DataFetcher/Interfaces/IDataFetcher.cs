@@ -14,8 +14,11 @@ namespace PortEval.DataFetcher.Interfaces
         /// <param name="request">Request to process</param>
         /// <typeparam name="TRequest">Request type</typeparam>
         /// <typeparam name="TResult">Response data type</typeparam>
-        /// <returns></returns>
-        public Task<Response<TResult>> ProcessRequest<TRequest, TResult>(TRequest request)
+        /// <returns>
+        /// A task representing the asynchronous request processing.
+        /// Task result contains a <see cref="Response{T}"/> instance containing the result of the request.
+        /// </returns>
+        public Task<Response<TResult>> ProcessRequestAsync<TRequest, TResult>(TRequest request)
             where TRequest : class, IRequest;
     }
 }

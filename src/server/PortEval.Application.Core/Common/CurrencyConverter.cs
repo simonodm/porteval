@@ -5,7 +5,7 @@ using PortEval.Domain.Exceptions;
 
 namespace PortEval.Application.Core.Common
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="ICurrencyConverter" />
     public class CurrencyConverter : ICurrencyConverter
     {
         /// <inheritdoc />

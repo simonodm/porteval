@@ -45,7 +45,7 @@ namespace PortEval.Application.Core.BackgroundJobs
         /// </summary>
         /// <param name="instrumentId">ID of the instrument to retrieve prices for.</param>
         /// <returns>A task representing the asynchronous job processing operation.</returns>
-        public async Task Run(int instrumentId)
+        public async Task RunAsync(int instrumentId)
         {
             _logger.LogInformation($"First price fetch for instrument {instrumentId}.");
             var instrument = await _instrumentRepository.FindAsync(instrumentId);

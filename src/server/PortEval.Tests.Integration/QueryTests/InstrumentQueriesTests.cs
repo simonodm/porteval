@@ -7,8 +7,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Queries;
 using Xunit;
+using PortEval.Application.Core;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
@@ -38,7 +38,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _instrumentQueries.GetAllInstruments();
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, AssertIsAAPLInstrument, AssertIsBTCInstrument);
         }
 
@@ -56,8 +56,8 @@ namespace PortEval.Tests.Integration.QueryTests
                 Page = 2
             });
 
-            Assert.Equal(QueryStatus.Ok, firstPageQueryResult.Status);
-            Assert.Equal(QueryStatus.Ok, secondPageQueryResult.Status);
+            Assert.Equal(OperationStatus.Ok, firstPageQueryResult.Status);
+            Assert.Equal(OperationStatus.Ok, secondPageQueryResult.Status);
             Assert.Equal(2, firstPageQueryResult.Response.TotalCount);
             Assert.Equal(1, firstPageQueryResult.Response.Page);
             Assert.Equal(2, secondPageQueryResult.Response.Page);
@@ -72,7 +72,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _instrumentQueries.GetInstrument(_appleInstrumentId);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             AssertIsAAPLInstrument(queryResult.Response);
         }
 
@@ -81,7 +81,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _instrumentQueries.GetInstrument(-1);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace PortEval.Tests.Integration.QueryTests
                 From = DateTime.UtcNow.AddDays(-1).AddHours(-1)
             });
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, AssertIsAAPLYesterdaysPrice, AssertIsAAPLCurrentPrice);
         }
 
@@ -101,28 +101,28 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _instrumentQueries.GetInstrumentPrices(-1, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
         public async Task GetInstrumentPricesPage_ReturnsCorrectlyPaginatedPrices()
         {
-            var firstPageQueryResult = await _instrumentQueries.GetInstrumentPricesPage(_appleInstrumentId,
+            var firstPageQueryResult = await _instrumentQueries.GetInstrumentPricesPageAsync(_appleInstrumentId,
                 new PaginationParams
                 {
                     Limit = 2,
                     Page = 1
                 }, new DateRangeParams());
 
-            var secondPageQueryResult = await _instrumentQueries.GetInstrumentPricesPage(_appleInstrumentId,
+            var secondPageQueryResult = await _instrumentQueries.GetInstrumentPricesPageAsync(_appleInstrumentId,
                 new PaginationParams
                 {
                     Limit = 2,
                     Page = 2
                 }, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.Ok, firstPageQueryResult.Status);
-            Assert.Equal(QueryStatus.Ok, secondPageQueryResult.Status);
+            Assert.Equal(OperationStatus.Ok, firstPageQueryResult.Status);
+            Assert.Equal(OperationStatus.Ok, secondPageQueryResult.Status);
             Assert.Equal(3, firstPageQueryResult.Response.TotalCount);
             Assert.Equal(2, firstPageQueryResult.Response.Count);
             Assert.Equal(1, firstPageQueryResult.Response.Page);
@@ -135,26 +135,26 @@ namespace PortEval.Tests.Integration.QueryTests
         [Fact]
         public async Task GetInstrumentPricesPage_ReturnsCompressedPrices_WhenCompressedFlagIsTrue()
         {
-            var queryResult = await _instrumentQueries.GetInstrumentPricesPage(_btcInstrumentId, new PaginationParams
+            var queryResult = await _instrumentQueries.GetInstrumentPricesPageAsync(_btcInstrumentId, new PaginationParams
             {
                 Limit = 300,
                 Page = 1
             }, new DateRangeParams(), true);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response.Data, AssertIsBTCCurrentPrice, AssertIsBTCYesterdaysPrice, AssertIsBTCTwoDaysOldPrice);
         }
 
         [Fact]
         public async Task GetInstrumentPricesPage_ReturnsCorrectlyAggregatedPrices_WhenAggregationFrequencyIsProvided()
         {
-            var queryResult = await _instrumentQueries.GetInstrumentPricesPage(_btcInstrumentId, new PaginationParams
+            var queryResult = await _instrumentQueries.GetInstrumentPricesPageAsync(_btcInstrumentId, new PaginationParams
             {
                 Limit = 300,
                 Page = 1
             }, new DateRangeParams(), false, AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response.Data, AssertIsBTCCurrentPrice, AssertIsBTCYesterdaysPrice, AssertIsBTCTwoDaysOldPrice);
         }
 
@@ -163,7 +163,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _instrumentQueries.GetInstrumentSplits(_appleInstrumentId);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, AssertIsAAPLYesterdaysSplit);
         }
 
@@ -172,7 +172,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _instrumentQueries.GetInstrumentSplit(_appleInstrumentId, _appleSplitId);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             AssertIsAAPLYesterdaysSplit(queryResult.Response);
         }
 
@@ -181,7 +181,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _instrumentQueries.GetInstrumentPrice(_btcInstrumentId, DateTime.UtcNow.AddDays(-1));
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             AssertIsBTCYesterdaysPrice(queryResult.Response);
         }
 
@@ -190,7 +190,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _instrumentQueries.GetInstrumentPrice(-1, DateTime.UtcNow);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -198,7 +198,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _instrumentQueries.GetInstrumentPrice(_btcInstrumentId, DateTime.UtcNow.AddDays(-7));
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Null(queryResult.Response);
         }
 
@@ -210,7 +210,7 @@ namespace PortEval.Tests.Integration.QueryTests
                 From = DateTime.UtcNow.AddDays(-2)
             });
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Equal(-3000m, queryResult.Response.Profit);
             Assert.Equal("USD", queryResult.Response.CurrencyCode);
         }
@@ -220,7 +220,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _instrumentQueries.GetInstrumentProfit(-1, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -231,7 +231,7 @@ namespace PortEval.Tests.Integration.QueryTests
                 From = DateTime.UtcNow.AddDays(-2)
             });
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Equal(-0.75m, queryResult.Response.Performance);
         }
 
@@ -240,7 +240,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _instrumentQueries.GetInstrumentPerformance(-1, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -250,7 +250,7 @@ namespace PortEval.Tests.Integration.QueryTests
                 await _instrumentQueries.ChartInstrumentPrices(_btcInstrumentId, new DateRangeParams { From = DateTime.UtcNow.AddDays(-2) },
                     AggregationFrequency.Day, "EUR");
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(3960m, p.Value);
@@ -278,7 +278,7 @@ namespace PortEval.Tests.Integration.QueryTests
                 await _instrumentQueries.ChartInstrumentProfit(_btcInstrumentId, new DateRangeParams(),
                     AggregationFrequency.Day, "EUR");
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(0m, p.Value);
@@ -304,7 +304,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _instrumentQueries.ChartInstrumentPerformance(_btcInstrumentId,
                 new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(0m, p.Value);
@@ -330,7 +330,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _instrumentQueries.ChartInstrumentProfitAggregated(_btcInstrumentId,
                 new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(0m, p.Value);
@@ -352,7 +352,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _instrumentQueries.ChartInstrumentPerformanceAggregated(_btcInstrumentId,
                 new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(0, p.Value);

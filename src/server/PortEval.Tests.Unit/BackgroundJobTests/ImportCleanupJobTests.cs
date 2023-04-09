@@ -45,7 +45,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<ImportCleanupJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             foreach (var import in importsToRemove)
             {
@@ -92,7 +92,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<ImportCleanupJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             foreach (var import in importsToRemove)
             {

@@ -26,7 +26,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var priceService = fixture.CreateDefaultInstrumentPriceServiceMock();
             var sut = fixture.Create<PriceImportProcessor>();
 
-            await sut.ImportRecords(new List<InstrumentPriceDto> { price });
+            await sut.ImportRecordsAsync(new List<InstrumentPriceDto> { price });
 
             priceService.Verify(s => s.AddPricePointAsync(It.Is<InstrumentPriceDto>(p =>
                 p.Id == default &&
@@ -48,7 +48,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var priceService = fixture.CreateDefaultInstrumentPriceServiceMock();
             var sut = fixture.Create<PriceImportProcessor>();
 
-            await sut.ImportRecords(new List<InstrumentPriceDto> { price });
+            await sut.ImportRecordsAsync(new List<InstrumentPriceDto> { price });
 
             priceService.Verify(s => s.AddPricePointAsync(It.IsAny<InstrumentPriceDto>()), Times.Never());
         }
@@ -65,7 +65,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var priceService = fixture.CreateDefaultInstrumentPriceServiceMock();
             var sut = fixture.Create<PriceImportProcessor>();
 
-            await sut.ImportRecords(new List<InstrumentPriceDto> { price });
+            await sut.ImportRecordsAsync(new List<InstrumentPriceDto> { price });
 
             priceService.Verify(s => s.AddPricePointAsync(It.IsAny<InstrumentPriceDto>()), Times.Never());
         }

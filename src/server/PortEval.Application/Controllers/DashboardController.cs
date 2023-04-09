@@ -1,40 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using PortEval.Application.Core;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Interfaces.Services;
 
 namespace PortEval.Application.Controllers
 {
     [Route("dashboard")]
     [ApiController]
-    public class DashboardController : ControllerBase
+    public class DashboardController : PortEvalControllerBase
     {
         private readonly IDashboardService _dashboardService;
-        private readonly IDashboardLayoutQueries _dashboardQueries;
 
-
-        public DashboardController(IDashboardLayoutQueries dashboardQueries, IDashboardService dashboardService)
+        public DashboardController(IDashboardService dashboardService)
         {
-            _dashboardQueries = dashboardQueries;
             _dashboardService = dashboardService;
         }
 
         [HttpGet]
         public async Task<ActionResult<DashboardLayoutDto>> GetDashboardLayout()
         {
-            var dashboardLayout = await _dashboardQueries.GetDashboardLayout();
-
-            return dashboardLayout.Response;
+            var dashboardLayout = await _dashboardService.GetDashboardLayoutAsync();
+            return GenerateActionResult(dashboardLayout);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateDashboardLayout([FromBody] DashboardLayoutDto layout)
+        public async Task<ActionResult<DashboardLayoutDto>> UpdateDashboardLayout([FromBody] DashboardLayoutDto layout)
         {
-            await _dashboardService.UpdateDashboardLayout(layout.Items);
-
-            return Ok();
+            var updatedLayout = await _dashboardService.UpdateDashboardLayoutAsync(layout.Items);
+            return GenerateActionResult(updatedLayout);
         }
     }
 }

@@ -3,8 +3,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Queries;
 using Xunit;
+using PortEval.Application.Core;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
@@ -26,7 +26,7 @@ namespace PortEval.Tests.Integration.QueryTests
 
             var rates = result.Response.ToList();
 
-            Assert.Equal(QueryStatus.Ok, result.Status);
+            Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Collection(rates,
                 r =>
                 {
@@ -54,7 +54,7 @@ namespace PortEval.Tests.Integration.QueryTests
 
             var exchangeRate = result.Response;
 
-            Assert.Equal(QueryStatus.Ok, result.Status);
+            Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal("USD", exchangeRate.CurrencyFromCode);
             Assert.Equal("EUR", exchangeRate.CurrencyToCode);
             Assert.Equal(1.00m, exchangeRate.ExchangeRate);
@@ -66,7 +66,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var result = await _currencyExchangeRateQueries.GetExchangeRateAt("AAA", "USD", DateTime.UtcNow);
 
-            Assert.Equal(QueryStatus.NotFound, result.Status);
+            Assert.Equal(OperationStatus.NotFound, result.Status);
             Assert.Null(result.Response);
         }
 
@@ -75,7 +75,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var result = await _currencyExchangeRateQueries.GetExchangeRateAt("USD", "AAA", DateTime.UtcNow);
 
-            Assert.Equal(QueryStatus.NotFound, result.Status);
+            Assert.Equal(OperationStatus.NotFound, result.Status);
             Assert.Null(result.Response);
         }
 
@@ -84,7 +84,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var result = await _currencyExchangeRateQueries.GetExchangeRateAt("USD", "EUR", DateTime.UtcNow.AddMonths(-1));
 
-            Assert.Equal(QueryStatus.NotFound, result.Status);
+            Assert.Equal(OperationStatus.NotFound, result.Status);
             Assert.Null(result.Response);
         }
     }

@@ -48,7 +48,7 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             await sut.UpdateDashboardLayout(dashboardLayout);
 
-            dashboardService.Verify(m => m.UpdateDashboardLayout(dashboardLayout.Items), Times.Once());
+            dashboardService.Verify(m => m.UpdateDashboardLayoutAsync(dashboardLayout.Items), Times.Once());
         }
     }
 }

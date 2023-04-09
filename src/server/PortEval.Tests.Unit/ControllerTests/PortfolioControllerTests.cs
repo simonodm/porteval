@@ -49,14 +49,14 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
             portfolioQueries
-                .Setup(m => m.GetPortfolio(portfolio.Id))
+                .Setup(m => m.GetPortfolioAsync(portfolio.Id))
                 .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(portfolio));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolio(portfolio.Id);
 
-            portfolioQueries.Verify(m => m.GetPortfolio(portfolio.Id), Times.Once());
+            portfolioQueries.Verify(m => m.GetPortfolioAsync(portfolio.Id), Times.Once());
             Assert.Equal(portfolio, result.Value);
         }
 
@@ -70,14 +70,14 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
             portfolioQueries
-                .Setup(m => m.GetPortfolio(It.IsAny<int>()))
+                .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
                 .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<PortfolioDto>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolio(portfolioId);
 
-            portfolioQueries.Verify(m => m.GetPortfolio(portfolioId), Times.Once());
+            portfolioQueries.Verify(m => m.GetPortfolioAsync(portfolioId), Times.Once());
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 

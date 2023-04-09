@@ -52,9 +52,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<SplitFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            priceFetcher.Verify(f => f.GetInstrumentSplits(
+            priceFetcher.Verify(f => f.GetInstrumentSplitsAsync(
                 instrument.Symbol,
                 instrument.TrackingInfo.TrackedSince,
                 It.IsInRange(DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1), Range.Inclusive)
@@ -97,9 +97,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<SplitFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            priceFetcher.Verify(f => f.GetInstrumentSplits(
+            priceFetcher.Verify(f => f.GetInstrumentSplitsAsync(
                 instrument.Symbol,
                 existingSplit.Time,
                 It.IsInRange(DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1), Range.Inclusive)
@@ -139,7 +139,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<SplitFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
             splitRepository.Verify(r => r.Add(It.Is<InstrumentSplit>(s =>
                 s.Time == splitData.Time &&
@@ -155,7 +155,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         {
             var mock = fixture.Freeze<Mock<IFinancialDataFetcher>>();
             mock
-                .Setup(m => m.GetInstrumentSplits(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .Setup(m => m.GetInstrumentSplitsAsync(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(splitData);
 
             return mock;

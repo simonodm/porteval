@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Repositories;
+﻿using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
-using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Queries;
 
 namespace PortEval.Application.Core.Services
 {
@@ -14,21 +15,67 @@ namespace PortEval.Application.Core.Services
     {
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly IInstrumentSplitRepository _splitRepository;
+        private readonly IInstrumentQueries _instrumentDataQueries;
 
         public InstrumentSplitService(IInstrumentRepository instrumentRepository,
-            IInstrumentSplitRepository splitRepository)
+            IInstrumentSplitRepository splitRepository, IInstrumentQueries instrumentDataQueries)
         {
             _instrumentRepository = instrumentRepository;
             _splitRepository = splitRepository;
+            _instrumentDataQueries = instrumentDataQueries;
         }
 
         /// <inheritdoc />
-        public async Task<InstrumentSplit> CreateSplitAsync(InstrumentSplitDto options)
+        public async Task<OperationResponse<IEnumerable<InstrumentSplitDto>>> GetInstrumentSplitsAsync(int instrumentId)
+        {
+            if (!await _instrumentRepository.ExistsAsync(instrumentId))
+            {
+                return new OperationResponse<IEnumerable<InstrumentSplitDto>>
+                {
+                    Status = OperationStatus.NotFound,
+                    Message = $"Instrument {instrumentId} does not exist."
+                };
+            }
+
+            var splits = await _instrumentDataQueries.GetInstrumentSplitsAsync(instrumentId);
+            return new OperationResponse<IEnumerable<InstrumentSplitDto>>
+            {
+                Response = splits
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<OperationResponse<InstrumentSplitDto>> GetInstrumentSplitAsync(int instrumentId, int splitId)
+        {
+            if (!await _instrumentRepository.ExistsAsync(instrumentId))
+            {
+                return new OperationResponse<InstrumentSplitDto>
+                {
+                    Status = OperationStatus.NotFound,
+                    Message = $"Instrument {instrumentId} does not exist."
+                };
+            }
+
+            var split = await _instrumentDataQueries.GetInstrumentSplitAsync(instrumentId, splitId);
+            return new OperationResponse<InstrumentSplitDto>
+            {
+                Status = split != null ? OperationStatus.Ok : OperationStatus.NotFound,
+                Message = split != null ? "" : $"Split {splitId} does not exist on instrument {instrumentId}.",
+                Response = split
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<OperationResponse<InstrumentSplitDto>> CreateSplitAsync(InstrumentSplitDto options)
         {
             var instrument = await _instrumentRepository.FindAsync(options.InstrumentId);
             if (instrument == null)
             {
-                throw new ItemNotFoundException($"Instrument {options.InstrumentId} does not exist.");
+                return new OperationResponse<InstrumentSplitDto>
+                {
+                    Status = OperationStatus.NotFound,
+                    Message = $"Instrument {options.InstrumentId} does not exist."
+                };
             }
 
             var ratio = new SplitRatio(options.SplitRatioDenominator, options.SplitRatioNumerator);
@@ -37,22 +84,29 @@ namespace PortEval.Application.Core.Services
             _splitRepository.Add(newSplit);
             await _splitRepository.UnitOfWork.CommitAsync();
 
-            return newSplit;
+            return await GetInstrumentSplitAsync(instrument.Id, newSplit.Id);
         }
 
         /// <inheritdoc />
-        public async Task<InstrumentSplit> UpdateSplitAsync(int instrumentId, InstrumentSplitDto options)
+        public async Task<OperationResponse<InstrumentSplitDto>> UpdateSplitAsync(int instrumentId, InstrumentSplitDto options)
         {
             var split = await _splitRepository.FindAsync(options.Id);
             if (split == null)
             {
-                throw new ItemNotFoundException($"Split {options.Id} does not exist.");
+                return new OperationResponse<InstrumentSplitDto>
+                {
+                    Status = OperationStatus.NotFound,
+                    Message = $"Split {options.Id} does not exist."
+                };
             }
 
             if (split.InstrumentId != instrumentId)
             {
-                throw new OperationNotAllowedException(
-                    $"Split {options.Id} does not belong to instrument {instrumentId}.");
+                return new OperationResponse<InstrumentSplitDto>
+                {
+                    Status = OperationStatus.Error,
+                    Message = $"Split {options.Id} does not belong to instrument {instrumentId}."
+                };
             }
 
             if (split.ProcessingStatus == InstrumentSplitProcessingStatus.Processed &&
@@ -64,7 +118,7 @@ namespace PortEval.Application.Core.Services
                 await _splitRepository.UnitOfWork.CommitAsync();
             }
 
-            return split;
+            return await GetInstrumentSplitAsync(instrumentId, split.Id);
         }
     }
 }

@@ -32,7 +32,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
             var sut = fixture.Create<DashboardService>();
 
-            await sut.UpdateDashboardLayout(newDashboardItems);
+            await sut.UpdateDashboardLayoutAsync(newDashboardItems);
 
             foreach (var item in existingDashboardItems)
                 dashboardItemRepository.Verify(r => r.Delete(item), Times.Once());
@@ -55,7 +55,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
             var sut = fixture.Create<DashboardService>();
 
-            await sut.UpdateDashboardLayout(newDashboardItems);
+            await sut.UpdateDashboardLayoutAsync(newDashboardItems);
 
             foreach (var item in newDashboardItems)
                 dashboardItemRepository.Verify(r => r.Add(It.Is<DashboardChartItem>(i =>
@@ -85,7 +85,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<DashboardService>();
 
             await Assert.ThrowsAsync<OperationNotAllowedException>(async () =>
-                await sut.UpdateDashboardLayout(newDashboardItems));
+                await sut.UpdateDashboardLayoutAsync(newDashboardItems));
         }
 
         [Fact]
@@ -106,7 +106,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<DashboardService>();
 
             await Assert.ThrowsAsync<OperationNotAllowedException>(async () =>
-                await sut.UpdateDashboardLayout(newDashboardItems));
+                await sut.UpdateDashboardLayoutAsync(newDashboardItems));
         }
 
         [Fact]
@@ -133,7 +133,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<DashboardService>();
 
             await Assert.ThrowsAsync<ItemNotFoundException>(async () =>
-                await sut.UpdateDashboardLayout(newDashboardItems));
+                await sut.UpdateDashboardLayoutAsync(newDashboardItems));
         }
 
         private List<DashboardItem> GenerateValidDashboardItemEntities(IFixture fixture)

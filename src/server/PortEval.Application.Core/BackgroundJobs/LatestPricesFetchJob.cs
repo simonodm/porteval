@@ -37,7 +37,7 @@ namespace PortEval.Application.Core.BackgroundJobs
         /// Starts the job.
         /// </summary>
         /// <returns>A task representing the asynchronous job processing operation.</returns>
-        public async Task Run()
+        public async Task RunAsync()
         {
             var startTime = DateTime.UtcNow;
             _logger.LogInformation("Running latest price fetch job.");

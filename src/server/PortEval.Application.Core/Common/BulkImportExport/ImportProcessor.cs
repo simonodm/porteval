@@ -19,7 +19,7 @@ namespace PortEval.Application.Core.Common.BulkImportExport
             Validator = new TValidator();
         }
 
-        public async Task<ImportResult<TRecord>> ImportRecords(IEnumerable<TRecord> records)
+        public async Task<ImportResult<TRecord>> ImportRecordsAsync(IEnumerable<TRecord> records)
         {
             var errorLog = new List<ProcessedRowErrorLogEntry<TRecord>>();
             foreach (var record in records)

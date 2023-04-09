@@ -4,8 +4,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Queries;
 using Xunit;
+using PortEval.Application.Core;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
@@ -27,7 +27,7 @@ namespace PortEval.Tests.Integration.QueryTests
 
             var dataImports = queryResult.Response.ToList();
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(dataImports,
                 import =>
                 {
@@ -55,7 +55,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _dataImportQueries.GetImport(Guid.NewGuid());
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
             Assert.Null(queryResult.Response);
         }
 
@@ -64,7 +64,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _dataImportQueries.GetImport(Guid.Parse("974c9b22-8276-4121-96ce-6bf3f0f70152"));
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.NotNull(queryResult.Response);
             Assert.Equal(TemplateType.Instruments, queryResult.Response.TemplateType);
             Assert.Equal(ImportStatus.Finished, queryResult.Response.Status);

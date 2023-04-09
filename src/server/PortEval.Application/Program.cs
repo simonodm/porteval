@@ -72,14 +72,14 @@ namespace PortEval.Application
         {
             var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
 
-            recurringJobManager.AddOrUpdate<ILatestPricesFetchJob>("latest_prices", job => job.Run(), "*/5 * * * *");
-            recurringJobManager.AddOrUpdate<IMissingInstrumentPricesFetchJob>("fetch_missing_prices", job => job.Run(), Cron.Daily);
+            recurringJobManager.AddOrUpdate<ILatestPricesFetchJob>("latest_prices", job => job.RunAsync(), "*/5 * * * *");
+            recurringJobManager.AddOrUpdate<IMissingInstrumentPricesFetchJob>("fetch_missing_prices", job => job.RunAsync(), Cron.Daily);
             recurringJobManager.AddOrUpdate<IMissingExchangeRatesFetchJob>("fetch_missing_exchange_rates",
-                job => job.Run(), Cron.Daily);
-            recurringJobManager.AddOrUpdate<IInstrumentPriceCleanupJob>("db_cleanup", job => job.Run(), Cron.Daily);
-            recurringJobManager.AddOrUpdate<IImportCleanupJob>("import_cleanup", job => job.Run(), Cron.Daily);
-            recurringJobManager.AddOrUpdate<ISplitFetchJob>("split_fetch", job => job.Run(), Cron.Daily);
-            recurringJobManager.AddOrUpdate<ISplitPriceAndTransactionAdjustmentJob>("split_price_adjustment", job => job.Run(), Cron.Daily);
+                job => job.RunAsync(), Cron.Daily);
+            recurringJobManager.AddOrUpdate<IInstrumentPriceCleanupJob>("db_cleanup", job => job.RunAsync(), Cron.Daily);
+            recurringJobManager.AddOrUpdate<IImportCleanupJob>("import_cleanup", job => job.RunAsync(), Cron.Daily);
+            recurringJobManager.AddOrUpdate<ISplitFetchJob>("split_fetch", job => job.RunAsync(), Cron.Daily);
+            recurringJobManager.AddOrUpdate<ISplitPriceAndTransactionAdjustmentJob>("split_price_adjustment", job => job.RunAsync(), Cron.Daily);
 
             recurringJobManager.Trigger("db_cleanup");
             recurringJobManager.Trigger("fetch_missing_prices");

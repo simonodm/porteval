@@ -38,7 +38,7 @@ namespace PortEval.Tests.Unit.DataFetcherTests
             var sut = new RequestHandler<TestRequest, bool>(request,
                 new List<DataSource> { api.Object });
 
-            var response = await sut.Handle();
+            var response = await sut.HandleAsync();
 
             Assert.Equal(StatusCode.Ok, response.StatusCode);
             Assert.True(response.Result);
@@ -61,7 +61,7 @@ namespace PortEval.Tests.Unit.DataFetcherTests
             var sut = new RequestHandler<TestRequest, bool>(request,
                 new List<DataSource> { firstFailingApi.Object, secondFailingApi.Object, workingApi.Object, thirdFailingApi.Object });
 
-            var response = await sut.Handle();
+            var response = await sut.HandleAsync();
 
             Assert.Equal(StatusCode.Ok, response.StatusCode);
             Assert.True(response.Result);
@@ -84,7 +84,7 @@ namespace PortEval.Tests.Unit.DataFetcherTests
                 new List<DataSource> { firstFailingApi.Object, secondFailingApi.Object, thirdFailingApi.Object },
                 RetryPolicy.None);
 
-            var response = await sut.Handle();
+            var response = await sut.HandleAsync();
 
             Assert.Equal(StatusCode.OtherError, response.StatusCode);
             Assert.NotEmpty(response.ErrorMessage);
@@ -110,7 +110,7 @@ namespace PortEval.Tests.Unit.DataFetcherTests
                 new List<DataSource> { api.Object },
                 retryPolicy);
 
-            var response = await sut.Handle();
+            var response = await sut.HandleAsync();
 
             Assert.Equal(StatusCode.Ok, response.StatusCode);
             Assert.True(response.Result);

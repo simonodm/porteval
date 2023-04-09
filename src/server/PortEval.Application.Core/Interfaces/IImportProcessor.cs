@@ -18,6 +18,6 @@ namespace PortEval.Application.Core.Interfaces
         /// A task representing the asynchronous import operation.
         /// Task result contains an <see cref="ImportResult{T}"/> instance containing information about the processed import.
         /// </returns>
-        public Task<ImportResult<TRecord>> ImportRecords(IEnumerable<TRecord> rows);
+        public Task<ImportResult<TRecord>> ImportRecordsAsync(IEnumerable<TRecord> rows);
     }
 }

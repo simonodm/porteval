@@ -1,27 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using System.Text;
-using PortEval.Application.Core.Queries;
 using Xunit;
+using PortEval.Application.Core;
 
 namespace PortEval.Tests.Unit.Helpers
 {
     internal static class ControllerTestHelper
     {
-        public static QueryResponse<T> GenerateSuccessfulQueryResponse<T>(T result)
+        public static OperationResponse<T> GenerateSuccessfulQueryResponse<T>(T result)
         {
-            return new QueryResponse<T>
+            return new OperationResponse<T>
             {
-                Status = QueryStatus.Ok,
+                Status = OperationStatus.Ok,
                 Response = result
             };
         }
 
-        public static QueryResponse<T> GenerateNotFoundQueryResponse<T>()
+        public static OperationResponse<T> GenerateNotFoundQueryResponse<T>()
         {
-            return new QueryResponse<T>
+            return new OperationResponse<T>
             {
-                Status = QueryStatus.NotFound,
+                Status = OperationStatus.NotFound,
                 Response = default
             };
         }

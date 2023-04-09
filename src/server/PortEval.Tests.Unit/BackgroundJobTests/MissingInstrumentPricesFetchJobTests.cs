@@ -47,9 +47,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<MissingInstrumentPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            priceFetcher.Verify(m => m.GetHistoricalDailyPrices(
+            priceFetcher.Verify(m => m.GetHistoricalDailyPricesAsync(
                 instrument.Symbol,
                 instrument.CurrencyCode,
                 PortEvalConstants.FinancialDataStartTime,
@@ -89,9 +89,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<MissingInstrumentPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            priceFetcher.Verify(m => m.GetIntradayPrices(
+            priceFetcher.Verify(m => m.GetIntradayPricesAsync(
                 instrument.Symbol,
                 instrument.CurrencyCode,
                 It.IsInRange(baseTime.AddDays(-5).AddMinutes(-5), baseTime.AddDays(-5).AddMinutes(5), Range.Inclusive),
@@ -132,9 +132,9 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<MissingInstrumentPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            priceFetcher.Verify(m => m.GetIntradayPrices(
+            priceFetcher.Verify(m => m.GetIntradayPricesAsync(
                 instrument.Symbol,
                 instrument.CurrencyCode,
                 It.IsInRange(baseTime.AddDays(-1).AddMinutes(-5), baseTime.AddDays(-1).AddMinutes(5), Range.Inclusive),
@@ -192,22 +192,22 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var sut = fixture.Create<MissingInstrumentPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            priceFetcher.Verify(m => m.GetHistoricalDailyPrices(
+            priceFetcher.Verify(m => m.GetHistoricalDailyPricesAsync(
                 instrument.Symbol,
                 instrument.CurrencyCode,
                 PortEvalConstants.FinancialDataStartTime,
                 It.IsInRange(baseTime.AddDays(-5).AddMinutes(-5), baseTime.AddDays(-5).AddMinutes(5), Range.Inclusive)
             ));
-            priceFetcher.Verify(m => m.GetIntradayPrices(
+            priceFetcher.Verify(m => m.GetIntradayPricesAsync(
                 instrument.Symbol,
                 instrument.CurrencyCode,
                 It.IsInRange(baseTime.AddDays(-5).AddMinutes(-5), baseTime.AddDays(-5).AddMinutes(5), Range.Inclusive),
                 It.IsInRange(baseTime.AddDays(-1).AddMinutes(-5), baseTime.AddDays(-1).AddMinutes(5), Range.Inclusive),
                 IntradayInterval.OneHour
             ));
-            priceFetcher.Verify(m => m.GetIntradayPrices(
+            priceFetcher.Verify(m => m.GetIntradayPricesAsync(
                 instrument.Symbol,
                 instrument.CurrencyCode,
                 It.IsInRange(baseTime.AddDays(-1).AddMinutes(-5), baseTime.AddDays(-1).AddMinutes(5), Range.Inclusive),

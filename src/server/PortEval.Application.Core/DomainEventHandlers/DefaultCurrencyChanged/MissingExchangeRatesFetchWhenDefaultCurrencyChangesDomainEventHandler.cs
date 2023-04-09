@@ -24,7 +24,7 @@ namespace PortEval.Application.Core.DomainEventHandlers.DefaultCurrencyChanged
 
         public Task Handle(DomainEventNotificationAdapter<DefaultCurrencyChangedDomainEvent> notification, CancellationToken cancellationToken)
         {
-            _jobClient.Enqueue<IMissingExchangeRatesFetchJob>(job => job.Run());
+            _jobClient.Enqueue<IMissingExchangeRatesFetchJob>(job => job.RunAsync());
             _logger.LogInformation($"Missing exchange rates job enqueued after default currency change to {notification.DomainEvent.NewDefaultCurrency.Code}.");
             return Task.CompletedTask;
         }

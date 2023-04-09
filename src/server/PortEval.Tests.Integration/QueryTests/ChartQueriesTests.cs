@@ -8,8 +8,8 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Queries;
 using Xunit;
+using PortEval.Application.Core;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
@@ -57,7 +57,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _chartQueries.GetCharts();
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, AssertIsTestPortfolioChart, AssertIsTestPositionInstrumentChart);
         }
 
@@ -66,7 +66,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _chartQueries.GetChart(_portfolioChartId);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             AssertIsTestPortfolioChart(queryResult.Response);
         }
 
@@ -75,7 +75,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _chartQueries.GetChart(-1);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         private void AssertIsTestPortfolioChart(ChartDto c)

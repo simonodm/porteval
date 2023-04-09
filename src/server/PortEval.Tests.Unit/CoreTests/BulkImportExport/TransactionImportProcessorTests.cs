@@ -26,7 +26,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var transactionService = fixture.CreateDefaultTransactionServiceMock();
             var sut = fixture.Create<TransactionImportProcessor>();
 
-            await sut.ImportRecords(new List<TransactionDto> { transaction });
+            await sut.ImportRecordsAsync(new List<TransactionDto> { transaction });
 
             transactionService.Verify(s => s.AddTransactionAsync(It.Is<TransactionDto>(t =>
                 t.Id == default &&
@@ -51,7 +51,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var transactionService = fixture.CreateDefaultTransactionServiceMock();
             var sut = fixture.Create<TransactionImportProcessor>();
 
-            await sut.ImportRecords(new List<TransactionDto> { transaction });
+            await sut.ImportRecordsAsync(new List<TransactionDto> { transaction });
 
             transactionService.Verify(s => s.UpdateTransactionAsync(It.Is<TransactionDto>(t =>
                 t.Id == transaction.Id &&
@@ -77,7 +77,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var transactionService = fixture.CreateDefaultTransactionServiceMock();
             var sut = fixture.Create<TransactionImportProcessor>();
 
-            await sut.ImportRecords(new List<TransactionDto> { transaction });
+            await sut.ImportRecordsAsync(new List<TransactionDto> { transaction });
 
             transactionService.Verify(s => s.AddTransactionAsync(It.IsAny<TransactionDto>()), Times.Never());
             transactionService.Verify(s => s.UpdateTransactionAsync(It.IsAny<TransactionDto>()), Times.Never());

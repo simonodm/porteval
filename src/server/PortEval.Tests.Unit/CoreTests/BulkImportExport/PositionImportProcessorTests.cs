@@ -26,7 +26,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var positionService = fixture.CreateDefaultPositionServiceMock();
             var sut = fixture.Create<PositionImportProcessor>();
 
-            await sut.ImportRecords(new List<PositionDto> { position });
+            await sut.ImportRecordsAsync(new List<PositionDto> { position });
 
             positionService.Verify(s => s.OpenPositionAsync(It.Is<PositionDto>(p =>
                 p.Id == default &&
@@ -50,7 +50,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var positionService = fixture.CreateDefaultPositionServiceMock();
             var sut = fixture.Create<PositionImportProcessor>();
 
-            await sut.ImportRecords(new List<PositionDto> { position });
+            await sut.ImportRecordsAsync(new List<PositionDto> { position });
 
             positionService.Verify(s => s.UpdatePositionAsync(It.Is<PositionDto>(p =>
                 p.Id == position.Id &&
@@ -74,7 +74,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var positionService = fixture.CreateDefaultPositionServiceMock();
             var sut = fixture.Create<PositionImportProcessor>();
 
-            await sut.ImportRecords(new List<PositionDto> { position });
+            await sut.ImportRecordsAsync(new List<PositionDto> { position });
 
             positionService.Verify(s => s.OpenPositionAsync(It.IsAny<PositionDto>()), Times.Never());
             positionService.Verify(s => s.UpdatePositionAsync(It.IsAny<PositionDto>()), Times.Never());

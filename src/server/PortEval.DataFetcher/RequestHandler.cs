@@ -57,16 +57,16 @@ namespace PortEval.DataFetcher
         /// Processes the request.
         /// </summary>
         /// <returns>A Response object containing processing status and retrieved data if the request is successful.</returns>
-        public async Task<Response<TResult>> Handle()
+        public async Task<Response<TResult>> HandleAsync()
         {
             var priorityApi = GetPriorityApi();
-            var result = await ProcessUsingDataSource(priorityApi);
+            var result = await ProcessUsingDataSourceAsync(priorityApi);
             if (result.StatusCode == StatusCode.Ok)
             {
                 return result;
             }
 
-            return await TryAllEligibleApis();
+            return await TryAllEligibleApisAsync();
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace PortEval.DataFetcher
         /// all the remaining requests get cancelled and the data from the successful API gets returned. 
         /// </summary>
         /// <returns>A Response object containing processing status and retrieved data if the request is successful.</returns>
-        private async Task<Response<TResult>> TryAllEligibleApis()
+        private async Task<Response<TResult>> TryAllEligibleApisAsync()
         {
             var apiTasks = new List<Task<Response<TResult>>>();
 
@@ -91,8 +91,8 @@ namespace PortEval.DataFetcher
             {
                 foreach (var api in _eligibleApis)
                 {
-                    var retryableJob = new RetryableAsyncJob<Response<TResult>>(async () => await ProcessUsingDataSource(api), _retryPolicy);
-                    apiTasks.Add(RunRetryableJob(retryableJob, cts));
+                    var retryableJob = new RetryableAsyncJob<Response<TResult>>(async () => await ProcessUsingDataSourceAsync(api), _retryPolicy);
+                    apiTasks.Add(RunRetryableJobAsync(retryableJob, cts));
                 }
 
                 await Task.WhenAll(apiTasks.ToArray<Task>());
@@ -119,7 +119,7 @@ namespace PortEval.DataFetcher
         /// <param name="retryableJob">Job to retry</param>
         /// <param name="cts">Cancellation token source</param>
         /// <returns>A Response object containing processing status and retrieved data if the request was successful.</returns>
-        private Task<Response<TResult>> RunRetryableJob(RetryableAsyncJob<Response<TResult>> retryableJob, CancellationTokenSource cts)
+        private Task<Response<TResult>> RunRetryableJobAsync(RetryableAsyncJob<Response<TResult>> retryableJob, CancellationTokenSource cts)
         {
             return Task.Run(async () =>
             {
@@ -127,7 +127,7 @@ namespace PortEval.DataFetcher
                 {
                     while (retryableJob.CanRetry())
                     {
-                        var jobResult = await retryableJob.Retry(cts.Token);
+                        var jobResult = await retryableJob.RetryAsync(cts.Token);
                         if (jobResult.StatusCode == StatusCode.Ok)
                         {
                             cts.Cancel();
@@ -165,7 +165,7 @@ namespace PortEval.DataFetcher
             });
         }
 
-        private async Task<Response<TResult>> ProcessUsingDataSource(DataSource dataSource)
+        private async Task<Response<TResult>> ProcessUsingDataSourceAsync(DataSource dataSource)
         {
             var type = dataSource.GetType();
             var methods = type.GetMethods();

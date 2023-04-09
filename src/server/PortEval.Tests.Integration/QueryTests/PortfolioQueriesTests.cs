@@ -8,8 +8,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Queries;
 using Xunit;
+using PortEval.Application.Core;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
@@ -36,25 +36,25 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.GetPortfolios();
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, AssertIsFirstPortfolio, AssertIsSecondPortfolio);
         }
 
         [Fact]
         public async Task GetPortfolio_ReturnsCorrectPortfolio_WhenPortfolioExists()
         {
-            var queryResult = await _portfolioQueries.GetPortfolio(_firstPortfolioId);
+            var queryResult = await _portfolioQueries.GetPortfolioAsync(_firstPortfolioId);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             AssertIsFirstPortfolio(queryResult.Response);
         }
 
         [Fact]
         public async Task GetPortfolio_ReturnsNotFound_WhenPortfolioDoesNotExist()
         {
-            var queryResult = await _portfolioQueries.GetPortfolio(-1);
+            var queryResult = await _portfolioQueries.GetPortfolioAsync(-1);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace PortEval.Tests.Integration.QueryTests
 
             var queryResult = await _portfolioQueries.GetPortfolioValue(_firstPortfolioId, time);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Equal(150m, queryResult.Response.Value);
             Assert.Equal("USD", queryResult.Response.CurrencyCode);
             Assert.Equal(time, queryResult.Response.Time);
@@ -77,7 +77,7 @@ namespace PortEval.Tests.Integration.QueryTests
 
             var queryResult = await _portfolioQueries.GetPortfolioValue(_secondPortfolioId, time);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Equal(5050m, queryResult.Response.Value);
             Assert.Equal("EUR", queryResult.Response.CurrencyCode);
             Assert.Equal(time, queryResult.Response.Time);
@@ -88,7 +88,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.GetPortfolioValue(-1, DateTime.UtcNow);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -96,7 +96,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.GetPortfolioProfit(_firstPortfolioId, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Equal(50m, queryResult.Response.Profit);
             Assert.Equal("USD", queryResult.Response.CurrencyCode);
             Assert.Equal(DateTime.UtcNow, queryResult.Response.To, TimeSpan.FromMinutes(1));
@@ -108,7 +108,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.GetPortfolioProfit(_secondPortfolioId, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Equal(-19950m, queryResult.Response.Profit);
             Assert.Equal("EUR", queryResult.Response.CurrencyCode);
             Assert.Equal(DateTime.UtcNow, queryResult.Response.To, TimeSpan.FromMinutes(1));
@@ -120,7 +120,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.GetPortfolioProfit(-1, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.GetPortfolioPerformance(_firstPortfolioId, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Equal(0.5m, queryResult.Response.Performance);
             Assert.Equal(DateTime.UtcNow, queryResult.Response.To, TimeSpan.FromMinutes(1));
             Assert.Equal(PortEvalConstants.FinancialDataStartTime, queryResult.Response.From);
@@ -139,7 +139,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.GetPortfolioPerformance(-1, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -148,7 +148,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _portfolioQueries.ChartPortfolioValue(_firstPortfolioId, new DateRangeParams(),
                 AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(130m, p.Value);
@@ -173,7 +173,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.ChartPortfolioValue(-1, new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -182,7 +182,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _portfolioQueries.ChartPortfolioProfit(_firstPortfolioId, new DateRangeParams(),
                 AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(0m, p.Value);
@@ -207,7 +207,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.ChartPortfolioProfit(-1, new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -216,7 +216,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _portfolioQueries.ChartPortfolioPerformance(_firstPortfolioId, new DateRangeParams(),
                 AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(0m, p.Value, 2);
@@ -241,7 +241,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.ChartPortfolioPerformance(-1, new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -250,7 +250,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _portfolioQueries.ChartPortfolioProfitAggregated(_firstPortfolioId, new DateRangeParams(),
                 AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(30m, p.Value);
@@ -271,7 +271,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.ChartPortfolioProfitAggregated(-1, new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -280,7 +280,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _portfolioQueries.ChartPortfolioPerformanceAggregated(_firstPortfolioId, new DateRangeParams(),
                 AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(0.3m, p.Value);
@@ -303,7 +303,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.ChartPortfolioPerformanceAggregated(-1, new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -311,7 +311,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.GetAllPortfoliosStatistics();
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, AssertIsFirstPortfolioPerformanceStatistics, AssertIsSecondPortfolioPerformanceStatistics);
         }
 
@@ -320,7 +320,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.GetPortfolioStatistics(_firstPortfolioId);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             AssertIsFirstPortfolioPerformanceStatistics(queryResult.Response);
         }
 
@@ -329,7 +329,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _portfolioQueries.GetPortfolioStatistics(-1);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         private void AssertIsFirstPortfolio(PortfolioDto p)

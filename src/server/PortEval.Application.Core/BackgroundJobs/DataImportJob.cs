@@ -54,7 +54,7 @@ namespace PortEval.Application.Core.BackgroundJobs
             };
         }
 
-        public async Task Run(Guid importId, string inputFileName, string logPath)
+        public async Task RunAsync(Guid importId, string inputFileName, string logPath)
         {
             _logger.LogInformation($"Processing import {importId}.");
 
@@ -134,7 +134,7 @@ namespace PortEval.Application.Core.BackgroundJobs
         private async Task ProcessImport<TRow>(CsvReader reader, string logPath)
         {
             var processor = _serviceProvider.GetRequiredService<IImportProcessor<TRow>>();
-            var result = await processor.ImportRecords(reader.GetRecords<TRow>().ToList());
+            var result = await processor.ImportRecordsAsync(reader.GetRecords<TRow>().ToList());
             SaveErrorLog(result.ErrorLog, _parsingErrors, logPath);
         }
 

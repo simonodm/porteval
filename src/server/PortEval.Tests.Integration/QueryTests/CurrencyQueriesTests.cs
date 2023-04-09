@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Queries;
 using Xunit;
+using PortEval.Application.Core;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
@@ -22,7 +22,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _currencyQueries.GetAllCurrencies();
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Contains(queryResult.Response, c => c.Code == "USD" && c.Name == "United States dollar" && c.Symbol == "US$");
             Assert.Contains(queryResult.Response, c => c.Code == "EUR" && c.Name == "European Euro" && c.Symbol == "€");
             Assert.Contains(queryResult.Response, c => c.Code == "CZK" && c.Name == "Czech koruna" && c.Symbol == "Kč");
@@ -33,7 +33,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _currencyQueries.GetCurrency("USD");
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Equal("USD", queryResult.Response.Code);
             Assert.Equal("United States dollar", queryResult.Response.Name);
             Assert.Equal("US$", queryResult.Response.Symbol);
@@ -45,7 +45,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _currencyQueries.GetCurrency("AAA");
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
             Assert.Null(queryResult.Response);
         }
     }

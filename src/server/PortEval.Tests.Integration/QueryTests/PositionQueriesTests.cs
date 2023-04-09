@@ -8,8 +8,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Queries;
 using Xunit;
+using PortEval.Application.Core;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
@@ -46,7 +46,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetAllPositions();
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, AssertIsAAPLPosition, AssertIsBTCPosition);
         }
 
@@ -55,7 +55,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPortfolioPositions(_firstPortfolioId);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, AssertIsAAPLPosition);
         }
 
@@ -64,7 +64,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPortfolioPositions(-1);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -72,7 +72,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPosition(_btcPositionId);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             AssertIsBTCPosition(queryResult.Response);
         }
 
@@ -81,7 +81,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPosition(-1);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -91,7 +91,7 @@ namespace PortEval.Tests.Integration.QueryTests
 
             var queryResult = await _positionQueries.GetPositionValue(_applePositionId, time);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Equal(150m, queryResult.Response.Value);
             Assert.Equal("USD", queryResult.Response.CurrencyCode);
             Assert.Equal(time, queryResult.Response.Time);
@@ -102,7 +102,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPositionValue(-1, DateTime.UtcNow);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -110,7 +110,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPositionProfit(_applePositionId, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Equal(50m, queryResult.Response.Profit);
             Assert.Equal("USD", queryResult.Response.CurrencyCode);
             Assert.Equal(PortEvalConstants.FinancialDataStartTime, queryResult.Response.From);
@@ -122,7 +122,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPositionProfit(-1, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -130,7 +130,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPositionPerformance(_applePositionId, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Equal(0.5m, queryResult.Response.Performance);
             Assert.Equal(PortEvalConstants.FinancialDataStartTime, queryResult.Response.From);
             Assert.Equal(DateTime.UtcNow, queryResult.Response.To, TimeSpan.FromMinutes(1));
@@ -141,7 +141,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPositionPerformance(-1, new DateRangeParams());
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -150,7 +150,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var time = DateTime.UtcNow;
             var queryResult = await _positionQueries.GetPositionBreakEvenPoint(_applePositionId, time);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Equal(100m, queryResult.Response.BreakEvenPoint);
             Assert.Equal(time, queryResult.Response.Time);
         }
@@ -160,7 +160,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPositionBreakEvenPoint(-1, DateTime.UtcNow);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -169,7 +169,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _positionQueries.ChartPositionValue(_applePositionId, new DateRangeParams(),
                 AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(130m, p.Value);
@@ -194,7 +194,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.ChartPositionValue(-1, new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -203,7 +203,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _positionQueries.ChartPositionProfit(_applePositionId, new DateRangeParams(),
                 AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(0m, p.Value);
@@ -228,7 +228,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.ChartPositionProfit(-1, new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -237,7 +237,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _positionQueries.ChartPositionPerformance(_applePositionId, new DateRangeParams(),
                 AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(0m, p.Value, 2);
@@ -262,7 +262,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.ChartPositionPerformance(-1, new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -271,7 +271,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _positionQueries.ChartPositionProfitAggregated(_applePositionId, new DateRangeParams(),
                 AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(30m, p.Value);
@@ -292,7 +292,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.ChartPositionProfitAggregated(-1, new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -301,7 +301,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _positionQueries.ChartPositionPerformanceAggregated(_applePositionId, new DateRangeParams(),
                 AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, p =>
             {
                 Assert.Equal(0.3m, p.Value);
@@ -324,7 +324,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.ChartPositionPerformanceAggregated(-1, new DateRangeParams(), AggregationFrequency.Day);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         [Fact]
@@ -332,7 +332,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPortfolioPositionsStatistics(_firstPortfolioId);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             Assert.Collection(queryResult.Response, AssertIsAAPLPerformanceStatistics);
         }
 
@@ -341,7 +341,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPositionStatistics(_applePositionId);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
+            Assert.Equal(OperationStatus.Ok, queryResult.Status);
             AssertIsAAPLPerformanceStatistics(queryResult.Response);
         }
 
@@ -350,7 +350,7 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var queryResult = await _positionQueries.GetPositionStatistics(-1);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
         }
 
         private void AssertIsAAPLPosition(PositionDto p)

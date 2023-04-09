@@ -9,6 +9,7 @@ using PortEval.Application.Models.DTOs.Enums;
 
 namespace PortEval.Application.Core.Services
 {
+    /// <inheritdoc cref="INotificationService" />
     public class NotificationService : INotificationService
     {
         private readonly ILogger _logger;
@@ -20,7 +21,8 @@ namespace PortEval.Application.Core.Services
             _notificationHub = notificationHub;
         }
 
-        public async Task SendNotificationAsync(NotificationType type, string message = null)
+        /// <inheritdoc />
+        public async Task<OperationResponse> SendNotificationAsync(NotificationType type, string message = null)
         {
             var notification = new NotificationDto
             {
@@ -31,6 +33,7 @@ namespace PortEval.Application.Core.Services
 
             _logger.LogInformation($"Sending notification: {type}, \"{message}\".");
             await _notificationHub.Clients.All.ReceiveNotification(notification);
+            return new OperationResponse();
         }
     }
 }

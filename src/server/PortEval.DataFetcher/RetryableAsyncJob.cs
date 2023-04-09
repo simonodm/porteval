@@ -27,7 +27,7 @@ namespace PortEval.DataFetcher
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Job result</returns>
         /// <exception cref="ApplicationException">Thrown if no retries are available as per the retry policy.</exception>
-        public async Task<TResult> Retry(CancellationToken cancellationToken)
+        public async Task<TResult> RetryAsync(CancellationToken cancellationToken)
         {
             if (!CanRetry()) throw new ApplicationException("Action failed - no retries left.");
 

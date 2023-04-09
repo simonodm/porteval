@@ -36,7 +36,7 @@ namespace PortEval.Application.Core.BackgroundJobs
         /// Starts the job.
         /// </summary>
         /// <returns>A task representing the asynchronous job processing operation.</returns>
-        public async Task Run()
+        public async Task RunAsync()
         {
             var currentTime = DateTime.UtcNow;
             _logger.LogInformation("Missing exchange rates job started.");
@@ -78,7 +78,7 @@ namespace PortEval.Application.Core.BackgroundJobs
         /// <returns>A task representing the asynchronous exchange rate retrieval and save operations.</returns>
         private async Task ProcessCurrencyRange(IEnumerable<Currency> currencies, Currency currency, TimeRange range, DateTime startTime)
         {
-            var fetchResult = await _fetcher.GetHistoricalDailyExchangeRates(currency.Code, range.From, range.To);
+            var fetchResult = await _fetcher.GetHistoricalDailyExchangeRatesAsync(currency.Code, range.From, range.To);
 
             var currenciesList = currencies.ToList();
             int i = 0;
