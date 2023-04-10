@@ -11,7 +11,6 @@ using PortEval.Tests.Unit.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Services;
 using Xunit;
 
@@ -27,15 +26,15 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var portfolios = fixture.CreateMany<PortfolioDto>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetPortfolios())
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(portfolios));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.GetAllPortfoliosAsync())
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(portfolios));
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolios();
 
-            portfolioQueries.Verify(m => m.GetPortfolios(), Times.Once());
+            portfolioService.Verify(m => m.GetAllPortfoliosAsync(), Times.Once());
             Assert.Equal(portfolios, result.Value);
         }
 
@@ -47,16 +46,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var portfolio = fixture.Create<PortfolioDto>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
                 .Setup(m => m.GetPortfolioAsync(portfolio.Id))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(portfolio));
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(portfolio));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolio(portfolio.Id);
 
-            portfolioQueries.Verify(m => m.GetPortfolioAsync(portfolio.Id), Times.Once());
+            portfolioService.Verify(m => m.GetPortfolioAsync(portfolio.Id), Times.Once());
             Assert.Equal(portfolio, result.Value);
         }
 
@@ -68,16 +67,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var portfolioId = fixture.Create<int>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
                 .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<PortfolioDto>());
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<PortfolioDto>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolio(portfolioId);
 
-            portfolioQueries.Verify(m => m.GetPortfolioAsync(portfolioId), Times.Once());
+            portfolioService.Verify(m => m.GetPortfolioAsync(portfolioId), Times.Once());
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -90,16 +89,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var portfolioId = fixture.Create<int>();
             var positions = fixture.CreateMany<PositionDto>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPortfolioPositions(portfolioId))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(positions));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPortfolioPositionsAsync(portfolioId))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(positions));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositions(portfolioId);
 
-            positionQueries.Verify(m => m.GetPortfolioPositions(portfolioId));
+            positionService.Verify(m => m.GetPortfolioPositionsAsync(portfolioId));
             Assert.Equal(positions, result.Value);
         }
 
@@ -111,16 +110,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var portfolioId = fixture.Create<int>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPortfolioPositions(portfolioId))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<PositionDto>>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPortfolioPositionsAsync(portfolioId))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<PositionDto>>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositions(portfolioId);
 
-            positionQueries.Verify(m => m.GetPortfolioPositions(portfolioId));
+            positionService.Verify(m => m.GetPortfolioPositionsAsync(portfolioId));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -133,16 +132,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var portfolioId = fixture.Create<int>();
             var statistics = fixture.CreateMany<PositionStatisticsDto>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPortfolioPositionsStatistics(portfolioId))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(statistics));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPortfolioPositionsStatisticsAsync(portfolioId))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(statistics));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionsStatistics(portfolioId);
 
-            positionQueries.Verify(m => m.GetPortfolioPositionsStatistics(portfolioId));
+            positionService.Verify(m => m.GetPortfolioPositionsStatisticsAsync(portfolioId));
             Assert.Equal(statistics, result.Value);
         }
 
@@ -154,16 +153,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var portfolioId = fixture.Create<int>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPortfolioPositionsStatistics(portfolioId))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<PositionStatisticsDto>>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPortfolioPositionsStatisticsAsync(portfolioId))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<PositionStatisticsDto>>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionsStatistics(portfolioId);
 
-            positionQueries.Verify(m => m.GetPortfolioPositionsStatistics(portfolioId));
+            positionService.Verify(m => m.GetPortfolioPositionsStatisticsAsync(portfolioId));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -176,16 +175,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var portfolioId = fixture.Create<int>();
             var value = fixture.Create<EntityValueDto>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetPortfolioValue(portfolioId, value.Time))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(value));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.GetPortfolioValueAsync(portfolioId, value.Time))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(value));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioValue(portfolioId, value.Time);
 
-            portfolioQueries.Verify(m => m.GetPortfolioValue(portfolioId, value.Time));
+            portfolioService.Verify(m => m.GetPortfolioValueAsync(portfolioId, value.Time));
             Assert.Equal(value, result.Value);
         }
 
@@ -199,16 +198,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var portfolioId = fixture.Create<int>();
             var value = fixture.Build<EntityValueDto>().With(v => v.Time, now).Create();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetPortfolioValue(portfolioId, It.Is<DateTime>(d => d >= now)))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(value));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.GetPortfolioValueAsync(portfolioId, It.Is<DateTime>(d => d >= now)))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(value));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioValue(portfolioId, null);
 
-            portfolioQueries.Verify(m => m.GetPortfolioValue(portfolioId, It.Is<DateTime>(d => d >= now)));
+            portfolioService.Verify(m => m.GetPortfolioValueAsync(portfolioId, It.Is<DateTime>(d => d >= now)));
             Assert.Equal(value, result.Value);
         }
 
@@ -220,16 +219,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var portfolioId = fixture.Create<int>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetPortfolioValue(portfolioId, It.IsAny<DateTime>()))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<EntityValueDto>());
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.GetPortfolioValueAsync(portfolioId, It.IsAny<DateTime>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<EntityValueDto>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioValue(portfolioId, DateTime.UtcNow);
 
-            portfolioQueries.Verify(m => m.GetPortfolioValue(portfolioId, It.IsAny<DateTime>()));
+            portfolioService.Verify(m => m.GetPortfolioValueAsync(portfolioId, It.IsAny<DateTime>()));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -243,16 +242,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var profit = fixture.Create<EntityProfitDto>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetPortfolioProfit(portfolioId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(profit));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.GetPortfolioProfitAsync(portfolioId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(profit));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioProfit(portfolioId, dateRange);
 
-            portfolioQueries.Verify(m => m.GetPortfolioProfit(portfolioId, dateRange));
+            portfolioService.Verify(m => m.GetPortfolioProfitAsync(portfolioId, dateRange));
             Assert.Equal(profit, result.Value);
         }
 
@@ -265,16 +264,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var portfolioId = fixture.Create<int>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetPortfolioProfit(portfolioId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<EntityProfitDto>());
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.GetPortfolioProfitAsync(portfolioId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<EntityProfitDto>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioProfit(portfolioId, dateRange);
 
-            portfolioQueries.Verify(m => m.GetPortfolioProfit(portfolioId, dateRange));
+            portfolioService.Verify(m => m.GetPortfolioProfitAsync(portfolioId, dateRange));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -288,16 +287,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var performance = fixture.Create<EntityPerformanceDto>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetPortfolioPerformance(portfolioId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(performance));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.GetPortfolioPerformanceAsync(portfolioId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(performance));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioPerformance(portfolioId, dateRange);
 
-            portfolioQueries.Verify(m => m.GetPortfolioPerformance(portfolioId, dateRange));
+            portfolioService.Verify(m => m.GetPortfolioPerformanceAsync(portfolioId, dateRange));
             Assert.Equal(performance, result.Value);
         }
 
@@ -310,16 +309,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var portfolioId = fixture.Create<int>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetPortfolioPerformance(portfolioId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<EntityPerformanceDto>());
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.GetPortfolioPerformanceAsync(portfolioId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<EntityPerformanceDto>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioPerformance(portfolioId, dateRange);
 
-            portfolioQueries.Verify(m => m.GetPortfolioPerformance(portfolioId, dateRange));
+            portfolioService.Verify(m => m.GetPortfolioPerformanceAsync(portfolioId, dateRange));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -335,16 +334,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.ChartPortfolioValue(portfolioId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(chartedValue));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.ChartPortfolioValueAsync(portfolioId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(chartedValue));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioChartedValue(portfolioId, dateRange, aggregationFrequency, currencyCode);
 
-            portfolioQueries.Verify(m => m.ChartPortfolioValue(portfolioId, dateRange, aggregationFrequency, currencyCode));
+            portfolioService.Verify(m => m.ChartPortfolioValueAsync(portfolioId, dateRange, aggregationFrequency, currencyCode));
             Assert.Equal(chartedValue, result.Value);
         }
 
@@ -359,16 +358,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.ChartPortfolioValue(portfolioId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.ChartPortfolioValueAsync(portfolioId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioChartedValue(portfolioId, dateRange, aggregationFrequency, currencyCode);
 
-            portfolioQueries.Verify(m => m.ChartPortfolioValue(portfolioId, dateRange, aggregationFrequency, currencyCode));
+            portfolioService.Verify(m => m.ChartPortfolioValueAsync(portfolioId, dateRange, aggregationFrequency, currencyCode));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -384,16 +383,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.ChartPortfolioProfit(portfolioId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(chartedProfit));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.ChartPortfolioProfitAsync(portfolioId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(chartedProfit));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioChartedProfit(portfolioId, dateRange, aggregationFrequency, currencyCode);
 
-            portfolioQueries.Verify(m => m.ChartPortfolioProfit(portfolioId, dateRange, aggregationFrequency, currencyCode));
+            portfolioService.Verify(m => m.ChartPortfolioProfitAsync(portfolioId, dateRange, aggregationFrequency, currencyCode));
             Assert.Equal(chartedProfit, result.Value);
         }
 
@@ -408,16 +407,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.ChartPortfolioProfit(portfolioId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.ChartPortfolioProfitAsync(portfolioId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioChartedProfit(portfolioId, dateRange, aggregationFrequency, currencyCode);
 
-            portfolioQueries.Verify(m => m.ChartPortfolioProfit(portfolioId, dateRange, aggregationFrequency, currencyCode));
+            portfolioService.Verify(m => m.ChartPortfolioProfitAsync(portfolioId, dateRange, aggregationFrequency, currencyCode));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -432,16 +431,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.ChartPortfolioPerformance(portfolioId, dateRange, aggregationFrequency))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(chartedPerformance));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.ChartPortfolioPerformanceAsync(portfolioId, dateRange, aggregationFrequency))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(chartedPerformance));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioChartedPerformance(portfolioId, dateRange, aggregationFrequency);
 
-            portfolioQueries.Verify(m => m.ChartPortfolioPerformance(portfolioId, dateRange, aggregationFrequency));
+            portfolioService.Verify(m => m.ChartPortfolioPerformanceAsync(portfolioId, dateRange, aggregationFrequency));
             Assert.Equal(chartedPerformance, result.Value);
         }
 
@@ -455,16 +454,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.ChartPortfolioPerformance(portfolioId, dateRange, aggregationFrequency))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.ChartPortfolioPerformanceAsync(portfolioId, dateRange, aggregationFrequency))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioChartedPerformance(portfolioId, dateRange, aggregationFrequency);
 
-            portfolioQueries.Verify(m => m.ChartPortfolioPerformance(portfolioId, dateRange, aggregationFrequency));
+            portfolioService.Verify(m => m.ChartPortfolioPerformanceAsync(portfolioId, dateRange, aggregationFrequency));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -479,16 +478,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.ChartPortfolioPerformanceAggregated(portfolioId, dateRange, aggregationFrequency))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(aggregatedPerformance));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.ChartPortfolioAggregatedPerformanceAsync(portfolioId, dateRange, aggregationFrequency))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(aggregatedPerformance));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioAggregatedPerformance(portfolioId, dateRange, aggregationFrequency);
 
-            portfolioQueries.Verify(m => m.ChartPortfolioPerformanceAggregated(portfolioId, dateRange, aggregationFrequency));
+            portfolioService.Verify(m => m.ChartPortfolioAggregatedPerformanceAsync(portfolioId, dateRange, aggregationFrequency));
             Assert.Equal(aggregatedPerformance, result.Value);
         }
 
@@ -502,16 +501,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.ChartPortfolioPerformanceAggregated(portfolioId, dateRange, aggregationFrequency))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.ChartPortfolioAggregatedPerformanceAsync(portfolioId, dateRange, aggregationFrequency))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioAggregatedPerformance(portfolioId, dateRange, aggregationFrequency);
 
-            portfolioQueries.Verify(m => m.ChartPortfolioPerformanceAggregated(portfolioId, dateRange, aggregationFrequency));
+            portfolioService.Verify(m => m.ChartPortfolioAggregatedPerformanceAsync(portfolioId, dateRange, aggregationFrequency));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -527,16 +526,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.ChartPortfolioProfitAggregated(portfolioId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(aggregatedProfit));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.ChartPortfolioAggregatedProfitAsync(portfolioId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(aggregatedProfit));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioAggregatedProfit(portfolioId, dateRange, aggregationFrequency, currencyCode);
 
-            portfolioQueries.Verify(m => m.ChartPortfolioProfitAggregated(portfolioId, dateRange, aggregationFrequency, currencyCode));
+            portfolioService.Verify(m => m.ChartPortfolioAggregatedProfitAsync(portfolioId, dateRange, aggregationFrequency, currencyCode));
             Assert.Equal(aggregatedProfit, result.Value);
         }
 
@@ -551,16 +550,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.ChartPortfolioProfitAggregated(portfolioId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.ChartPortfolioAggregatedProfitAsync(portfolioId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioAggregatedProfit(portfolioId, dateRange, aggregationFrequency, currencyCode);
 
-            portfolioQueries.Verify(m => m.ChartPortfolioProfitAggregated(portfolioId, dateRange, aggregationFrequency, currencyCode));
+            portfolioService.Verify(m => m.ChartPortfolioAggregatedProfitAsync(portfolioId, dateRange, aggregationFrequency, currencyCode));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -572,16 +571,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var statistics = fixture.CreateMany<EntityStatisticsDto>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetAllPortfoliosStatistics())
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(statistics));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.GetAllPortfoliosStatisticsAsync())
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(statistics));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetAllPortfoliosStatistics();
 
-            portfolioQueries.Verify(m => m.GetAllPortfoliosStatistics(), Times.Once());
+            portfolioService.Verify(m => m.GetAllPortfoliosStatisticsAsync(), Times.Once());
             Assert.Equal(statistics, result.Value);
         }
 
@@ -594,16 +593,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var portfolioId = fixture.Create<int>();
             var statistics = fixture.Create<EntityStatisticsDto>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetPortfolioStatistics(portfolioId))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(statistics));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.GetPortfolioStatisticsAsync(portfolioId))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(statistics));
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioStatistics(portfolioId);
 
-            portfolioQueries.Verify(m => m.GetPortfolioStatistics(portfolioId), Times.Once());
+            portfolioService.Verify(m => m.GetPortfolioStatisticsAsync(portfolioId), Times.Once());
             Assert.Equal(statistics, result.Value);
         }
 
@@ -615,16 +614,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var portfolioId = fixture.Create<int>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetPortfolioStatistics(portfolioId))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<EntityStatisticsDto>());
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.GetPortfolioStatisticsAsync(portfolioId))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<EntityStatisticsDto>());
 
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfolioStatistics(portfolioId);
 
-            portfolioQueries.Verify(m => m.GetPortfolioStatistics(portfolioId), Times.Once());
+            portfolioService.Verify(m => m.GetPortfolioStatisticsAsync(portfolioId), Times.Once());
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -639,7 +638,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
             portfolioService
                 .Setup(m => m.CreatePortfolioAsync(portfolio))
-                .ReturnsAsync(fixture.Create<Portfolio>());
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(portfolio));
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             await sut.PostPortfolio(portfolio);
@@ -656,6 +655,10 @@ namespace PortEval.Tests.Unit.ControllerTests
             var portfolio = fixture.Create<PortfolioDto>();
 
             var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.UpdatePortfolioAsync(portfolio))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(portfolio));
+
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             await sut.PutPortfolio(portfolio.Id, portfolio);
@@ -677,7 +680,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PutPortfolio(portfolio.Id + 1, portfolio);
 
             portfolioService.Verify(m => m.UpdatePortfolioAsync(portfolio), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
         }
 
         [Fact]
@@ -689,6 +692,9 @@ namespace PortEval.Tests.Unit.ControllerTests
             var portfolioId = fixture.Create<int>();
 
             var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.DeletePortfolioAsync(portfolioId))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse());
             var sut = fixture.Build<PortfoliosController>().OmitAutoProperties().Create();
 
             await sut.DeletePortfolio(portfolioId);

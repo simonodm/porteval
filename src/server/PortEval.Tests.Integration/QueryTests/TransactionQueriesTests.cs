@@ -28,10 +28,9 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetTransactions_ReturnsAllTransactions_WhenNoFiltersAreProvided()
         {
             var queryResult =
-                await _transactionQueries.GetTransactions(new TransactionFilters(), new DateRangeParams());
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsInitialAAPLTransaction, AssertIsInitialBTCTransaction);
+                await _transactionQueries.GetTransactionsAsync(new TransactionFilters(), DateTime.MinValue, DateTime.UtcNow);
+            
+            Assert.Collection(queryResult, AssertIsInitialAAPLTransaction, AssertIsInitialBTCTransaction);
         }
 
         [Fact]
@@ -40,13 +39,12 @@ namespace PortEval.Tests.Integration.QueryTests
             var appleInstrumentId =
                 _context.Instruments.Where(i => i.Symbol == "AAPL").Select(i => i.Id).FirstOrDefault();
 
-            var queryResult = await _transactionQueries.GetTransactions(new TransactionFilters
+            var queryResult = await _transactionQueries.GetTransactionsAsync(new TransactionFilters
             {
                 InstrumentId = appleInstrumentId
-            }, new DateRangeParams());
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsInitialAAPLTransaction);
+            }, DateTime.MinValue, DateTime.UtcNow);
+            
+            Assert.Collection(queryResult, AssertIsInitialAAPLTransaction);
         }
 
         [Fact]
@@ -55,13 +53,12 @@ namespace PortEval.Tests.Integration.QueryTests
             var portfolioId = _context.Portfolios.Where(p => p.Name == "Portfolio 1").Select(p => p.Id)
                 .FirstOrDefault();
 
-            var queryResult = await _transactionQueries.GetTransactions(new TransactionFilters
+            var queryResult = await _transactionQueries.GetTransactionsAsync(new TransactionFilters
             {
                 PortfolioId = portfolioId
-            }, new DateRangeParams());
+            }, DateTime.MinValue, DateTime.UtcNow);
 
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsInitialAAPLTransaction);
+            Assert.Collection(queryResult, AssertIsInitialAAPLTransaction);
         }
 
         [Fact]
@@ -72,13 +69,12 @@ namespace PortEval.Tests.Integration.QueryTests
             var positionId = _context.Positions.Where(p => p.InstrumentId == appleInstrumentId).Select(p => p.Id)
                 .FirstOrDefault();
 
-            var queryResult = await _transactionQueries.GetTransactions(new TransactionFilters
+            var queryResult = await _transactionQueries.GetTransactionsAsync(new TransactionFilters
             {
                 PositionId = positionId
-            }, new DateRangeParams());
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsInitialAAPLTransaction);
+            }, DateTime.MinValue, DateTime.UtcNow);
+            
+            Assert.Collection(queryResult, AssertIsInitialAAPLTransaction);
         }
 
         [Fact]
@@ -90,27 +86,23 @@ namespace PortEval.Tests.Integration.QueryTests
             var positionId = position!.Id;
             var portfolioId = position!.PortfolioId;
 
-            var queryResult = await _transactionQueries.GetTransactions(new TransactionFilters
+            var queryResult = await _transactionQueries.GetTransactionsAsync(new TransactionFilters
             {
                 InstrumentId = appleInstrumentId,
                 PortfolioId = portfolioId,
                 PositionId = positionId
-            }, new DateRangeParams());
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsInitialAAPLTransaction);
+            }, DateTime.MinValue, DateTime.UtcNow);
+            
+            Assert.Collection(queryResult, AssertIsInitialAAPLTransaction);
         }
 
         [Fact]
         public async Task GetTransactions_ReturnsTransactionsInRange_WhenDateRangeParamsAreProvided()
         {
-            var queryResult = await _transactionQueries.GetTransactions(new TransactionFilters(), new DateRangeParams
-            {
-                From = DateTime.UtcNow.AddDays(-1).AddHours(-1)
-            });
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsInitialBTCTransaction);
+            var queryResult = await _transactionQueries.GetTransactionsAsync(new TransactionFilters(),
+                DateTime.UtcNow.AddDays(-1).AddHours(-1), DateTime.UtcNow);
+            
+            Assert.Collection(queryResult, AssertIsInitialBTCTransaction);
         }
 
         [Fact]
@@ -118,18 +110,17 @@ namespace PortEval.Tests.Integration.QueryTests
         {
             var appleInstrumentId =
                 _context.Instruments.Where(i => i.Symbol == "AAPL").Select(i => i.Id).FirstOrDefault();
-            var queryResult = await _transactionQueries.GetTransaction(appleInstrumentId);
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            AssertIsInitialAAPLTransaction(queryResult.Response);
+            var queryResult = await _transactionQueries.GetTransactionAsync(appleInstrumentId);
+            
+            AssertIsInitialAAPLTransaction(queryResult);
         }
 
         [Fact]
-        public async Task GetTransaction_ReturnsNotFound_WhenTransactionDoesNotExist()
+        public async Task GetTransaction_ReturnsNull_WhenTransactionDoesNotExist()
         {
-            var queryResult = await _transactionQueries.GetTransaction(-1);
+            var queryResult = await _transactionQueries.GetTransactionAsync(-1);
 
-            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
+            Assert.Null(queryResult);
         }
 
         private void AssertIsInitialAAPLTransaction(TransactionDto t)

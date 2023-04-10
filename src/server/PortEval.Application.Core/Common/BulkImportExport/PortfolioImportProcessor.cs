@@ -20,12 +20,20 @@ namespace PortEval.Application.Core.Common.BulkImportExport
 
             if (row.Id == default)
             {
-                await _portfolioService.CreatePortfolioAsync(row);
+                var response = await _portfolioService.CreatePortfolioAsync(row);
+                if (response.Status != OperationStatus.Ok)
+                {
+                    logEntry.AddError(response.Message);
+                }
+                logEntry.Data.Id = response.Response?.Id ?? default;
             }
             else
             {
-                var portfolio = await _portfolioService.UpdatePortfolioAsync(row);
-                logEntry.Data.Id = portfolio.Id;
+                var response = await _portfolioService.UpdatePortfolioAsync(row);
+                if (response.Status != OperationStatus.Ok)
+                {
+                    logEntry.AddError(response.Message);
+                }
             }
 
             return logEntry;

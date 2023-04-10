@@ -8,7 +8,7 @@ using PortEval.Tests.Unit.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Services;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests
@@ -16,7 +16,7 @@ namespace PortEval.Tests.Unit.ControllerTests
     public class CurrencyExchangeRatesControllerTests
     {
         [Fact]
-        public async Task GetExchangeRates_ReturnsExchangeRatesFromProvidedCurrency_IfCurrencyExists()
+        public async Task GetExchangeRatesAsync_ReturnsExchangeRatesFromProvidedCurrency_IfCurrencyExists()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -25,21 +25,21 @@ namespace PortEval.Tests.Unit.ControllerTests
             var time = fixture.Create<DateTime>();
             var exchangeRates = fixture.CreateMany<CurrencyExchangeRateDto>();
 
-            var exchangeRateQueries = fixture.Freeze<Mock<ICurrencyExchangeRateQueries>>();
-            exchangeRateQueries
-                .Setup(m => m.GetExchangeRates(currencyCode, time))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(exchangeRates));
+            var exchangeRateService = fixture.Freeze<Mock<ICurrencyExchangeRateService>>();
+            exchangeRateService
+                .Setup(m => m.GetExchangeRatesAsync(currencyCode, time))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(exchangeRates));
 
             var sut = fixture.Build<CurrencyExchangeRatesController>().OmitAutoProperties().Create();
 
             var result = await sut.GetExchangeRates(currencyCode, time);
 
-            exchangeRateQueries.Verify(m => m.GetExchangeRates(currencyCode, time), Times.Once());
+            exchangeRateService.Verify(m => m.GetExchangeRatesAsync(currencyCode, time), Times.Once());
             Assert.Equal(exchangeRates, result.Value);
         }
 
         [Fact]
-        public async Task GetExchangeRates_ReturnsCurrentExchangeRatesFromProvidedCurrency_IfNoTimeIsProvided()
+        public async Task GetExchangeRatesAsync_ReturnsCurrentExchangeRatesFromProvidedCurrency_IfNoTimeIsProvided()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -48,21 +48,21 @@ namespace PortEval.Tests.Unit.ControllerTests
             var now = DateTime.UtcNow;
             var exchangeRates = fixture.CreateMany<CurrencyExchangeRateDto>();
 
-            var exchangeRateQueries = fixture.Freeze<Mock<ICurrencyExchangeRateQueries>>();
-            exchangeRateQueries
-                .Setup(m => m.GetExchangeRates(currencyCode, It.Is<DateTime>(dt => dt >= now)))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(exchangeRates));
+            var exchangeRateService = fixture.Freeze<Mock<ICurrencyExchangeRateService>>();
+            exchangeRateService
+                .Setup(m => m.GetExchangeRatesAsync(currencyCode, It.Is<DateTime>(dt => dt >= now)))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(exchangeRates));
 
             var sut = fixture.Build<CurrencyExchangeRatesController>().OmitAutoProperties().Create();
 
             var result = await sut.GetExchangeRates(currencyCode, null);
 
-            exchangeRateQueries.Verify(m => m.GetExchangeRates(currencyCode, It.Is<DateTime>(dt => dt >= now)), Times.Once());
+            exchangeRateService.Verify(m => m.GetExchangeRatesAsync(currencyCode, It.Is<DateTime>(dt => dt >= now)), Times.Once());
             Assert.Equal(exchangeRates, result.Value);
         }
 
         [Fact]
-        public async Task GetExchangeRates_ReturnsNotFound_WhenCurrencyDoesNotExist()
+        public async Task GetExchangeRatesAsync_ReturnsNotFound_WhenCurrencyDoesNotExist()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -70,16 +70,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var currencyCode = fixture.Create<string>();
             var time = fixture.Create<DateTime>();
 
-            var exchangeRateQueries = fixture.Freeze<Mock<ICurrencyExchangeRateQueries>>();
-            exchangeRateQueries
-                .Setup(m => m.GetExchangeRates(currencyCode, time))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<CurrencyExchangeRateDto>>());
+            var exchangeRateService = fixture.Freeze<Mock<ICurrencyExchangeRateService>>();
+            exchangeRateService
+                .Setup(m => m.GetExchangeRatesAsync(currencyCode, time))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<CurrencyExchangeRateDto>>());
 
             var sut = fixture.Build<CurrencyExchangeRatesController>().OmitAutoProperties().Create();
 
             var result = await sut.GetExchangeRates(currencyCode, time);
 
-            exchangeRateQueries.Verify(m => m.GetExchangeRates(currencyCode, time), Times.Once());
+            exchangeRateService.Verify(m => m.GetExchangeRatesAsync(currencyCode, time), Times.Once());
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -93,16 +93,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var now = DateTime.UtcNow;
             var exchangeRates = fixture.CreateMany<CurrencyExchangeRateDto>();
 
-            var exchangeRateQueries = fixture.Freeze<Mock<ICurrencyExchangeRateQueries>>();
-            exchangeRateQueries
-                .Setup(m => m.GetExchangeRates(currencyCode, It.Is<DateTime>(dt => dt >= now)))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(exchangeRates));
+            var exchangeRateService = fixture.Freeze<Mock<ICurrencyExchangeRateService>>();
+            exchangeRateService
+                .Setup(m => m.GetExchangeRatesAsync(currencyCode, It.Is<DateTime>(dt => dt >= now)))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(exchangeRates));
 
             var sut = fixture.Build<CurrencyExchangeRatesController>().OmitAutoProperties().Create();
 
             var result = await sut.GetLatestExchangeRates(currencyCode);
 
-            exchangeRateQueries.Verify(m => m.GetExchangeRates(currencyCode, It.Is<DateTime>(dt => dt >= now)), Times.Once());
+            exchangeRateService.Verify(m => m.GetExchangeRatesAsync(currencyCode, It.Is<DateTime>(dt => dt >= now)), Times.Once());
             Assert.Equal(exchangeRates, result.Value);
         }
 
@@ -115,16 +115,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var currencyCode = fixture.Create<string>();
             var now = DateTime.UtcNow;
 
-            var exchangeRateQueries = fixture.Freeze<Mock<ICurrencyExchangeRateQueries>>();
-            exchangeRateQueries
-                .Setup(m => m.GetExchangeRates(currencyCode, It.Is<DateTime>(dt => dt >= now)))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<CurrencyExchangeRateDto>>());
+            var exchangeRateService = fixture.Freeze<Mock<ICurrencyExchangeRateService>>();
+            exchangeRateService
+                .Setup(m => m.GetExchangeRatesAsync(currencyCode, It.Is<DateTime>(dt => dt >= now)))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<CurrencyExchangeRateDto>>());
 
             var sut = fixture.Build<CurrencyExchangeRatesController>().OmitAutoProperties().Create();
 
             var result = await sut.GetLatestExchangeRates(currencyCode);
 
-            exchangeRateQueries.Verify(m => m.GetExchangeRates(currencyCode, It.Is<DateTime>(dt => dt >= now)), Times.Once());
+            exchangeRateService.Verify(m => m.GetExchangeRatesAsync(currencyCode, It.Is<DateTime>(dt => dt >= now)), Times.Once());
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -139,22 +139,22 @@ namespace PortEval.Tests.Unit.ControllerTests
             var now = DateTime.UtcNow;
             var exchangeRate = fixture.Create<CurrencyExchangeRateDto>();
 
-            var exchangeRateQueries = fixture.Freeze<Mock<ICurrencyExchangeRateQueries>>();
-            exchangeRateQueries
+            var exchangeRateService = fixture.Freeze<Mock<ICurrencyExchangeRateService>>();
+            exchangeRateService
                 .Setup(m =>
-                    m.GetExchangeRateAt(
+                    m.GetExchangeRateAtAsync(
                         currencyCodeFrom,
                         currencyCodeTo,
                         It.Is<DateTime>(dt => dt >= now)
                     )
                 )
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(exchangeRate));
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(exchangeRate));
 
             var sut = fixture.Build<CurrencyExchangeRatesController>().OmitAutoProperties().Create();
 
             var result = await sut.GetLatestExchangeRate(currencyCodeFrom, currencyCodeTo);
 
-            exchangeRateQueries.Verify(m => m.GetExchangeRateAt(currencyCodeFrom, currencyCodeTo, It.Is<DateTime>(dt => dt >= now)), Times.Once());
+            exchangeRateService.Verify(m => m.GetExchangeRateAtAsync(currencyCodeFrom, currencyCodeTo, It.Is<DateTime>(dt => dt >= now)), Times.Once());
             Assert.Equal(exchangeRate, result.Value);
         }
 
@@ -168,22 +168,22 @@ namespace PortEval.Tests.Unit.ControllerTests
             var currencyCodeTo = fixture.Create<string>();
             var now = DateTime.UtcNow;
 
-            var exchangeRateQueries = fixture.Freeze<Mock<ICurrencyExchangeRateQueries>>();
-            exchangeRateQueries
+            var exchangeRateService = fixture.Freeze<Mock<ICurrencyExchangeRateService>>();
+            exchangeRateService
                 .Setup(m =>
-                    m.GetExchangeRateAt(
+                    m.GetExchangeRateAtAsync(
                         currencyCodeFrom,
                         currencyCodeTo,
                         It.Is<DateTime>(dt => dt >= now)
                     )
                 )
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<CurrencyExchangeRateDto>());
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<CurrencyExchangeRateDto>());
 
             var sut = fixture.Build<CurrencyExchangeRatesController>().OmitAutoProperties().Create();
 
             var result = await sut.GetLatestExchangeRate(currencyCodeFrom, currencyCodeTo);
 
-            exchangeRateQueries.Verify(m => m.GetExchangeRateAt(currencyCodeFrom, currencyCodeTo, It.Is<DateTime>(dt => dt >= now)), Times.Once());
+            exchangeRateService.Verify(m => m.GetExchangeRateAtAsync(currencyCodeFrom, currencyCodeTo, It.Is<DateTime>(dt => dt >= now)), Times.Once());
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -198,22 +198,22 @@ namespace PortEval.Tests.Unit.ControllerTests
             var time = fixture.Create<DateTime>();
             var exchangeRate = fixture.Create<CurrencyExchangeRateDto>();
 
-            var exchangeRateQueries = fixture.Freeze<Mock<ICurrencyExchangeRateQueries>>();
-            exchangeRateQueries
+            var exchangeRateService = fixture.Freeze<Mock<ICurrencyExchangeRateService>>();
+            exchangeRateService
                 .Setup(m =>
-                    m.GetExchangeRateAt(
+                    m.GetExchangeRateAtAsync(
                         currencyCodeFrom,
                         currencyCodeTo,
                         time
                     )
                 )
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(exchangeRate));
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(exchangeRate));
 
             var sut = fixture.Build<CurrencyExchangeRatesController>().OmitAutoProperties().Create();
 
             var result = await sut.GetExchangeRateAt(currencyCodeFrom, currencyCodeTo, time);
 
-            exchangeRateQueries.Verify(m => m.GetExchangeRateAt(currencyCodeFrom, currencyCodeTo, time), Times.Once());
+            exchangeRateService.Verify(m => m.GetExchangeRateAtAsync(currencyCodeFrom, currencyCodeTo, time), Times.Once());
             Assert.Equal(exchangeRate, result.Value);
         }
 
@@ -227,22 +227,22 @@ namespace PortEval.Tests.Unit.ControllerTests
             var currencyCodeTo = fixture.Create<string>();
             var time = fixture.Create<DateTime>();
 
-            var exchangeRateQueries = fixture.Freeze<Mock<ICurrencyExchangeRateQueries>>();
-            exchangeRateQueries
+            var exchangeRateService = fixture.Freeze<Mock<ICurrencyExchangeRateService>>();
+            exchangeRateService
                 .Setup(m =>
-                    m.GetExchangeRateAt(
+                    m.GetExchangeRateAtAsync(
                         currencyCodeFrom,
                         currencyCodeTo,
                         time
                     )
                 )
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<CurrencyExchangeRateDto>());
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<CurrencyExchangeRateDto>());
 
             var sut = fixture.Build<CurrencyExchangeRatesController>().OmitAutoProperties().Create();
 
             var result = await sut.GetExchangeRateAt(currencyCodeFrom, currencyCodeTo, time);
 
-            exchangeRateQueries.Verify(m => m.GetExchangeRateAt(currencyCodeFrom, currencyCodeTo, time), Times.Once());
+            exchangeRateService.Verify(m => m.GetExchangeRateAtAsync(currencyCodeFrom, currencyCodeTo, time), Times.Once());
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
     }

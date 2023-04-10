@@ -36,336 +36,136 @@ namespace PortEval.Tests.Integration.QueryTests
         [Fact]
         public async Task GetAllInstruments_ReturnsAllInstrumentsFromDb()
         {
-            var queryResult = await _instrumentQueries.GetAllInstruments();
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsAAPLInstrument, AssertIsBTCInstrument);
+            var queryResult = await _instrumentQueries.GetAllInstrumentsAsync();
+            
+            Assert.Collection(queryResult, AssertIsAAPLInstrument, AssertIsBTCInstrument);
         }
 
         [Fact]
         public async Task GetInstrumentPage_ReturnsAllInstrumentsCorrectlyPaginated()
         {
-            var firstPageQueryResult = await _instrumentQueries.GetInstrumentsPage(new PaginationParams
+            var firstPageQueryResult = await _instrumentQueries.GetInstrumentPageAsync(new PaginationParams
             {
                 Limit = 1,
                 Page = 1
             });
-            var secondPageQueryResult = await _instrumentQueries.GetInstrumentsPage(new PaginationParams
+            var secondPageQueryResult = await _instrumentQueries.GetInstrumentPageAsync(new PaginationParams
             {
                 Limit = 1,
                 Page = 2
             });
 
-            Assert.Equal(OperationStatus.Ok, firstPageQueryResult.Status);
-            Assert.Equal(OperationStatus.Ok, secondPageQueryResult.Status);
-            Assert.Equal(2, firstPageQueryResult.Response.TotalCount);
-            Assert.Equal(1, firstPageQueryResult.Response.Page);
-            Assert.Equal(2, secondPageQueryResult.Response.Page);
-            Assert.Equal(1, firstPageQueryResult.Response.Count);
-            Assert.Equal(1, secondPageQueryResult.Response.Count);
-            Assert.Collection(firstPageQueryResult.Response.Data, AssertIsAAPLInstrument);
-            Assert.Collection(secondPageQueryResult.Response.Data, AssertIsBTCInstrument);
+            Assert.Collection(firstPageQueryResult, AssertIsAAPLInstrument);
+            Assert.Collection(secondPageQueryResult, AssertIsBTCInstrument);
         }
 
         [Fact]
         public async Task GetInstrument_ReturnsCorrectInstrument_WhenInstrumentExists()
         {
-            var queryResult = await _instrumentQueries.GetInstrument(_appleInstrumentId);
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            AssertIsAAPLInstrument(queryResult.Response);
+            var queryResult = await _instrumentQueries.GetInstrumentAsync(_appleInstrumentId);
+            
+            AssertIsAAPLInstrument(queryResult);
         }
 
         [Fact]
-        public async Task GetInstrument_ReturnsNotFound_WhenInstrumentDoesNotExist()
+        public async Task GetInstrument_ReturnsNull_WhenInstrumentDoesNotExist()
         {
-            var queryResult = await _instrumentQueries.GetInstrument(-1);
+            var queryResult = await _instrumentQueries.GetInstrumentAsync(-1);
 
-            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
+            Assert.Null(queryResult);
         }
 
         [Fact]
         public async Task GetInstrumentPrices_ReturnsInstrumentPricesInRange()
         {
-            var queryResult = await _instrumentQueries.GetInstrumentPrices(_appleInstrumentId, new DateRangeParams
-            {
-                From = DateTime.UtcNow.AddDays(-1).AddHours(-1)
-            });
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsAAPLYesterdaysPrice, AssertIsAAPLCurrentPrice);
-        }
-
-        [Fact]
-        public async Task GetInstrumentPrices_ReturnsNotFound_WhenInstrumentDoesNotExist()
-        {
-            var queryResult = await _instrumentQueries.GetInstrumentPrices(-1, new DateRangeParams());
-
-            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
+            var queryResult = await _instrumentQueries.GetInstrumentPricesAsync(_appleInstrumentId, DateTime.UtcNow.AddDays(-1).AddHours(-1), DateTime.UtcNow);
+            
+            Assert.Collection(queryResult, AssertIsAAPLYesterdaysPrice, AssertIsAAPLCurrentPrice);
         }
 
         [Fact]
         public async Task GetInstrumentPricesPage_ReturnsCorrectlyPaginatedPrices()
         {
-            var firstPageQueryResult = await _instrumentQueries.GetInstrumentPricesPageAsync(_appleInstrumentId,
+            var firstPageQueryResult = await _instrumentQueries.GetInstrumentPricesPageAsync(_appleInstrumentId, DateTime.MinValue, DateTime.UtcNow,
                 new PaginationParams
                 {
                     Limit = 2,
                     Page = 1
-                }, new DateRangeParams());
+                }, null);
 
-            var secondPageQueryResult = await _instrumentQueries.GetInstrumentPricesPageAsync(_appleInstrumentId,
+            var secondPageQueryResult = await _instrumentQueries.GetInstrumentPricesPageAsync(_appleInstrumentId, DateTime.MinValue, DateTime.UtcNow,
                 new PaginationParams
                 {
                     Limit = 2,
                     Page = 2
-                }, new DateRangeParams());
+                }, null);
 
-            Assert.Equal(OperationStatus.Ok, firstPageQueryResult.Status);
-            Assert.Equal(OperationStatus.Ok, secondPageQueryResult.Status);
-            Assert.Equal(3, firstPageQueryResult.Response.TotalCount);
-            Assert.Equal(2, firstPageQueryResult.Response.Count);
-            Assert.Equal(1, firstPageQueryResult.Response.Page);
-            Assert.Equal(1, secondPageQueryResult.Response.Count);
-            Assert.Equal(2, secondPageQueryResult.Response.Page);
-            Assert.Collection(firstPageQueryResult.Response.Data, AssertIsAAPLCurrentPrice, AssertIsAAPLYesterdaysPrice);
-            Assert.Collection(secondPageQueryResult.Response.Data, AssertIsAAPLTwoDaysOldPrice);
+            Assert.Collection(firstPageQueryResult, AssertIsAAPLCurrentPrice, AssertIsAAPLYesterdaysPrice);
+            Assert.Collection(secondPageQueryResult, AssertIsAAPLTwoDaysOldPrice);
         }
 
         [Fact]
-        public async Task GetInstrumentPricesPage_ReturnsCompressedPrices_WhenCompressedFlagIsTrue()
+        public async Task GetInstrumentPricesPageCompressed_ReturnsCompressedPrices_WhenCompressedFlagIsTrue()
         {
-            var queryResult = await _instrumentQueries.GetInstrumentPricesPageAsync(_btcInstrumentId, new PaginationParams
+            var queryResult = await _instrumentQueries.GetInstrumentPricesPageCompressedAsync(_btcInstrumentId, DateTime.MinValue, DateTime.UtcNow, new PaginationParams
             {
                 Limit = 300,
                 Page = 1
-            }, new DateRangeParams(), true);
+            });
 
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response.Data, AssertIsBTCCurrentPrice, AssertIsBTCYesterdaysPrice, AssertIsBTCTwoDaysOldPrice);
+            Assert.Collection(queryResult, AssertIsBTCCurrentPrice, AssertIsBTCYesterdaysPrice, AssertIsBTCTwoDaysOldPrice);
         }
 
         [Fact]
         public async Task GetInstrumentPricesPage_ReturnsCorrectlyAggregatedPrices_WhenAggregationFrequencyIsProvided()
         {
-            var queryResult = await _instrumentQueries.GetInstrumentPricesPageAsync(_btcInstrumentId, new PaginationParams
+            var queryResult = await _instrumentQueries.GetInstrumentPricesPageAsync(_btcInstrumentId, DateTime.MinValue, DateTime.UtcNow, new PaginationParams
             {
                 Limit = 300,
                 Page = 1
-            }, new DateRangeParams(), false, AggregationFrequency.Day);
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response.Data, AssertIsBTCCurrentPrice, AssertIsBTCYesterdaysPrice, AssertIsBTCTwoDaysOldPrice);
+            }, AggregationFrequency.Day);
+            
+            Assert.Collection(queryResult, AssertIsBTCCurrentPrice, AssertIsBTCYesterdaysPrice, AssertIsBTCTwoDaysOldPrice);
         }
 
         [Fact]
         public async Task GetInstrumentSplits_ReturnsInstrumentSplits()
         {
-            var queryResult = await _instrumentQueries.GetInstrumentSplits(_appleInstrumentId);
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsAAPLYesterdaysSplit);
+            var queryResult = await _instrumentQueries.GetInstrumentSplitsAsync(_appleInstrumentId);
+            
+            Assert.Collection(queryResult, AssertIsAAPLYesterdaysSplit);
         }
 
         [Fact]
         public async Task GetInstrumentSplit_ReturnsInstrumentSplit()
         {
-            var queryResult = await _instrumentQueries.GetInstrumentSplit(_appleInstrumentId, _appleSplitId);
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            AssertIsAAPLYesterdaysSplit(queryResult.Response);
+            var queryResult = await _instrumentQueries.GetInstrumentSplitAsync(_appleInstrumentId, _appleSplitId);
+            
+            AssertIsAAPLYesterdaysSplit(queryResult);
         }
 
         [Fact]
         public async Task GetInstrumentPrice_ReturnsLatestPriceAtTime_WhenPriceExists()
         {
-            var queryResult = await _instrumentQueries.GetInstrumentPrice(_btcInstrumentId, DateTime.UtcNow.AddDays(-1));
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            AssertIsBTCYesterdaysPrice(queryResult.Response);
+            var queryResult = await _instrumentQueries.GetInstrumentPriceAsync(_btcInstrumentId, DateTime.UtcNow.AddDays(-1));
+            
+            AssertIsBTCYesterdaysPrice(queryResult);
         }
 
         [Fact]
-        public async Task GetInstrumentPrice_ReturnsNotFound_WhenInstrumentDoesNotExist()
+        public async Task GetInstrumentPrice_ReturnsNull_WhenInstrumentDoesNotExist()
         {
-            var queryResult = await _instrumentQueries.GetInstrumentPrice(-1, DateTime.UtcNow);
+            var queryResult = await _instrumentQueries.GetInstrumentPriceAsync(-1, DateTime.UtcNow);
 
-            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
+            Assert.Null(queryResult);
         }
 
         [Fact]
         public async Task GetInstrumentPrice_ReturnsNull_WhenNoPriceAtProvidedTimeExists()
         {
-            var queryResult = await _instrumentQueries.GetInstrumentPrice(_btcInstrumentId, DateTime.UtcNow.AddDays(-7));
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Null(queryResult.Response);
-        }
-
-        [Fact]
-        public async Task GetInstrumentProfit_ReturnsCorrectProfit()
-        {
-            var queryResult = await _instrumentQueries.GetInstrumentProfit(_btcInstrumentId, new DateRangeParams
-            {
-                From = DateTime.UtcNow.AddDays(-2)
-            });
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Equal(-3000m, queryResult.Response.Profit);
-            Assert.Equal("USD", queryResult.Response.CurrencyCode);
-        }
-
-        [Fact]
-        public async Task GetInstrumentProfit_ReturnsNotFound_WhenInstrumentDoesNotExist()
-        {
-            var queryResult = await _instrumentQueries.GetInstrumentProfit(-1, new DateRangeParams());
-
-            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
-        }
-
-        [Fact]
-        public async Task GetInstrumentPerformance_ReturnsCorrectPerformance()
-        {
-            var queryResult = await _instrumentQueries.GetInstrumentPerformance(_btcInstrumentId, new DateRangeParams
-            {
-                From = DateTime.UtcNow.AddDays(-2)
-            });
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Equal(-0.75m, queryResult.Response.Performance);
-        }
-
-        [Fact]
-        public async Task GetInstrumentPerformance_ReturnsNotFound_WhenInstrumentDoesNotExist()
-        {
-            var queryResult = await _instrumentQueries.GetInstrumentPerformance(-1, new DateRangeParams());
-
-            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
-        }
-
-        [Fact]
-        public async Task ChartInstrumentPrices_ReturnsChartedInstrumentPricesConvertedToTargetCurrency_WhenTargetCurrencyIsNotInstrumentCurrency()
-        {
-            var queryResult =
-                await _instrumentQueries.ChartInstrumentPrices(_btcInstrumentId, new DateRangeParams { From = DateTime.UtcNow.AddDays(-2) },
-                    AggregationFrequency.Day, "EUR");
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, p =>
-            {
-                Assert.Equal(3960m, p.Value);
-                Assert.Equal(DateTime.UtcNow.AddDays(-2), p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(3960m, p.Value);
-                Assert.Equal(DateTime.UtcNow.Date.AddDays(-1), p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(2000m, p.Value);
-                Assert.Equal(DateTime.UtcNow.Date, p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(1010m, p.Value);
-                Assert.Equal(DateTime.UtcNow, p.Time, TimeSpan.FromHours(1));
-            });
-        }
-
-        [Fact]
-        public async Task
-            ChartInstrumentProfit_ReturnsChartedInstrumentProfitConvertedToTargetCurrency_WhenTargetCurrencyIsNotInstrumentCurrency()
-        {
-            var queryResult =
-                await _instrumentQueries.ChartInstrumentProfit(_btcInstrumentId, new DateRangeParams(),
-                    AggregationFrequency.Day, "EUR");
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, p =>
-            {
-                Assert.Equal(0m, p.Value);
-                Assert.Equal(DateTime.UtcNow.AddDays(-2), p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(0m, p.Value);
-                Assert.Equal(DateTime.UtcNow.Date.AddDays(-1), p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(-2000m, p.Value);
-                Assert.Equal(DateTime.UtcNow.Date, p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(-3030m, p.Value);
-                Assert.Equal(DateTime.UtcNow, p.Time, TimeSpan.FromHours(1));
-            });
-        }
-
-        [Fact]
-        public async Task ChartInstrumentPerformance_ReturnsChartedInstrumentPerformance()
-        {
-            var queryResult = await _instrumentQueries.ChartInstrumentPerformance(_btcInstrumentId,
-                new DateRangeParams(), AggregationFrequency.Day);
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, p =>
-            {
-                Assert.Equal(0m, p.Value);
-                Assert.Equal(DateTime.UtcNow.AddDays(-2), p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(0m, p.Value);
-                Assert.Equal(DateTime.UtcNow.Date.AddDays(-1), p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(-0.5m, p.Value);
-                Assert.Equal(DateTime.UtcNow.Date, p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(-0.75m, p.Value);
-                Assert.Equal(DateTime.UtcNow, p.Time, TimeSpan.FromHours(1));
-            });
-        }
-
-        [Fact]
-        public async Task ChartInstrumentAggregatedProfit_ReturnsCorrectAggregatedProfit()
-        {
-            var queryResult = await _instrumentQueries.ChartInstrumentProfitAggregated(_btcInstrumentId,
-                new DateRangeParams(), AggregationFrequency.Day);
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, p =>
-            {
-                Assert.Equal(0m, p.Value);
-                Assert.Equal(DateTime.UtcNow.Date.AddDays(-1), p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(-2000m, p.Value);
-                Assert.Equal(DateTime.UtcNow.Date, p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(-1000m, p.Value);
-                Assert.Equal(DateTime.UtcNow, p.Time, TimeSpan.FromHours(1));
-            });
-        }
-
-        [Fact]
-        public async Task ChartInstrumentAggregatedPerformance_ReturnsCorrectAggregatedPerformance()
-        {
-            var queryResult = await _instrumentQueries.ChartInstrumentPerformanceAggregated(_btcInstrumentId,
-                new DateRangeParams(), AggregationFrequency.Day);
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, p =>
-            {
-                Assert.Equal(0, p.Value);
-                Assert.Equal(DateTime.UtcNow.Date.AddDays(-1), p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(-0.5m, p.Value);
-                Assert.Equal(DateTime.UtcNow.Date, p.Time, TimeSpan.FromHours(1));
-            }, p =>
-            {
-                Assert.Equal(-0.5m, p.Value);
-                Assert.Equal(DateTime.UtcNow, p.Time, TimeSpan.FromHours(1));
-            });
+            var queryResult = await _instrumentQueries.GetInstrumentPriceAsync(_btcInstrumentId, DateTime.UtcNow.AddDays(-7));
+            
+            Assert.Null(queryResult);
         }
 
         private void AssertIsAAPLInstrument(InstrumentDto i)

@@ -18,22 +18,22 @@ namespace PortEval.Application.Core.Interfaces.Queries
             DateTime to);
 
         Task<int> GetInstrumentPriceCountAsync(int instrumentId, DateTime from, DateTime to,
-            AggregationFrequency? frequency);
+            AggregationFrequency? frequency = null);
 
         Task<IEnumerable<InstrumentPriceDto>> GetInstrumentPricesPageAsync(
             int instrumentId,
             DateTime from,
             DateTime to,
             PaginationParams pagination,
-            AggregationFrequency? frequency);
+            AggregationFrequency? frequency = null);
 
         Task<int> GetInstrumentPriceCompressedCountAsync(int instrumentId,
             DateTime from, DateTime to,
-            AggregationFrequency? frequency);
+            AggregationFrequency? frequency = null);
 
         Task<IEnumerable<InstrumentPriceDto>> GetInstrumentPricesPageCompressedAsync(int instrumentId,
             DateTime from, DateTime to,
-            PaginationParams pagination, AggregationFrequency? frequency);
+            PaginationParams pagination, AggregationFrequency? frequency = null);
 
         Task<InstrumentPriceDto> GetInstrumentPriceAsync(int instrumentId, DateTime time);
         Task<IEnumerable<InstrumentSplitDto>> GetInstrumentSplitsAsync(int instrumentId);

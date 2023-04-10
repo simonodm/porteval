@@ -1,19 +1,19 @@
-﻿using AutoFixture;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Core.Common;
+using PortEval.Application.Core.Common.ChartDataGenerators;
+using PortEval.Application.Core.Interfaces.Calculators;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
 using PortEval.Tests.Unit.Helpers.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using PortEval.Application.Core.Common;
-using PortEval.Application.Core.Common.ChartDataGenerators;
-using PortEval.Application.Core.Interfaces.Calculators;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.Common
+namespace PortEval.Tests.Unit.CoreTests.Common
 {
     public class PortfolioChartDataGeneratorTests
     {

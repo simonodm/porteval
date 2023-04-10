@@ -1,14 +1,15 @@
-﻿using AutoFixture;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Core.Common.BulkImportExport;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Tests.Unit.Helpers.Extensions;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
-using PortEval.Application.Core.Common.BulkImportExport;
 
-namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
+namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
 {
     public class PortfolioImportProcessorTests
     {
@@ -23,7 +24,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
                 .With(p => p.Id, 0)
                 .With(p => p.CurrencyCode, "USD")
                 .Create();
-            var portfolioService = fixture.CreateDefaultPortfolioServiceMock();
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
             var sut = fixture.Create<PortfolioImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<PortfolioDto> { portfolio });
@@ -46,7 +47,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
                 .Build<PortfolioDto>()
                 .With(p => p.CurrencyCode, "USD")
                 .Create();
-            var portfolioService = fixture.CreateDefaultPortfolioServiceMock();
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
             var sut = fixture.Create<PortfolioImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<PortfolioDto> { portfolio });
@@ -66,7 +67,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
                 .Customize(new AutoMoqCustomization());
 
             var portfolio = fixture.Create<PortfolioDto>();
-            var portfolioService = fixture.CreateDefaultPortfolioServiceMock();
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
             var sut = fixture.Create<PortfolioImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<PortfolioDto> { portfolio });

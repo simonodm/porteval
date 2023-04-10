@@ -1,14 +1,14 @@
-﻿using AutoFixture;
-using AutoFixture.AutoMoq;
-using FluentValidation;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using FluentValidation;
 using PortEval.Application.Core.Common.BulkImportExport;
+using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
+namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
 {
     internal class TestRow
     {

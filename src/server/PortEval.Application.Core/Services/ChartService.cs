@@ -76,15 +76,7 @@ namespace PortEval.Application.Core.Services
                 await _chartRepository.UnitOfWork.CommitAsync();
                 return await GetChartAsync(chart.Id);
             }
-            catch (ItemNotFoundException ex)
-            {
-                return new OperationResponse<ChartDto>
-                {
-                    Status = OperationStatus.NotFound,
-                    Message = ex.Message
-                };
-            }
-            catch (OperationNotAllowedException ex)
+            catch (PortEvalException ex)
             {
                 return new OperationResponse<ChartDto>
                 {
@@ -125,15 +117,7 @@ namespace PortEval.Application.Core.Services
                 await _chartRepository.UnitOfWork.CommitAsync();
                 return await GetChartAsync(options.Id);
             }
-            catch (ItemNotFoundException ex)
-            {
-                return new OperationResponse<ChartDto>
-                {
-                    Status = OperationStatus.NotFound,
-                    Message = ex.Message
-                };
-            }
-            catch (OperationNotAllowedException ex)
+            catch (PortEvalException ex)
             {
                 return new OperationResponse<ChartDto>
                 {

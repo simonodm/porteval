@@ -44,6 +44,7 @@ namespace PortEval.Application.Extensions
         /// Injects PortEval's application services.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
+        /// <param name="configuration">ASP.NET configuration.</param>
         public static void AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IInstrumentService, InstrumentService>();
@@ -66,7 +67,6 @@ namespace PortEval.Application.Extensions
                         provider.GetRequiredService<IDataImportRepository>(),
                         provider.GetRequiredService<IBackgroundJobClient>(),
                         provider.GetRequiredService<IFileSystem>(),
-                        provider.GetRequiredService<IFileStreamFactory>(),
                         provider.GetRequiredService<IDataImportQueries>(),
                         fileStoragePath)
             );

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Core.BackgroundJobs;
 using PortEval.Application.Core.Interfaces;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Models.FinancialDataFetcher;
 using Xunit;
 using Range = Moq.Range;
@@ -40,12 +41,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 Time = DateTime.Parse("2022-01-01")
             };
 
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
+            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
             splitRepository
                 .Setup(r => r.ListInstrumentSplitsAsync(instrument.Id))
                 .ReturnsAsync(Enumerable.Empty<InstrumentSplit>());
+            splitRepository
+                .Setup(r => r.Add(It.IsAny<InstrumentSplit>()))
+                .Returns<InstrumentSplit>(s => s);
             var priceFetcher = CreatePriceFetcherMockReturningSplitData(fixture, new[] { splitData });
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
+            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
             instrumentRepository
                 .Setup(r => r.ListAllAsync())
                 .ReturnsAsync(instruments);
@@ -85,12 +89,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 Time = DateTime.Parse("2022-01-01")
             };
 
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
+            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
             splitRepository
                 .Setup(r => r.ListInstrumentSplitsAsync(instrument.Id))
                 .ReturnsAsync(new[] { existingSplit });
+            splitRepository
+                .Setup(r => r.Add(It.IsAny<InstrumentSplit>()))
+                .Returns<InstrumentSplit>(s => s);
             var priceFetcher = CreatePriceFetcherMockReturningSplitData(fixture, new[] { splitData });
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
+            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
             instrumentRepository
                 .Setup(r => r.ListAllAsync())
                 .ReturnsAsync(instruments);
@@ -127,12 +134,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 Time = DateTime.Parse("2022-01-01")
             };
 
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
+            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
             splitRepository
                 .Setup(r => r.ListInstrumentSplitsAsync(instrument.Id))
                 .ReturnsAsync(Enumerable.Empty<InstrumentSplit>());
+            splitRepository
+                .Setup(r => r.Add(It.IsAny<InstrumentSplit>()))
+                .Returns<InstrumentSplit>(s => s);
             CreatePriceFetcherMockReturningSplitData(fixture, new[] { splitData });
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
+            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
             instrumentRepository
                 .Setup(r => r.ListAllAsync())
                 .ReturnsAsync(instruments);

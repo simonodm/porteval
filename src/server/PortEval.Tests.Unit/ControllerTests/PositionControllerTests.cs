@@ -11,7 +11,6 @@ using PortEval.Tests.Unit.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Services;
 using Xunit;
 
@@ -27,16 +26,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var position = fixture.Create<PositionDto>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPosition(position.Id))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(position));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionAsync(position.Id))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(position));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPosition(position.Id);
 
-            positionQueries.Verify(m => m.GetPosition(position.Id), Times.Once());
+            positionService.Verify(m => m.GetPositionAsync(position.Id), Times.Once());
             Assert.Equal(position, result.Value);
         }
 
@@ -48,16 +47,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var positionId = fixture.Create<int>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPosition(It.IsAny<int>()))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<PositionDto>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<PositionDto>());
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPosition(positionId);
 
-            positionQueries.Verify(m => m.GetPosition(positionId), Times.Once());
+            positionService.Verify(m => m.GetPositionAsync(positionId), Times.Once());
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -70,16 +69,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var positionId = fixture.Create<int>();
             var value = fixture.Create<EntityValueDto>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPositionValue(positionId, value.Time))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(value));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionValueAsync(positionId, value.Time))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(value));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionValue(positionId, value.Time);
 
-            positionQueries.Verify(m => m.GetPositionValue(positionId, value.Time));
+            positionService.Verify(m => m.GetPositionValueAsync(positionId, value.Time));
             Assert.Equal(value, result.Value);
         }
 
@@ -93,16 +92,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var positionId = fixture.Create<int>();
             var value = fixture.Build<EntityValueDto>().With(v => v.Time, now).Create();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPositionValue(positionId, It.Is<DateTime>(d => d >= now)))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(value));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionValueAsync(positionId, It.Is<DateTime>(d => d >= now)))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(value));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionValue(positionId, null);
 
-            positionQueries.Verify(m => m.GetPositionValue(positionId, It.Is<DateTime>(d => d >= now)));
+            positionService.Verify(m => m.GetPositionValueAsync(positionId, It.Is<DateTime>(d => d >= now)));
             Assert.Equal(value, result.Value);
         }
 
@@ -114,16 +113,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var positionId = fixture.Create<int>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPositionValue(positionId, It.IsAny<DateTime>()))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<EntityValueDto>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionValueAsync(positionId, It.IsAny<DateTime>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<EntityValueDto>());
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionValue(positionId, DateTime.UtcNow);
 
-            positionQueries.Verify(m => m.GetPositionValue(positionId, It.IsAny<DateTime>()));
+            positionService.Verify(m => m.GetPositionValueAsync(positionId, It.IsAny<DateTime>()));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -137,16 +136,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var profit = fixture.Create<EntityProfitDto>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPositionProfit(positionId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(profit));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionProfitAsync(positionId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(profit));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionProfit(positionId, dateRange);
 
-            positionQueries.Verify(m => m.GetPositionProfit(positionId, dateRange));
+            positionService.Verify(m => m.GetPositionProfitAsync(positionId, dateRange));
             Assert.Equal(profit, result.Value);
         }
 
@@ -159,16 +158,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var positionId = fixture.Create<int>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPositionProfit(positionId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<EntityProfitDto>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionProfitAsync(positionId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<EntityProfitDto>());
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionProfit(positionId, dateRange);
 
-            positionQueries.Verify(m => m.GetPositionProfit(positionId, dateRange));
+            positionService.Verify(m => m.GetPositionProfitAsync(positionId, dateRange));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -182,16 +181,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var performance = fixture.Create<EntityPerformanceDto>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPositionPerformance(positionId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(performance));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionPerformanceAsync(positionId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(performance));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionPerformance(positionId, dateRange);
 
-            positionQueries.Verify(m => m.GetPositionPerformance(positionId, dateRange));
+            positionService.Verify(m => m.GetPositionPerformanceAsync(positionId, dateRange));
             Assert.Equal(performance, result.Value);
         }
 
@@ -204,16 +203,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var positionId = fixture.Create<int>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPositionPerformance(positionId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<EntityPerformanceDto>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionPerformanceAsync(positionId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<EntityPerformanceDto>());
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionPerformance(positionId, dateRange);
 
-            positionQueries.Verify(m => m.GetPositionPerformance(positionId, dateRange));
+            positionService.Verify(m => m.GetPositionPerformanceAsync(positionId, dateRange));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -227,16 +226,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var bep = fixture.Create<PositionBreakEvenPointDto>();
             var time = fixture.Create<DateTime>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPositionBreakEvenPoint(positionId, time))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(bep));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionBreakEvenPointAsync(positionId, time))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(bep));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionBreakEvenPoint(positionId, time);
 
-            positionQueries.Verify(m => m.GetPositionBreakEvenPoint(positionId, time));
+            positionService.Verify(m => m.GetPositionBreakEvenPointAsync(positionId, time));
             Assert.Equal(bep, result.Value);
         }
 
@@ -250,16 +249,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var bep = fixture.Create<PositionBreakEvenPointDto>();
             var now = DateTime.UtcNow;
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPositionBreakEvenPoint(positionId, It.Is<DateTime>(dt => dt >= now)))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(bep));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionBreakEvenPointAsync(positionId, It.Is<DateTime>(dt => dt >= now)))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(bep));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionBreakEvenPoint(positionId, null);
 
-            positionQueries.Verify(m => m.GetPositionBreakEvenPoint(positionId, It.Is<DateTime>(dt => dt >= now)));
+            positionService.Verify(m => m.GetPositionBreakEvenPointAsync(positionId, It.Is<DateTime>(dt => dt >= now)));
             Assert.Equal(bep, result.Value);
         }
 
@@ -272,16 +271,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var positionId = fixture.Create<int>();
             var time = fixture.Create<DateTime>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPositionBreakEvenPoint(positionId, time))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<PositionBreakEvenPointDto>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionBreakEvenPointAsync(positionId, time))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<PositionBreakEvenPointDto>());
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionBreakEvenPoint(positionId, time);
 
-            positionQueries.Verify(m => m.GetPositionBreakEvenPoint(positionId, time));
+            positionService.Verify(m => m.GetPositionBreakEvenPointAsync(positionId, time));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -297,16 +296,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.ChartPositionValue(positionId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(chartedValue));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.ChartPositionValueAsync(positionId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(chartedValue));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionChartedValue(positionId, dateRange, aggregationFrequency, currencyCode);
 
-            positionQueries.Verify(m => m.ChartPositionValue(positionId, dateRange, aggregationFrequency, currencyCode));
+            positionService.Verify(m => m.ChartPositionValueAsync(positionId, dateRange, aggregationFrequency, currencyCode));
             Assert.Equal(chartedValue, result.Value);
         }
 
@@ -321,16 +320,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.ChartPositionValue(positionId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.ChartPositionValueAsync(positionId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionChartedValue(positionId, dateRange, aggregationFrequency, currencyCode);
 
-            positionQueries.Verify(m => m.ChartPositionValue(positionId, dateRange, aggregationFrequency, currencyCode));
+            positionService.Verify(m => m.ChartPositionValueAsync(positionId, dateRange, aggregationFrequency, currencyCode));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -346,16 +345,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.ChartPositionProfit(positionId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(chartedProfit));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.ChartPositionProfitAsync(positionId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(chartedProfit));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionChartedProfit(positionId, dateRange, aggregationFrequency, currencyCode);
 
-            positionQueries.Verify(m => m.ChartPositionProfit(positionId, dateRange, aggregationFrequency, currencyCode));
+            positionService.Verify(m => m.ChartPositionProfitAsync(positionId, dateRange, aggregationFrequency, currencyCode));
             Assert.Equal(chartedProfit, result.Value);
         }
 
@@ -370,16 +369,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.ChartPositionProfit(positionId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.ChartPositionProfitAsync(positionId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionChartedProfit(positionId, dateRange, aggregationFrequency, currencyCode);
 
-            positionQueries.Verify(m => m.ChartPositionProfit(positionId, dateRange, aggregationFrequency, currencyCode));
+            positionService.Verify(m => m.ChartPositionProfitAsync(positionId, dateRange, aggregationFrequency, currencyCode));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -394,16 +393,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.ChartPositionPerformance(positionId, dateRange, aggregationFrequency))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(chartedPerformance));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.ChartPositionPerformanceAsync(positionId, dateRange, aggregationFrequency))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(chartedPerformance));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionChartedPerformance(positionId, dateRange, aggregationFrequency);
 
-            positionQueries.Verify(m => m.ChartPositionPerformance(positionId, dateRange, aggregationFrequency));
+            positionService.Verify(m => m.ChartPositionPerformanceAsync(positionId, dateRange, aggregationFrequency));
             Assert.Equal(chartedPerformance, result.Value);
         }
 
@@ -417,16 +416,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.ChartPositionPerformance(positionId, dateRange, aggregationFrequency))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.ChartPositionPerformanceAsync(positionId, dateRange, aggregationFrequency))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionChartedPerformance(positionId, dateRange, aggregationFrequency);
 
-            positionQueries.Verify(m => m.ChartPositionPerformance(positionId, dateRange, aggregationFrequency));
+            positionService.Verify(m => m.ChartPositionPerformanceAsync(positionId, dateRange, aggregationFrequency));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -441,16 +440,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.ChartPositionPerformanceAggregated(positionId, dateRange, aggregationFrequency))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(aggregatedPerformance));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.ChartPositionAggregatedPerformanceAsync(positionId, dateRange, aggregationFrequency))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(aggregatedPerformance));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionAggregatedPerformance(positionId, dateRange, aggregationFrequency);
 
-            positionQueries.Verify(m => m.ChartPositionPerformanceAggregated(positionId, dateRange, aggregationFrequency));
+            positionService.Verify(m => m.ChartPositionAggregatedPerformanceAsync(positionId, dateRange, aggregationFrequency));
             Assert.Equal(aggregatedPerformance, result.Value);
         }
 
@@ -464,16 +463,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.ChartPositionPerformanceAggregated(positionId, dateRange, aggregationFrequency))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.ChartPositionAggregatedPerformanceAsync(positionId, dateRange, aggregationFrequency))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionAggregatedPerformance(positionId, dateRange, aggregationFrequency);
 
-            positionQueries.Verify(m => m.ChartPositionPerformanceAggregated(positionId, dateRange, aggregationFrequency));
+            positionService.Verify(m => m.ChartPositionAggregatedPerformanceAsync(positionId, dateRange, aggregationFrequency));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -489,16 +488,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.ChartPositionProfitAggregated(positionId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(aggregatedProfit));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.ChartPositionAggregatedProfitAsync(positionId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(aggregatedProfit));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionAggregatedProfit(positionId, dateRange, aggregationFrequency, currencyCode);
 
-            positionQueries.Verify(m => m.ChartPositionProfitAggregated(positionId, dateRange, aggregationFrequency, currencyCode));
+            positionService.Verify(m => m.ChartPositionAggregatedProfitAsync(positionId, dateRange, aggregationFrequency, currencyCode));
             Assert.Equal(aggregatedProfit, result.Value);
         }
 
@@ -513,16 +512,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.ChartPositionProfitAggregated(positionId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.ChartPositionAggregatedProfitAsync(positionId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionAggregatedProfit(positionId, dateRange, aggregationFrequency, currencyCode);
 
-            positionQueries.Verify(m => m.ChartPositionProfitAggregated(positionId, dateRange, aggregationFrequency, currencyCode));
+            positionService.Verify(m => m.ChartPositionAggregatedProfitAsync(positionId, dateRange, aggregationFrequency, currencyCode));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -535,16 +534,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var positionId = fixture.Create<int>();
             var statistics = fixture.Create<PositionStatisticsDto>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPositionStatistics(positionId))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(statistics));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionStatisticsAsync(positionId))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(statistics));
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionStatistics(positionId);
 
-            positionQueries.Verify(m => m.GetPositionStatistics(positionId), Times.Once());
+            positionService.Verify(m => m.GetPositionStatisticsAsync(positionId), Times.Once());
             Assert.Equal(statistics, result.Value);
         }
 
@@ -556,16 +555,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var positionId = fixture.Create<int>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetPositionStatistics(positionId))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<PositionStatisticsDto>());
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetPositionStatisticsAsync(positionId))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<PositionStatisticsDto>());
 
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionStatistics(positionId);
 
-            positionQueries.Verify(m => m.GetPositionStatistics(positionId), Times.Once());
+            positionService.Verify(m => m.GetPositionStatisticsAsync(positionId), Times.Once());
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -580,7 +579,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var positionService = fixture.Freeze<Mock<IPositionService>>();
             positionService
                 .Setup(m => m.OpenPositionAsync(position))
-                .ReturnsAsync(fixture.Create<Position>());
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(position));
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             await sut.PostPosition(position);
@@ -597,6 +596,10 @@ namespace PortEval.Tests.Unit.ControllerTests
             var position = fixture.Create<PositionDto>();
 
             var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.UpdatePositionAsync(position))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(position));
+
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             await sut.PutPosition(position.Id, position);
@@ -618,7 +621,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PutPosition(position.Id + 1, position);
 
             positionService.Verify(m => m.UpdatePositionAsync(position), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
         }
 
         [Fact]
@@ -630,6 +633,10 @@ namespace PortEval.Tests.Unit.ControllerTests
             var positionId = fixture.Create<int>();
 
             var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.RemovePositionAsync(positionId))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse());
+
             var sut = fixture.Build<PositionsController>().OmitAutoProperties().Create();
 
             await sut.DeletePosition(positionId);

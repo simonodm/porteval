@@ -1,15 +1,16 @@
-﻿using AutoFixture;
-using AutoFixture.AutoMoq;
-using Moq;
-using PortEval.Application.Models.DTOs;
-using PortEval.Tests.Unit.Helpers.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Xunit;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using Moq;
 using PortEval.Application.Core.Common.BulkImportExport;
+using PortEval.Application.Core.Interfaces.Services;
+using PortEval.Application.Models.DTOs;
+using PortEval.Tests.Unit.Helpers.Extensions;
+using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
+namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
 {
     public class TransactionImportProcessorTests
     {
@@ -23,7 +24,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
                 .With(t => t.Id, 0)
                 .With(t => t.Time, DateTime.UtcNow)
                 .Create();
-            var transactionService = fixture.CreateDefaultTransactionServiceMock();
+            var transactionService = fixture.Freeze<Mock<ITransactionService>>();
             var sut = fixture.Create<TransactionImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<TransactionDto> { transaction });
@@ -48,7 +49,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var transaction = fixture.Build<TransactionDto>()
                 .With(t => t.Time, DateTime.UtcNow)
                 .Create();
-            var transactionService = fixture.CreateDefaultTransactionServiceMock();
+            var transactionService = fixture.Freeze<Mock<ITransactionService>>();
             var sut = fixture.Create<TransactionImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<TransactionDto> { transaction });
@@ -74,7 +75,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
                 .With(t => t.Amount, 0)
                 .With(t => t.Time, DateTime.UtcNow)
                 .Create();
-            var transactionService = fixture.CreateDefaultTransactionServiceMock();
+            var transactionService = fixture.Freeze<Mock<ITransactionService>>();
             var sut = fixture.Create<TransactionImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<TransactionDto> { transaction });

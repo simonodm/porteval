@@ -8,7 +8,6 @@ using PortEval.Tests.Unit.Helpers;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Services;
 using Xunit;
 
@@ -23,20 +22,20 @@ namespace PortEval.Tests.Unit.ControllerTests
                 .Customize(new AutoMoqCustomization());
 
             var portfolios = fixture.CreateMany<PortfolioDto>();
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetPortfolios())
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(portfolios));
+            var portfolioService = fixture.Freeze<Mock<IPortfolioService>>();
+            portfolioService
+                .Setup(m => m.GetAllPortfoliosAsync())
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(portfolios));
             var csvService = fixture.Freeze<Mock<ICsvExportService>>();
             csvService
                 .Setup(m => m.ConvertToCsv(portfolios))
-                .Returns(Encoding.UTF8.GetBytes($"{portfolios.First().Id}"));
+                .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse(Encoding.UTF8.GetBytes($"{portfolios.First().Id}")));
 
             var sut = fixture.Build<CsvExportController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfoliosExport();
 
-            portfolioQueries.Verify(m => m.GetPortfolios(), Times.Once());
+            portfolioService.Verify(m => m.GetAllPortfoliosAsync(), Times.Once());
             csvService.Verify(m => m.ConvertToCsv(portfolios), Times.Once());
             ControllerTestHelper.AssertFileContentEqual(portfolios.First().Id.ToString(), result);
         }
@@ -48,20 +47,20 @@ namespace PortEval.Tests.Unit.ControllerTests
                 .Customize(new AutoMoqCustomization());
 
             var positions = fixture.CreateMany<PositionDto>();
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetAllPositions())
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(positions));
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
+            positionService
+                .Setup(m => m.GetAllPositionsAsync())
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(positions));
             var csvService = fixture.Freeze<Mock<ICsvExportService>>();
             csvService
                 .Setup(m => m.ConvertToCsv(positions))
-                .Returns(Encoding.UTF8.GetBytes($"{positions.First().Id}"));
+                .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse(Encoding.UTF8.GetBytes($"{positions.First().Id}")));
 
             var sut = fixture.Build<CsvExportController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionsExport();
 
-            positionQueries.Verify(m => m.GetAllPositions(), Times.Once());
+            positionService.Verify(m => m.GetAllPositionsAsync(), Times.Once());
             csvService.Verify(m => m.ConvertToCsv(positions), Times.Once());
             ControllerTestHelper.AssertFileContentEqual(positions.First().Id.ToString(), result);
         }
@@ -75,20 +74,20 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
 
             var transactions = fixture.CreateMany<TransactionDto>();
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
-            transactionQueries
-                .Setup(m => m.GetTransactions(It.IsAny<TransactionFilters>(), dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(transactions));
+            var transactionService = fixture.Freeze<Mock<ITransactionService>>();
+            transactionService
+                .Setup(m => m.GetTransactionsAsync(It.IsAny<TransactionFilters>(), dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(transactions));
             var csvService = fixture.Freeze<Mock<ICsvExportService>>();
             csvService
                 .Setup(m => m.ConvertToCsv(transactions))
-                .Returns(Encoding.UTF8.GetBytes($"{transactions.First().Id}"));
+                .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse(Encoding.UTF8.GetBytes($"{transactions.First().Id}")));
 
             var sut = fixture.Build<CsvExportController>().OmitAutoProperties().Create();
 
             var result = await sut.GetTransactionsExport(dateRange);
 
-            transactionQueries.Verify(m => m.GetTransactions(It.IsAny<TransactionFilters>(), dateRange), Times.Once());
+            transactionService.Verify(m => m.GetTransactionsAsync(It.IsAny<TransactionFilters>(), dateRange), Times.Once());
             csvService.Verify(m => m.ConvertToCsv(transactions), Times.Once());
             ControllerTestHelper.AssertFileContentEqual(transactions.First().Id.ToString(), result);
         }
@@ -100,20 +99,20 @@ namespace PortEval.Tests.Unit.ControllerTests
                 .Customize(new AutoMoqCustomization());
 
             var instruments = fixture.CreateMany<InstrumentDto>();
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.GetAllInstruments())
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(instruments));
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.GetAllInstrumentsAsync())
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(instruments));
             var csvService = fixture.Freeze<Mock<ICsvExportService>>();
             csvService
                 .Setup(m => m.ConvertToCsv(instruments))
-                .Returns(Encoding.UTF8.GetBytes($"{instruments.First().Id}"));
+                .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse(Encoding.UTF8.GetBytes($"{instruments.First().Id}")));
 
             var sut = fixture.Build<CsvExportController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentExport();
 
-            instrumentQueries.Verify(m => m.GetAllInstruments(), Times.Once());
+            instrumentService.Verify(m => m.GetAllInstrumentsAsync(), Times.Once());
             csvService.Verify(m => m.ConvertToCsv(instruments), Times.Once());
             ControllerTestHelper.AssertFileContentEqual(instruments.First().Id.ToString(), result);
         }
@@ -128,21 +127,21 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var prices = fixture.CreateMany<InstrumentPriceDto>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentPriceService = fixture.Freeze<Mock<IInstrumentPriceService>>();
 
-            instrumentQueries
-                .Setup(m => m.GetInstrumentPrices(instrumentId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(prices));
+            instrumentPriceService
+                .Setup(m => m.GetInstrumentPricesAsync(instrumentId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(prices));
             var csvService = fixture.Freeze<Mock<ICsvExportService>>();
             csvService
                 .Setup(m => m.ConvertToCsv(prices))
-                .Returns(Encoding.UTF8.GetBytes($"{prices.First().Id}"));
+                .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse(Encoding.UTF8.GetBytes($"{prices.First().Id}")));
 
             var sut = fixture.Build<CsvExportController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPricesExport(instrumentId, dateRange);
 
-            instrumentQueries.Verify(m => m.GetInstrumentPrices(instrumentId, dateRange), Times.Once());
+            instrumentPriceService.Verify(m => m.GetInstrumentPricesAsync(instrumentId, dateRange), Times.Once());
             csvService.Verify(m => m.ConvertToCsv(prices), Times.Once());
             ControllerTestHelper.AssertFileContentEqual(prices.First().Id.ToString(), result);
         }

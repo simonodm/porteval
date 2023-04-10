@@ -3,16 +3,14 @@ using AutoFixture.AutoMoq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PortEval.Application.Controllers;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Tests.Unit.Helpers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Interfaces.Services;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests
@@ -28,15 +26,15 @@ namespace PortEval.Tests.Unit.ControllerTests
             var instrumentsPage = fixture.Create<PaginatedResponse<InstrumentDto>>();
             var pagination = fixture.Create<PaginationParams>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.GetInstrumentsPage(pagination))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(instrumentsPage));
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.GetInstrumentsPageAsync(pagination))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(instrumentsPage));
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetAllInstruments(pagination);
 
-            instrumentQueries.Verify(m => m.GetInstrumentsPage(pagination), Times.Once());
+            instrumentService.Verify(m => m.GetInstrumentsPageAsync(pagination), Times.Once());
             Assert.Equal(instrumentsPage, result.Value);
         }
 
@@ -48,16 +46,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var instrument = fixture.Create<InstrumentDto>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.GetInstrument(instrument.Id))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(instrument));
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.GetInstrumentAsync(instrument.Id))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(instrument));
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrument(instrument.Id);
 
-            instrumentQueries.Verify(m => m.GetInstrument(instrument.Id), Times.Once());
+            instrumentService.Verify(m => m.GetInstrumentAsync(instrument.Id), Times.Once());
             Assert.Equal(instrument, result.Value);
         }
 
@@ -69,16 +67,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var instrumentId = fixture.Create<int>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.GetInstrument(It.IsAny<int>()))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<InstrumentDto>());
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<InstrumentDto>());
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrument(instrumentId);
 
-            instrumentQueries.Verify(m => m.GetInstrument(instrumentId), Times.Once());
+            instrumentService.Verify(m => m.GetInstrumentAsync(instrumentId), Times.Once());
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -92,16 +90,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var profit = fixture.Create<EntityProfitDto>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.GetInstrumentProfit(instrumentId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(profit));
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.GetInstrumentProfitAsync(instrumentId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(profit));
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentProfit(instrumentId, dateRange);
 
-            instrumentQueries.Verify(m => m.GetInstrumentProfit(instrumentId, dateRange));
+            instrumentService.Verify(m => m.GetInstrumentProfitAsync(instrumentId, dateRange));
             Assert.Equal(profit, result.Value);
         }
 
@@ -114,16 +112,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var instrumentId = fixture.Create<int>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.GetInstrumentProfit(instrumentId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<EntityProfitDto>());
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.GetInstrumentProfitAsync(instrumentId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<EntityProfitDto>());
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentProfit(instrumentId, dateRange);
 
-            instrumentQueries.Verify(m => m.GetInstrumentProfit(instrumentId, dateRange));
+            instrumentService.Verify(m => m.GetInstrumentProfitAsync(instrumentId, dateRange));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -137,16 +135,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var performance = fixture.Create<EntityPerformanceDto>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.GetInstrumentPerformance(instrumentId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(performance));
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.GetInstrumentPerformanceAsync(instrumentId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(performance));
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentPerformance(instrumentId, dateRange);
 
-            instrumentQueries.Verify(m => m.GetInstrumentPerformance(instrumentId, dateRange));
+            instrumentService.Verify(m => m.GetInstrumentPerformanceAsync(instrumentId, dateRange));
             Assert.Equal(performance, result.Value);
         }
 
@@ -159,16 +157,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var instrumentId = fixture.Create<int>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.GetInstrumentPerformance(instrumentId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<EntityPerformanceDto>());
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.GetInstrumentPerformanceAsync(instrumentId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<EntityPerformanceDto>());
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentPerformance(instrumentId, dateRange);
 
-            instrumentQueries.Verify(m => m.GetInstrumentPerformance(instrumentId, dateRange));
+            instrumentService.Verify(m => m.GetInstrumentPerformanceAsync(instrumentId, dateRange));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -184,16 +182,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.ChartInstrumentPrices(instrumentId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(chartedPrices));
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.ChartInstrumentPricesAsync(instrumentId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(chartedPrices));
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentChartedPrices(instrumentId, dateRange, aggregationFrequency, currencyCode);
 
-            instrumentQueries.Verify(m => m.ChartInstrumentPrices(instrumentId, dateRange, aggregationFrequency, currencyCode));
+            instrumentService.Verify(m => m.ChartInstrumentPricesAsync(instrumentId, dateRange, aggregationFrequency, currencyCode));
             Assert.Equal(chartedPrices, result.Value);
         }
 
@@ -208,16 +206,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.ChartInstrumentPrices(instrumentId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.ChartInstrumentPricesAsync(instrumentId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentChartedPrices(instrumentId, dateRange, aggregationFrequency, currencyCode);
 
-            instrumentQueries.Verify(m => m.ChartInstrumentPrices(instrumentId, dateRange, aggregationFrequency, currencyCode));
+            instrumentService.Verify(m => m.ChartInstrumentPricesAsync(instrumentId, dateRange, aggregationFrequency, currencyCode));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -233,16 +231,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.ChartInstrumentProfit(instrumentId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(chartedProfit));
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.ChartInstrumentProfitAsync(instrumentId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(chartedProfit));
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentChartedProfit(instrumentId, dateRange, aggregationFrequency, currencyCode);
 
-            instrumentQueries.Verify(m => m.ChartInstrumentProfit(instrumentId, dateRange, aggregationFrequency, currencyCode));
+            instrumentService.Verify(m => m.ChartInstrumentProfitAsync(instrumentId, dateRange, aggregationFrequency, currencyCode));
             Assert.Equal(chartedProfit, result.Value);
         }
 
@@ -257,16 +255,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.ChartInstrumentProfit(instrumentId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.ChartInstrumentProfitAsync(instrumentId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentChartedProfit(instrumentId, dateRange, aggregationFrequency, currencyCode);
 
-            instrumentQueries.Verify(m => m.ChartInstrumentProfit(instrumentId, dateRange, aggregationFrequency, currencyCode));
+            instrumentService.Verify(m => m.ChartInstrumentProfitAsync(instrumentId, dateRange, aggregationFrequency, currencyCode));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -281,16 +279,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.ChartInstrumentPerformance(instrumentId, dateRange, aggregationFrequency))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(chartedPerformance));
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.ChartInstrumentPerformanceAsync(instrumentId, dateRange, aggregationFrequency))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(chartedPerformance));
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentChartedPerformance(instrumentId, dateRange, aggregationFrequency);
 
-            instrumentQueries.Verify(m => m.ChartInstrumentPerformance(instrumentId, dateRange, aggregationFrequency));
+            instrumentService.Verify(m => m.ChartInstrumentPerformanceAsync(instrumentId, dateRange, aggregationFrequency));
             Assert.Equal(chartedPerformance, result.Value);
         }
 
@@ -304,16 +302,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.ChartInstrumentPerformance(instrumentId, dateRange, aggregationFrequency))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.ChartInstrumentPerformanceAsync(instrumentId, dateRange, aggregationFrequency))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentChartedPerformance(instrumentId, dateRange, aggregationFrequency);
 
-            instrumentQueries.Verify(m => m.ChartInstrumentPerformance(instrumentId, dateRange, aggregationFrequency));
+            instrumentService.Verify(m => m.ChartInstrumentPerformanceAsync(instrumentId, dateRange, aggregationFrequency));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -328,16 +326,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.ChartInstrumentPerformanceAggregated(instrumentId, dateRange, aggregationFrequency))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(aggregatedPerformance));
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.ChartInstrumentAggregatedPerformanceAsync(instrumentId, dateRange, aggregationFrequency))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(aggregatedPerformance));
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentAggregatedPerformance(instrumentId, dateRange, aggregationFrequency);
 
-            instrumentQueries.Verify(m => m.ChartInstrumentPerformanceAggregated(instrumentId, dateRange, aggregationFrequency));
+            instrumentService.Verify(m => m.ChartInstrumentAggregatedPerformanceAsync(instrumentId, dateRange, aggregationFrequency));
             Assert.Equal(aggregatedPerformance, result.Value);
         }
 
@@ -351,16 +349,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.ChartInstrumentPerformanceAggregated(instrumentId, dateRange, aggregationFrequency))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.ChartInstrumentAggregatedPerformanceAsync(instrumentId, dateRange, aggregationFrequency))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentAggregatedPerformance(instrumentId, dateRange, aggregationFrequency);
 
-            instrumentQueries.Verify(m => m.ChartInstrumentPerformanceAggregated(instrumentId, dateRange, aggregationFrequency));
+            instrumentService.Verify(m => m.ChartInstrumentAggregatedPerformanceAsync(instrumentId, dateRange, aggregationFrequency));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -376,16 +374,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.ChartInstrumentProfitAggregated(instrumentId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(aggregatedProfit));
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.ChartInstrumentAggregatedProfitAsync(instrumentId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(aggregatedProfit));
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentAggregatedProfit(instrumentId, dateRange, aggregationFrequency, currencyCode);
 
-            instrumentQueries.Verify(m => m.ChartInstrumentProfitAggregated(instrumentId, dateRange, aggregationFrequency, currencyCode));
+            instrumentService.Verify(m => m.ChartInstrumentAggregatedProfitAsync(instrumentId, dateRange, aggregationFrequency, currencyCode));
             Assert.Equal(aggregatedProfit, result.Value);
         }
 
@@ -400,16 +398,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var aggregationFrequency = fixture.Create<AggregationFrequency>();
             var currencyCode = fixture.Create<string>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.ChartInstrumentProfitAggregated(instrumentId, dateRange, aggregationFrequency, currencyCode))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<EntityChartPointDto>>());
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.ChartInstrumentAggregatedProfitAsync(instrumentId, dateRange, aggregationFrequency, currencyCode))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<EntityChartPointDto>>());
 
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentAggregatedProfit(instrumentId, dateRange, aggregationFrequency, currencyCode);
 
-            instrumentQueries.Verify(m => m.ChartInstrumentProfitAggregated(instrumentId, dateRange, aggregationFrequency, currencyCode));
+            instrumentService.Verify(m => m.ChartInstrumentAggregatedProfitAsync(instrumentId, dateRange, aggregationFrequency, currencyCode));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -424,7 +422,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
             instrumentService
                 .Setup(m => m.CreateInstrumentAsync(instrument))
-                .ReturnsAsync(fixture.Create<Instrument>());
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(instrument));
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             await sut.PostInstrument(instrument);
@@ -441,6 +439,9 @@ namespace PortEval.Tests.Unit.ControllerTests
             var instrument = fixture.Create<InstrumentDto>();
 
             var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.UpdateInstrumentAsync(instrument))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(instrument));
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             await sut.PutInstrument(instrument.Id, instrument);
@@ -462,7 +463,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PutInstrument(instrument.Id + 1, instrument);
 
             instrumentService.Verify(m => m.UpdateInstrumentAsync(instrument), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
         }
 
         [Fact]
@@ -474,6 +475,9 @@ namespace PortEval.Tests.Unit.ControllerTests
             var instrumentId = fixture.Create<int>();
 
             var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.DeleteAsync(It.IsAny<int>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse());
             var sut = fixture.Build<InstrumentsController>().OmitAutoProperties().Create();
 
             await sut.DeleteInstrument(instrumentId);

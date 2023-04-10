@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 using PortEval.Application.Core.Interfaces.Queries;
+using System.Threading.Tasks;
 using Xunit;
-using PortEval.Application.Core;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
@@ -20,10 +19,9 @@ namespace PortEval.Tests.Integration.QueryTests
         [Fact]
         public async Task GetKnownExchanges_ReturnsExchangesFromDb()
         {
-            var queryResult = await _exchangeQueries.GetKnownExchanges();
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, e =>
+            var queryResult = await _exchangeQueries.GetKnownExchangesAsync();
+            
+            Assert.Collection(queryResult, e =>
             {
                 Assert.Equal("NASDAQ", e.Symbol);
                 Assert.Equal("NASDAQ", e.Name);

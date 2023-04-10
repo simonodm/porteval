@@ -1,12 +1,13 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
-using PortEval.Application.Core.Interfaces.Queries;
 
 namespace PortEval.Infrastructure
 {
-    /// <inheritdoc cref="IDbConnectionCreator" />
-    public class PortEvalDbConnectionCreator : IDbConnectionCreator
+    /// <summary>
+    /// A factory for creating a connection to the PortEval database.
+    /// </summary>
+    public class PortEvalDbConnectionCreator
     {
         private readonly string _connectionString;
         private IDbConnection _connection;
@@ -16,7 +17,10 @@ namespace PortEval.Infrastructure
             _connectionString = configuration.GetConnectionString("PortEvalDb");
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Creates a connection to the PortEval database.
+        /// </summary>
+        /// <returns>An <see cref="IDbConnection"/> instance connected to the PortEval database.</returns>
         public IDbConnection CreateConnection() => _connection ??= new SqlConnection(_connectionString);
     }
 }

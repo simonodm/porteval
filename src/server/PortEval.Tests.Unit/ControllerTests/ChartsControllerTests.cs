@@ -3,12 +3,10 @@ using AutoFixture.AutoMoq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PortEval.Application.Controllers;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
-using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Interfaces.Services;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests
@@ -23,15 +21,15 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var charts = fixture.CreateMany<ChartDto>();
 
-            var chartQueries = fixture.Freeze<Mock<IChartQueries>>();
-            chartQueries
-                .Setup(m => m.GetCharts())
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(charts));
+            var chartService = fixture.Freeze<Mock<IChartService>>();
+            chartService
+                .Setup(m => m.GetAllChartsAsync())
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(charts));
             var sut = fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetAllCharts();
 
-            chartQueries.Verify(m => m.GetCharts(), Times.Once());
+            chartService.Verify(m => m.GetAllChartsAsync(), Times.Once());
             Assert.Equal(charts, result.Value);
         }
 
@@ -43,16 +41,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var chart = fixture.Create<ChartDto>();
 
-            var chartQueries = fixture.Freeze<Mock<IChartQueries>>();
-            chartQueries
-                .Setup(m => m.GetChart(chart.Id))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(chart));
+            var chartService = fixture.Freeze<Mock<IChartService>>();
+            chartService
+                .Setup(m => m.GetChartAsync(chart.Id))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(chart));
 
             var sut = fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetChart(chart.Id);
 
-            chartQueries.Verify(m => m.GetChart(chart.Id), Times.Once());
+            chartService.Verify(m => m.GetChartAsync(chart.Id), Times.Once());
             Assert.Equal(chart, result.Value);
         }
 
@@ -64,16 +62,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var chartId = fixture.Create<int>();
 
-            var chartQueries = fixture.Freeze<Mock<IChartQueries>>();
-            chartQueries
-                .Setup(m => m.GetChart(It.IsAny<int>()))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<ChartDto>());
+            var chartService = fixture.Freeze<Mock<IChartService>>();
+            chartService
+                .Setup(m => m.GetChartAsync(It.IsAny<int>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<ChartDto>());
 
             var sut = fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetChart(chartId);
 
-            chartQueries.Verify(m => m.GetChart(chartId), Times.Once());
+            chartService.Verify(m => m.GetChartAsync(chartId), Times.Once());
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -88,7 +86,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var chartService = fixture.Freeze<Mock<IChartService>>();
             chartService
                 .Setup(m => m.CreateChartAsync(chart))
-                .ReturnsAsync(fixture.Create<Chart>());
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(fixture.Create<ChartDto>()));
             var sut = fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
             await sut.PostChart(chart);
@@ -105,6 +103,10 @@ namespace PortEval.Tests.Unit.ControllerTests
             var chart = fixture.Create<ChartDto>();
 
             var chartService = fixture.Freeze<Mock<IChartService>>();
+            chartService
+                .Setup(m => m.UpdateChartAsync(chart))
+                .Returns<ChartDto>(c =>
+                    Task.FromResult(OperationResponseHelper.GenerateSuccessfulOperationResponse(c)));
             var sut = fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
             await sut.PutChart(chart.Id, chart);
@@ -126,7 +128,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PutChart(chart.Id + 1, chart);
 
             chartService.Verify(m => m.UpdateChartAsync(chart), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
         }
 
         [Fact]
@@ -138,6 +140,9 @@ namespace PortEval.Tests.Unit.ControllerTests
             var chartId = fixture.Create<int>();
 
             var chartService = fixture.Freeze<Mock<IChartService>>();
+            chartService
+                .Setup(m => m.DeleteChartAsync(It.IsAny<int>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse());
             var sut = fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
             await sut.DeleteChart(chartId);

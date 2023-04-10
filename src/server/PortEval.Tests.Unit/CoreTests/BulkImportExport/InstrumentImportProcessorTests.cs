@@ -1,14 +1,15 @@
-﻿using AutoFixture;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Core.Common.BulkImportExport;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Tests.Unit.Helpers.Extensions;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
-using PortEval.Application.Core.Common.BulkImportExport;
 
-namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
+namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
 {
     public class InstrumentImportProcessorTests
     {
@@ -24,7 +25,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
                 .With(i => i.Exchange, "NASDAQ")
                 .With(i => i.Id, 0)
                 .Create();
-            var instrumentService = fixture.CreateDefaultInstrumentServiceMock();
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
             var sut = fixture.Create<InstrumentImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<InstrumentDto> { instrument });
@@ -50,7 +51,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
                 .With(i => i.CurrencyCode, "USD")
                 .With(i => i.Exchange, "NASDAQ")
                 .Create();
-            var instrumentService = fixture.CreateDefaultInstrumentServiceMock();
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
             var sut = fixture.Create<InstrumentImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<InstrumentDto> { instrument });
@@ -75,7 +76,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
                 .With(i => i.Symbol, "")
                 .With(i => i.CurrencyCode, "")
                 .Create();
-            var instrumentService = fixture.CreateDefaultInstrumentServiceMock();
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
             var sut = fixture.Create<InstrumentImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<InstrumentDto> { instrument });

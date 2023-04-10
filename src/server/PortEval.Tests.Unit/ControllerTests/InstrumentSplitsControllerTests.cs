@@ -8,7 +8,6 @@ using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Services;
 using Xunit;
 
@@ -25,16 +24,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var instrumentId = fixture.Create<int>();
             var split = fixture.Create<InstrumentSplitDto>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.GetInstrumentSplits(instrumentId))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse<IEnumerable<InstrumentSplitDto>>(new[] { split }));
+            var instrumentSplitService = fixture.Freeze<Mock<IInstrumentSplitService>>();
+            instrumentSplitService
+                .Setup(m => m.GetInstrumentSplitsAsync(instrumentId))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse<IEnumerable<InstrumentSplitDto>>(new[] { split }));
 
             var sut = fixture.Build<InstrumentSplitsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentSplits(instrumentId);
 
-            instrumentQueries.Verify(m => m.GetInstrumentSplits(instrumentId));
+            instrumentSplitService.Verify(m => m.GetInstrumentSplitsAsync(instrumentId));
             Assert.Collection(result.Value, s =>
             {
                 Assert.Equal(split, s);
@@ -50,16 +49,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var instrumentId = fixture.Create<int>();
             var split = fixture.Create<InstrumentSplitDto>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.GetInstrumentSplits(instrumentId))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<InstrumentSplitDto>>());
+            var instrumentSplitService = fixture.Freeze<Mock<IInstrumentSplitService>>();
+            instrumentSplitService
+                .Setup(m => m.GetInstrumentSplitsAsync(instrumentId))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<InstrumentSplitDto>>());
 
             var sut = fixture.Build<InstrumentSplitsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentSplits(instrumentId);
 
-            instrumentQueries.Verify(m => m.GetInstrumentSplits(instrumentId));
+            instrumentSplitService.Verify(m => m.GetInstrumentSplitsAsync(instrumentId));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -71,16 +70,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             
             var split = fixture.Create<InstrumentSplitDto>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.GetInstrumentSplit(split.InstrumentId, split.Id))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(split));
+            var instrumentSplitService = fixture.Freeze<Mock<IInstrumentSplitService>>();
+            instrumentSplitService
+                .Setup(m => m.GetInstrumentSplitAsync(split.InstrumentId, split.Id))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(split));
 
             var sut = fixture.Build<InstrumentSplitsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentSplit(split.InstrumentId, split.Id);
 
-            instrumentQueries.Verify(m => m.GetInstrumentSplit(split.InstrumentId, split.Id));
+            instrumentSplitService.Verify(m => m.GetInstrumentSplitAsync(split.InstrumentId, split.Id));
             Assert.Equal(split, result.Value);
         }
 
@@ -95,7 +94,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var instrumentSplitService = fixture.Freeze<Mock<IInstrumentSplitService>>();
             instrumentSplitService
                 .Setup(m => m.CreateSplitAsync(split))
-                .ReturnsAsync(fixture.Create<InstrumentSplit>());
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(split));
 
             var sut = fixture.Build<InstrumentSplitsController>().OmitAutoProperties().Create();
 
@@ -118,7 +117,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PostInstrumentSplit(split.InstrumentId + 1, split);
 
             instrumentSplitService.Verify(m => m.CreateSplitAsync(It.IsAny<InstrumentSplitDto>()), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
         }
 
         [Fact]
@@ -132,7 +131,10 @@ namespace PortEval.Tests.Unit.ControllerTests
             var instrumentSplitService = fixture.Freeze<Mock<IInstrumentSplitService>>();
             instrumentSplitService
                 .Setup(m => m.CreateSplitAsync(split))
-                .ReturnsAsync(fixture.Create<InstrumentSplit>());
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(split));
+            instrumentSplitService
+                .Setup(m => m.UpdateSplitAsync(split.InstrumentId, split))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(split));
 
             var sut = fixture.Build<InstrumentSplitsController>().OmitAutoProperties().Create();
 
@@ -155,7 +157,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PutInstrumentSplit(split.InstrumentId + 1, split);
 
             instrumentSplitService.Verify(m => m.UpdateSplitAsync(It.IsAny<int>(), It.IsAny<InstrumentSplitDto>()), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
         }
     }
 }

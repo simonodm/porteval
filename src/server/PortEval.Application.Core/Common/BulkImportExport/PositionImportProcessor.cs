@@ -20,12 +20,21 @@ namespace PortEval.Application.Core.Common.BulkImportExport
 
             if (row.Id != default)
             {
-                await _positionService.UpdatePositionAsync(row);
+                var response = await _positionService.UpdatePositionAsync(row);
+                if (response.Status != OperationStatus.Ok)
+                {
+                    logEntry.AddError(response.Message);
+                }
             }
             else
             {
-                var position = await _positionService.OpenPositionAsync(row);
-                logEntry.Data.Id = position.Id;
+                var response = await _positionService.OpenPositionAsync(row);
+                if (response.Status != OperationStatus.Ok)
+                {
+                    logEntry.AddError(response.Message);
+                }
+
+                logEntry.Data.Id = response.Response?.Id ?? default;
             }
 
             return logEntry;

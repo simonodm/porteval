@@ -25,17 +25,15 @@ namespace PortEval.Application.Core.Services
 
         private readonly IBackgroundJobClient _jobClient;
         private readonly IFileSystem _fileSystem;
-        private readonly IFileStreamFactory _fileStreamFactory;
         private readonly string _storagePath;
 
-        public CsvImportService(IDataImportRepository importRepository, IBackgroundJobClient jobClient, IFileSystem fileSystem, IFileStreamFactory fileStreamFactory, IDataImportQueries importDataQueries, string storagePath)
+        public CsvImportService(IDataImportRepository importRepository, IBackgroundJobClient jobClient, IFileSystem fileSystem, IDataImportQueries importDataQueries, string storagePath)
         {
             _importRepository = importRepository;
             _jobClient = jobClient;
             _fileSystem = fileSystem;
             _storagePath = storagePath;
             _importDataQueries = importDataQueries;
-            _fileStreamFactory = fileStreamFactory;
         }
 
         /// <inheritdoc />
@@ -70,7 +68,7 @@ namespace PortEval.Application.Core.Services
             var tempFilePath = GetTemporaryFilePath(guid);
             var logFilePath = GetErrorLogPath(guid);
 
-            await using var fs = _fileStreamFactory.New(tempFilePath, FileMode.Create);
+            await using var fs = _fileSystem.File.OpenWrite(tempFilePath);
             await inputFileStream.CopyToAsync(fs);
             fs.Close();
 
@@ -85,13 +83,13 @@ namespace PortEval.Application.Core.Services
         {
             try
             {
-                var stream = _fileStreamFactory.New(GetErrorLogPath(guid), FileMode.Open);
+                var stream = _fileSystem.File.OpenRead(GetErrorLogPath(guid));
                 return new OperationResponse<Stream>
                 {
                     Response = stream
                 };
             }
-            catch
+            catch (Exception ex)
             {
                 return new OperationResponse<Stream>
                 {
@@ -112,7 +110,7 @@ namespace PortEval.Application.Core.Services
 
             return new OperationResponse<Stream>
             {
-                Response = _fileStreamFactory.New(path, FileMode.Open)
+                Response = _fileSystem.File.OpenRead(path)
             };
         }
 
@@ -133,7 +131,7 @@ namespace PortEval.Application.Core.Services
 
         private void GenerateTemplate(string path, TemplateType templateType)
         {
-            using var fs = _fileStreamFactory.New(path, FileMode.Create);
+            using var fs = _fileSystem.File.OpenWrite(path);
             using var sw = new StreamWriter(fs);
             using var csv = new CsvWriter(sw, CultureInfo.InvariantCulture);
             csv.RegisterImportClassMaps();

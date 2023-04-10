@@ -18,7 +18,7 @@ namespace PortEval.Application.Controllers
                 return BadRequest(response.Message);
             }
 
-            return Ok(response.Response);
+            return response.Response;
         }
 
         protected ActionResult<T> GenerateActionResult<T>(OperationResponse<T> response, string actionName, object routeValues)

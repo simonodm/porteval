@@ -57,19 +57,6 @@ namespace PortEval.Infrastructure.Queries
                 new { BaseCurrencyCode = currencyFrom, TargetCurrencyCode = currencyTo, Time = time });
         }
 
-        public async Task<IEnumerable<CurrencyDto>> GetExchangeableCurrenciesAsync(string baseCurrencyCode,
-            DateTime time)
-        {
-            using var connection = _connectionCreator.CreateConnection();
-            var query = @"SELECT DISTINCT Code, Name, Symbol, IsDefault FROM dbo.Currencies
-                          INNER JOIN (SELECT * FROM dbo.CurrencyExchangeRates WHERE Time <= @Time AND CurrencyFromCode = @CurrencyCode) as ER
-                          ON ER.CurrencyToCode = Currencies.Code
-                          ORDER BY Code";
-
-            return await connection.QueryAsync<CurrencyDto>(query,
-                new { CurrencyCode = baseCurrencyCode, Time = time });
-        }
-
         public async Task<IEnumerable<CurrencyExchangeRateDto>> GetDirectExchangeRatesAsync(string currencyCode,
             DateTime time)
         {

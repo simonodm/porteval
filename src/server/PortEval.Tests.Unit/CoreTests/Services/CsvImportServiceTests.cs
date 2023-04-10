@@ -1,15 +1,4 @@
-﻿using AutoFixture;
-using AutoFixture.AutoMoq;
-using AutoFixture.Kernel;
-using Hangfire;
-using Hangfire.Common;
-using Hangfire.States;
-using Moq;
-using PortEval.Domain.Models.Entities;
-using PortEval.Domain.Models.Enums;
-using PortEval.Tests.Unit.Helpers;
-using PortEval.Tests.Unit.Helpers.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
@@ -17,11 +6,26 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.Kernel;
+using Hangfire;
+using Hangfire.Common;
+using Hangfire.States;
+using Moq;
+using PortEval.Application.Core;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Services;
+using PortEval.Application.Models.DTOs;
+using PortEval.Domain.Models.Entities;
+using PortEval.Domain.Models.Enums;
+using PortEval.Tests.Unit.Helpers;
+using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.Services
+namespace PortEval.Tests.Unit.CoreTests.Services
 {
     internal class CsvImportServiceStoragePathArg : ISpecimenBuilder
     {
@@ -66,13 +70,76 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
                 }
             );
 
+        [Fact]
+        public async Task GetAllImportsAsync_ReturnsAllImports()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+
+            var imports = fixture.CreateMany<CsvTemplateImportDto>();
+
+            var importQueriesMock = fixture.Freeze<Mock<IDataImportQueries>>();
+            importQueriesMock
+                .Setup(m => m.GetAllImportsAsync())
+                .ReturnsAsync(imports);
+
+            var sut = fixture.Create<CsvImportService>();
+
+            var result = await sut.GetAllImportsAsync();
+
+            Assert.Equal(OperationStatus.Ok, result.Status);
+            Assert.Equal(imports, result.Response);
+        }
+
+        [Fact]
+        public async Task GetImportAsync_ReturnsCorrectImport_WhenItExists()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+
+            var import = fixture.Create<CsvTemplateImportDto>();
+
+            var importQueriesMock = fixture.Freeze<Mock<IDataImportQueries>>();
+            importQueriesMock
+                .Setup(m => m.GetImportAsync(import.ImportId))
+                .ReturnsAsync(import);
+
+            var sut = fixture.Create<CsvImportService>();
+
+            var result = await sut.GetImportAsync(import.ImportId);
+
+            Assert.Equal(OperationStatus.Ok, result.Status);
+            Assert.Equal(import, result.Response);
+        }
+
+        [Fact]
+        public async Task GetImportAsync_ReturnsNotFound_WhenImportDoesNotExist()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+
+            var importQueriesMock = fixture.Freeze<Mock<IDataImportQueries>>();
+            importQueriesMock
+                .Setup(m => m.GetImportAsync(It.IsAny<Guid>()))
+                .Returns(Task.FromResult<CsvTemplateImportDto>(null));
+
+            var sut = fixture.Create<CsvImportService>();
+
+            var result = await sut.GetImportAsync(Guid.NewGuid());
+
+            Assert.Equal(OperationStatus.NotFound, result.Status);
+        }
+
         [Theory]
         [MemberData(nameof(ImportData))]
         public async Task StartingImport_AddsImportToRepository(string data, TemplateType templateType)
         {
             var fixture = GetFixtureWithMockFileSystem();
 
-            var importRepository = fixture.CreateDefaultDataImportRepositoryMock();
+            var importRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            importRepository
+                .Setup(m => m.Add(It.IsAny<DataImport>()))
+                .Returns<DataImport>(d => d);
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddDirectory(_storagePath);
 
@@ -86,30 +153,18 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
         [Theory]
         [MemberData(nameof(ImportData))]
-        public async Task StartingImport_ReturnsMatchingDataImportEntry(string data, TemplateType templateType)
-        {
-            var fixture = GetFixtureWithMockFileSystem();
-
-            fixture.CreateDefaultDataImportRepositoryMock();
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddDirectory(_storagePath);
-
-            var sut = fixture.Create<CsvImportService>();
-
-            await using var stream = GenerateStreamFromString(data);
-            var importEntry = await sut.StartImportAsync(stream, templateType);
-
-            Assert.Equal(templateType, importEntry.TemplateType);
-            Assert.Equal(ImportStatus.Pending, importEntry.Status);
-        }
-
-        [Theory]
-        [MemberData(nameof(ImportData))]
         public async Task StartingImport_EnqueuesImportJob(string data, TemplateType templateType)
         {
             var fixture = GetFixtureWithMockFileSystem();
 
-            fixture.CreateDefaultDataImportRepositoryMock();
+            var importRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            importRepository
+                .Setup(m => m.Add(It.IsAny<DataImport>()))
+                .Returns<DataImport>(d => d);
+            var importQueries = fixture.Freeze<Mock<IDataImportQueries>>();
+            importQueries
+                .Setup(m => m.GetImportAsync(It.IsAny<Guid>()))
+                .ReturnsAsync((Guid id) => fixture.Build<CsvTemplateImportDto>().With(i => i.ImportId, id).Create());
             var jobClient = fixture.Freeze<Mock<IBackgroundJobClient>>();
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddDirectory(_storagePath);
@@ -121,7 +176,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
             jobClient.Verify(c => c.Create(
                 It.Is<Job>(job =>
-                    job.Method.Name == "Run" && (Guid)job.Args[0] == importEntry.Id &&
+                    job.Method.Name == nameof(IDataImportJob.RunAsync) && (Guid)job.Args[0] == importEntry.Response.ImportId &&
                     job.Type.IsAssignableTo(typeof(IDataImportJob))),
                 It.IsAny<EnqueuedState>()));
         }
@@ -134,14 +189,14 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var guid = fixture.Create<Guid>();
             var content = fixture.Create<string>();
 
-            fixture.CreateDefaultDataImportRepositoryMock();
+            fixture.Freeze<Mock<IDataImportRepository>>();
             fixture.Freeze<Mock<IBackgroundJobClient>>();
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(Path.Combine(_storagePath, $"{guid}_log.csv"), content);
 
             var sut = fixture.Create<CsvImportService>();
 
-            await using var stream = sut.TryGetErrorLog(guid);
+            await using var stream = sut.TryGetErrorLog(guid).Response;
             using var sr = new StreamReader(stream);
             var actualContent = await sr.ReadToEndAsync();
 
@@ -149,22 +204,22 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
         }
 
         [Fact]
-        public void GettingErrorLog_ReturnsNull_WhenErrorLogDoesNotExist()
+        public void GettingErrorLog_ReturnsError_WhenErrorLogDoesNotExist()
         {
             var fixture = GetFixtureWithMockFileSystem();
 
             var guid = fixture.Create<Guid>();
 
-            fixture.CreateDefaultDataImportRepositoryMock();
+            fixture.Freeze<Mock<IDataImportRepository>>();
             fixture.Freeze<Mock<IBackgroundJobClient>>();
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddDirectory(_storagePath);
 
             var sut = fixture.Create<CsvImportService>();
 
-            var stream = sut.TryGetErrorLog(guid);
+            var response = sut.TryGetErrorLog(guid);
 
-            Assert.Null(stream);
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Theory]
@@ -178,13 +233,13 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
         {
             var fixture = GetFixtureWithMockFileSystem();
 
-            fixture.CreateDefaultDataImportRepositoryMock();
+            fixture.Freeze<Mock<IDataImportRepository>>();
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddDirectory(_storagePath);
 
             var sut = fixture.Create<CsvImportService>();
 
-            await using var templateStream = sut.GetCsvTemplate(templateType);
+            await using var templateStream = sut.GetCsvTemplate(templateType).Response;
             using var sr = new StreamReader(templateStream);
 
             var templateContentFirstLine = await sr.ReadLineAsync();
@@ -205,14 +260,14 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var fixture = GetFixtureWithMockFileSystem();
             var fileContent = fixture.Create<string>();
 
-            fixture.CreateDefaultDataImportRepositoryMock();
+            fixture.Freeze<Mock<IDataImportRepository>>();
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(Path.Combine(_storagePath, templateType.ToString().ToLower() + "_template.csv"),
                 fileContent);
 
             var sut = fixture.Create<CsvImportService>();
 
-            await using var templateStream = sut.GetCsvTemplate(templateType);
+            await using var templateStream = sut.GetCsvTemplate(templateType).Response;
             using var sr = new StreamReader(templateStream);
 
             var actualContent = await sr.ReadToEndAsync();

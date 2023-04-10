@@ -1,20 +1,122 @@
-﻿using AutoFixture;
+﻿using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Core;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Repositories;
+using PortEval.Application.Core.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using PortEval.Tests.Unit.Helpers.Extensions;
-using System.Threading.Tasks;
-using PortEval.Application.Core.Services;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.Services
+namespace PortEval.Tests.Unit.CoreTests.Services
 {
     public class InstrumentSplitServiceTests
     {
+        [Fact]
+        public async Task GetInstrumentSplitsAsync_ReturnsAllInstrumentSplits_WhenInstrumentExists()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+
+            var instrumentId = fixture.Create<int>();
+            var splits = fixture.CreateMany<InstrumentSplitDto>();
+
+            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            instrumentQueries
+                .Setup(m => m.GetInstrumentSplitsAsync(instrumentId))
+                .ReturnsAsync(splits);
+
+            var sut = fixture.Create<InstrumentSplitService>();
+            var result = await sut.GetInstrumentSplitsAsync(instrumentId);
+
+            Assert.Equal(OperationStatus.Ok, result.Status);
+            Assert.Equal(splits, result.Response);
+        }
+
+        [Fact]
+        public async Task GetInstrumentSplitsAsync_ReturnsNotFound_WhenInstrumentDoesNotExist()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            
+            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+
+            instrumentQueries
+                .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
+                .ReturnsAsync((InstrumentDto)null);
+
+            var sut = fixture.Create<InstrumentSplitService>();
+            var result = await sut.GetInstrumentSplitsAsync(fixture.Create<int>());
+
+            Assert.Equal(OperationStatus.NotFound, result.Status);
+        }
+
+        [Fact]
+        public async Task GetInstrumentSplitAsync_ReturnsSplit_WhenInstrumentAndSplitExist()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+
+            var instrumentId = fixture.Create<int>();
+            var splitId = fixture.Create<int>();
+
+            var split = fixture.Create<InstrumentSplitDto>();
+
+            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            instrumentQueries
+                .Setup(m => m.GetInstrumentSplitAsync(instrumentId, splitId))
+                .ReturnsAsync(split);
+
+            var sut = fixture.Create<InstrumentSplitService>();
+            var result = await sut.GetInstrumentSplitAsync(instrumentId, splitId);
+
+            Assert.Equal(OperationStatus.Ok, result.Status);
+            Assert.Equal(split, result.Response);
+        }
+
+        [Fact]
+        public async Task GetInstrumentSplitAsync_ReturnsNotFound_WhenInstrumentDoesNotExist()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+
+            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            instrumentQueries
+                .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
+                .ReturnsAsync((InstrumentDto)null);
+
+            var sut = fixture.Create<InstrumentSplitService>();
+            var result = await sut.GetInstrumentSplitAsync(fixture.Create<int>(), fixture.Create<int>());
+
+            Assert.Equal(OperationStatus.NotFound, result.Status);
+        }
+
+        [Fact]
+        public async Task GetInstrumentSplitAsync_ReturnsNotFound_WhenSplitDoesNotExist()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+
+            var instrumentId = fixture.Create<int>();
+            var splitId = fixture.Create<int>();
+
+            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            instrumentQueries
+                .Setup(m => m.GetInstrumentSplitAsync(instrumentId, splitId))
+                .ReturnsAsync((InstrumentSplitDto)null);
+
+            var sut = fixture.Create<InstrumentSplitService>();
+            var result = await sut.GetInstrumentSplitAsync(instrumentId, splitId);
+
+            Assert.Equal(OperationStatus.NotFound, result.Status);
+        }
+
         [Fact]
         public async Task CreateSplitAsync_SavesSplitToRepository_WhenWellFormed()
         {
@@ -23,8 +125,8 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
             var split = fixture.Create<InstrumentSplitDto>();
 
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
+            fixture.Freeze<Mock<IInstrumentRepository>>();
+            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
 
             var sut = fixture.Create<InstrumentSplitService>();
 
@@ -46,39 +148,41 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
             var split = fixture.Create<InstrumentSplitDto>();
 
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.CreateDefaultSplitRepositoryMock();
+            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.Freeze<Mock<IInstrumentSplitRepository>>();
 
             var sut = fixture.Create<InstrumentSplitService>();
 
             var result = await sut.CreateSplitAsync(split);
 
-            Assert.Equal(split.InstrumentId, result.InstrumentId);
-            Assert.Equal(split.Time, result.Time);
-            Assert.Equal(split.SplitRatioDenominator, result.SplitRatio.Denominator);
-            Assert.Equal(split.SplitRatioNumerator, result.SplitRatio.Numerator);
+            Assert.Equal(OperationStatus.Ok, result.Status);
+            Assert.Equal(split.InstrumentId, result.Response.InstrumentId);
+            Assert.Equal(split.Time, result.Response.Time);
+            Assert.Equal(split.SplitRatioDenominator, result.Response.SplitRatioDenominator);
+            Assert.Equal(split.SplitRatioNumerator, result.Response.SplitRatioNumerator);
         }
 
         [Fact]
-        public async Task CreateSplitAsync_ThrowsNotFoundException_WhenInstrumentDoesNotExist()
+        public async Task CreateSplitAsync_ReturnsNotFound_WhenInstrumentDoesNotExist()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
             var split = fixture.Create<InstrumentSplitDto>();
 
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
+            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
             instrumentRepository
                 .Setup(r => r.ExistsAsync(split.InstrumentId))
                 .ReturnsAsync(false);
             instrumentRepository
                 .Setup(r => r.FindAsync(split.InstrumentId))
                 .ReturnsAsync((Instrument)null);
-            fixture.CreateDefaultSplitRepositoryMock();
+            fixture.Freeze<Mock<IInstrumentSplitRepository>>();
 
             var sut = fixture.Create<InstrumentSplitService>();
+            var result = await sut.CreateSplitAsync(split);
 
-            await Assert.ThrowsAsync<ItemNotFoundException>(() => sut.CreateSplitAsync(split));
+            Assert.Equal(OperationStatus.NotFound, result.Status);
         }
 
         [Fact]
@@ -94,8 +198,8 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
                 new SplitRatio(updatedSplit.SplitRatioDenominator, updatedSplit.SplitRatioNumerator));
             existingSplit.MarkAsProcessed();
 
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
+            fixture.Freeze<Mock<IInstrumentRepository>>();
+            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
             splitRepository
                 .Setup(r => r.FindAsync(updatedSplit.Id))
                 .ReturnsAsync(existingSplit);
@@ -126,8 +230,8 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
                 new SplitRatio(updatedSplit.SplitRatioDenominator, updatedSplit.SplitRatioNumerator));
             existingSplit.MarkAsProcessed();
 
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
+            fixture.Freeze<Mock<IInstrumentRepository>>();
+            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
             splitRepository
                 .Setup(r => r.FindAsync(updatedSplit.Id))
                 .ReturnsAsync(existingSplit);
@@ -136,11 +240,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
             var result = await sut.UpdateSplitAsync(updatedSplit.InstrumentId, updatedSplit);
 
-            Assert.Equal(updatedSplit.InstrumentId, result.InstrumentId);
-            Assert.Equal(updatedSplit.Time, result.Time);
-            Assert.Equal(updatedSplit.SplitRatioDenominator, result.SplitRatio.Denominator);
-            Assert.Equal(updatedSplit.SplitRatioNumerator, result.SplitRatio.Numerator);
-            Assert.Equal(updatedSplit.Status, result.ProcessingStatus);
+            Assert.Equal(updatedSplit.InstrumentId, result.Response.InstrumentId);
+            Assert.Equal(updatedSplit.Time, result.Response.Time);
+            Assert.Equal(updatedSplit.SplitRatioDenominator, result.Response.SplitRatioDenominator);
+            Assert.Equal(updatedSplit.SplitRatioNumerator, result.Response.SplitRatioNumerator);
+            Assert.Equal(updatedSplit.Status, result.Response.Status);
         }
 
         [Fact]
@@ -151,8 +255,8 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
             var split = fixture.Create<InstrumentSplitDto>();
 
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
+            fixture.Freeze<Mock<IInstrumentRepository>>();
+            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
             splitRepository
                 .Setup(m => m.ExistsAsync(split.Id))
                 .ReturnsAsync(false);

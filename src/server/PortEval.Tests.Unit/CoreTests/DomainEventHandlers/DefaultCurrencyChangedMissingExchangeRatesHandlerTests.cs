@@ -1,22 +1,22 @@
-﻿using AutoFixture;
+﻿using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Hangfire;
 using Hangfire.Common;
 using Hangfire.States;
 using Moq;
-using PortEval.Domain.Events;
-using System.Threading.Tasks;
 using PortEval.Application.Core.Common;
 using PortEval.Application.Core.DomainEventHandlers.DefaultCurrencyChanged;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
+using PortEval.Domain.Events;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
+namespace PortEval.Tests.Unit.CoreTests.DomainEventHandlers
 {
     public class DefaultCurrencyChangedMissingExchangeRatesHandlerTests
     {
         [Fact]
-        public async Task Handle_EnqueuesMissingPriceFetchJob()
+        public async Task Handle_EnqueuesMissingExchangeRateFetchJob()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -31,7 +31,7 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
 
             backgroundJobClient.Verify(c => c.Create(
                 It.Is<Job>(job =>
-                    job.Method.Name == "Run" &&
+                    job.Method.Name == nameof(IMissingExchangeRatesFetchJob.RunAsync) &&
                     job.Type.IsAssignableTo(typeof(IMissingExchangeRatesFetchJob))),
                 It.IsAny<EnqueuedState>()
             ));

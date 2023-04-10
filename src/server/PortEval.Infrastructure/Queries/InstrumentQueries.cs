@@ -82,7 +82,7 @@ namespace PortEval.Infrastructure.Queries
         }
 
         public async Task<int> GetInstrumentPriceCountAsync(int instrumentId, DateTime from, DateTime to,
-            AggregationFrequency? frequency)
+            AggregationFrequency? frequency = null)
         {
             using var connection = _connectionCreator.CreateConnection();
             var partitionCalc = GetInstrumentPriceIntervalPartitionCalc(frequency);
@@ -107,7 +107,7 @@ namespace PortEval.Infrastructure.Queries
             DateTime from,
             DateTime to,
             PaginationParams pagination,
-            AggregationFrequency? frequency)
+            AggregationFrequency? frequency = null)
         {
             using var connection = _connectionCreator.CreateConnection();
             var partitionCalc = GetInstrumentPriceIntervalPartitionCalc(frequency);
@@ -138,7 +138,7 @@ namespace PortEval.Infrastructure.Queries
 
         public async Task<int> GetInstrumentPriceCompressedCountAsync(int instrumentId,
             DateTime from, DateTime to,
-            AggregationFrequency? frequency)
+            AggregationFrequency? frequency = null)
         {
             using var connection = _connectionCreator.CreateConnection();
             var partitionCalc = GetInstrumentPriceIntervalPartitionCalc(frequency);
@@ -174,7 +174,7 @@ namespace PortEval.Infrastructure.Queries
 
         public async Task<IEnumerable<InstrumentPriceDto>> GetInstrumentPricesPageCompressedAsync(int instrumentId,
             DateTime from, DateTime to,
-            PaginationParams pagination, AggregationFrequency? frequency)
+            PaginationParams pagination, AggregationFrequency? frequency = null)
         {
             using var connection = _connectionCreator.CreateConnection();
             var partitionCalc = GetInstrumentPriceIntervalPartitionCalc(frequency);

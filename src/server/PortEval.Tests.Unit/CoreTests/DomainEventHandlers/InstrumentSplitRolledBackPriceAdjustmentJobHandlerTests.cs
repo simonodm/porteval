@@ -1,17 +1,17 @@
-﻿using AutoFixture;
+﻿using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Hangfire;
 using Hangfire.Common;
 using Hangfire.States;
 using Moq;
-using PortEval.Domain.Events;
-using System.Threading.Tasks;
 using PortEval.Application.Core.Common;
 using PortEval.Application.Core.DomainEventHandlers.InstrumentSplitRollbackRequested;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
+using PortEval.Domain.Events;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
+namespace PortEval.Tests.Unit.CoreTests.DomainEventHandlers
 {
     public class InstrumentSplitRolledBackPriceAdjustmentJobHandlerTests
     {
@@ -32,7 +32,7 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
 
             jobClient.Verify(c => c.Create(
                 It.Is<Job>(job =>
-                    job.Method.Name == "Run" &&
+                    job.Method.Name == nameof(ISplitPriceAndTransactionAdjustmentJob.RunAsync) &&
                     job.Type.IsAssignableTo(typeof(ISplitPriceAndTransactionAdjustmentJob))),
                 It.IsAny<EnqueuedState>()
             ));

@@ -1,20 +1,45 @@
-﻿using AutoFixture;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Core;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Repositories;
+using PortEval.Application.Core.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.ValueObjects;
+using PortEval.Infrastructure.Queries;
 using PortEval.Tests.Unit.Helpers.Extensions;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using PortEval.Application.Core.Services;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.Services
+namespace PortEval.Tests.Unit.CoreTests.Services
 {
     public class DashboardServiceTests
     {
+        [Fact]
+        public async Task GetDashboardLayoutAsync_ReturnsDashboardLayout()
+        {
+            var fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+
+            var items = GenerateValidDashboardItemDtos(fixture);
+
+            var dashboardQueries = fixture.Freeze<Mock<IDashboardLayoutQueries>>();
+            dashboardQueries
+                .Setup(m => m.GetDashboardItemsAsync())
+                .ReturnsAsync(items);
+
+            var sut = fixture.Create<DashboardService>();
+
+            var result = await sut.GetDashboardLayoutAsync();
+
+            Assert.Equal(OperationStatus.Ok, result.Status);
+            Assert.Equal(items, result.Response.Items);
+        }
+
         [Fact]
         public async Task UpdatingDashboardLayout_RemovesExistingDashboardItems_WhenWellFormed()
         {
@@ -24,8 +49,8 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var existingDashboardItems = GenerateValidDashboardItemEntities(fixture);
             var newDashboardItems = GenerateValidDashboardItemDtos(fixture);
 
-            fixture.CreateDefaultChartRepositoryMock();
-            var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
+            fixture.Freeze<Mock<IChartRepository>>();
+            var dashboardItemRepository = fixture.Freeze<Mock<IDashboardItemRepository>>();
             dashboardItemRepository
                 .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
@@ -46,12 +71,15 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
             var existingDashboardItems = GenerateValidDashboardItemEntities(fixture);
             var newDashboardItems = GenerateValidDashboardItemDtos(fixture);
-
-            fixture.CreateDefaultChartRepositoryMock();
-            var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
+            
+            var dashboardItemRepository = fixture.Freeze<Mock<IDashboardItemRepository>>();
             dashboardItemRepository
                 .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
+            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            chartRepository
+                .Setup(r => r.FindAsync(It.IsAny<int>()))
+                .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
 
             var sut = fixture.Create<DashboardService>();
 
@@ -68,7 +96,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
         }
 
         [Fact]
-        public async Task UpdatingDashboardLayout_ThrowsException_WhenOverlapsAreDetected()
+        public async Task UpdatingDashboardLayout_ReturnsError_WhenOverlapsAreDetected()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -76,20 +104,20 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var existingDashboardItems = GenerateValidDashboardItemEntities(fixture);
             var newDashboardItems = GenerateOverlappingDashboardItemDtos(fixture);
 
-            fixture.CreateDefaultChartRepositoryMock();
-            var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
+            fixture.Freeze<Mock<IChartRepository>>();
+            var dashboardItemRepository = fixture.Freeze<Mock<IDashboardItemRepository>>();
             dashboardItemRepository
                 .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
 
             var sut = fixture.Create<DashboardService>();
+            var response = await sut.UpdateDashboardLayoutAsync(newDashboardItems);
 
-            await Assert.ThrowsAsync<OperationNotAllowedException>(async () =>
-                await sut.UpdateDashboardLayoutAsync(newDashboardItems));
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
-        public async Task UpdatingDashboardLayout_ThrowsException_WhenItemsHaveInvalidDimensions()
+        public async Task UpdatingDashboardLayout_ReturnsError_WhenItemsHaveInvalidDimensions()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -97,20 +125,20 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var existingDashboardItems = GenerateValidDashboardItemEntities(fixture);
             var newDashboardItems = GenerateInvalidDimensionsDashboardItemDtos(fixture);
 
-            fixture.CreateDefaultChartRepositoryMock();
-            var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
+            fixture.Freeze<Mock<IChartRepository>>();
+            var dashboardItemRepository = fixture.Freeze<Mock<IDashboardItemRepository>>();
             dashboardItemRepository
                 .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
 
             var sut = fixture.Create<DashboardService>();
+            var response = await sut.UpdateDashboardLayoutAsync(newDashboardItems);
 
-            await Assert.ThrowsAsync<OperationNotAllowedException>(async () =>
-                await sut.UpdateDashboardLayoutAsync(newDashboardItems));
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
-        public async Task UpdatingDashboardLayout_ThrowsException_WhenChartDoesNotExist()
+        public async Task UpdatingDashboardLayout_ReturnsError_WhenChartDoesNotExist()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
@@ -118,22 +146,22 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var existingDashboardItems = GenerateValidDashboardItemEntities(fixture);
             var newDashboardItems = GenerateValidDashboardItemDtos(fixture);
 
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
+            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
             chartRepository
                 .Setup(r => r.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((Chart)null);
             chartRepository
                 .Setup(r => r.ExistsAsync(It.IsAny<int>()))
                 .ReturnsAsync(false);
-            var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
+            var dashboardItemRepository = fixture.Freeze<Mock<IDashboardItemRepository>>();
             dashboardItemRepository
                 .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
 
             var sut = fixture.Create<DashboardService>();
-
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () =>
-                await sut.UpdateDashboardLayoutAsync(newDashboardItems));
+            var response = await sut.UpdateDashboardLayoutAsync(newDashboardItems);
+            
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         private List<DashboardItem> GenerateValidDashboardItemEntities(IFixture fixture)

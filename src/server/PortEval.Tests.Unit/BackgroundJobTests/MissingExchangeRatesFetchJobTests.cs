@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PortEval.Application.Core.BackgroundJobs;
 using PortEval.Application.Core.Interfaces;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Models.FinancialDataFetcher;
 using Xunit;
 
@@ -43,11 +44,14 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var correctListSaved = false;
 
             var priceFetcher = CreatePriceFetcherReturningExchangeRates(fixture, exchangeRates);
-            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
+            var currencyRepository = fixture.Freeze<Mock<ICurrencyRepository>>();
             currencyRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Currency> { currency, firstTargetCurrency, secondTargetCurrency });
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
+            currencyRepository
+                .Setup(m => m.Update(It.IsAny<Currency>()))
+                .Returns<Currency>(c => c);
+            var exchangeRateRepository = fixture.Freeze<Mock<ICurrencyExchangeRateRepository>>();
             exchangeRateRepository
                 .Setup(m => m.ListExchangeRatesAsync(currency.Code))
                 .ReturnsAsync(Enumerable.Empty<CurrencyExchangeRate>());
@@ -100,11 +104,11 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             };
 
             var priceFetcher = CreatePriceFetcherReturningExchangeRates(fixture, newExchangeRates);
-            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
+            var currencyRepository = fixture.Freeze<Mock<ICurrencyRepository>>();
             currencyRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Currency> { currency, targetCurrency });
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
+            var exchangeRateRepository = fixture.Freeze<Mock<ICurrencyExchangeRateRepository>>();
             exchangeRateRepository
                 .Setup(m => m.ListExchangeRatesAsync(currency.Code))
                 .ReturnsAsync(existingExchangeRates);
@@ -134,11 +138,11 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var currency = new Currency("USD", "US Dollar", "US$", false);
 
             var priceFetcher = CreatePriceFetcherReturningExchangeRates(fixture, Enumerable.Empty<ExchangeRates>());
-            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
+            var currencyRepository = fixture.Freeze<Mock<ICurrencyRepository>>();
             currencyRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Currency> { currency });
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
+            var exchangeRateRepository = fixture.Freeze<Mock<ICurrencyExchangeRateRepository>>();
 
             var sut = fixture.Create<MissingExchangeRatesFetchJob>();
 

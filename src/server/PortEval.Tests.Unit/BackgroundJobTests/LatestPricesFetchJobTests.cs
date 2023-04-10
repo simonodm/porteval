@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using PortEval.Application.Core.BackgroundJobs;
 using PortEval.Application.Core.Interfaces;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Models.FinancialDataFetcher;
 using Xunit;
 
@@ -27,12 +28,18 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var price = fixture.Build<PricePoint>().With(p => p.Time, DateTime.UtcNow.AddMinutes(-10)).Create();
 
             var priceFetcher = CreatePriceFetcherMockReturningLatestPriceData(fixture, instrument, price);
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
+            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
             instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Instrument> { instrument });
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
-            var instrumentPriceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
+            instrumentRepository
+                .Setup(m => m.Update(It.IsAny<Instrument>()))
+                .Returns<Instrument>(i => i);
+            var exchangeRateRepository = fixture.Freeze<Mock<ICurrencyExchangeRateRepository>>();
+            var instrumentPriceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            instrumentPriceRepository
+                .Setup(m => m.Add(It.IsAny<InstrumentPrice>()))
+                .Returns<InstrumentPrice>(p => p);
 
             var sut = fixture.Create<LatestPricesFetchJob>();
 
@@ -52,12 +59,18 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var price = fixture.Build<PricePoint>().With(p => p.Time, DateTime.UtcNow).Create();
 
             var priceFetcher = CreatePriceFetcherMockReturningLatestPriceData(fixture, instrument, price);
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
+            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
             instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Instrument> { instrument });
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
-            var instrumentPriceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
+            instrumentRepository
+                .Setup(m => m.Update(It.IsAny<Instrument>()))
+                .Returns<Instrument>(i => i);
+            var exchangeRateRepository = fixture.Freeze<Mock<ICurrencyExchangeRateRepository>>();
+            var instrumentPriceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            instrumentPriceRepository
+                .Setup(m => m.Add(It.IsAny<InstrumentPrice>()))
+                .Returns<InstrumentPrice>(p => p);
 
             var sut = fixture.Create<LatestPricesFetchJob>();
 
@@ -76,12 +89,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             instrument.SetTrackingFrom(DateTime.Parse("2022-01-01"));
 
             var priceFetcher = CreatePriceFetcherMockReturningLatestPriceData(fixture, instrument, null);
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
+            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
             instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Instrument> { instrument });
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
-            var instrumentPriceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
+            instrumentRepository
+                .Setup(m => m.Update(It.IsAny<Instrument>()))
+                .Returns<Instrument>(i => i);
+            var exchangeRateRepository = fixture.Freeze<Mock<ICurrencyExchangeRateRepository>>();
+            var instrumentPriceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
 
             var sut = fixture.Create<LatestPricesFetchJob>();
 

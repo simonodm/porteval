@@ -15,9 +15,10 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Extensions
         /// <summary>
         /// Fetches JSON from the specified endpoint. Takes rate limiting into account.
         /// </summary>
-        /// <param name="httpClient">HttpClient to use for the fetch</param>
+        /// <param name="httpClient">HTTP client to use for the fetch</param>
         /// <param name="queryUrl">URL to fetch</param>
         /// <param name="rateLimiter">Request rate limiter</param>
+        /// <param name="headers">Optional HTTP headers to add to the request</param>
         /// <typeparam name="TResult">Target response type after parsing.</typeparam>
         /// <returns>A Response object containing the operation status and parsed data if the operation was successful.</returns>
         public static async Task<Response<TResult>> GetJsonAsync<TResult>(this HttpClient httpClient, string queryUrl, RateLimiter rateLimiter = null, Dictionary<string, string> headers = null)

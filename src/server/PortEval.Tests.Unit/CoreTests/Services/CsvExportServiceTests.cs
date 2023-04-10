@@ -1,13 +1,13 @@
-﻿using AutoFixture;
-using AutoFixture.AutoMoq;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using AutoFixture;
+using AutoFixture.AutoMoq;
 using PortEval.Application.Core.Services;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.Services
+namespace PortEval.Tests.Unit.CoreTests.Services
 {
     internal class CsvConversionTestType
     {
@@ -29,7 +29,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
 
             var convertedBytes = sut.ConvertToCsv(Enumerable.Empty<CsvConversionTestType>());
 
-            var bytesAsString = Encoding.Default.GetString(convertedBytes);
+            var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);
             var lines = bytesAsString.Split("\r\n");
             var header = GenerateExpectedHeader();
             Assert.Equal(header, lines[0]);
@@ -44,7 +44,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
-            var bytesAsString = Encoding.Default.GetString(convertedBytes);
+            var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);
             var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(7, lines.Length);
@@ -59,7 +59,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
-            var bytesAsString = Encoding.Default.GetString(convertedBytes);
+            var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);
             var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(5, lines[0].Split(",").Length);
@@ -74,7 +74,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
-            var bytesAsString = Encoding.Default.GetString(convertedBytes);
+            var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);
             var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(rows.First().FirstColumn, lines[1].Split(",")[0]);
@@ -89,7 +89,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
-            var bytesAsString = Encoding.Default.GetString(convertedBytes);
+            var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);
             var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(rows.First().ThirdColumn.ToString(), lines[1].Split(",")[2]);
@@ -104,7 +104,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
-            var bytesAsString = Encoding.Default.GetString(convertedBytes);
+            var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);
             var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(rows.First().FourthColumn.ToString(CultureInfo.CurrentCulture), lines[1].Split(",")[3]);
@@ -120,7 +120,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Services
             var sut = fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
-            var bytesAsString = Encoding.Default.GetString(convertedBytes);
+            var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);
             var lines = bytesAsString.Split("\r\n");
 
             Assert.Equal(

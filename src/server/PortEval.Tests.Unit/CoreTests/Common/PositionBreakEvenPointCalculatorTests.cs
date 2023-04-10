@@ -1,11 +1,11 @@
-﻿using AutoFixture;
+﻿using System.Linq;
+using AutoFixture;
 using AutoFixture.AutoMoq;
-using PortEval.Application.Models.DTOs;
-using System.Linq;
 using PortEval.Application.Core.Common.Calculators;
+using PortEval.Application.Models.DTOs;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.Common
+namespace PortEval.Tests.Unit.CoreTests.Common
 {
     public class PositionBreakEvenPointCalculatorTests
     {

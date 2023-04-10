@@ -15,9 +15,6 @@ namespace PortEval.Application.Core.Interfaces.Queries
         Task<CurrencyExchangeRateDto> GetCurrencyExchangeRateAsync(string currencyFrom, string currencyTo,
             DateTime time);
 
-        Task<IEnumerable<CurrencyDto>> GetExchangeableCurrenciesAsync(string baseCurrencyCode,
-            DateTime time);
-
         Task<IEnumerable<CurrencyExchangeRateDto>> GetDirectExchangeRatesAsync(string currencyCode,
             DateTime time);
 

@@ -55,27 +55,25 @@ namespace PortEval.Tests.Integration.QueryTests
         [Fact]
         public async Task GetCharts_ReturnsAllChartsFromDb()
         {
-            var queryResult = await _chartQueries.GetCharts();
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsTestPortfolioChart, AssertIsTestPositionInstrumentChart);
+            var queryResult = await _chartQueries.GetChartsAsync();
+            
+            Assert.Collection(queryResult, AssertIsTestPortfolioChart, AssertIsTestPositionInstrumentChart);
         }
 
         [Fact]
         public async Task GetChart_ReturnsCorrectChart_WhenChartExists()
         {
-            var queryResult = await _chartQueries.GetChart(_portfolioChartId);
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            AssertIsTestPortfolioChart(queryResult.Response);
+            var queryResult = await _chartQueries.GetChartAsync(_portfolioChartId);
+            
+            AssertIsTestPortfolioChart(queryResult);
         }
 
         [Fact]
-        public async Task GetChart_ReturnsNotFound_WhenChartDoesNotExist()
+        public async Task GetChart_ReturnsNull_WhenChartDoesNotExist()
         {
-            var queryResult = await _chartQueries.GetChart(-1);
+            var queryResult = await _chartQueries.GetChartAsync(-1);
 
-            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
+            Assert.Null(queryResult);
         }
 
         private void AssertIsTestPortfolioChart(ChartDto c)

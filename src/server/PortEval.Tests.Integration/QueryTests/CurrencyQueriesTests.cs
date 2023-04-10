@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 using PortEval.Application.Core.Interfaces.Queries;
-using Xunit;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using PortEval.Application.Core;
+using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
@@ -18,35 +20,78 @@ namespace PortEval.Tests.Integration.QueryTests
         }
 
         [Fact]
-        public async Task GetAllCurrencies_ReturnsKeyCurrenciesFromDb()
+        public async Task GetAllCurrenciesAsync_ReturnsKeyCurrenciesFromDb()
         {
-            var queryResult = await _currencyQueries.GetAllCurrencies();
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Contains(queryResult.Response, c => c.Code == "USD" && c.Name == "United States dollar" && c.Symbol == "US$");
-            Assert.Contains(queryResult.Response, c => c.Code == "EUR" && c.Name == "European Euro" && c.Symbol == "€");
-            Assert.Contains(queryResult.Response, c => c.Code == "CZK" && c.Name == "Czech koruna" && c.Symbol == "Kč");
+            var queryResult = await _currencyQueries.GetAllCurrenciesAsync();
+            
+            Assert.Contains(queryResult, c => c.Code == "USD" && c.Name == "United States dollar" && c.Symbol == "US$");
+            Assert.Contains(queryResult, c => c.Code == "EUR" && c.Name == "European Euro" && c.Symbol == "€");
+            Assert.Contains(queryResult, c => c.Code == "CZK" && c.Name == "Czech koruna" && c.Symbol == "Kč");
         }
 
         [Fact]
-        public async Task GetCurrency_ReturnsCurrencyFromDb()
+        public async Task GetCurrencyAsync_ReturnsCurrencyFromDb()
         {
-            var queryResult = await _currencyQueries.GetCurrency("USD");
-
-            Assert.Equal(OperationStatus.Ok, queryResult.Status);
-            Assert.Equal("USD", queryResult.Response.Code);
-            Assert.Equal("United States dollar", queryResult.Response.Name);
-            Assert.Equal("US$", queryResult.Response.Symbol);
-            Assert.True(queryResult.Response.IsDefault);
+            var queryResult = await _currencyQueries.GetCurrencyAsync("USD");
+            
+            Assert.Equal("USD", queryResult.Code);
+            Assert.Equal("United States dollar", queryResult.Name);
+            Assert.Equal("US$", queryResult.Symbol);
+            Assert.True(queryResult.IsDefault);
         }
 
         [Fact]
-        public async Task GetCurrency_ReturnsNotFound_WhenCurrencyDoesNotExist()
+        public async Task GetCurrencyAsync_ReturnsNull_WhenCurrencyDoesNotExist()
         {
-            var queryResult = await _currencyQueries.GetCurrency("AAA");
+            var queryResult = await _currencyQueries.GetCurrencyAsync("AAA");
 
-            Assert.Equal(OperationStatus.NotFound, queryResult.Status);
-            Assert.Null(queryResult.Response);
+            Assert.Null(queryResult);
+        }
+
+        [Fact]
+        public async Task GetExchangeRates_ReturnsCorrectExchangeRatesFromDb()
+        {
+            var result = await _currencyQueries.GetDirectExchangeRatesAsync("USD", DateTime.UtcNow);
+
+            var rates = result.ToList();
+            
+            Assert.Collection(rates,
+                r =>
+                {
+                    Assert.Equal("USD", r.CurrencyFromCode);
+                    Assert.Equal("CZK", r.CurrencyToCode);
+                    Assert.Equal(25m, r.ExchangeRate);
+                    Assert.Equal(DateTime.UtcNow, r.Time, TimeSpan.FromHours(1));
+                },
+                r =>
+                {
+                    Assert.Equal("USD", r.CurrencyFromCode);
+                    Assert.Equal("EUR", r.CurrencyToCode);
+                    Assert.Equal(1.01m, r.ExchangeRate);
+                    Assert.Equal(DateTime.UtcNow, r.Time, TimeSpan.FromHours(1));
+                }
+            );
+        }
+
+        [Fact]
+        public async Task GetExchangeRateAt_ReturnsCorrectExchangeRateAtSpecifiedTime()
+        {
+            var result =
+                await _currencyQueries.GetCurrencyExchangeRateAsync("USD", "EUR",
+                    DateTime.UtcNow.AddHours(1).AddDays(-1));
+            
+            Assert.Equal("USD", result.CurrencyFromCode);
+            Assert.Equal("EUR", result.CurrencyToCode);
+            Assert.Equal(1.00m, result.ExchangeRate);
+            Assert.Equal(DateTime.UtcNow.AddDays(-1), result.Time, TimeSpan.FromHours(2));
+        }
+
+        [Fact]
+        public async Task GetExchangeRateAt_ReturnsNull_WhenCurrencyIsNotFound()
+        {
+            var result = await _currencyQueries.GetCurrencyExchangeRateAsync("AAA", "USD", DateTime.UtcNow);
+            
+            Assert.Null(result);
         }
     }
 }

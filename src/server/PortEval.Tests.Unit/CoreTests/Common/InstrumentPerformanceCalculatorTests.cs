@@ -2,7 +2,7 @@
 using PortEval.Application.Core.Common.Calculators;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.Common
+namespace PortEval.Tests.Unit.CoreTests.Common
 {
     public class InstrumentPerformanceCalculatorTests
     {

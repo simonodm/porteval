@@ -1,15 +1,16 @@
-﻿using AutoFixture;
-using AutoFixture.AutoMoq;
-using Moq;
-using PortEval.Application.Models.DTOs;
-using PortEval.Tests.Unit.Helpers.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Xunit;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using Moq;
 using PortEval.Application.Core.Common.BulkImportExport;
+using PortEval.Application.Core.Interfaces.Services;
+using PortEval.Application.Models.DTOs;
+using PortEval.Tests.Unit.Helpers.Extensions;
+using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
+namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
 {
     public class PositionImportProcessorTests
     {
@@ -23,7 +24,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
                 .With(p => p.Id, 0)
                 .With(p => p.Time, DateTime.UtcNow)
                 .Create();
-            var positionService = fixture.CreateDefaultPositionServiceMock();
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
             var sut = fixture.Create<PositionImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<PositionDto> { position });
@@ -47,7 +48,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var position = fixture.Build<PositionDto>()
                 .With(p => p.Time, DateTime.UtcNow)
                 .Create();
-            var positionService = fixture.CreateDefaultPositionServiceMock();
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
             var sut = fixture.Create<PositionImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<PositionDto> { position });
@@ -71,7 +72,7 @@ namespace PortEval.Tests.Unit.FeatureTests.BulkImportExport
             var position = fixture.Build<PositionDto>()
                 .With(p => p.InstrumentId, 0)
                 .Create();
-            var positionService = fixture.CreateDefaultPositionServiceMock();
+            var positionService = fixture.Freeze<Mock<IPositionService>>();
             var sut = fixture.Create<PositionImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<PositionDto> { position });

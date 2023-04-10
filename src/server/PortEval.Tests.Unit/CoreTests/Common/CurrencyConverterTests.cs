@@ -1,13 +1,13 @@
-﻿using AutoFixture;
+﻿using System;
+using System.Collections.Generic;
+using AutoFixture;
 using AutoFixture.AutoMoq;
+using PortEval.Application.Core.Common;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using PortEval.Application.Core.Common;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.Common
+namespace PortEval.Tests.Unit.CoreTests.Common
 {
     public class CurrencyConverterTests
     {

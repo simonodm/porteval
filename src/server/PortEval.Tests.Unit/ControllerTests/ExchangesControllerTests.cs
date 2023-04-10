@@ -2,10 +2,10 @@
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Controllers;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Tests.Unit.Helpers;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests
@@ -20,16 +20,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var exchanges = fixture.CreateMany<ExchangeDto>();
 
-            var exchangeQueries = fixture.Freeze<Mock<IExchangeQueries>>();
-            exchangeQueries
-                .Setup(m => m.GetKnownExchanges())
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(exchanges));
+            var instrumentService = fixture.Freeze<Mock<IInstrumentService>>();
+            instrumentService
+                .Setup(m => m.GetKnownExchangesAsync())
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(exchanges));
 
             var sut = fixture.Build<ExchangesController>().OmitAutoProperties().Create();
 
             var result = await sut.GetKnownExchanges();
 
-            exchangeQueries.Verify(m => m.GetKnownExchanges(), Times.Once());
+            instrumentService.Verify(m => m.GetKnownExchangesAsync(), Times.Once());
             Assert.Equal(exchanges, result.Value);
         }
     }

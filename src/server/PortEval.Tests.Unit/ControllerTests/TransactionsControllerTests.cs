@@ -3,14 +3,12 @@ using AutoFixture.AutoMoq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PortEval.Application.Controllers;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Interfaces.Services;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests
@@ -27,16 +25,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var dateRange = fixture.Create<DateRangeParams>();
             var transactions = fixture.CreateMany<TransactionDto>();
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
-            transactionQueries
-                .Setup(m => m.GetTransactions(filters, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(transactions));
+            var transactionService = fixture.Freeze<Mock<ITransactionService>>();
+            transactionService
+                .Setup(m => m.GetTransactionsAsync(filters, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(transactions));
 
             var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetTransactions(filters, dateRange);
 
-            transactionQueries.Verify(m => m.GetTransactions(filters, dateRange));
+            transactionService.Verify(m => m.GetTransactionsAsync(filters, dateRange));
             Assert.Equal(transactions, result.Value);
         }
 
@@ -50,16 +48,16 @@ namespace PortEval.Tests.Unit.ControllerTests
             var filters = fixture.Create<TransactionFilters>();
             var dateRange = fixture.Create<DateRangeParams>();
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
-            transactionQueries
-                .Setup(m => m.GetTransactions(filters, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<TransactionDto>>());
+            var transactionService = fixture.Freeze<Mock<ITransactionService>>();
+            transactionService
+                .Setup(m => m.GetTransactionsAsync(filters, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<TransactionDto>>());
 
             var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetTransactions(filters, dateRange);
 
-            transactionQueries.Verify(m => m.GetTransactions(filters, dateRange));
+            transactionService.Verify(m => m.GetTransactionsAsync(filters, dateRange));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -71,16 +69,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var transaction = fixture.Create<TransactionDto>();
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
-            transactionQueries
-                .Setup(m => m.GetTransaction(transaction.Id))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(transaction));
+            var transactionService = fixture.Freeze<Mock<ITransactionService>>();
+            transactionService
+                .Setup(m => m.GetTransactionAsync(transaction.Id))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(transaction));
 
             var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetTransaction(transaction.Id);
 
-            transactionQueries.Verify(m => m.GetTransaction(transaction.Id));
+            transactionService.Verify(m => m.GetTransactionAsync(transaction.Id));
             Assert.Equal(transaction, result.Value);
         }
 
@@ -92,16 +90,16 @@ namespace PortEval.Tests.Unit.ControllerTests
 
             var transactionId = fixture.Create<int>();
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
-            transactionQueries
-                .Setup(m => m.GetTransaction(transactionId))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<TransactionDto>());
+            var transactionService = fixture.Freeze<Mock<ITransactionService>>();
+            transactionService
+                .Setup(m => m.GetTransactionAsync(transactionId))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<TransactionDto>());
 
             var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetTransaction(transactionId);
 
-            transactionQueries.Verify(m => m.GetTransaction(transactionId));
+            transactionService.Verify(m => m.GetTransactionAsync(transactionId));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
@@ -116,7 +114,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var transactionService = fixture.Freeze<Mock<ITransactionService>>();
             transactionService
                 .Setup(m => m.AddTransactionAsync(transaction))
-                .ReturnsAsync(fixture.Create<Transaction>());
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(transaction));
 
             var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
@@ -134,6 +132,9 @@ namespace PortEval.Tests.Unit.ControllerTests
             var transaction = fixture.Create<TransactionDto>();
 
             var transactionService = fixture.Freeze<Mock<ITransactionService>>();
+            transactionService
+                .Setup(m => m.UpdateTransactionAsync(transaction))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(transaction));
 
             var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
@@ -157,7 +158,7 @@ namespace PortEval.Tests.Unit.ControllerTests
             var result = await sut.PutTransaction(transaction.Id + 1, transaction);
 
             transactionService.Verify(m => m.UpdateTransactionAsync(transaction), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
         }
 
         [Fact]
@@ -169,6 +170,9 @@ namespace PortEval.Tests.Unit.ControllerTests
             var transactionId = fixture.Create<int>();
 
             var transactionService = fixture.Freeze<Mock<ITransactionService>>();
+            transactionService
+                .Setup(m => m.DeleteTransactionAsync(transactionId))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse());
 
             var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
