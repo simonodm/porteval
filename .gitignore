@@ -98,4 +98,5 @@ app/**/docs/
 *.xmpi
 *.lot
 *.out
-*.pdf
+
+thesis.pdf
