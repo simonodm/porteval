@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Services
@@ -43,7 +44,7 @@ namespace PortEval.Application.Core.Services
 
             return new OperationResponse<IEnumerable<CsvTemplateImportDto>>
             {
-                Response = imports
+                Response = imports.Select(AssignErrorLogUrl)
             };
         }
 
@@ -56,7 +57,7 @@ namespace PortEval.Application.Core.Services
             {
                 Status = import != null ? OperationStatus.Ok : OperationStatus.NotFound,
                 Message = import != null ? "" : $"Import {id} does not exist.",
-                Response = import
+                Response = import != null ? AssignErrorLogUrl(import) : null
             };
         }
 
@@ -148,6 +149,16 @@ namespace PortEval.Application.Core.Services
             await _importRepository.UnitOfWork.CommitAsync();
 
             return importEntry;
+        }
+
+        private CsvTemplateImportDto AssignErrorLogUrl(CsvTemplateImportDto importDto)
+        {
+            if (importDto.ErrorLogAvailable)
+            {
+                importDto.ErrorLogUrl = $"/imports/{importDto.ImportId}/log";
+            }
+
+            return importDto;
         }
     }
 }

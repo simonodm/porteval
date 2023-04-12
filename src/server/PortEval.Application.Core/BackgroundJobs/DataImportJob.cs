@@ -66,7 +66,7 @@ namespace PortEval.Application.Core.BackgroundJobs
 
             try
             {
-                using var fs = _fileSystem.FileStream.Create(inputFileName, FileMode.Open);
+                using var fs = _fileSystem.File.OpenRead(inputFileName);
                 using var reader = new StreamReader(fs);
                 using var csv = new CsvReader(reader, _csvConfig);
                 csv.RegisterImportClassMaps();
@@ -140,7 +140,7 @@ namespace PortEval.Application.Core.BackgroundJobs
 
         private void SaveErrorLog<T>(IEnumerable<ProcessedRowErrorLogEntry<T>> processedErrorLog, IEnumerable<RawRowErrorLogEntry> parsingErrorLog, string filename)
         {
-            using var fs = _fileSystem.FileStream.Create(filename, FileMode.Create);
+            using var fs = _fileSystem.File.OpenWrite(filename);
             using var sw = new StreamWriter(fs);
             using var csv = new CsvWriter(sw, _csvConfig);
             csv.RegisterImportClassMaps();

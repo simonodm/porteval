@@ -18,7 +18,7 @@ namespace PortEval.Application.Core.Common.BulkImportExport
         {
             var logEntry = new ProcessedRowErrorLogEntry<InstrumentPriceDto>(row);
             var existingPrice = await _priceService.GetInstrumentPriceAsync(row.InstrumentId, row.Time);
-            if (existingPrice.Status == OperationStatus.NotFound)
+            if (existingPrice.Status == OperationStatus.NotFound || existingPrice.Response.Time != row.Time)
             {
                 var newPrice = await _priceService.AddPricePointAsync(row);
                 if (newPrice.Status != OperationStatus.Ok)
@@ -27,6 +27,10 @@ namespace PortEval.Application.Core.Common.BulkImportExport
                 }
 
                 logEntry.Data.Id = newPrice.Response?.Id ?? default;
+            }
+            else
+            {
+                logEntry.AddError("Price already exists.");
             }
 
             return logEntry;
