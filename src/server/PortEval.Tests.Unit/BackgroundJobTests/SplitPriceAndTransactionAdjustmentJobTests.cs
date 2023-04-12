@@ -35,7 +35,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 new InstrumentSplit(1, 1, DateTime.UtcNow, new SplitRatio(1, 5))
             };
 
-            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
+            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
             splitRepository
                 .Setup(r => r.ListNonProcessedSplitsAsync())
                 .ReturnsAsync(splits);
@@ -45,7 +45,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             splitRepository
                 .Setup(r => r.Update(It.IsAny<InstrumentSplit>()))
                 .Returns<InstrumentSplit>(s => s);
-            var priceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
                 .Setup(m => m.ListInstrumentPricesAsync(It.IsAny<int>()))
                 .ReturnsAsync(prices);
@@ -85,7 +85,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 new InstrumentSplit(1, 1, DateTime.UtcNow, new SplitRatio(1, 5))
             };
 
-            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
+            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
             splitRepository
                 .Setup(r => r.ListNonProcessedSplitsAsync())
                 .ReturnsAsync(splits);
@@ -95,7 +95,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             splitRepository
                 .Setup(r => r.Update(It.IsAny<InstrumentSplit>()))
                 .Returns<InstrumentSplit>(s => s);
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(r => r.ListAllInstrumentPositionsAsync(1))
                 .ReturnsAsync(new[] { position });
@@ -130,7 +130,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 new InstrumentSplit(1, 1, DateTime.UtcNow, new SplitRatio(1, 5))
             };
 
-            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
+            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
             splitRepository
                 .Setup(r => r.ListNonProcessedSplitsAsync())
                 .ReturnsAsync(splits);
@@ -140,7 +140,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             splitRepository
                 .Setup(r => r.Update(It.IsAny<InstrumentSplit>()))
                 .Returns<InstrumentSplit>(s => s);
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(r => r.ListAllInstrumentPositionsAsync(1))
                 .ReturnsAsync(new[] { position });
@@ -180,7 +180,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 split
             };
 
-            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
+            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
             splitRepository
                 .Setup(r => r.ListRollbackRequestedSplitsAsync())
                 .ReturnsAsync(splits);
@@ -190,7 +190,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             splitRepository
                 .Setup(r => r.Update(It.IsAny<InstrumentSplit>()))
                 .Returns<InstrumentSplit>(s => s);
-            var priceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
                 .Setup(m => m.ListInstrumentPricesAsync(It.IsAny<int>()))
                 .ReturnsAsync(prices);
@@ -233,7 +233,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 split
             };
 
-            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
+            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
             splitRepository
                 .Setup(r => r.ListRollbackRequestedSplitsAsync())
                 .ReturnsAsync(splits);
@@ -243,7 +243,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             splitRepository
                 .Setup(r => r.Update(It.IsAny<InstrumentSplit>()))
                 .Returns<InstrumentSplit>(s => s);
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(r => r.ListAllInstrumentPositionsAsync(1))
                 .ReturnsAsync(new[] { position });
@@ -281,7 +281,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 split
             };
 
-            var splitRepository = fixture.Freeze<Mock<IInstrumentSplitRepository>>();
+            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
             splitRepository
                 .Setup(r => r.ListRollbackRequestedSplitsAsync())
                 .ReturnsAsync(splits);
@@ -291,7 +291,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             splitRepository
                 .Setup(r => r.Update(It.IsAny<InstrumentSplit>()))
                 .Returns<InstrumentSplit>(s => s);
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(r => r.ListAllInstrumentPositionsAsync(1))
                 .ReturnsAsync(new[] { position });

@@ -34,7 +34,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var positions = fixture.CreateMany<PositionDto>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetAllPositionsAsync())
                 .ReturnsAsync(positions);
@@ -55,7 +55,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var portfolioId = fixture.Create<int>();
             var positions = fixture.CreateMany<PositionDto>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPortfolioPositionsAsync(portfolioId))
                 .ReturnsAsync(positions);
@@ -75,7 +75,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var portfolioId = fixture.Create<int>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPortfolioPositionsAsync(portfolioId))
                 .ReturnsAsync((PositionDto[]) null);
@@ -95,7 +95,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var positionId = fixture.Create<int>();
             var position = fixture.Create<PositionDto>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(positionId))
                 .ReturnsAsync(position);
@@ -115,7 +115,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var positionId = fixture.Create<int>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(positionId))
                 .ReturnsAsync((PositionDto) null);
@@ -154,7 +154,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
                 .ReturnsAsync((PositionDto) null);
@@ -194,7 +194,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
                 .ReturnsAsync((PositionDto) null);
@@ -234,7 +234,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
                 .ReturnsAsync((PositionDto) null);
@@ -273,7 +273,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
                 .ReturnsAsync((PositionDto) null);
@@ -311,7 +311,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
                 .ReturnsAsync((PositionDto) null);
@@ -349,7 +349,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
                 .ReturnsAsync((PositionDto) null);
@@ -387,7 +387,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
                 .ReturnsAsync((PositionDto) null);
@@ -425,7 +425,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
                 .ReturnsAsync((PositionDto) null);
@@ -463,7 +463,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
                 .ReturnsAsync((PositionDto) null);
@@ -483,7 +483,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var positions = fixture.CreateMany<PositionDto>(2);
             var statistics = fixture.Create<PositionStatisticsDto>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries  
                 .Setup(m => m.GetPortfolioPositionsAsync(It.IsAny<int>()))
                 .ReturnsAsync(positions);
@@ -506,7 +506,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
                 .ReturnsAsync((PortfolioDto) null);
@@ -526,7 +526,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var position = fixture.Create<PositionDto>();
             var statistics = fixture.Create<PositionStatisticsDto>();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
                 .ReturnsAsync(position);
@@ -549,7 +549,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
                 .ReturnsAsync((PositionDto) null);
@@ -568,9 +568,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var position = fixture.Create<PositionDto>();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
-            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.Freeze<Mock<IInstrumentPriceService>>();
 
             var sut = fixture.Create<PositionService>();
@@ -596,15 +596,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var position = fixture.Create<PositionDto>();
 
-            var portfolioRepository = fixture.Freeze<Mock<IPortfolioRepository>>();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
                 .Setup(r => r.ExistsAsync(position.PortfolioId))
                 .Returns(Task.FromResult(false));
             portfolioRepository
                 .Setup(r => r.FindAsync(position.PortfolioId))
                 .Returns(Task.FromResult<Portfolio>(null));
-            fixture.Freeze<Mock<IPositionRepository>>();
-            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultPositionRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.Freeze<Mock<IInstrumentPriceService>>();
 
             var sut = fixture.Create<PositionService>();
@@ -620,9 +620,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var position = fixture.Create<PositionDto>();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<IPositionRepository>>();
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultPositionRepositoryMock();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(r => r.ExistsAsync(position.InstrumentId))
                 .Returns(Task.FromResult(false));
@@ -644,9 +644,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var position = fixture.Create<PositionDto>();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<IPositionRepository>>();
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultPositionRepositoryMock();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(r => r.FindAsync(position.InstrumentId))
                 .Returns(Task.FromResult(
@@ -674,9 +674,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var position = fixture.Build<PositionDto>().With(p => p.Amount, (decimal?)null).Create();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<IPositionRepository>>();
-            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultPositionRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.Freeze<Mock<IInstrumentPriceService>>();
 
             var sut = fixture.Create<PositionService>();
@@ -692,9 +692,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var position = fixture.Build<PositionDto>().With(p => p.Amount, 0).Create();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<IPositionRepository>>();
-            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultPositionRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.Freeze<Mock<IInstrumentPriceService>>();
 
             var sut = fixture.Create<PositionService>();
@@ -710,9 +710,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var position = fixture.Build<PositionDto>().With(p => p.Price, (decimal?)null).Create();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<IPositionRepository>>();
-            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultPositionRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.Freeze<Mock<IInstrumentPriceService>>();
 
             var sut = fixture.Create<PositionService>();
@@ -728,9 +728,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var position = fixture.Build<PositionDto>().With(p => p.Price, 0).Create();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<IPositionRepository>>();
-            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultPositionRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.Freeze<Mock<IInstrumentPriceService>>();
 
             var sut = fixture.Create<PositionService>();
@@ -746,9 +746,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var position = fixture.Build<PositionDto>().With(p => p.Time, (DateTime?)null).Create();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<IPositionRepository>>();
-            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultPositionRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.Freeze<Mock<IInstrumentPriceService>>();
 
             var sut = fixture.Create<PositionService>();
@@ -765,9 +765,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var position = fixture.Build<PositionDto>()
                 .With(p => p.Time, PortEvalConstants.FinancialDataStartTime.AddDays(-1)).Create();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<IPositionRepository>>();
-            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultPositionRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.Freeze<Mock<IInstrumentPriceService>>();
 
             var sut = fixture.Create<PositionService>();
@@ -783,9 +783,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var position = fixture.Create<PositionDto>();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
-            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.Freeze<Mock<IInstrumentPriceService>>();
 
             var sut = fixture.Create<PositionService>();
@@ -803,15 +803,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var position = fixture.Create<PositionDto>();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(r => r.FindAsync(position.Id))
                 .Returns(Task.FromResult<Position>(null));
             positionRepository
                 .Setup(r => r.ExistsAsync(position.Id))
                 .Returns(Task.FromResult(false));
-            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.Freeze<Mock<IInstrumentPriceService>>();
 
             var sut = fixture.Create<PositionService>();
@@ -827,9 +827,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var positionId = fixture.Create<int>();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
-            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.Freeze<Mock<IInstrumentPriceService>>();
 
             var sut = fixture.Create<PositionService>();
@@ -847,15 +847,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var positionId = fixture.Create<int>();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(r => r.ExistsAsync(positionId))
                 .Returns(Task.FromResult(false));
             positionRepository
                 .Setup(r => r.FindAsync(positionId))
                 .Returns(Task.FromResult<Position>(null));
-            fixture.Freeze<Mock<IInstrumentRepository>>();
+            fixture.CreateDefaultInstrumentRepositoryMock();
             fixture.Freeze<Mock<IInstrumentPriceService>>();
 
             var sut = fixture.Create<PositionService>();

@@ -7,6 +7,7 @@ using PortEval.Domain.Models.ValueObjects;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Domain.Exceptions;
 
 namespace PortEval.Application.Core.Services
 {
@@ -79,19 +80,32 @@ namespace PortEval.Application.Core.Services
         private async Task<OperationResponse<List<DashboardItem>>> GenerateItemEntities(IEnumerable<DashboardItemDto> items)
         {
             var result = new List<DashboardItem>();
-            foreach (var item in items)
+            try
             {
-                var chart = await _chartRepository.FindAsync(item.ChartId);
-                if (chart == null)
+                foreach (var item in items)
                 {
-                    return new OperationResponse<List<DashboardItem>>
+                    var chart = await _chartRepository.FindAsync(item.ChartId);
+                    if (chart == null)
                     {
-                        Status = OperationStatus.Error,
-                        Message = $"Chart {item.ChartId} does not exist."
-                    };
+                        return new OperationResponse<List<DashboardItem>>
+                        {
+                            Status = OperationStatus.Error,
+                            Message = $"Chart {item.ChartId} does not exist."
+                        };
+                    }
+
+                    var position = new DashboardPosition(item.DashboardPositionX, item.DashboardPositionY,
+                        item.DashboardWidth, item.DashboardHeight);
+                    result.Add(DashboardChartItem.Create(chart, position));
                 }
-                var position = new DashboardPosition(item.DashboardPositionX, item.DashboardPositionY, item.DashboardWidth, item.DashboardHeight);
-                result.Add(DashboardChartItem.Create(chart, position));
+            }
+            catch (PortEvalException ex)
+            {
+                return new OperationResponse<List<DashboardItem>>
+                {
+                    Status = OperationStatus.Error,
+                    Message = ex.Message
+                };
             }
 
             return new OperationResponse<List<DashboardItem>>

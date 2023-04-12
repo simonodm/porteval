@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using PortEval.Application.Core.BackgroundJobs;
 using PortEval.Application.Core.Interfaces.Repositories;
+using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
 
 namespace PortEval.Tests.Unit.BackgroundJobTests
@@ -35,12 +36,12 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 new InstrumentPrice(5, baseTime.AddDays(-7), baseTime, 100, 1)
             };
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(instruments);
 
-            var priceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
                 .Setup(m => m.ListInstrumentPricesAsync(instruments[0].Id))
                 .ReturnsAsync(prices);
@@ -78,12 +79,12 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 new InstrumentPrice(6, baseTime.AddDays(-5), baseTime, 100, 1)
             };
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(instruments);
 
-            var priceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
                 .Setup(m => m.ListInstrumentPricesAsync(instruments[0].Id))
                 .ReturnsAsync(prices);
@@ -123,12 +124,12 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 new InstrumentPrice(7, baseTime.AddHours(-23).AddMinutes(-5), baseTime, 100, 1)
             };
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(instruments);
 
-            var priceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
                 .Setup(m => m.ListInstrumentPricesAsync(instruments[0].Id))
                 .ReturnsAsync(prices);

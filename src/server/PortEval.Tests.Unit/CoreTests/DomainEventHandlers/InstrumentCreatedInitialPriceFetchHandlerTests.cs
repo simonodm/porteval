@@ -28,7 +28,7 @@ namespace PortEval.Tests.Unit.CoreTests.DomainEventHandlers
             var domainEvent = fixture.Create<InstrumentCreatedDomainEvent>();
             var domainEventAdapter = new DomainEventNotificationAdapter<InstrumentCreatedDomainEvent>(domainEvent);
             var backgroundJobClient = fixture.Freeze<Mock<IBackgroundJobClient>>();
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.Update(It.IsAny<Instrument>()))
                 .Returns<Instrument>(i => i);

@@ -24,7 +24,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var currencies = fixture.CreateMany<CurrencyDto>();
 
-            var currencyQueriesMock = fixture.Freeze<Mock<ICurrencyQueries>>();
+            var currencyQueriesMock = fixture.CreateDefaultCurrencyQueriesMock();
             currencyQueriesMock
                 .Setup(m => m.GetAllCurrenciesAsync())
                 .ReturnsAsync(currencies);
@@ -45,7 +45,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var currency = fixture.Create<CurrencyDto>();
 
-            var currencyQueriesMock = fixture.Freeze<Mock<ICurrencyQueries>>();
+            var currencyQueriesMock = fixture.CreateDefaultCurrencyQueriesMock();
             currencyQueriesMock
                 .Setup(m => m.GetCurrencyAsync(currency.Code))
                 .ReturnsAsync(currency);
@@ -64,7 +64,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var currencyQueriesMock = fixture.Freeze<Mock<ICurrencyQueries>>();
+            var currencyQueriesMock = fixture.CreateDefaultCurrencyQueriesMock();
             currencyQueriesMock
                 .Setup(m => m.GetCurrencyAsync(It.IsAny<string>()))
                 .ReturnsAsync((CurrencyDto)null);
@@ -87,7 +87,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var defaultCurrency = new Currency(fixture.Create<string>(), fixture.Create<string>(),
                 fixture.Create<string>(), true);
 
-            var currencyRepository = fixture.Freeze<Mock<ICurrencyRepository>>();
+            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
                 .Setup(r => r.FindAsync(currencyDto.Code))
                 .ReturnsAsync(currency);

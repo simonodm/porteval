@@ -17,6 +17,7 @@ using PortEval.Application.Core.Interfaces;
 using PortEval.Application.Core.Interfaces.Repositories;
 using Xunit;
 using PortEval.Application.Core.Common.BulkImportExport;
+using PortEval.Tests.Unit.Helpers.Extensions;
 
 namespace PortEval.Tests.Unit.BackgroundJobTests
 {
@@ -40,7 +41,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note\n,ABC,USD,TestNote"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
@@ -71,7 +72,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note\n,ABC,USD,TestNote"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
@@ -106,7 +107,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Position ID,Instrument ID,Portfolio ID,Note,Time,Amount,Price\n,1,1,TestNote,2022-01-01,5,100"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
@@ -143,7 +144,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Transaction ID,Position ID,Price,Amount,Time\n,1,100,-1,2005-04-12 14:59"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
@@ -180,7 +181,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Instrument ID,Symbol,Name,Exchange,Type,Currency,Note\n1,AAPL,Apple Inc.,NASDAQ,stock,USD,TestNote"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
@@ -218,7 +219,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Price ID,Instrument ID,Price,Time\n0,14,39.99,2020-02-29"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
@@ -255,7 +256,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
@@ -297,7 +298,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
@@ -337,7 +338,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note\n,abc,,"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
@@ -372,7 +373,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID;Note"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
@@ -405,7 +406,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
@@ -441,7 +442,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             var fileSystem = fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);

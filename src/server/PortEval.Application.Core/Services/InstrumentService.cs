@@ -314,7 +314,7 @@ namespace PortEval.Application.Core.Services
             {
                 return new OperationResponse<InstrumentDto>
                 {
-                    Status = OperationStatus.NotFound,
+                    Status = OperationStatus.Error,
                     Message = $"Currency {options.CurrencyCode} does not exist."
                 };
             }

@@ -198,6 +198,7 @@ namespace PortEval.Application.Extensions
         /// <param name="services">ASP.NET service IoC container.</param>
         public static void ConfigureDapper(this IServiceCollection services)
         {
+            services.AddScoped<PortEvalDbConnectionCreator>();
             Dapper.SqlMapper.AddTypeHandler(new ColorHandler());
             Dapper.SqlMapper.AddTypeMap(typeof(DateTime), DbType.DateTime2);
         }

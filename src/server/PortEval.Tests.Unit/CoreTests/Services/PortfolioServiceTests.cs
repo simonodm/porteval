@@ -31,7 +31,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var portfolios = fixture.CreateMany<PortfolioDto>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(q => q.GetAllPortfoliosAsync())
                 .ReturnsAsync(portfolios);
@@ -50,7 +50,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Customize(new AutoMoqCustomization());
 
             var portfolio = fixture.Create<PortfolioDto>();
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync(portfolio.Id))
                 .ReturnsAsync(portfolio);
@@ -70,7 +70,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var portfolio = fixture.Create<PortfolioDto>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync(portfolio.Id))
                 .ReturnsAsync((PortfolioDto) null);
@@ -109,7 +109,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
                 .ReturnsAsync((PortfolioDto) null);
@@ -149,7 +149,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
                 .ReturnsAsync((PortfolioDto) null);
@@ -189,7 +189,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
                 .ReturnsAsync((PortfolioDto) null);
@@ -226,7 +226,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
                 .ReturnsAsync((PortfolioDto) null);
@@ -263,7 +263,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
                 .ReturnsAsync((PortfolioDto) null);
@@ -300,7 +300,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
                 .ReturnsAsync((PortfolioDto) null);
@@ -337,7 +337,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
                 .ReturnsAsync((PortfolioDto) null);
@@ -374,7 +374,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
                 .ReturnsAsync((PortfolioDto) null);
@@ -394,7 +394,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var portfolios = fixture.CreateMany<PortfolioDto>(2);
             var statisticsDto = fixture.Create<EntityStatisticsDto>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetAllPortfoliosAsync())
                 .ReturnsAsync(portfolios);
@@ -420,7 +420,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var portfolio = fixture.Create<PortfolioDto>();
             var statisticsDto = fixture.Create<EntityStatisticsDto>();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
                 .ReturnsAsync(portfolio);
@@ -445,8 +445,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            var portfolioRepository = fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<ICurrencyRepository>>();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
 
@@ -467,7 +467,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            var currencyRepository = fixture.Freeze<Mock<ICurrencyRepository>>();
+            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
                 .Setup(r => r.ExistsAsync(portfolioDto.CurrencyCode))
                 .Returns(Task.FromResult(false));
@@ -485,8 +485,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<ICurrencyRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
 
@@ -506,8 +506,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            var portfolioRepository = fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<ICurrencyRepository>>();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
 
@@ -528,8 +528,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            var currencyRepository = fixture.Freeze<Mock<ICurrencyRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
                 .Setup(r => r.ExistsAsync(portfolioDto.CurrencyCode))
                 .Returns(Task.FromResult(false));
@@ -548,14 +548,14 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            var portfolioRepository = fixture.Freeze<Mock<IPortfolioRepository>>();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
                 .Setup(r => r.ExistsAsync(portfolioDto.Id))
                 .Returns(Task.FromResult(false));
             portfolioRepository
                 .Setup(r => r.FindAsync(portfolioDto.Id))
                 .Returns(Task.FromResult<Portfolio>(null));
-            fixture.Freeze<Mock<ICurrencyRepository>>();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
             var result = await sut.UpdatePortfolioAsync(portfolioDto);
@@ -571,8 +571,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var portfolioDto = fixture.Create<PortfolioDto>();
 
-            fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<ICurrencyRepository>>();
+            fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
 
@@ -591,8 +591,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var portfolioId = fixture.Create<int>();
 
-            var portfolioRepository = fixture.Freeze<Mock<IPortfolioRepository>>();
-            fixture.Freeze<Mock<ICurrencyRepository>>();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
 
@@ -609,11 +609,11 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var portfolioId = fixture.Create<int>();
 
-            var portfolioRepository = fixture.Freeze<Mock<IPortfolioRepository>>();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
                 .Setup(r => r.ExistsAsync(portfolioId))
                 .Returns(Task.FromResult(false));
-            fixture.Freeze<Mock<ICurrencyRepository>>();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
             var sut = fixture.Create<PortfolioService>();
             var result = await sut.DeletePortfolioAsync(portfolioId);

@@ -30,7 +30,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             
             var prices = fixture.CreateMany<InstrumentPriceDto>();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Instrument(
@@ -46,7 +46,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Setup(m => m.ExistsAsync(It.IsAny<int>()))
                 .ReturnsAsync(true);
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentPricesAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(prices);
@@ -65,20 +65,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Instrument(
-                    id,
-                    fixture.Create<string>(),
-                    fixture.Create<string>(),
-                    fixture.Create<string>(),
-                    fixture.Create<InstrumentType>(),
-                    fixture.Create<string>(),
-                    fixture.Create<string>())
-                );
+                .ReturnsAsync((Instrument)null);
+            instrumentRepository
+                .Setup(m => m.ExistsAsync(It.IsAny<int>()))
+                .ReturnsAsync(false);
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
                 .ReturnsAsync((InstrumentDto)null);
@@ -108,12 +103,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(p => p.Limit, 15)
                 .Create();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.ExistsAsync(It.IsAny<int>()))
                 .ReturnsAsync(true);
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentPricesPageAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), paginationParams, It.IsAny<AggregationFrequency?>()))
                 .ReturnsAsync(pricesToTake);
@@ -148,7 +143,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(p => p.Limit, 15)
                 .Create();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Instrument(
@@ -164,12 +159,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Setup(m => m.ExistsAsync(It.IsAny<int>()))
                 .ReturnsAsync(true);
 
-            var instrumentPriceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            var instrumentPriceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             instrumentPriceRepository
                 .Setup(m => m.Add(It.IsAny<InstrumentPrice>()))
                 .Returns<InstrumentPrice>(p => p);
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentPricesPageCompressedAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), paginationParams, It.IsAny<AggregationFrequency?>()))
                 .ReturnsAsync(pricesToTake);
@@ -195,7 +190,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
                 .ReturnsAsync((InstrumentDto)null);
@@ -215,7 +210,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var price = fixture.Create<InstrumentPriceDto>();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.Add(It.IsAny<Instrument>()))
                 .Returns<Instrument>(i => i);
@@ -233,7 +228,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             instrumentRepository
                 .Setup(m => m.ExistsAsync(It.IsAny<int>()))
                 .ReturnsAsync(true);
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentPriceAsync(It.IsAny<int>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(price);
@@ -252,7 +247,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentPriceAsync(It.IsAny<int>(), It.IsAny<DateTime>()))
                 .ReturnsAsync((InstrumentPriceDto)null);
@@ -272,7 +267,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var priceDto = fixture.Create<InstrumentPriceDto>();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Instrument(
@@ -284,7 +279,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                     fixture.Create<string>(),
                     fixture.Create<string>())
                 );
-            var priceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
                 .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Time))
                 .ReturnsAsync(false);
@@ -311,14 +306,14 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var priceDto = fixture.Create<InstrumentPriceDto>();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(r => r.ExistsAsync(priceDto.InstrumentId))
                 .ReturnsAsync(false);
             instrumentRepository
                 .Setup(r => r.FindAsync(priceDto.InstrumentId))
                 .ReturnsAsync((Instrument)null);
-            fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            fixture.CreateDefaultInstrumentPriceRepositoryMock();
 
             var sut = fixture.Create<InstrumentPriceService>();
 
@@ -334,7 +329,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var priceDto = fixture.Create<InstrumentPriceDto>();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Instrument(
@@ -346,7 +341,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                     fixture.Create<string>(),
                     fixture.Create<string>())
                 );
-            var priceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
                 .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Time))
                 .ReturnsAsync(true);
@@ -371,7 +366,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(p => p.Time, price.Time)
                 .Create();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Instrument(
@@ -383,7 +378,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                     fixture.Create<string>(),
                     fixture.Create<string>())
                 );
-            var priceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
                 .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Id))
                 .ReturnsAsync(true);
@@ -406,7 +401,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var priceDto = fixture.Create<InstrumentPriceDto>();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Instrument(
@@ -418,7 +413,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                     fixture.Create<string>(),
                     fixture.Create<string>())
                 );
-            var priceRepository = fixture.Freeze<Mock<IInstrumentPriceRepository>>();
+            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
             priceRepository
                 .Setup(r => r.ExistsAsync(priceDto.InstrumentId, priceDto.Id))
                 .ReturnsAsync(false);

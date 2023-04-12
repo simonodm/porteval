@@ -12,6 +12,7 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Threading.Tasks;
 using PortEval.Application.Core.BackgroundJobs;
 using PortEval.Application.Core.Interfaces.Repositories;
+using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
 
 namespace PortEval.Tests.Unit.BackgroundJobTests
@@ -38,7 +39,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             imports.AddRange(importsToRemove);
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(imports);
@@ -85,7 +86,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 fileSystem.AddFile(import.ErrorLogPath, import.Id.ToString());
             }
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
+            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
             dataImportRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(imports);

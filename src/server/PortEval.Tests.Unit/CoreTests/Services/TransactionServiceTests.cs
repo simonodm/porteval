@@ -30,12 +30,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var transactions = fixture.CreateMany<TransactionDto>();
             var filter = fixture.Build<TransactionFilters>().With(f => f.PositionId, fixture.Create<int>()).Create();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync((int)filter.PositionId))
                 .ReturnsAsync(fixture.Create<PositionDto>());
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
+            var transactionQueries = fixture.CreateDefaultTransactionQueriesMock();
             transactionQueries
                 .Setup(m => m.GetTransactionsAsync(filter, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(transactions);
@@ -55,7 +55,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var filter = fixture.Build<TransactionFilters>().With(f => f.PositionId, fixture.Create<int>()).Create();
 
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
+            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
             positionQueries
                 .Setup(m => m.GetPositionAsync((int)filter.PositionId))
                 .ReturnsAsync((PositionDto)null);
@@ -75,12 +75,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var transactions = fixture.CreateMany<TransactionDto>();
             var filter = fixture.Build<TransactionFilters>().With(f => f.InstrumentId, fixture.Create<int>()).Create();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentAsync((int)filter.InstrumentId))
                 .ReturnsAsync(fixture.Create<InstrumentDto>());
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
+            var transactionQueries = fixture.CreateDefaultTransactionQueriesMock();
             transactionQueries
                 .Setup(m => m.GetTransactionsAsync(filter, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(transactions);
@@ -100,7 +100,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var filter = fixture.Build<TransactionFilters>().With(f => f.InstrumentId, fixture.Create<int>()).Create();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentAsync((int)filter.InstrumentId))
                 .ReturnsAsync((InstrumentDto)null);
@@ -120,12 +120,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var transactions = fixture.CreateMany<TransactionDto>();
             var filter = fixture.Build<TransactionFilters>().With(f => f.PositionId, fixture.Create<int>()).Create();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync((int)filter.PortfolioId))
                 .ReturnsAsync(fixture.Create<PortfolioDto>());
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
+            var transactionQueries = fixture.CreateDefaultTransactionQueriesMock();
             transactionQueries
                 .Setup(m => m.GetTransactionsAsync(filter, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(transactions);
@@ -145,7 +145,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var filter = fixture.Build<TransactionFilters>().With(f => f.PortfolioId, fixture.Create<int>()).Create();
 
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
+            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
             portfolioQueries
                 .Setup(m => m.GetPortfolioAsync((int)filter.PortfolioId))
                 .ReturnsAsync((PortfolioDto)null);
@@ -164,7 +164,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var transaction = fixture.Create<TransactionDto>();
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
+            var transactionQueries = fixture.CreateDefaultTransactionQueriesMock();
             transactionQueries
                 .Setup(m => m.GetTransactionAsync(transaction.Id))
                 .ReturnsAsync(transaction);
@@ -184,7 +184,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var transactionId = fixture.Create<int>();
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
+            var transactionQueries = fixture.CreateDefaultTransactionQueriesMock();
             transactionQueries
                 .Setup(m => m.GetTransactionAsync(transactionId))
                 .ReturnsAsync((TransactionDto)null);
@@ -207,7 +207,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(t => t.PositionId, position.Id)
                 .Create();
 
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(r => r.FindAsync(position.Id))
                 .ReturnsAsync(position);
@@ -232,7 +232,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var transaction = fixture.Create<TransactionDto>();
 
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(r => r.FindAsync(transaction.PositionId))
                 .ReturnsAsync((Position)null);
@@ -258,7 +258,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(t => t.PositionId, position.Id)
                 .Create();
 
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(r => r.FindAsync(position.Id))
                 .ReturnsAsync(position);

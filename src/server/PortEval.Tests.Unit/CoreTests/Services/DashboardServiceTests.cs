@@ -27,7 +27,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var items = GenerateValidDashboardItemDtos(fixture);
 
-            var dashboardQueries = fixture.Freeze<Mock<IDashboardLayoutQueries>>();
+            var dashboardQueries = fixture.CreateDefaultDashboardLayoutQueriesMock();
             dashboardQueries
                 .Setup(m => m.GetDashboardItemsAsync())
                 .ReturnsAsync(items);
@@ -49,8 +49,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var existingDashboardItems = GenerateValidDashboardItemEntities(fixture);
             var newDashboardItems = GenerateValidDashboardItemDtos(fixture);
 
-            fixture.Freeze<Mock<IChartRepository>>();
-            var dashboardItemRepository = fixture.Freeze<Mock<IDashboardItemRepository>>();
+            fixture.CreateDefaultChartRepositoryMock();
+            var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
             dashboardItemRepository
                 .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
@@ -72,11 +72,11 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var existingDashboardItems = GenerateValidDashboardItemEntities(fixture);
             var newDashboardItems = GenerateValidDashboardItemDtos(fixture);
             
-            var dashboardItemRepository = fixture.Freeze<Mock<IDashboardItemRepository>>();
+            var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
             dashboardItemRepository
                 .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
@@ -104,8 +104,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var existingDashboardItems = GenerateValidDashboardItemEntities(fixture);
             var newDashboardItems = GenerateOverlappingDashboardItemDtos(fixture);
 
-            fixture.Freeze<Mock<IChartRepository>>();
-            var dashboardItemRepository = fixture.Freeze<Mock<IDashboardItemRepository>>();
+            fixture.CreateDefaultChartRepositoryMock();
+            var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
             dashboardItemRepository
                 .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
@@ -125,8 +125,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var existingDashboardItems = GenerateValidDashboardItemEntities(fixture);
             var newDashboardItems = GenerateInvalidDimensionsDashboardItemDtos(fixture);
 
-            fixture.Freeze<Mock<IChartRepository>>();
-            var dashboardItemRepository = fixture.Freeze<Mock<IDashboardItemRepository>>();
+            fixture.CreateDefaultChartRepositoryMock();
+            var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
             dashboardItemRepository
                 .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);
@@ -146,14 +146,14 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var existingDashboardItems = GenerateValidDashboardItemEntities(fixture);
             var newDashboardItems = GenerateValidDashboardItemDtos(fixture);
 
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((Chart)null);
             chartRepository
                 .Setup(r => r.ExistsAsync(It.IsAny<int>()))
                 .ReturnsAsync(false);
-            var dashboardItemRepository = fixture.Freeze<Mock<IDashboardItemRepository>>();
+            var dashboardItemRepository = fixture.CreateDefaultDashboardItemRepositoryMock();
             dashboardItemRepository
                 .Setup(r => r.GetDashboardItemsAsync())
                 .ReturnsAsync(existingDashboardItems);

@@ -54,7 +54,7 @@ namespace PortEval.Tests.Integration
 
             builder.ConfigureTestServices(services =>
             {
-                services.RemoveAll<IDbConnectionCreator>();
+                services.RemoveAll<PortEvalDbConnectionCreator>();
                 services.RemoveAll<PortEvalDbContext>();
                 services.ConfigureDapper();
                 services.ConfigureDbContext(_configuration);

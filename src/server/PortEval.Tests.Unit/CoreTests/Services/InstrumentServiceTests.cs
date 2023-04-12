@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -9,12 +10,14 @@ using PortEval.Application.Core.Interfaces.Calculators;
 using PortEval.Application.Core.Interfaces.ChartDataGenerators;
 using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Repositories;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Core.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
+using PortEval.Tests.Unit.Helpers;
 using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
 
@@ -30,7 +33,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var instruments = fixture.CreateMany<InstrumentDto>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetAllInstrumentsAsync())
                 .ReturnsAsync(instruments);
@@ -54,7 +57,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var instruments = fixture.CreateMany<InstrumentDto>(totalCount);
             var instrumentsToTake = instruments.Skip(takeCount).Take(takeCount);
             
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentPageAsync(It.IsAny<PaginationParams>()))
                 .ReturnsAsync(instrumentsToTake);
@@ -75,7 +78,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var instrument = fixture.Create<InstrumentDto>();
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
                 .ReturnsAsync(instrument);
@@ -93,7 +96,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
                 .ReturnsAsync((InstrumentDto)null);
@@ -112,7 +115,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var exchanges = fixture.CreateMany<ExchangeDto>();
 
-            var exchangeQueries = fixture.Freeze<Mock<IExchangeQueries>>();
+            var exchangeQueries = fixture.CreateDefaultExchangeQueriesMock();
             exchangeQueries
                 .Setup(m => m.GetKnownExchangesAsync())
                 .ReturnsAsync(exchanges);
@@ -133,6 +136,14 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var profit = fixture.Create<decimal>();
             var dateRange = fixture.Create<DateRangeParams>();
 
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
+            instrumentQueries
+                .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
+                .ReturnsAsync(fixture.Create<InstrumentDto>());
+            var priceService = fixture.Freeze<Mock<IInstrumentPriceService>>();
+            priceService
+                .Setup(m => m.GetInstrumentPriceAsync(It.IsAny<int>(), It.IsAny<DateTime>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(fixture.Create<InstrumentPriceDto>()));
             var profitCalculator = fixture.Freeze<Mock<IInstrumentProfitCalculator>>();
             profitCalculator               
                 .Setup(m => m.CalculateProfit(It.IsAny<decimal>(), It.IsAny<decimal>()))
@@ -153,7 +164,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
                 .ReturnsAsync((InstrumentDto)null);
@@ -173,6 +184,14 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var performance = fixture.Create<decimal>();
             var dateRange = fixture.Create<DateRangeParams>();
 
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
+            instrumentQueries
+                .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
+                .ReturnsAsync(fixture.Create<InstrumentDto>());
+            var priceService = fixture.Freeze<Mock<IInstrumentPriceService>>();
+            priceService
+                .Setup(m => m.GetInstrumentPriceAsync(It.IsAny<int>(), It.IsAny<DateTime>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(fixture.Create<InstrumentPriceDto>()));
             var performanceCalculator = fixture.Freeze<Mock<IInstrumentPerformanceCalculator>>();
             performanceCalculator
                 .Setup(m => m.CalculatePerformance(It.IsAny<decimal>(), It.IsAny<decimal>()))
@@ -193,7 +212,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
                 .ReturnsAsync((InstrumentDto)null);
@@ -212,6 +231,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var chartData = fixture.CreateMany<EntityChartPointDto>();
 
+            fixture.CreateDefaultInstrumentQueriesMock();
+            
             var chartGenerator = fixture.Freeze<Mock<IInstrumentChartDataGenerator>>();
             chartGenerator
                 .Setup(m => m.ChartPrices(It.IsAny<IEnumerable<InstrumentPriceDto>>(), It.IsAny<DateRangeParams>(), It.IsAny<AggregationFrequency>()))
@@ -230,7 +251,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
                 .ReturnsAsync((InstrumentDto)null);
@@ -249,6 +270,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var chartData = fixture.CreateMany<EntityChartPointDto>();
 
+            fixture.CreateDefaultInstrumentQueriesMock();
+            
             var chartGenerator = fixture.Freeze<Mock<IInstrumentChartDataGenerator>>();
             chartGenerator
                 .Setup(m => m.ChartProfit(It.IsAny<IEnumerable<InstrumentPriceDto>>(), It.IsAny<DateRangeParams>(), It.IsAny<AggregationFrequency>()))
@@ -267,7 +290,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
                 .ReturnsAsync((InstrumentDto)null);
@@ -286,6 +309,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var chartData = fixture.CreateMany<EntityChartPointDto>();
 
+            fixture.CreateDefaultInstrumentQueriesMock();
+            
             var chartGenerator = fixture.Freeze<Mock<IInstrumentChartDataGenerator>>();
             chartGenerator
                 .Setup(m => m.ChartPerformance(It.IsAny<IEnumerable<InstrumentPriceDto>>(), It.IsAny<DateRangeParams>(), It.IsAny<AggregationFrequency>()))
@@ -304,7 +329,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
                 .ReturnsAsync((InstrumentDto)null);
@@ -323,6 +348,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var chartData = fixture.CreateMany<EntityChartPointDto>();
 
+            fixture.CreateDefaultInstrumentQueriesMock();
+            
             var chartGenerator = fixture.Freeze<Mock<IInstrumentChartDataGenerator>>();
             chartGenerator
                 .Setup(m => m.ChartAggregatedProfit(It.IsAny<IEnumerable<InstrumentPriceDto>>(), It.IsAny<DateRangeParams>(), It.IsAny<AggregationFrequency>()))
@@ -341,7 +368,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
+            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
             instrumentQueries
                 .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
                 .ReturnsAsync((InstrumentDto)null);
@@ -360,6 +387,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var chartData = fixture.CreateMany<EntityChartPointDto>();
 
+            fixture.CreateDefaultInstrumentQueriesMock();
+            
             var chartGenerator = fixture.Freeze<Mock<IInstrumentChartDataGenerator>>();
             chartGenerator
                 .Setup(m => m.ChartAggregatedPerformance(It.IsAny<IEnumerable<InstrumentPriceDto>>(), It.IsAny<DateRangeParams>(), It.IsAny<AggregationFrequency>()))
@@ -380,9 +409,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var instrument = fixture.Create<InstrumentDto>();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
-            fixture.Freeze<Mock<ICurrencyRepository>>();
-            fixture.Freeze<Mock<IExchangeRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
+            fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
 
@@ -408,9 +437,10 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var instrumentDto = fixture.Create<InstrumentDto>();
 
-            fixture.Freeze<Mock<IInstrumentRepository>>();
-            fixture.Freeze<Mock<ICurrencyRepository>>();
-            fixture.Freeze<Mock<IExchangeRepository>>();
+            fixture.CreateDefaultInstrumentQueriesMock();
+            fixture.CreateDefaultInstrumentRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
+            fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
 
@@ -432,10 +462,10 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var instrument = fixture.Create<InstrumentDto>();
 
-            fixture.Freeze<Mock<IInstrumentRepository>>();
-            fixture.Freeze<Mock<ICurrencyRepository>>();
+            fixture.CreateDefaultInstrumentRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
 
-            var exchangeRepository = fixture.Freeze<Mock<IExchangeRepository>>();
+            var exchangeRepository = fixture.CreateDefaultExchangeRepositoryMock();
             exchangeRepository
                 .Setup(e => e.ExistsAsync(It.IsAny<string>()))
                 .Returns(Task.FromResult(false));
@@ -457,9 +487,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var instrument = fixture.Create<InstrumentDto>();
 
-            fixture.Freeze<Mock<IInstrumentRepository>>();
-            fixture.Freeze<Mock<ICurrencyRepository>>();
-            var exchangeRepository = fixture.Freeze<Mock<IExchangeRepository>>();
+            fixture.CreateDefaultInstrumentRepositoryMock();
+            fixture.CreateDefaultCurrencyRepositoryMock();
+            var exchangeRepository = fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
             await sut.CreateInstrumentAsync(instrument);
@@ -471,21 +501,22 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         }
 
         [Fact]
-        public async Task CreatingInstrument_ThrowsException_WhenCurrencyDoesNotExist()
+        public async Task CreatingInstrument_ReturnsError_WhenCurrencyDoesNotExist()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
             var instrument = fixture.Create<InstrumentDto>();
 
-            var currencyRepository = fixture.Freeze<Mock<ICurrencyRepository>>();
+            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
                 .Setup(c => c.ExistsAsync(It.IsAny<string>()))
                 .Returns(Task.FromResult(false));
 
             var sut = fixture.Create<InstrumentService>();
 
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await sut.CreateInstrumentAsync(instrument));
+            var response = await sut.CreateInstrumentAsync(instrument);
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
@@ -497,13 +528,16 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var instrument = fixture.Create<Instrument>();
             var updatedInstrumentDto = fixture.Create<InstrumentDto>();
             updatedInstrumentDto.Id = instrument.Id;
-
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.FindAsync(updatedInstrumentDto.Id))
                 .Returns(Task.FromResult(instrument));
 
-            fixture.Freeze<Mock<IExchangeRepository>>();
+            var exchangeRepository = fixture.CreateDefaultExchangeRepositoryMock();
+            exchangeRepository
+                .Setup(m => m.Add(It.IsAny<Exchange>()))
+                .Returns<Exchange>(e => e);
 
             var sut = fixture.Create<InstrumentService>();
             await sut.UpdateInstrumentAsync(updatedInstrumentDto);
@@ -520,14 +554,14 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         }
 
         [Fact]
-        public async Task UpdatingInstrument_ThrowsException_WhenInstrumentDoesNotExist()
+        public async Task UpdatingInstrument_ReturnsError_WhenInstrumentDoesNotExist()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
             var updatedInstrumentDto = fixture.Create<InstrumentDto>();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.FindAsync(updatedInstrumentDto.Id))
                 .Returns(Task.FromResult<Instrument>(null));
@@ -536,9 +570,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Returns(Task.FromResult(false));
 
             var sut = fixture.Create<InstrumentService>();
-
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () =>
-                await sut.UpdateInstrumentAsync(updatedInstrumentDto));
+            var response = await sut.UpdateInstrumentAsync(updatedInstrumentDto);
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
@@ -551,12 +584,20 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var updatedInstrumentDto = fixture.Create<InstrumentDto>();
             updatedInstrumentDto.Id = instrument.Id;
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var exchangeRepository = fixture.CreateDefaultExchangeRepositoryMock();
+            exchangeRepository
+                .Setup(m => m.Add(It.IsAny<Exchange>()))
+                .Returns<Exchange>(e => e);
+            
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.FindAsync(updatedInstrumentDto.Id))
                 .Returns(Task.FromResult(instrument));
+            instrumentRepository
+                .Setup(m => m.Update(It.IsAny<Instrument>()))
+                .Returns<Instrument>(i => i);
 
-            fixture.Freeze<Mock<IExchangeRepository>>();
+            fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
             var updatedInstrument = await sut.UpdateInstrumentAsync(updatedInstrumentDto);
@@ -578,15 +619,21 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var updatedInstrumentDto = fixture.Create<InstrumentDto>();
             updatedInstrumentDto.Id = instrument.Id;
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.FindAsync(updatedInstrumentDto.Id))
                 .Returns(Task.FromResult(instrument));
+            instrumentRepository
+                .Setup(m => m.Update(It.IsAny<Instrument>()))
+                .Returns<Instrument>(i => i);
 
-            var exchangeRepository = fixture.Freeze<Mock<IExchangeRepository>>();
+            var exchangeRepository = fixture.CreateDefaultExchangeRepositoryMock();
             exchangeRepository
                 .Setup(e => e.ExistsAsync(updatedInstrumentDto.Exchange))
                 .Returns(Task.FromResult(false));
+            exchangeRepository
+                .Setup(m => m.Add(It.IsAny<Exchange>()))
+                .Returns<Exchange>(e => e);
 
             var sut = fixture.Create<InstrumentService>();
             await sut.UpdateInstrumentAsync(updatedInstrumentDto);
@@ -605,12 +652,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var updatedInstrumentDto = fixture.Create<InstrumentDto>();
             updatedInstrumentDto.Id = instrument.Id;
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.FindAsync(instrument.Id))
                 .Returns(Task.FromResult(instrument));
-
-            var exchangeRepository = fixture.Freeze<Mock<IExchangeRepository>>();
+            instrumentRepository
+                .Setup(m => m.Update(It.IsAny<Instrument>()))
+                .Returns<Instrument>(i => i);
+            
+            var exchangeRepository = fixture.CreateDefaultExchangeRepositoryMock();
             exchangeRepository
                 .Setup(e => e.ExistsAsync(updatedInstrumentDto.Exchange))
                 .Returns(Task.FromResult(true));
@@ -629,13 +679,13 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var instrumentId = fixture.Create<int>();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.ExistsAsync(It.Is<int>(id => id == instrumentId)))
                 .Returns(Task.FromResult(true));
 
-            fixture.Freeze<Mock<ICurrencyRepository>>();
-            fixture.Freeze<Mock<IExchangeRepository>>();
+            fixture.CreateDefaultCurrencyRepositoryMock();
+            fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
 
@@ -645,24 +695,25 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         }
 
         [Fact]
-        public async Task DeletingInstrument_ThrowsException_WhenInstrumentDoesNotExist()
+        public async Task DeletingInstrument_ReturnsNotFound_WhenInstrumentDoesNotExist()
         {
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
             var instrumentId = fixture.Create<int>();
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(i => i.ExistsAsync(instrumentId))
                 .Returns(Task.FromResult(false));
 
-            fixture.Freeze<Mock<ICurrencyRepository>>();
-            fixture.Freeze<Mock<IExchangeRepository>>();
+            fixture.CreateDefaultCurrencyRepositoryMock();
+            fixture.CreateDefaultExchangeRepositoryMock();
 
             var sut = fixture.Create<InstrumentService>();
 
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await sut.DeleteAsync(instrumentId));
+            var response = await sut.DeleteAsync(instrumentId);
+            Assert.Equal(OperationStatus.NotFound, response.Status);
         }
     }
 }

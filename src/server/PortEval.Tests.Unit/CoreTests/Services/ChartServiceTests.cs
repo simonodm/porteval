@@ -94,7 +94,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var charts = fixture.CreateMany<ChartDto>();
 
-            var chartQueries = fixture.Freeze<Mock<IChartQueries>>();
+            var chartQueries = fixture.CreateDefaultChartQueriesMock();
             chartQueries
                 .Setup(m => m.GetChartsAsync())
                 .ReturnsAsync(charts);
@@ -115,7 +115,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
             var chart = fixture.Create<ChartDto>();
 
-            var chartQueries = fixture.Freeze<Mock<IChartQueries>>();
+            var chartQueries = fixture.CreateDefaultChartQueriesMock();
             chartQueries
                 .Setup(m => m.GetChartAsync(chart.Id))
                 .ReturnsAsync(chart);
@@ -134,7 +134,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             var fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
-            var chartQueries = fixture.Freeze<Mock<IChartQueries>>();
+            var chartQueries = fixture.CreateDefaultChartQueriesMock();
             chartQueries
                 .Setup(m => m.GetChartAsync(It.IsAny<int>()))
                 .ReturnsAsync((ChartDto)null);
@@ -167,7 +167,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                         : new ToDateRange((DateRangeUnit)toDateRangeUnit, (int)toDateRangeValue))
                 .Create();
 
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(m => m.Add(It.IsAny<Chart>()))
                 .Returns<Chart>(c => c);
@@ -194,9 +194,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(c => c.Type, type)
                 .Create();
 
-            fixture.Freeze<Mock<IChartRepository>>();
+            fixture.CreateDefaultChartRepositoryMock();
             CreateEntityRepositoryMocks(fixture);
-            var currencyRepository = fixture.Freeze<Mock<ICurrencyRepository>>();
+            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
                 .Setup(r => r.ExistsAsync(chart.CurrencyCode))
                 .ReturnsAsync(false);
@@ -222,7 +222,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(c => c.Frequency, (AggregationFrequency?)null)
                 .Create();
 
-            fixture.Freeze<Mock<IChartRepository>>();
+            fixture.CreateDefaultChartRepositoryMock();
             CreateEntityRepositoryMocks(fixture);
 
             var sut = fixture.Create<ChartService>();
@@ -242,7 +242,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(c => c.ToDateRange, (ToDateRange)null)
                 .Create();
 
-            fixture.Freeze<Mock<IChartRepository>>();
+            fixture.CreateDefaultChartRepositoryMock();
             CreateEntityRepositoryMocks(fixture);
 
             var sut = fixture.Create<ChartService>();
@@ -262,7 +262,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(c => c.DateRangeStart, (DateTime?)null)
                 .Create();
 
-            fixture.Freeze<Mock<IChartRepository>>();
+            fixture.CreateDefaultChartRepositoryMock();
             CreateEntityRepositoryMocks(fixture);
 
             var sut = fixture.Create<ChartService>();
@@ -282,7 +282,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(c => c.DateRangeEnd, (DateTime?)null)
                 .Create();
 
-            fixture.Freeze<Mock<IChartRepository>>();
+            fixture.CreateDefaultChartRepositoryMock();
             CreateEntityRepositoryMocks(fixture);
 
             var sut = fixture.Create<ChartService>();
@@ -303,9 +303,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Create();
             chart.Lines.Add(portfolioLine);
 
-            fixture.Freeze<Mock<IChartRepository>>();
+            fixture.CreateDefaultChartRepositoryMock();
             CreateEntityRepositoryMocks(fixture);
-            var portfolioRepository = fixture.Freeze<Mock<IPortfolioRepository>>();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
                 .Setup(r => r.ExistsAsync((int)portfolioLine.PortfolioId))
                 .ReturnsAsync(false);
@@ -331,9 +331,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Create();
             chart.Lines.Add(positionLine);
 
-            fixture.Freeze<Mock<IChartRepository>>();
+            fixture.CreateDefaultChartRepositoryMock();
             CreateEntityRepositoryMocks(fixture);
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(r => r.ExistsAsync((int)positionLine.PositionId))
                 .ReturnsAsync(false);
@@ -359,9 +359,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Create();
             chart.Lines.Add(instrumentLine);
 
-            fixture.Freeze<Mock<IChartRepository>>();
+            fixture.CreateDefaultChartRepositoryMock();
             CreateEntityRepositoryMocks(fixture);
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(r => r.ExistsAsync((int)instrumentLine.InstrumentId))
                 .ReturnsAsync(false);
@@ -396,7 +396,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                         : new ToDateRange((DateRangeUnit)toDateRangeUnit, (int)toDateRangeValue))
                 .Create();
 
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
@@ -427,12 +427,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(c => c.Type, type)
                 .Create();
 
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
             CreateEntityRepositoryMocks(fixture);
-            var currencyRepository = fixture.Freeze<Mock<ICurrencyRepository>>();
+            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
                 .Setup(r => r.ExistsAsync(chart.CurrencyCode))
                 .ReturnsAsync(false);
@@ -459,7 +459,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(c => c.Frequency, (AggregationFrequency?)null)
                 .Create();
 
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
@@ -482,7 +482,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(c => c.ToDateRange, (ToDateRange)null)
                 .Create();
 
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
@@ -505,7 +505,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(c => c.DateRangeStart, (DateTime?)null)
                 .Create();
 
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
@@ -528,7 +528,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .With(c => c.DateRangeEnd, (DateTime?)null)
                 .Create();
 
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
@@ -552,12 +552,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Create();
             chart.Lines.Add(portfolioLine);
 
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
             CreateEntityRepositoryMocks(fixture);
-            var portfolioRepository = fixture.Freeze<Mock<IPortfolioRepository>>();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
                 .Setup(r => r.ExistsAsync((int)portfolioLine.PortfolioId))
                 .ReturnsAsync(false);
@@ -583,12 +583,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Create();
             chart.Lines.Add(positionLine);
 
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
             CreateEntityRepositoryMocks(fixture);
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(r => r.ExistsAsync((int)positionLine.PositionId))
                 .ReturnsAsync(false);
@@ -614,12 +614,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Create();
             chart.Lines.Add(instrumentLine);
 
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
             CreateEntityRepositoryMocks(fixture);
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(r => r.ExistsAsync((int)instrumentLine.InstrumentId))
                 .ReturnsAsync(false);
@@ -640,7 +640,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Customize(new AutoMoqCustomization());
 
             var chart = fixture.Create<ChartDto>();
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.ExistsAsync(chart.Id))
                 .ReturnsAsync(false);
@@ -662,7 +662,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Customize(new AutoMoqCustomization());
 
             var id = fixture.Create<int>();
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(m => m.ExistsAsync(It.IsAny<int>()))
                 .ReturnsAsync(true);
@@ -685,7 +685,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                 .Customize(new AutoMoqCustomization());
 
             var id = fixture.Create<int>();
-            var chartRepository = fixture.Freeze<Mock<IChartRepository>>();
+            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
             chartRepository
                 .Setup(r => r.ExistsAsync(id))
                 .ReturnsAsync(false);
@@ -702,18 +702,18 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
         private void CreateEntityRepositoryMocks(IFixture fixture)
         {
-            var portfolioRepository = fixture.Freeze<Mock<IPortfolioRepository>>();
+            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
             portfolioRepository
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Portfolio(id, fixture.Create<string>(), fixture.Create<string>(),
                     fixture.Create<string>()));
 
-            var positionRepository = fixture.Freeze<Mock<IPositionRepository>>();
+            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Position(id, fixture.Create<int>(), fixture.Create<int>(), fixture.Create<string>()));
 
-            var instrumentRepository = fixture.Freeze<Mock<IInstrumentRepository>>();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
             instrumentRepository
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .ReturnsAsync((int id) => new Instrument(
@@ -726,7 +726,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                     fixture.Create<string>())
                 );
 
-            var currencyRepository = fixture.Freeze<Mock<ICurrencyRepository>>();
+            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
             currencyRepository
                 .Setup(m => m.FindAsync(It.IsAny<string>()))
                 .ReturnsAsync((string code) => new Currency(code, fixture.Create<string>(), fixture.Create<string>()));
