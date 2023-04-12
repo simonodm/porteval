@@ -25,6 +25,8 @@ import { ChartConfig, ChartLine, ChartLineConfigurationContextType,
 import { useCreateChartMutation, useGetChartQuery, useUpdateChartMutation } from '../../redux/api/chartApi';
 import { checkIsLoaded, checkIsError } from '../../utils/queries';
 
+import './ChartView.css';
+
 type Params = {
     /**
      * ID of chart to render.
@@ -242,20 +244,22 @@ function ChartView(): JSX.Element {
             </PageHeading>
             <LoadingWrapper isError={isError} isLoaded={isLoaded}>
                 <ChartLineConfigurationContext.Provider value={context}>
-                    <Container fluid className="d-flex flex-column flex-grow-1 g-0">
+                    <Container fluid className="chart-view-container d-flex flex-column flex-grow-1 g-0">
                         <Row className="mb-5">
                             <Col>
                                 <ChartConfigurator onChange={handleChartSave} />
                             </Col>
                         </Row>
-                        <Row className="flex-grow-1 gy-5">
+                        <Row className="chart-editor flex-grow-1 gy-5">
                             <Col xs={12} lg={8} className="min-vh-50">
                                 {chart && <PortEvalChart chart={chart} /> }
                             </Col>
-                            <Col xs={12} lg={4}>
-                                <PortfolioPicker />
-                                <InstrumentPicker />
-                            </Col>
+                            <Col xs={12} lg={4} className="d-flex">
+                                <Container fluid className="chart-item-pickers">
+                                    <PortfolioPicker />
+                                    <InstrumentPicker />
+                                </Container>  
+                            </Col>                          
                         </Row>
                     </Container>
                     <ModalWrapper

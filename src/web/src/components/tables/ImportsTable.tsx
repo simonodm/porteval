@@ -21,7 +21,7 @@ function ImportsTable(): JSX.Element {
     const [userSettings] = useUserSettings();
 
     const handleLogDownload = (importEntry: ImportEntry) => {
-        fetch(importEntry.errorLogUrl)
+        fetch(`/api${importEntry.errorLogUrl}`)
             .then(res => res.blob())
             .then(blob => {
                 const file = URL.createObjectURL(blob);

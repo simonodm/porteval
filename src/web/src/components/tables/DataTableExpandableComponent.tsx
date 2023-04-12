@@ -3,6 +3,7 @@ import React from 'react';
 type Props = {
     /**
      * Number of data columns in the parent row.
+     * This property is required to properly align the expandable component to the width of the parent row.
      */
     originalRowColumnCount: number;
 

@@ -1,0 +1,14 @@
+.chart-view-container {
+    min-height: 0;
+}
+
+.chart-editor {
+    min-height: 0;
+}
+
+@media screen and (min-width: 992px) {
+    .chart-editor {
+        flex-wrap: nowrap; /* this is done to prevent chart and pickers from overflowing the row on multi-column layout */
+    }
+}
+

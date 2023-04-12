@@ -1,4 +1,4 @@
-import { isRejected, isRejectedWithValue } from '@reduxjs/toolkit';
+import { isRejectedWithValue } from '@reduxjs/toolkit';
 import { Middleware } from 'redux';
 import { toast } from 'react-toastify';
 import { isRequestErrorResponse, isValidationErrorResponse } from '../api/apiTypes';
@@ -25,8 +25,6 @@ const rtkQueryErrorDisplay: Middleware = () => (next) => (action) => {
         } else {
             toast.error(data, constants.TOAST_OPTIONS);
         }
-    } else if (isRejected(action)) {
-        toast.error(constants.ERROR_STRING, constants.TOAST_OPTIONS);
     }
 
     return next(action);
