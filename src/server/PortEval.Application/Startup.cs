@@ -1,6 +1,9 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,19 +11,14 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using PortEval.Application.Core.Hubs;
 using PortEval.Application.Extensions;
 using PortEval.Application.Filters;
-using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Converters;
 using PortEval.Application.Models.Validators;
 using PortEval.Domain.Models.Enums;
-using PortEval.Infrastructure;
-using System.ComponentModel;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.HttpLogging;
-using PortEval.Application.Core.Hubs;
 using Serilog;
+using System.ComponentModel;
 
 namespace PortEval.Application
 {

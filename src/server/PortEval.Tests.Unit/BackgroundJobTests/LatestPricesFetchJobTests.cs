@@ -1,100 +1,100 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Core.BackgroundJobs;
+using PortEval.Application.Core.Interfaces;
+using PortEval.Application.Core.Interfaces.Repositories;
+using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Tests.Unit.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.BackgroundJobs;
-using PortEval.Application.Core.Interfaces;
-using PortEval.Application.Models.FinancialDataFetcher;
 using Xunit;
 
 namespace PortEval.Tests.Unit.BackgroundJobTests
 {
     public class LatestPricesFetchJobTests
     {
+        private IFixture _fixture;
+        private Mock<IInstrumentRepository> _instrumentRepository;
+        private Mock<IInstrumentPriceRepository> _instrumentPriceRepository;
+        private Mock<ICurrencyExchangeRateRepository> _exchangeRateRepository;
+
+        public LatestPricesFetchJobTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _instrumentRepository = _fixture.CreateDefaultInstrumentRepositoryMock();
+            _instrumentPriceRepository = _fixture.CreateDefaultInstrumentPriceRepositoryMock();
+            _exchangeRateRepository = _fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
+        }
+
         [Fact]
         public async Task Run_ImportsLatestPriceRetrievedFromFetcher()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var instrument = new Instrument(1, "Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
             instrument.SetTrackingFrom(DateTime.Parse("2022-01-01"));
-            var price = fixture.Build<PricePoint>().With(p => p.Time, DateTime.UtcNow.AddMinutes(-10)).Create();
+            var price = _fixture.Build<PricePoint>().With(p => p.Time, DateTime.UtcNow.AddMinutes(-10)).Create();
 
-            var priceFetcher = CreatePriceFetcherMockReturningLatestPriceData(fixture, instrument, price);
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            CreatePriceFetcherMockReturningLatestPriceData(_fixture, instrument, price);
+            _instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Instrument> { instrument });
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
-            var instrumentPriceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
+            _instrumentPriceRepository
+                .Setup(m => m.Add(It.IsAny<InstrumentPrice>()))
+                .Returns<InstrumentPrice>(p => p);
 
-            var sut = fixture.Create<LatestPricesFetchJob>();
+            var sut = _fixture.Create<LatestPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            instrumentPriceRepository.Verify(m => m.Add(It.Is<InstrumentPrice>(p => p.Price == price.Price)));
+            _instrumentPriceRepository.Verify(m => m.Add(It.Is<InstrumentPrice>(p => p.Price == price.Price)));
         }
 
         [Fact]
         public async Task Run_UpdatesInstrumentsTrackingInfo_WhenPriceFetchSucceeds()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var instrument = new Instrument(1, "Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
             instrument.SetTrackingFrom(DateTime.Parse("2022-01-01"));
-            var price = fixture.Build<PricePoint>().With(p => p.Time, DateTime.UtcNow).Create();
+            var price = _fixture.Build<PricePoint>().With(p => p.Time, DateTime.UtcNow).Create();
 
-            var priceFetcher = CreatePriceFetcherMockReturningLatestPriceData(fixture, instrument, price);
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            CreatePriceFetcherMockReturningLatestPriceData(_fixture, instrument, price);
+            _instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Instrument> { instrument });
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
-            var instrumentPriceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
 
-            var sut = fixture.Create<LatestPricesFetchJob>();
+            var sut = _fixture.Create<LatestPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            instrumentRepository.Verify(m => m.Update(It.Is<Instrument>(i => i.Id == instrument.Id && i.TrackingInfo.LastUpdate >= price.Time)));
+            _instrumentRepository.Verify(m => m.Update(It.Is<Instrument>(i => i.Id == instrument.Id && i.TrackingInfo.LastUpdate >= price.Time)));
         }
 
         [Fact]
         public async Task Run_DoesNotUpdateTrackingInfo_WhenNoPricesAreRetrieved()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var instrument = new Instrument(1, "Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
             instrument.SetTrackingFrom(DateTime.Parse("2022-01-01"));
 
-            var priceFetcher = CreatePriceFetcherMockReturningLatestPriceData(fixture, instrument, null);
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            CreatePriceFetcherMockReturningLatestPriceData(_fixture, instrument, null);
+            _instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Instrument> { instrument });
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
-            var instrumentPriceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
 
-            var sut = fixture.Create<LatestPricesFetchJob>();
+            var sut = _fixture.Create<LatestPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            instrumentRepository.Verify(m => m.Update(It.Is<Instrument>(i => i.Id == instrument.Id)), Times.Never());
+            _instrumentRepository.Verify(m => m.Update(It.Is<Instrument>(i => i.Id == instrument.Id)), Times.Never());
         }
 
-        private Mock<IFinancialDataFetcher> CreatePriceFetcherMockReturningLatestPriceData(IFixture fixture, Instrument instrument, PricePoint price)
+        private Mock<IFinancialDataFetcher> CreatePriceFetcherMockReturningLatestPriceData(IFixture _fixture, Instrument instrument, PricePoint price)
         {
-            var priceFetcher = fixture.Freeze<Mock<IFinancialDataFetcher>>();
+            var priceFetcher = _fixture.Freeze<Mock<IFinancialDataFetcher>>();
             priceFetcher
-                .Setup(m => m.GetLatestInstrumentPrice(instrument.Symbol, instrument.CurrencyCode))
+                .Setup(m => m.GetLatestInstrumentPriceAsync(instrument.Symbol, instrument.CurrencyCode))
                 .ReturnsAsync(price);
 
             return priceFetcher;

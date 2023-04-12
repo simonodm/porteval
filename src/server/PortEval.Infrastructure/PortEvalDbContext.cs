@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Infrastructure.Configurations;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Repositories;
 
 namespace PortEval.Infrastructure
 {

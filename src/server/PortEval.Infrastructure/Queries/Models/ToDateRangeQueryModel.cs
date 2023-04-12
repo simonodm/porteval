@@ -1,8 +1,8 @@
 ﻿using PortEval.Domain.Models.Enums;
 
-namespace PortEval.Application.Core.Queries.Models
+namespace PortEval.Infrastructure.Queries.Models
 {
-    internal class ToDateRangeQueryModel
+    public class ToDateRangeQueryModel
     {
         public DateRangeUnit ToDateRangeUnit { get; set; }
         public int ToDateRangeValue { get; set; }

@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Queries;
 using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
@@ -23,11 +22,10 @@ namespace PortEval.Tests.Integration.QueryTests
         [Fact]
         public async Task GetDataImports_ReturnsImportsFromDatabaseTable()
         {
-            var queryResult = await _dataImportQueries.GetAllImports();
+            var queryResult = await _dataImportQueries.GetAllImportsAsync();
 
-            var dataImports = queryResult.Response.ToList();
+            var dataImports = queryResult.ToList();
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
             Assert.Collection(dataImports,
                 import =>
                 {
@@ -51,23 +49,21 @@ namespace PortEval.Tests.Integration.QueryTests
         }
 
         [Fact]
-        public async Task GetDataImportById_ReturnsNotFound_WhenImportDoesNotExist()
+        public async Task GetDataImportById_ReturnsNull_WhenImportDoesNotExist()
         {
-            var queryResult = await _dataImportQueries.GetImport(Guid.NewGuid());
+            var queryResult = await _dataImportQueries.GetImportAsync(Guid.NewGuid());
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
-            Assert.Null(queryResult.Response);
+            Assert.Null(queryResult);
         }
 
         [Fact]
         public async Task GetDataImportById_ReturnsImport_WhenItExists()
         {
-            var queryResult = await _dataImportQueries.GetImport(Guid.Parse("974c9b22-8276-4121-96ce-6bf3f0f70152"));
+            var queryResult = await _dataImportQueries.GetImportAsync(Guid.Parse("974c9b22-8276-4121-96ce-6bf3f0f70152"));
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
-            Assert.NotNull(queryResult.Response);
-            Assert.Equal(TemplateType.Instruments, queryResult.Response.TemplateType);
-            Assert.Equal(ImportStatus.Finished, queryResult.Response.Status);
+            Assert.NotNull(queryResult);
+            Assert.Equal(TemplateType.Instruments, queryResult.TemplateType);
+            Assert.Equal(ImportStatus.Finished, queryResult.Status);
         }
     }
 }

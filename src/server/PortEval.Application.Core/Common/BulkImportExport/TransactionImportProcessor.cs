@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Services;
+﻿using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.Validators;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Common.BulkImportExport
 {
@@ -20,12 +20,21 @@ namespace PortEval.Application.Core.Common.BulkImportExport
 
             if (row.Id != default)
             {
-                await _transactionService.UpdateTransactionAsync(row);
+                var response = await _transactionService.UpdateTransactionAsync(row);
+                if (response.Status != OperationStatus.Ok)
+                {
+                    logEntry.AddError(response.Message);
+                }
             }
             else
             {
-                var transaction = await _transactionService.AddTransactionAsync(row);
-                logEntry.Data.Id = transaction.Id;
+                var response = await _transactionService.AddTransactionAsync(row);
+                if (response.Status != OperationStatus.Ok)
+                {
+                    logEntry.AddError(response.Message);
+                }
+
+                logEntry.Data.Id = response.Response?.Id ?? default;
             }
 
             return logEntry;

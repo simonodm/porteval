@@ -1,10 +1,10 @@
-﻿using PortEval.DataFetcher.Interfaces;
+﻿using PortEval.Application.Core.Interfaces;
+using PortEval.Application.Models.FinancialDataFetcher;
+using PortEval.DataFetcher.Interfaces;
 using PortEval.Infrastructure.FinancialDataFetcher.Requests;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces;
-using PortEval.Application.Models.FinancialDataFetcher;
 
 namespace PortEval.Infrastructure.FinancialDataFetcher
 {
@@ -19,7 +19,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<PricePoint>> GetHistoricalDailyPrices(string symbol, string currencyCode, DateTime from,
+        public async Task<IEnumerable<PricePoint>> GetHistoricalDailyPricesAsync(string symbol, string currencyCode, DateTime from,
             DateTime to)
         {
             var request = new HistoricalDailyInstrumentPricesRequest
@@ -29,12 +29,12 @@ namespace PortEval.Infrastructure.FinancialDataFetcher
                 To = to
             };
 
-            var response = await _fetcher.ProcessRequest<HistoricalDailyInstrumentPricesRequest, IEnumerable<PricePoint>>(request);
+            var response = await _fetcher.ProcessRequestAsync<HistoricalDailyInstrumentPricesRequest, IEnumerable<PricePoint>>(request);
             return response.Result;
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<PricePoint>> GetIntradayPrices(string symbol, string currencyCode, DateTime from, DateTime to,
+        public async Task<IEnumerable<PricePoint>> GetIntradayPricesAsync(string symbol, string currencyCode, DateTime from, DateTime to,
             IntradayInterval interval = IntradayInterval.OneHour)
         {
             var request = new IntradayInstrumentPricesRequest
@@ -45,24 +45,24 @@ namespace PortEval.Infrastructure.FinancialDataFetcher
                 Interval = interval
             };
 
-            var response = await _fetcher.ProcessRequest<IntradayInstrumentPricesRequest, IEnumerable<PricePoint>>(request);
+            var response = await _fetcher.ProcessRequestAsync<IntradayInstrumentPricesRequest, IEnumerable<PricePoint>>(request);
             return response.Result;
         }
 
         /// <inheritdoc />
-        public async Task<PricePoint> GetLatestInstrumentPrice(string symbol, string currencyCode)
+        public async Task<PricePoint> GetLatestInstrumentPriceAsync(string symbol, string currencyCode)
         {
             var request = new LatestInstrumentPriceRequest
             {
                 Symbol = symbol
             };
 
-            var response = await _fetcher.ProcessRequest<LatestInstrumentPriceRequest, PricePoint>(request);
+            var response = await _fetcher.ProcessRequestAsync<LatestInstrumentPriceRequest, PricePoint>(request);
             return response.Result;
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<PricePoint>> GetHistoricalDailyCryptoPrices(string symbol, string targetCurrency,
+        public async Task<IEnumerable<PricePoint>> GetHistoricalDailyCryptoPricesAsync(string symbol, string targetCurrency,
             DateTime from, DateTime to)
         {
             var request = new HistoricalDailyCryptoPricesRequest
@@ -73,12 +73,12 @@ namespace PortEval.Infrastructure.FinancialDataFetcher
                 To = to
             };
 
-            var response = await _fetcher.ProcessRequest<HistoricalDailyCryptoPricesRequest, IEnumerable<PricePoint>>(request);
+            var response = await _fetcher.ProcessRequestAsync<HistoricalDailyCryptoPricesRequest, IEnumerable<PricePoint>>(request);
             return response.Result;
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<PricePoint>> GetIntradayCryptoPrices(string symbol, string targetCurrency,
+        public async Task<IEnumerable<PricePoint>> GetIntradayCryptoPricesAsync(string symbol, string targetCurrency,
             DateTime from, DateTime to, IntradayInterval interval = IntradayInterval.OneHour)
         {
             var request = new IntradayCryptoPricesRequest
@@ -90,12 +90,12 @@ namespace PortEval.Infrastructure.FinancialDataFetcher
                 Interval = interval
             };
 
-            var response = await _fetcher.ProcessRequest<IntradayCryptoPricesRequest, IEnumerable<PricePoint>>(request);
+            var response = await _fetcher.ProcessRequestAsync<IntradayCryptoPricesRequest, IEnumerable<PricePoint>>(request);
             return response.Result;
         }
 
         /// <inheritdoc />
-        public async Task<PricePoint> GetLatestCryptoPrice(string symbol, string targetCurrency)
+        public async Task<PricePoint> GetLatestCryptoPriceAsync(string symbol, string targetCurrency)
         {
             var request = new LatestCryptoPriceRequest
             {
@@ -103,24 +103,24 @@ namespace PortEval.Infrastructure.FinancialDataFetcher
                 CurrencyCode = targetCurrency
             };
 
-            var response = await _fetcher.ProcessRequest<LatestCryptoPriceRequest, PricePoint>(request);
+            var response = await _fetcher.ProcessRequestAsync<LatestCryptoPriceRequest, PricePoint>(request);
             return response.Result;
         }
 
         /// <inheritdoc />
-        public async Task<ExchangeRates> GetLatestExchangeRates(string baseCurrency)
+        public async Task<ExchangeRates> GetLatestExchangeRatesAsync(string baseCurrency)
         {
             var request = new LatestExchangeRatesRequest
             {
                 CurrencyCode = baseCurrency
             };
 
-            var response = await _fetcher.ProcessRequest<LatestExchangeRatesRequest, ExchangeRates>(request);
+            var response = await _fetcher.ProcessRequestAsync<LatestExchangeRatesRequest, ExchangeRates>(request);
             return response.Result;
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ExchangeRates>> GetHistoricalDailyExchangeRates(string baseCurrency, DateTime from, DateTime to)
+        public async Task<IEnumerable<ExchangeRates>> GetHistoricalDailyExchangeRatesAsync(string baseCurrency, DateTime from, DateTime to)
         {
             var request = new HistoricalDailyExchangeRatesRequest
             {
@@ -129,12 +129,12 @@ namespace PortEval.Infrastructure.FinancialDataFetcher
                 To = to
             };
 
-            var response = await _fetcher.ProcessRequest<HistoricalDailyExchangeRatesRequest, IEnumerable<ExchangeRates>>(request);
+            var response = await _fetcher.ProcessRequestAsync<HistoricalDailyExchangeRatesRequest, IEnumerable<ExchangeRates>>(request);
             return response.Result;
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<InstrumentSplitData>> GetInstrumentSplits(string symbol, DateTime from,
+        public async Task<IEnumerable<InstrumentSplitData>> GetInstrumentSplitsAsync(string symbol, DateTime from,
             DateTime to)
         {
             var request = new InstrumentSplitsRequest
@@ -144,7 +144,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher
                 To = to
             };
 
-            var response = await _fetcher.ProcessRequest<InstrumentSplitsRequest,
+            var response = await _fetcher.ProcessRequestAsync<InstrumentSplitsRequest,
                 IEnumerable<InstrumentSplitData>>(request);
             return response.Result;
         }

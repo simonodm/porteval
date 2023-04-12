@@ -1,6 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.Common;
 using PortEval.Application.Core.Interfaces;
@@ -8,6 +6,8 @@ using PortEval.Application.Core.Interfaces.BackgroundJobs;
 using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Domain.Events;
 using PortEval.Domain.Models.Enums;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.DomainEventHandlers.InstrumentCreated
 {
@@ -33,7 +33,7 @@ namespace PortEval.Application.Core.DomainEventHandlers.InstrumentCreated
             _instrumentRepository.Update(domainEvent.Instrument);
             await _instrumentRepository.UnitOfWork.CommitAsync();
 
-            _jobClient.Enqueue<IInitialPriceFetchJob>(job => job.Run(domainEvent.Instrument.Id));
+            _jobClient.Enqueue<IInitialPriceFetchJob>(job => job.RunAsync(domainEvent.Instrument.Id));
 
             _logger.LogInformation($"Initial price fetch job enqueued for instrument {domainEvent.Instrument.Symbol}, ID {domainEvent.Instrument.Id}.");
         }

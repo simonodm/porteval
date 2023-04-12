@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using PortEval.Application.Models.FinancialDataFetcher;
+﻿using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.DataFetcher;
 using PortEval.DataFetcher.Models;
 using PortEval.Infrastructure.FinancialDataFetcher.Requests;
 using PortEval.Infrastructure.FinancialDataFetcher.Tiingo;
 using PortEval.Infrastructure.FinancialDataFetcher.Tiingo.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Integration.DataFetcherTests
@@ -41,7 +41,7 @@ namespace PortEval.Tests.Integration.DataFetcherTests
             var sut = new DataFetcher.DataFetcher(httpClient);
             sut.RegisterDataSource<TiingoApi>(GetMockConfiguration());
 
-            var response = await sut.ProcessRequest<HistoricalDailyInstrumentPricesRequest, IEnumerable<PricePoint>>(request);
+            var response = await sut.ProcessRequestAsync<HistoricalDailyInstrumentPricesRequest, IEnumerable<PricePoint>>(request);
 
             Assert.Equal(StatusCode.Ok, response.StatusCode);
             Assert.Collection(response.Result, pricePoint =>
@@ -91,7 +91,7 @@ namespace PortEval.Tests.Integration.DataFetcherTests
             var sut = new DataFetcher.DataFetcher(httpClient);
             sut.RegisterDataSource<TiingoApi>(GetMockConfiguration());
 
-            var response = await sut.ProcessRequest<HistoricalDailyCryptoPricesRequest, IEnumerable<PricePoint>>(request);
+            var response = await sut.ProcessRequestAsync<HistoricalDailyCryptoPricesRequest, IEnumerable<PricePoint>>(request);
 
             Assert.Equal(StatusCode.Ok, response.StatusCode);
             Assert.Collection(response.Result, pricePoint =>
@@ -142,7 +142,7 @@ namespace PortEval.Tests.Integration.DataFetcherTests
             var sut = new DataFetcher.DataFetcher(httpClient);
             sut.RegisterDataSource<TiingoApi>(GetMockConfiguration());
 
-            var response = await sut.ProcessRequest<IntradayCryptoPricesRequest, IEnumerable<PricePoint>>(request);
+            var response = await sut.ProcessRequestAsync<IntradayCryptoPricesRequest, IEnumerable<PricePoint>>(request);
 
             Assert.Equal(StatusCode.Ok, response.StatusCode);
             Assert.Collection(response.Result, pricePoint =>
@@ -178,7 +178,7 @@ namespace PortEval.Tests.Integration.DataFetcherTests
             var sut = new DataFetcher.DataFetcher(httpClient);
             sut.RegisterDataSource<TiingoApi>(GetMockConfiguration());
 
-            var response = await sut.ProcessRequest<LatestInstrumentPriceRequest, PricePoint>(request);
+            var response = await sut.ProcessRequestAsync<LatestInstrumentPriceRequest, PricePoint>(request);
 
             Assert.Equal(StatusCode.Ok, response.StatusCode);
             Assert.Equal(apiMockResponse[0].Price, response.Result.Price);
@@ -223,7 +223,7 @@ namespace PortEval.Tests.Integration.DataFetcherTests
             var sut = new DataFetcher.DataFetcher(httpClient);
             sut.RegisterDataSource<TiingoApi>(GetMockConfiguration());
 
-            var response = await sut.ProcessRequest<LatestCryptoPriceRequest, PricePoint>(request);
+            var response = await sut.ProcessRequestAsync<LatestCryptoPriceRequest, PricePoint>(request);
 
             Assert.Equal(StatusCode.Ok, response.StatusCode);
             Assert.Equal(apiMockResponse[0].Data[0].LastPrice, response.Result.Price);

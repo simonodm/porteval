@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Models.Enums;
@@ -7,8 +8,6 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Queries;
 using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
@@ -55,27 +54,25 @@ namespace PortEval.Tests.Integration.QueryTests
         [Fact]
         public async Task GetCharts_ReturnsAllChartsFromDb()
         {
-            var queryResult = await _chartQueries.GetCharts();
+            var queryResult = await _chartQueries.GetChartsAsync();
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
-            Assert.Collection(queryResult.Response, AssertIsTestPortfolioChart, AssertIsTestPositionInstrumentChart);
+            Assert.Collection(queryResult, AssertIsTestPortfolioChart, AssertIsTestPositionInstrumentChart);
         }
 
         [Fact]
         public async Task GetChart_ReturnsCorrectChart_WhenChartExists()
         {
-            var queryResult = await _chartQueries.GetChart(_portfolioChartId);
+            var queryResult = await _chartQueries.GetChartAsync(_portfolioChartId);
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
-            AssertIsTestPortfolioChart(queryResult.Response);
+            AssertIsTestPortfolioChart(queryResult);
         }
 
         [Fact]
-        public async Task GetChart_ReturnsNotFound_WhenChartDoesNotExist()
+        public async Task GetChart_ReturnsNull_WhenChartDoesNotExist()
         {
-            var queryResult = await _chartQueries.GetChart(-1);
+            var queryResult = await _chartQueries.GetChartAsync(-1);
 
-            Assert.Equal(QueryStatus.NotFound, queryResult.Status);
+            Assert.Null(queryResult);
         }
 
         private void AssertIsTestPortfolioChart(ChartDto c)

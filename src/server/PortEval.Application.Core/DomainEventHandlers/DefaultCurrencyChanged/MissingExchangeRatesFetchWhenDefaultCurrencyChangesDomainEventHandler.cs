@@ -1,11 +1,11 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.Common;
 using PortEval.Application.Core.Interfaces;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
 using PortEval.Domain.Events;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.DomainEventHandlers.DefaultCurrencyChanged
 {
@@ -24,7 +24,7 @@ namespace PortEval.Application.Core.DomainEventHandlers.DefaultCurrencyChanged
 
         public Task Handle(DomainEventNotificationAdapter<DefaultCurrencyChangedDomainEvent> notification, CancellationToken cancellationToken)
         {
-            _jobClient.Enqueue<IMissingExchangeRatesFetchJob>(job => job.Run());
+            _jobClient.Enqueue<IMissingExchangeRatesFetchJob>(job => job.RunAsync());
             _logger.LogInformation($"Missing exchange rates job enqueued after default currency change to {notification.DomainEvent.NewDefaultCurrency.Code}.");
             return Task.CompletedTask;
         }

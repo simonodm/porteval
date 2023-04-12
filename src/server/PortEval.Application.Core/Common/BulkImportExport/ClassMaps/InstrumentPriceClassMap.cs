@@ -7,7 +7,6 @@ namespace PortEval.Application.Core.Common.BulkImportExport.ClassMaps
     {
         public InstrumentPriceClassMap()
         {
-            Map(p => p.Id).Name("Price ID").Default(default(int));
             Map(p => p.InstrumentId).Name("Instrument ID");
             Map(p => p.Price).Name("Price");
             Map(p => p.Time).Name("Time");

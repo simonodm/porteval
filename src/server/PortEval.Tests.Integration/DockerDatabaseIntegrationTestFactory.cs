@@ -13,7 +13,6 @@ using PortEval.Application.Extensions;
 using PortEval.Infrastructure;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 using Xunit;
 
 namespace PortEval.Tests.Integration
@@ -54,7 +53,7 @@ namespace PortEval.Tests.Integration
 
             builder.ConfigureTestServices(services =>
             {
-                services.RemoveAll<IDbConnectionCreator>();
+                services.RemoveAll<PortEvalDbConnectionCreator>();
                 services.RemoveAll<PortEvalDbContext>();
                 services.ConfigureDapper();
                 services.ConfigureDbContext(_configuration);

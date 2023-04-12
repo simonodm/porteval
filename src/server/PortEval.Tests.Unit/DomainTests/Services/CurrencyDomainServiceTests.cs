@@ -9,16 +9,21 @@ namespace PortEval.Tests.Unit.DomainTests.Services
 {
     public class CurrencyDomainServiceTests
     {
+        private IFixture _fixture;
+
+        public CurrencyDomainServiceTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         [Fact]
         public void ChangeDefaultCurrency_UnsetsPreviousDefaultCurrency()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var newDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
+            var previousDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>(), true);
 
-            var newDefaultCurrency = new Currency(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
-            var previousDefaultCurrency = new Currency(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), true);
-
-            var sut = fixture.Create<CurrencyDomainService>();
+            var sut = _fixture.Create<CurrencyDomainService>();
 
             sut.ChangeDefaultCurrency(previousDefaultCurrency, newDefaultCurrency);
 
@@ -28,13 +33,10 @@ namespace PortEval.Tests.Unit.DomainTests.Services
         [Fact]
         public void ChangeDefaultCurrency_ThrowsException_WhenProvidedDefaultCurrencyIsNotDefault()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var newDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
+            var previousDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
 
-            var newDefaultCurrency = new Currency(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
-            var previousDefaultCurrency = new Currency(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
-
-            var sut = fixture.Create<CurrencyDomainService>();
+            var sut = _fixture.Create<CurrencyDomainService>();
 
             Assert.Throws<OperationNotAllowedException>(() => sut.ChangeDefaultCurrency(previousDefaultCurrency, newDefaultCurrency));
         }
@@ -42,13 +44,10 @@ namespace PortEval.Tests.Unit.DomainTests.Services
         [Fact]
         public void ChangeDefaultCurrency_SetsNewDefaultCurrencyAsDefault()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var newDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
+            var previousDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>(), true);
 
-            var newDefaultCurrency = new Currency(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
-            var previousDefaultCurrency = new Currency(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>(), true);
-
-            var sut = fixture.Create<CurrencyDomainService>();
+            var sut = _fixture.Create<CurrencyDomainService>();
 
             sut.ChangeDefaultCurrency(previousDefaultCurrency, newDefaultCurrency);
 

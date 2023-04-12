@@ -2,34 +2,40 @@
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Controllers;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Tests.Unit.Helpers;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests
 {
     public class ExchangesControllerTests
     {
+        private IFixture _fixture;
+        private Mock<IInstrumentService> _instrumentService;
+
+        public ExchangesControllerTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _instrumentService = _fixture.Freeze<Mock<IInstrumentService>>();
+        }
+
         [Fact]
         public async Task GetKnownExchanges_ReturnsExchanges()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var exchanges = _fixture.CreateMany<ExchangeDto>();
 
-            var exchanges = fixture.CreateMany<ExchangeDto>();
+            _instrumentService
+                .Setup(m => m.GetKnownExchangesAsync())
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(exchanges));
 
-            var exchangeQueries = fixture.Freeze<Mock<IExchangeQueries>>();
-            exchangeQueries
-                .Setup(m => m.GetKnownExchanges())
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(exchanges));
-
-            var sut = fixture.Build<ExchangesController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<ExchangesController>().OmitAutoProperties().Create();
 
             var result = await sut.GetKnownExchanges();
 
-            exchangeQueries.Verify(m => m.GetKnownExchanges(), Times.Once());
+            _instrumentService.Verify(m => m.GetKnownExchangesAsync(), Times.Once());
             Assert.Equal(exchanges, result.Value);
         }
     }

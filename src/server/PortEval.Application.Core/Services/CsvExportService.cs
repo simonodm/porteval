@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using CsvHelper;
+﻿using CsvHelper;
 using PortEval.Application.Core.Extensions;
 using PortEval.Application.Core.Interfaces.Services;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 
 namespace PortEval.Application.Core.Services
 {
+    /// <inheritdoc cref="ICsvExportService" />
     public class CsvExportService : ICsvExportService
     {
-        public byte[] ConvertToCsv<T>(IEnumerable<T> rows)
+        /// <inheritdoc />
+        public OperationResponse<byte[]> ConvertToCsv<T>(IEnumerable<T> rows)
         {
             using var ms = new MemoryStream();
             using var sw = new StreamWriter(ms);
@@ -18,7 +20,10 @@ namespace PortEval.Application.Core.Services
 
             csv.WriteRecords(rows);
             sw.Flush();
-            return ms.ToArray();
+            return new OperationResponse<byte[]>
+            {
+                Response = ms.ToArray()
+            };
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Services;
+﻿using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.Validators;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Common.BulkImportExport
 {
@@ -20,12 +20,21 @@ namespace PortEval.Application.Core.Common.BulkImportExport
 
             if (row.Id != default)
             {
-                await _instrumentService.UpdateInstrumentAsync(row);
+                var response = await _instrumentService.UpdateInstrumentAsync(row);
+                if (response.Status != OperationStatus.Ok)
+                {
+                    logEntry.AddError(response.Message);
+                }
             }
             else
             {
-                var instrument = await _instrumentService.CreateInstrumentAsync(row);
-                logEntry.Data.Id = instrument.Id;
+                var response = await _instrumentService.CreateInstrumentAsync(row);
+                if (response.Status != OperationStatus.Ok)
+                {
+                    logEntry.AddError(response.Message);
+                }
+
+                logEntry.Data.Id = response.Response?.Id ?? default;
             }
 
             return logEntry;

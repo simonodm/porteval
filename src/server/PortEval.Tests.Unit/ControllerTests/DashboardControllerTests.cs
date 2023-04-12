@@ -2,53 +2,64 @@
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Controllers;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Tests.Unit.Helpers;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Interfaces.Services;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests
 {
     public class DashboardControllerTests
     {
+        private IFixture _fixture;
+        private Mock<IDashboardService> _dashboardLayoutService;
+
+        public DashboardControllerTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _dashboardLayoutService = _fixture.Freeze<Mock<IDashboardService>>();
+        }
+
         [Fact]
         public async Task GetDashboardLayout_ReturnsDashboardLayout()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var dashboardLayout = _fixture.Create<DashboardLayoutDto>();
 
-            var dashboardLayout = fixture.Create<DashboardLayoutDto>();
+            _dashboardLayoutService
+                .Setup(m => m.GetDashboardLayoutAsync())
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(dashboardLayout));
 
-            var dashboardLayoutQueries = fixture.Freeze<Mock<IDashboardLayoutQueries>>();
-            dashboardLayoutQueries
-                .Setup(m => m.GetDashboardLayout())
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(dashboardLayout));
-
-            var sut = fixture.Build<DashboardController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<DashboardController>().OmitAutoProperties().Create();
 
             var result = await sut.GetDashboardLayout();
 
-            dashboardLayoutQueries.Verify(m => m.GetDashboardLayout(), Times.Once());
+            _dashboardLayoutService.Verify(m => m.GetDashboardLayoutAsync(), Times.Once());
             Assert.Equal(dashboardLayout, result.Value);
         }
 
         [Fact]
         public async Task UpdateDashboardLayout_UpdatesLayout()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var dashboardLayout = _fixture.Create<DashboardLayoutDto>();
 
-            var dashboardLayout = fixture.Create<DashboardLayoutDto>();
+            _dashboardLayoutService
+                .Setup(m => m.UpdateDashboardLayoutAsync(It.IsAny<IEnumerable<DashboardItemDto>>()))
+                .Returns<IEnumerable<DashboardItemDto>>(items =>
+                    Task.FromResult(OperationResponseHelper.GenerateSuccessfulOperationResponse(
+                        new DashboardLayoutDto
+                        {
+                            Items = items.ToList()
+                        })));
 
-            var dashboardService = fixture.Freeze<Mock<IDashboardService>>();
-
-            var sut = fixture.Build<DashboardController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<DashboardController>().OmitAutoProperties().Create();
 
             await sut.UpdateDashboardLayout(dashboardLayout);
 
-            dashboardService.Verify(m => m.UpdateDashboardLayout(dashboardLayout.Items), Times.Once());
+            _dashboardLayoutService.Verify(m => m.UpdateDashboardLayoutAsync(dashboardLayout.Items), Times.Once());
         }
     }
 }

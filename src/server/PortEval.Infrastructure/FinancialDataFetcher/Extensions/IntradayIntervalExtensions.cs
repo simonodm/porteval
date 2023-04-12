@@ -1,5 +1,5 @@
-﻿using System;
-using PortEval.Application.Models.FinancialDataFetcher;
+﻿using PortEval.Application.Models.FinancialDataFetcher;
+using System;
 
 namespace PortEval.Infrastructure.FinancialDataFetcher.Extensions
 {

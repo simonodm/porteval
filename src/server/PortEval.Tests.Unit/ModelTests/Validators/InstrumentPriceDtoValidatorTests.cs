@@ -11,6 +11,14 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class InstrumentPriceDtoValidatorTests
     {
+        private IFixture _fixture;
+
+        public InstrumentPriceDtoValidatorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         public static IEnumerable<object[]> ValidInstrumentPriceData = new List<object[]>
         {
             new object[] { 1, DateTime.Parse("2022-01-01"), 100 },
@@ -21,16 +29,13 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [MemberData(nameof(ValidInstrumentPriceData))]
         public void Validate_ValidatesSuccessfully_WhenPriceIsValid(int instrumentId, DateTime time, decimal price)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var priceDto = fixture.Build<InstrumentPriceDto>()
+            var priceDto = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.InstrumentId, instrumentId)
                 .With(p => p.Time, time)
                 .With(p => p.Price, price)
                 .Create();
 
-            var sut = fixture.Create<InstrumentPriceDtoValidator>();
+            var sut = _fixture.Create<InstrumentPriceDtoValidator>();
 
             var validationResult = sut.Validate(priceDto);
 
@@ -40,14 +45,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenInstrumentIdIsMissing()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var priceDto = fixture.Build<InstrumentPriceDto>()
+            var priceDto = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.InstrumentId, 0)
                 .Create();
 
-            var sut = fixture.Create<InstrumentPriceDtoValidator>();
+            var sut = _fixture.Create<InstrumentPriceDtoValidator>();
 
             var validationResult = sut.Validate(priceDto);
 
@@ -58,14 +60,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPriceIsZero()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var priceDto = fixture.Build<InstrumentPriceDto>()
+            var priceDto = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.Price, 0)
                 .Create();
 
-            var sut = fixture.Create<InstrumentPriceDtoValidator>();
+            var sut = _fixture.Create<InstrumentPriceDtoValidator>();
 
             var validationResult = sut.Validate(priceDto);
 
@@ -76,14 +75,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPriceIsNegative()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var priceDto = fixture.Build<InstrumentPriceDto>()
+            var priceDto = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.Price, -1)
                 .Create();
 
-            var sut = fixture.Create<InstrumentPriceDtoValidator>();
+            var sut = _fixture.Create<InstrumentPriceDtoValidator>();
 
             var validationResult = sut.Validate(priceDto);
 
@@ -94,14 +90,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPriceIsTooLarge()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var priceDto = fixture.Build<InstrumentPriceDto>()
+            var priceDto = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.Price, decimal.MaxValue)
                 .Create();
 
-            var sut = fixture.Create<InstrumentPriceDtoValidator>();
+            var sut = _fixture.Create<InstrumentPriceDtoValidator>();
 
             var validationResult = sut.Validate(priceDto);
 
@@ -112,14 +105,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenTimeIsInTheFuture()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var priceDto = fixture.Build<InstrumentPriceDto>()
+            var priceDto = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.Time, DateTime.MaxValue)
                 .Create();
 
-            var sut = fixture.Create<InstrumentPriceDtoValidator>();
+            var sut = _fixture.Create<InstrumentPriceDtoValidator>();
 
             var validationResult = sut.Validate(priceDto);
 
@@ -130,14 +120,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenTimeIsBeforeEarliestAllowedTime()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var priceDto = fixture.Build<InstrumentPriceDto>()
+            var priceDto = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.Time, PortEvalConstants.FinancialDataStartTime.AddDays(-1))
                 .Create();
 
-            var sut = fixture.Create<InstrumentPriceDtoValidator>();
+            var sut = _fixture.Create<InstrumentPriceDtoValidator>();
 
             var validationResult = sut.Validate(priceDto);
 

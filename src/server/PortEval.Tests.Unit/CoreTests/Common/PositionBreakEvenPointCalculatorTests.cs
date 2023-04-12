@@ -1,21 +1,26 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
+using PortEval.Application.Core.Common.Calculators;
 using PortEval.Application.Models.DTOs;
 using System.Linq;
-using PortEval.Application.Core.Common.Calculators;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.Common
+namespace PortEval.Tests.Unit.CoreTests.Common
 {
     public class PositionBreakEvenPointCalculatorTests
     {
+        private IFixture _fixture;
+
+        public PositionBreakEvenPointCalculatorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         [Fact]
         public void CalculatePositionBreakEvenPoint_ReturnsZero_WhenNoTransactionsAreProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var sut = fixture.Create<PositionBreakEvenPointCalculator>();
+            var sut = _fixture.Create<PositionBreakEvenPointCalculator>();
 
             var result = sut.CalculatePositionBreakEvenPoint(Enumerable.Empty<TransactionDto>());
 
@@ -25,12 +30,9 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void CalculatePositionBreakEvenPoint_ReturnsTransactionPrice_WhenOneTransactionIsProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transaction = _fixture.Create<TransactionDto>();
 
-            var transaction = fixture.Create<TransactionDto>();
-
-            var sut = fixture.Create<PositionBreakEvenPointCalculator>();
+            var sut = _fixture.Create<PositionBreakEvenPointCalculator>();
 
             var result = sut.CalculatePositionBreakEvenPoint(new[] { transaction });
 
@@ -40,25 +42,22 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void CalculatePositionBreakEvenPoint_ReturnsCorrectBreakEvenPoint_WhenMultipleTransactionsAreProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var firstTransaction = fixture.Build<TransactionDto>()
+            var firstTransaction = _fixture.Build<TransactionDto>()
                 .With(t => t.Amount, 3)
                 .With(t => t.Price, 100m)
                 .Create();
 
-            var secondTransaction = fixture.Build<TransactionDto>()
+            var secondTransaction = _fixture.Build<TransactionDto>()
                 .With(t => t.Amount, -2)
                 .With(t => t.Price, 105m)
                 .Create();
 
-            var thirdTransaction = fixture.Build<TransactionDto>()
+            var thirdTransaction = _fixture.Build<TransactionDto>()
                 .With(t => t.Amount, 3)
                 .With(t => t.Price, 110m)
                 .Create();
 
-            var sut = fixture.Create<PositionBreakEvenPointCalculator>();
+            var sut = _fixture.Create<PositionBreakEvenPointCalculator>();
 
             var result =
                 sut.CalculatePositionBreakEvenPoint(new[] { firstTransaction, secondTransaction, thirdTransaction });

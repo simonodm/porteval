@@ -1,37 +1,31 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Interfaces.Services;
-using PortEval.Application.Core.Queries;
 
 namespace PortEval.Application.Controllers
 {
     [Route("imports")]
     [ApiController]
-    public class CsvImportController : ControllerBase
+    public class CsvImportController : PortEvalControllerBase
     {
         private readonly ICsvImportService _importService;
-        private readonly IDataImportQueries _importQueries;
 
-        public CsvImportController(ICsvImportService importService, IDataImportQueries importQueries)
+        public CsvImportController(ICsvImportService importService)
         {
             _importService = importService;
-            _importQueries = importQueries;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CsvTemplateImportDto>>> GetAllImports()
         {
-            var result = await _importQueries.GetAllImports();
+            var result = await _importService.GetAllImportsAsync();
 
-            return result.Response.ToList();
+            return GenerateActionResult(result);
         }
 
         [HttpGet("{id}")]
@@ -42,13 +36,8 @@ namespace PortEval.Application.Controllers
                 return BadRequest("Invalid import log id provided.");
             }
 
-            var result = await _importQueries.GetImport(guid);
-            if (result.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Import {id} not found.");
-            }
-
-            return result.Response;
+            var result = await _importService.GetImportAsync(guid);
+            return GenerateActionResult(result);
         }
 
         [HttpGet("{id}/log")]
@@ -60,31 +49,22 @@ namespace PortEval.Application.Controllers
             }
 
             var fileStream = _importService.TryGetErrorLog(guid);
-            if (fileStream == null)
-            {
-                return NotFound($"No error log found for import {id}.");
-            }
-
-            return File(fileStream, "text/csv", "error-log.csv");
+            return GenerateFileActionResult(fileStream, "text/csv", "error-log.csv");
         }
 
         [HttpGet("template")]
         public IActionResult GetImportTemplate(TemplateType templateType)
         {
             var stream = _importService.GetCsvTemplate(templateType);
-            return File(stream, "text/csv", $"import_{templateType.ToString().ToLower()}");
+            return GenerateFileActionResult(stream, "text/csv", $"import_{templateType.ToString().ToLower()}");
         }
 
         [HttpPost]
-        public async Task<ActionResult<CsvTemplateImportResultDto>> UploadFile([FromForm] IFormFile file, [FromForm] TemplateType type)
+        public async Task<ActionResult<CsvTemplateImportDto>> UploadFile([FromForm] IFormFile file, [FromForm] TemplateType type)
         {
             await using var stream = file.OpenReadStream();
-            var importEntry = await _importService.StartImport(stream, type);
-
-            return Ok(new CsvTemplateImportResultDto
-            {
-                ImportId = importEntry.Id
-            });
+            var importEntry = await _importService.StartImportAsync(stream, type);
+            return GenerateActionResult(importEntry, nameof(GetImport), new { id = importEntry.Response.ImportId });
         }
     }
 }

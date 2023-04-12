@@ -1,4 +1,5 @@
-﻿using PortEval.DataFetcher;
+﻿using PortEval.Application.Models.FinancialDataFetcher;
+using PortEval.DataFetcher;
 using PortEval.DataFetcher.Models;
 using PortEval.DataFetcher.Responses;
 using PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost.Models;
@@ -8,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Models.FinancialDataFetcher;
 
 namespace PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost
 {
@@ -20,7 +20,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost
         private const string _baseUrl = "https://api.exchangerate.host";
 
         [RequestProcessor(typeof(HistoricalDailyExchangeRatesRequest), typeof(IEnumerable<ExchangeRates>))]
-        public async Task<Response<IEnumerable<ExchangeRates>>> Process(HistoricalDailyExchangeRatesRequest request)
+        public async Task<Response<IEnumerable<ExchangeRates>>> ProcessAsync(HistoricalDailyExchangeRatesRequest request)
         {
             var tasks = GenerateHistoricalPricesTasks(request).ToList();
             await Task.WhenAll(tasks);
@@ -52,10 +52,10 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost
         }
 
         [RequestProcessorAttribute(typeof(LatestExchangeRatesRequest), typeof(ExchangeRates))]
-        public async Task<Response<ExchangeRates>> Process(LatestExchangeRatesRequest request)
+        public async Task<Response<ExchangeRates>> ProcessAsync(LatestExchangeRatesRequest request)
         {
             var queryUrl = $"{_baseUrl}/latest?base={request.CurrencyCode}";
-            var response = await HttpClient.GetJson<ExchangeRatesLatestResponseModel>(queryUrl, Configuration?.RateLimiter);
+            var response = await HttpClient.GetJsonAsync<ExchangeRatesLatestResponseModel>(queryUrl, Configuration?.RateLimiter);
 
             return new Response<ExchangeRates>
             {
@@ -78,7 +78,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost
                 var endDate = i == ranges.Count - 1 ? ranges[i] : ranges[i].AddDays(-1);
                 var queryUrl =
                     $"{_baseUrl}/timeseries?start_date={startDate:yyyy-MM-dd}&end_date={endDate:yyyy-MM-dd}&base={request.CurrencyCode}";
-                var task = Task.Run(async () => await HttpClient.GetJson<ExchangeRatesTimeSeriesResponseModel>(queryUrl, Configuration?.RateLimiter));
+                var task = Task.Run(async () => await HttpClient.GetJsonAsync<ExchangeRatesTimeSeriesResponseModel>(queryUrl, Configuration?.RateLimiter));
                 tasks.Add(task);
             }
 

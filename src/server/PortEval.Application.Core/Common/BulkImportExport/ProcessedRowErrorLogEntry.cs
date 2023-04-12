@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using PortEval.Application.Core.Interfaces;
+using System.Collections.Generic;
 using System.Linq;
-using PortEval.Application.Core.Interfaces;
 
 namespace PortEval.Application.Core.Common.BulkImportExport
 {

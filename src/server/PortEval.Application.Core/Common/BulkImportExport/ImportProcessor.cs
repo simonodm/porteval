@@ -1,9 +1,9 @@
-﻿using System;
+﻿using FluentValidation;
+using PortEval.Application.Core.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentValidation;
-using PortEval.Application.Core.Interfaces;
 
 namespace PortEval.Application.Core.Common.BulkImportExport
 {
@@ -19,7 +19,7 @@ namespace PortEval.Application.Core.Common.BulkImportExport
             Validator = new TValidator();
         }
 
-        public async Task<ImportResult<TRecord>> ImportRecords(IEnumerable<TRecord> records)
+        public async Task<ImportResult<TRecord>> ImportRecordsAsync(IEnumerable<TRecord> records)
         {
             var errorLog = new List<ProcessedRowErrorLogEntry<TRecord>>();
             foreach (var record in records)

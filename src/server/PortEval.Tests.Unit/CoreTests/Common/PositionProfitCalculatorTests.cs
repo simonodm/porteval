@@ -1,12 +1,12 @@
-﻿using PortEval.Application.Models.DTOs;
+﻿using PortEval.Application.Core.Common;
+using PortEval.Application.Core.Common.Calculators;
+using PortEval.Application.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PortEval.Application.Core.Common;
-using PortEval.Application.Core.Common.Calculators;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.Common
+namespace PortEval.Tests.Unit.CoreTests.Common
 {
     public class PositionProfitCalculatorTests
     {

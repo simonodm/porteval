@@ -1,6 +1,13 @@
 ﻿using AutoFixture;
 using Moq;
+using PortEval.Application.Core.Common;
+using PortEval.Application.Core.Interfaces;
+using PortEval.Application.Core.Interfaces.Calculators;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.FinancialDataFetcher;
+using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
@@ -8,17 +15,169 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Common;
-using PortEval.Application.Core.Interfaces;
-using PortEval.Application.Core.Interfaces.Calculators;
-using PortEval.Application.Core.Interfaces.Repositories;
-using PortEval.Application.Core.Interfaces.Services;
-using PortEval.Application.Models.FinancialDataFetcher;
 
 namespace PortEval.Tests.Unit.Helpers.Extensions
 {
     internal static class FixtureExtensions
     {
+        #region Query Mocks
+
+        public static Mock<IChartQueries> CreateDefaultChartQueriesMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<IChartQueries>>();
+            mock
+                .Setup(m => m.GetChartsAsync())
+                .ReturnsAsync(fixture.CreateMany<ChartDto>());
+            mock
+                .Setup(m => m.GetChartAsync(It.IsAny<int>()))
+                .ReturnsAsync(fixture.Create<ChartDto>());
+
+            return mock;
+        }
+
+        public static Mock<ICurrencyQueries> CreateDefaultCurrencyQueriesMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<ICurrencyQueries>>();
+            mock
+                .Setup(m => m.GetAllCurrenciesAsync())
+                .ReturnsAsync(fixture.CreateMany<CurrencyDto>());
+            mock
+                .Setup(m => m.GetCurrencyAsync(It.IsAny<string>()))
+                .ReturnsAsync(fixture.Create<CurrencyDto>());
+            mock
+                .Setup(m => m.GetDefaultCurrencyAsync())
+                .ReturnsAsync(fixture.Create<CurrencyDto>());
+            mock
+                .Setup(
+                    m => m.GetCurrencyExchangeRateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>()))
+                .ReturnsAsync(fixture.Create<CurrencyExchangeRateDto>());
+            mock
+                .Setup(m => m.GetDirectExchangeRatesAsync(It.IsAny<string>(), It.IsAny<DateTime>()))
+                .ReturnsAsync(fixture.CreateMany<CurrencyExchangeRateDto>());
+            mock
+                .Setup(m => m.GetDirectExchangeRatesAsync(It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<DateRangeParams>()))
+                .ReturnsAsync(fixture.CreateMany<CurrencyExchangeRateDto>());
+            mock
+                .Setup(m => m.GetInversedExchangeRatesAsync(It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<DateRangeParams>()))
+                .ReturnsAsync(fixture.CreateMany<CurrencyExchangeRateDto>());
+
+            return mock;
+        }
+
+        public static Mock<IDashboardLayoutQueries> CreateDefaultDashboardLayoutQueriesMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<IDashboardLayoutQueries>>();
+            mock
+                .Setup(m => m.GetDashboardItemsAsync())
+                .ReturnsAsync(fixture.CreateMany<DashboardItemDto>());
+
+            return mock;
+        }
+
+        public static Mock<IDataImportQueries> CreateDefaultDataImportQueriesMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<IDataImportQueries>>();
+            mock
+                .Setup(m => m.GetAllImportsAsync())
+                .ReturnsAsync(fixture.CreateMany<CsvTemplateImportDto>());
+            mock
+                .Setup(m => m.GetImportAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(fixture.Create<CsvTemplateImportDto>());
+
+            return mock;
+        }
+
+        public static Mock<IExchangeQueries> CreateDefaultExchangeQueriesMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<IExchangeQueries>>();
+            mock
+                .Setup(m => m.GetKnownExchangesAsync())
+                .ReturnsAsync(fixture.CreateMany<ExchangeDto>());
+
+            return mock;
+        }
+
+        public static Mock<IInstrumentQueries> CreateDefaultInstrumentQueriesMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<IInstrumentQueries>>();
+            mock
+                .Setup(m => m.GetAllInstrumentsAsync())
+                .ReturnsAsync(fixture.CreateMany<InstrumentDto>());
+            mock
+                .Setup(m => m.GetInstrumentPageAsync(It.IsAny<PaginationParams>()))
+                .ReturnsAsync(fixture.CreateMany<InstrumentDto>());
+            mock
+                .Setup(m => m.GetInstrumentCountAsync())
+                .ReturnsAsync(fixture.Create<int>());
+            mock
+                .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
+                .ReturnsAsync(fixture.Create<InstrumentDto>());
+            mock
+                .Setup(m => m.GetInstrumentPricesAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .ReturnsAsync(fixture.CreateMany<InstrumentPriceDto>());
+            mock
+                .Setup(m => m.GetInstrumentPricesPageAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<PaginationParams>(), It.IsAny<AggregationFrequency?>()))
+                .ReturnsAsync(fixture.CreateMany<InstrumentPriceDto>());
+            mock
+                .Setup(m => m.GetInstrumentPricesPageCompressedAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<PaginationParams>(), It.IsAny<AggregationFrequency?>()))
+                .ReturnsAsync(fixture.CreateMany<InstrumentPriceDto>());
+            mock
+                .Setup(m => m.GetInstrumentPriceCountAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<AggregationFrequency?>()))
+                .ReturnsAsync(fixture.Create<int>());
+            mock
+                .Setup(m => m.GetInstrumentPriceCompressedCountAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<AggregationFrequency?>()))
+                .ReturnsAsync(fixture.Create<int>());
+
+            return mock;
+        }
+
+        public static Mock<IPortfolioQueries> CreateDefaultPortfolioQueriesMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<IPortfolioQueries>>();
+            mock
+                .Setup(m => m.GetAllPortfoliosAsync())
+                .ReturnsAsync(fixture.CreateMany<PortfolioDto>());
+            mock
+                .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
+                .ReturnsAsync(fixture.Create<PortfolioDto>());
+
+            return mock;
+        }
+
+        public static Mock<IPositionQueries> CreateDefaultPositionQueriesMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<IPositionQueries>>();
+            mock
+                .Setup(m => m.GetAllPositionsAsync())
+                .ReturnsAsync(fixture.CreateMany<PositionDto>());
+            mock
+                .Setup(m => m.GetPortfolioPositionsAsync(It.IsAny<int>()))
+                .ReturnsAsync(fixture.CreateMany<PositionDto>());
+            mock
+                .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
+                .ReturnsAsync(fixture.Create<PositionDto>());
+
+            return mock;
+        }
+
+        public static Mock<ITransactionQueries> CreateDefaultTransactionQueriesMock(this IFixture fixture)
+        {
+            var mock = fixture.Freeze<Mock<ITransactionQueries>>();
+            mock
+                .Setup(m => m.GetTransactionsAsync(It.IsAny<TransactionFilters>(), It.IsAny<DateTime>(),
+                    It.IsAny<DateTime>()))
+                .ReturnsAsync(fixture.CreateMany<TransactionDto>());
+            mock
+                .Setup(m => m.GetTransactionAsync(It.IsAny<int>()))
+                .ReturnsAsync(fixture.Create<TransactionDto>());
+
+            return mock;
+        }
+
+        #endregion
+
         #region Repository Mocks
 
         public static Mock<ICurrencyRepository> CreateDefaultCurrencyRepositoryMock(this IFixture fixture)
@@ -78,7 +237,7 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
                         fixture.Create<string>(),
                         fixture.Create<string>(),
                         fixture.Create<string>(),
-                        fixture.Create<InstrumentType>(),
+                        InstrumentType.Stock,
                         fixture.Create<string>(),
                         fixture.Create<string>()
                     ))
@@ -126,7 +285,7 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
             var mock = fixture.Freeze<Mock<IPositionRepository>>();
             mock
                 .Setup(m => m.ListPortfolioPositionsAsync(It.IsAny<int>()))
-                .Returns(Task.FromResult(fixture.CreateMany<Position>()));
+                .Returns(Task.FromResult((IEnumerable<Position>)new List<Position> { new Position(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<int>(), fixture.Create<string>()) }));
             mock
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .Returns<int>(id => Task.FromResult(new Position(id, fixture.Create<int>(), fixture.Create<int>(), fixture.Create<string>())));
@@ -278,90 +437,21 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
 
         #endregion
 
-        #region Service Mocks
-
-        public static Mock<IInstrumentPriceService> CreateDefaultInstrumentPriceServiceMock(this IFixture fixture)
-        {
-            var mock = fixture.Freeze<Mock<IInstrumentPriceService>>();
-            mock
-                .Setup(m => m.AddPricePointAsync(It.IsAny<InstrumentPriceDto>()))
-                .Returns(Task.FromResult(fixture.Create<InstrumentPrice>()));
-            mock
-                .Setup(m => m.AddPriceIfNotExistsAsync(It.IsAny<int>(), It.IsAny<DateTime>(), It.IsAny<decimal>()))
-                .Returns(Task.FromResult(fixture.Create<InstrumentPrice>()));
-
-            return mock;
-        }
-
-        public static Mock<IPortfolioService> CreateDefaultPortfolioServiceMock(this IFixture fixture)
-        {
-            var mock = fixture.Freeze<Mock<IPortfolioService>>();
-            mock
-                .Setup(m => m.CreatePortfolioAsync(It.IsAny<PortfolioDto>()))
-                .ReturnsAsync(fixture.Create<Portfolio>());
-            mock
-                .Setup(m => m.UpdatePortfolioAsync(It.IsAny<PortfolioDto>()))
-                .ReturnsAsync(fixture.Create<Portfolio>());
-
-            return mock;
-        }
-
-        public static Mock<IPositionService> CreateDefaultPositionServiceMock(this IFixture fixture)
-        {
-            var mock = fixture.Freeze<Mock<IPositionService>>();
-            mock
-                .Setup(m => m.OpenPositionAsync(It.IsAny<PositionDto>()))
-                .ReturnsAsync(fixture.Create<Position>());
-            mock
-                .Setup(m => m.UpdatePositionAsync(It.IsAny<PositionDto>()))
-                .ReturnsAsync(fixture.Create<Position>());
-
-            return mock;
-        }
-
-        public static Mock<IInstrumentService> CreateDefaultInstrumentServiceMock(this IFixture fixture)
-        {
-            var mock = fixture.Freeze<Mock<IInstrumentService>>();
-            mock
-                .Setup(m => m.CreateInstrumentAsync(It.IsAny<InstrumentDto>()))
-                .ReturnsAsync(fixture.Create<Instrument>());
-            mock
-                .Setup(m => m.UpdateInstrumentAsync(It.IsAny<InstrumentDto>()))
-                .ReturnsAsync(fixture.Create<Instrument>());
-
-            return mock;
-        }
-
-        public static Mock<ITransactionService> CreateDefaultTransactionServiceMock(this IFixture fixture)
-        {
-            var mock = fixture.Freeze<Mock<ITransactionService>>();
-            mock
-                .Setup(m => m.AddTransactionAsync(It.IsAny<TransactionDto>()))
-                .ReturnsAsync(fixture.Create<Transaction>());
-            mock
-                .Setup(m => m.UpdateTransactionAsync(It.IsAny<TransactionDto>()))
-                .ReturnsAsync(fixture.Create<Transaction>());
-
-            return mock;
-        }
-
-        #endregion
-
         public static Mock<IFinancialDataFetcher> CreatePriceFetcherMockReturningHistoricalPrices(this IFixture fixture, Instrument instrument,
             IEnumerable<PricePoint> dailyPrices, IEnumerable<PricePoint> hourlyPrices,
             IEnumerable<PricePoint> fiveMinPrices)
         {
             var priceFetcher = fixture.Freeze<Mock<IFinancialDataFetcher>>();
             priceFetcher
-                .Setup(m => m.GetHistoricalDailyPrices(instrument.Symbol,
+                .Setup(m => m.GetHistoricalDailyPricesAsync(instrument.Symbol,
                     instrument.CurrencyCode, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(dailyPrices ?? Enumerable.Empty<PricePoint>());
             priceFetcher
-                .Setup(m => m.GetIntradayPrices(instrument.Symbol,
+                .Setup(m => m.GetIntradayPricesAsync(instrument.Symbol,
                     instrument.CurrencyCode, It.IsAny<DateTime>(), It.IsAny<DateTime>(), IntradayInterval.OneHour))
                 .ReturnsAsync(hourlyPrices ?? Enumerable.Empty<PricePoint>());
             priceFetcher
-                .Setup(m => m.GetIntradayPrices(instrument.Symbol,
+                .Setup(m => m.GetIntradayPricesAsync(instrument.Symbol,
                     instrument.CurrencyCode, It.IsAny<DateTime>(), It.IsAny<DateTime>(), IntradayInterval.FiveMinutes))
                 .ReturnsAsync(fiveMinPrices ?? Enumerable.Empty<PricePoint>());
 

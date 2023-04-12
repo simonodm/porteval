@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using PortEval.Application.Models.DTOs;
+﻿using PortEval.Application.Models.DTOs;
+using System.Collections.Generic;
 
 namespace PortEval.Application.Core.Interfaces.Calculators
 {

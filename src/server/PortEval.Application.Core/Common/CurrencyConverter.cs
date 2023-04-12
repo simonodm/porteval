@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using PortEval.Application.Core.Interfaces.ChartDataGenerators;
+﻿using PortEval.Application.Core.Interfaces.ChartDataGenerators;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Exceptions;
+using System.Collections.Generic;
 
 namespace PortEval.Application.Core.Common
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="ICurrencyConverter" />
     public class CurrencyConverter : ICurrencyConverter
     {
         /// <inheritdoc />

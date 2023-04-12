@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
-using PortEval.DataFetcher;
+﻿using PortEval.DataFetcher;
 using PortEval.DataFetcher.Responses;
+using System.Threading.Tasks;
 
 namespace PortEval.Tests.Unit.DataFetcherTests.HelperTypes
 {

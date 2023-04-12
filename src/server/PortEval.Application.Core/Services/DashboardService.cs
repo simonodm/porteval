@@ -1,26 +1,46 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.ValueObjects;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Services
 {
+    /// <inheritdoc cref="IDashboardService"/>
     public class DashboardService : IDashboardService
     {
         private readonly IChartRepository _chartRepository;
         private readonly IDashboardItemRepository _dashboardItemRepository;
+        private readonly IDashboardLayoutQueries _dashboardLayoutDataQueries;
 
-        public DashboardService(IDashboardItemRepository dashboardItemRepository, IChartRepository chartRepository)
+        public DashboardService(IDashboardItemRepository dashboardItemRepository, IChartRepository chartRepository, IDashboardLayoutQueries dashboardLayoutDataQueries)
         {
             _dashboardItemRepository = dashboardItemRepository;
             _chartRepository = chartRepository;
+            _dashboardLayoutDataQueries = dashboardLayoutDataQueries;
         }
 
-        public async Task UpdateDashboardLayout(IEnumerable<DashboardItemDto> newItems)
+        /// <inheritdoc />
+        public async Task<OperationResponse<DashboardLayoutDto>> GetDashboardLayoutAsync()
+        {
+            var items = await _dashboardLayoutDataQueries.GetDashboardItemsAsync();
+
+            return new OperationResponse<DashboardLayoutDto>
+            {
+                Response = new DashboardLayoutDto
+                {
+                    Items = items.ToList()
+                }
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<OperationResponse<DashboardLayoutDto>> UpdateDashboardLayoutAsync(IEnumerable<DashboardItemDto> newItems)
         {
             var existingItems = await _dashboardItemRepository.GetDashboardItemsAsync();
 
@@ -30,41 +50,68 @@ namespace PortEval.Application.Core.Services
             }
 
             var newItemEntities = await GenerateItemEntities(newItems);
-            if (OverlapsExist(newItemEntities))
+            if (newItemEntities.Status != OperationStatus.Ok)
             {
-                throw new OperationNotAllowedException("Dashboard layout overlaps detected.");
+                return new OperationResponse<DashboardLayoutDto>
+                {
+                    Status = newItemEntities.Status,
+                    Message = newItemEntities.Message
+                };
             }
 
-            foreach (var entity in newItemEntities)
+            if (OverlapsExist(newItemEntities.Response))
+            {
+                return new OperationResponse<DashboardLayoutDto>
+                {
+                    Status = OperationStatus.Error,
+                    Message = "Dashboard layout overlaps detected."
+                };
+            }
+
+            foreach (var entity in newItemEntities.Response)
             {
                 _dashboardItemRepository.Add(entity);
             }
 
             await _dashboardItemRepository.UnitOfWork.CommitAsync();
+            return await GetDashboardLayoutAsync();
         }
 
-        private async Task<Chart> FetchChart(int chartId)
-        {
-            var chart = await _chartRepository.FindAsync(chartId);
-            if (chart == null)
-            {
-                throw new ItemNotFoundException($"Chart {chartId} does not exist.");
-            }
-
-            return chart;
-        }
-
-        private async Task<List<DashboardItem>> GenerateItemEntities(IEnumerable<DashboardItemDto> items)
+        private async Task<OperationResponse<List<DashboardItem>>> GenerateItemEntities(IEnumerable<DashboardItemDto> items)
         {
             var result = new List<DashboardItem>();
-            foreach (var item in items)
+            try
             {
-                var chart = await FetchChart(item.ChartId);
-                var position = new DashboardPosition(item.DashboardPositionX, item.DashboardPositionY, item.DashboardWidth, item.DashboardHeight);
-                result.Add(DashboardChartItem.Create(chart, position));
+                foreach (var item in items)
+                {
+                    var chart = await _chartRepository.FindAsync(item.ChartId);
+                    if (chart == null)
+                    {
+                        return new OperationResponse<List<DashboardItem>>
+                        {
+                            Status = OperationStatus.Error,
+                            Message = $"Chart {item.ChartId} does not exist."
+                        };
+                    }
+
+                    var position = new DashboardPosition(item.DashboardPositionX, item.DashboardPositionY,
+                        item.DashboardWidth, item.DashboardHeight);
+                    result.Add(DashboardChartItem.Create(chart, position));
+                }
+            }
+            catch (PortEvalException ex)
+            {
+                return new OperationResponse<List<DashboardItem>>
+                {
+                    Status = OperationStatus.Error,
+                    Message = ex.Message
+                };
             }
 
-            return result;
+            return new OperationResponse<List<DashboardItem>>
+            {
+                Response = result
+            };
         }
 
         private bool OverlapsExist(IEnumerable<DashboardItem> items)

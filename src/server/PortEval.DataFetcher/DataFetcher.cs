@@ -87,7 +87,7 @@ namespace PortEval.DataFetcher
         }
 
         /// <inheritdoc />
-        public async Task<Response<TResult>> ProcessRequest<TRequest, TResult>(TRequest request)
+        public async Task<Response<TResult>> ProcessRequestAsync<TRequest, TResult>(TRequest request)
             where TRequest : class, IRequest
         {
             var eligibleApis = _registeredClients.Where(CanProcessRequest<TRequest, TResult>).ToList();
@@ -102,7 +102,7 @@ namespace PortEval.DataFetcher
             }
 
             var handler = new RequestHandler<TRequest, TResult>(request, eligibleApis, _retryPolicy);
-            return await handler.Handle();
+            return await handler.HandleAsync();
         }
 
         private static bool CanProcessRequest<TRequest, TResult>(DataSource source)

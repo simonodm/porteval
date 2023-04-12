@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Interfaces.BackgroundJobs
 {
@@ -13,6 +13,6 @@ namespace PortEval.Application.Core.Interfaces.BackgroundJobs
         /// </summary>
         /// <returns>A task representing the asynchronous exchange rate download and import operations.</returns>
         [AutomaticRetry(Attempts = 0)]
-        Task Run();
+        public Task RunAsync();
     }
 }

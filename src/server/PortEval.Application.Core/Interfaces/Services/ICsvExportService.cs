@@ -13,6 +13,6 @@ namespace PortEval.Application.Core.Interfaces.Services
         /// <typeparam name="T">Type of provided records.</typeparam>
         /// <param name="rows">A collection of records to convert to CSV.</param>
         /// <returns>A byte array representing the final CSV file.</returns>
-        public byte[] ConvertToCsv<T>(IEnumerable<T> rows);
+        public OperationResponse<byte[]> ConvertToCsv<T>(IEnumerable<T> rows);
     }
 }

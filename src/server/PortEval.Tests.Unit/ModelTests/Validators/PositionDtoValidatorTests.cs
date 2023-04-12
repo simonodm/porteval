@@ -11,6 +11,14 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class PositionDtoValidatorTests
     {
+        private IFixture _fixture;
+
+        public PositionDtoValidatorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         public static IEnumerable<object[]> ValidPositionData = new List<object[]>
         {
             new object[] { 0, 1, 1, "", 2m, 100.1m, DateTime.Parse("2020-06-30 22:17:13") },
@@ -24,10 +32,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         public void Validate_ValidatesSuccessfully_WhenPositionDataIsValid(int positionId, int portfolioId,
             int instrumentId, string note, decimal? amount, decimal? price, DateTime? time)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.Id, positionId)
                 .With(p => p.PortfolioId, portfolioId)
                 .With(p => p.InstrumentId, instrumentId)
@@ -37,7 +42,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .With(p => p.Time, time)
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 
@@ -47,14 +52,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPortfolioIdIsMissing()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.PortfolioId, 0)
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 
@@ -65,14 +67,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenInstrumentIdIsMissing()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.InstrumentId, 0)
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 
@@ -83,14 +82,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenNoteIsLongerThan255Characters()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
-                .With(p => p.Note, string.Join(string.Empty, fixture.CreateMany<string>(50)))
+            var position = _fixture.Build<PositionDto>()
+                .With(p => p.Note, string.Join(string.Empty, _fixture.CreateMany<string>(50)))
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 
@@ -101,15 +97,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPositionIdAndAmountIsMissing()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.Id, 0)
                 .With(p => p.Amount, (decimal?)null)
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 
@@ -120,15 +113,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPositionIdAndPriceIsMissing()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.Id, 0)
                 .With(p => p.Price, (decimal?)null)
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 
@@ -139,15 +129,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPositionIdAndTimeIsMissing()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.Id, 0)
                 .With(p => p.Time, (DateTime?)null)
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 
@@ -158,15 +145,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPositionIdIsMissingAndAmountIsNegative()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.Id, 0)
                 .With(p => p.Amount, -1)
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 
@@ -177,15 +161,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPositionIdIsMissingAndPriceIsNegative()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.Id, 0)
                 .With(p => p.Price, -1)
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 
@@ -196,15 +177,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPositionIdIsMissingAndTimeIsInTheFuture()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.Id, 0)
                 .With(p => p.Time, DateTime.UtcNow.AddDays(1))
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 
@@ -215,15 +193,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPositionIdIsMissingAndTimeIsBeforeEarliestAllowedTime()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.Id, 0)
                 .With(p => p.Time, PortEvalConstants.FinancialDataStartTime.AddDays(-1))
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 
@@ -234,15 +209,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPositionIdIsMissingAndPriceIsTooLarge()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.Id, 0)
                 .With(p => p.Price, decimal.MaxValue)
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 
@@ -253,15 +225,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPositionIdIsMissingAndAmountIsTooLarge()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.Id, 0)
                 .With(p => p.Amount, decimal.MaxValue)
                 .Create();
 
-            var sut = fixture.Create<PositionDtoValidator>();
+            var sut = _fixture.Create<PositionDtoValidator>();
 
             var validationResult = sut.Validate(position);
 

@@ -1,6 +1,10 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Core.BackgroundJobs;
+using PortEval.Application.Core.Interfaces.Repositories;
+using PortEval.Application.Models.FinancialDataFetcher;
+using PortEval.Domain;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Tests.Unit.Helpers.Extensions;
@@ -8,9 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.BackgroundJobs;
-using PortEval.Application.Models.FinancialDataFetcher;
-using PortEval.Domain;
 using Xunit;
 using Range = Moq.Range;
 
@@ -18,18 +19,27 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 {
     public class MissingInstrumentPricesFetchJobTests
     {
+        private IFixture _fixture;
+        private Mock<IInstrumentRepository> _instrumentRepository;
+        private Mock<IInstrumentPriceRepository> _priceRepository;
+
+        public MissingInstrumentPricesFetchJobTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _instrumentRepository = _fixture.CreateDefaultInstrumentRepositoryMock();
+            _priceRepository = _fixture.CreateDefaultInstrumentPriceRepositoryMock();
+        }
+
         [Fact]
         public async Task Run_ImportsMissingDailyPricesFromFetcherResult()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var baseTime = DateTime.UtcNow;
             var instrument = new Instrument(1, "Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
             instrument.SetTrackingFrom(DateTime.UtcNow.AddMonths(-1));
             var prices = new List<PricePoint>
             {
-                fixture
+                _fixture
                     .Build<PricePoint>()
                     .With(p => p.CurrencyCode, "USD")
                     .With(p => p.Time, baseTime.AddDays(-6))
@@ -37,25 +47,22 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                     .Create()
             };
 
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            _instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Instrument> { instrument });
-            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
-            var priceFetcher = fixture.CreatePriceFetcherMockReturningHistoricalPrices(instrument, prices, null, null);
+            var priceFetcher = _fixture.CreatePriceFetcherMockReturningHistoricalPrices(instrument, prices, null, null);
 
+            var sut = _fixture.Create<MissingInstrumentPricesFetchJob>();
 
-            var sut = fixture.Create<MissingInstrumentPricesFetchJob>();
+            await sut.RunAsync();
 
-            await sut.Run();
-
-            priceFetcher.Verify(m => m.GetHistoricalDailyPrices(
+            priceFetcher.Verify(m => m.GetHistoricalDailyPricesAsync(
                 instrument.Symbol,
                 instrument.CurrencyCode,
                 PortEvalConstants.FinancialDataStartTime,
                 It.IsInRange(baseTime.AddDays(-5).AddMinutes(-5), baseTime.AddDays(-5).AddMinutes(5), Range.Inclusive)));
 
-            priceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(list =>
+            _priceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(list =>
                 list.Any(price => price.Time == prices[0].Time && price.Price == prices[0].Price && price.InstrumentId == instrument.Id)
             )));
         }
@@ -63,15 +70,12 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_ImportsMissingHourlyPricesFromFetcherResult()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var baseTime = DateTime.UtcNow;
             var instrument = new Instrument(1, "Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
             instrument.SetTrackingFrom(baseTime.AddMonths(-1));
             var prices = new List<PricePoint>
             {
-                fixture
+                _fixture
                     .Build<PricePoint>()
                     .With(p => p.CurrencyCode, "USD")
                     .With(p => p.Time, baseTime.AddHours(-48))
@@ -79,26 +83,24 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                     .Create()
             };
 
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            _instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Instrument> { instrument });
-            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
-            var priceFetcher = fixture.CreatePriceFetcherMockReturningHistoricalPrices(instrument, null, prices, null);
+            var priceFetcher = _fixture.CreatePriceFetcherMockReturningHistoricalPrices(instrument, null, prices, null);
 
 
-            var sut = fixture.Create<MissingInstrumentPricesFetchJob>();
+            var sut = _fixture.Create<MissingInstrumentPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            priceFetcher.Verify(m => m.GetIntradayPrices(
+            priceFetcher.Verify(m => m.GetIntradayPricesAsync(
                 instrument.Symbol,
                 instrument.CurrencyCode,
                 It.IsInRange(baseTime.AddDays(-5).AddMinutes(-5), baseTime.AddDays(-5).AddMinutes(5), Range.Inclusive),
                 It.IsInRange(baseTime.AddDays(-1).AddMinutes(-5), baseTime.AddDays(-1).AddMinutes(5), Range.Inclusive),
                 IntradayInterval.OneHour
             ));
-            priceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(list =>
+            _priceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(list =>
                 list.Any(price => price.Time == prices[0].Time && price.Price == prices[0].Price && price.InstrumentId == instrument.Id)
             )));
         }
@@ -106,15 +108,12 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_ImportsMissingFiveMinutePricesFromFetcherResult()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var baseTime = DateTime.UtcNow;
             var instrument = new Instrument(1, "Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
             instrument.SetTrackingFrom(baseTime.AddMonths(-1));
             var prices = new List<PricePoint>
             {
-                fixture
+                _fixture
                     .Build<PricePoint>()
                     .With(p => p.CurrencyCode, "USD")
                     .With(p => p.Time, baseTime.AddMinutes(-10))
@@ -122,26 +121,24 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                     .Create()
             };
 
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            _instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Instrument> { instrument });
-            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
-            var priceFetcher = fixture.CreatePriceFetcherMockReturningHistoricalPrices(instrument, null, null, prices);
+            var priceFetcher = _fixture.CreatePriceFetcherMockReturningHistoricalPrices(instrument, null, null, prices);
 
 
-            var sut = fixture.Create<MissingInstrumentPricesFetchJob>();
+            var sut = _fixture.Create<MissingInstrumentPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            priceFetcher.Verify(m => m.GetIntradayPrices(
+            priceFetcher.Verify(m => m.GetIntradayPricesAsync(
                 instrument.Symbol,
                 instrument.CurrencyCode,
                 It.IsInRange(baseTime.AddDays(-1).AddMinutes(-5), baseTime.AddDays(-1).AddMinutes(5), Range.Inclusive),
                 It.IsInRange(baseTime.AddMinutes(-5), baseTime.AddMinutes(5), Range.Inclusive),
                 IntradayInterval.FiveMinutes
             ));
-            priceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(list =>
+            _priceRepository.Verify(m => m.BulkUpsertAsync(It.Is<IList<InstrumentPrice>>(list =>
                 list.Any(price => price.Time == prices[0].Time && price.Price == prices[0].Price && price.InstrumentId == instrument.Id)
             )));
         }
@@ -149,15 +146,12 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_SplitsMissingRangesCorrectly()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var baseTime = DateTime.UtcNow;
             var instrument = new Instrument(1, "Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
             instrument.SetTrackingFrom(baseTime.AddMonths(-1));
             var dailyPrices = new List<PricePoint>
             {
-                fixture
+                _fixture
                     .Build<PricePoint>()
                     .With(p => p.CurrencyCode, "USD")
                     .With(p => p.Time, baseTime.AddMonths(-1).AddDays(1))
@@ -166,7 +160,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             };
             var hourlyPrices = new List<PricePoint>
             {
-                fixture
+                _fixture
                     .Build<PricePoint>()
                     .With(p => p.CurrencyCode, "USD")
                     .With(p => p.Time, baseTime.AddDays(-4))
@@ -175,7 +169,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             };
             var fiveMinPrices = new List<PricePoint>
             {
-                fixture
+                _fixture
                     .Build<PricePoint>()
                     .With(p => p.CurrencyCode, "USD")
                     .With(p => p.Time, baseTime.AddHours(-1))
@@ -183,31 +177,29 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                     .Create()
             };
 
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            _instrumentRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Instrument> { instrument });
-            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
-            var priceFetcher = fixture.CreatePriceFetcherMockReturningHistoricalPrices(instrument, dailyPrices, hourlyPrices, fiveMinPrices);
+            var priceFetcher = _fixture.CreatePriceFetcherMockReturningHistoricalPrices(instrument, dailyPrices, hourlyPrices, fiveMinPrices);
 
-            var sut = fixture.Create<MissingInstrumentPricesFetchJob>();
+            var sut = _fixture.Create<MissingInstrumentPricesFetchJob>();
 
-            await sut.Run();
+            await sut.RunAsync();
 
-            priceFetcher.Verify(m => m.GetHistoricalDailyPrices(
+            priceFetcher.Verify(m => m.GetHistoricalDailyPricesAsync(
                 instrument.Symbol,
                 instrument.CurrencyCode,
                 PortEvalConstants.FinancialDataStartTime,
                 It.IsInRange(baseTime.AddDays(-5).AddMinutes(-5), baseTime.AddDays(-5).AddMinutes(5), Range.Inclusive)
             ));
-            priceFetcher.Verify(m => m.GetIntradayPrices(
+            priceFetcher.Verify(m => m.GetIntradayPricesAsync(
                 instrument.Symbol,
                 instrument.CurrencyCode,
                 It.IsInRange(baseTime.AddDays(-5).AddMinutes(-5), baseTime.AddDays(-5).AddMinutes(5), Range.Inclusive),
                 It.IsInRange(baseTime.AddDays(-1).AddMinutes(-5), baseTime.AddDays(-1).AddMinutes(5), Range.Inclusive),
                 IntradayInterval.OneHour
             ));
-            priceFetcher.Verify(m => m.GetIntradayPrices(
+            priceFetcher.Verify(m => m.GetIntradayPricesAsync(
                 instrument.Symbol,
                 instrument.CurrencyCode,
                 It.IsInRange(baseTime.AddDays(-1).AddMinutes(-5), baseTime.AddDays(-1).AddMinutes(5), Range.Inclusive),

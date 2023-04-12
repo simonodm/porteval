@@ -11,6 +11,6 @@ namespace PortEval.Application.Core.Interfaces.BackgroundJobs
         /// Executes the job.
         /// </summary>
         /// <returns>A task responsible for the asynchronous split download and import operations.</returns>
-        public Task Run();
+        public Task RunAsync();
     }
 }

@@ -1,32 +1,42 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Core.Common.ChartDataGenerators;
+using PortEval.Application.Core.Interfaces.Calculators;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
-using PortEval.Application.Core.Common.ChartDataGenerators;
-using PortEval.Application.Core.Interfaces.Calculators;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.Common
+namespace PortEval.Tests.Unit.CoreTests.Common
 {
     public class InstrumentChartDataGeneratorTests
     {
+        private IFixture _fixture;
+        private Mock<IInstrumentProfitCalculator> _profitCalculator;
+        private Mock<IInstrumentPerformanceCalculator> _performanceCalculator;
+
+
+        public InstrumentChartDataGeneratorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _profitCalculator = _fixture.Freeze<Mock<IInstrumentProfitCalculator>>();
+            _performanceCalculator = _fixture.Freeze<Mock<IInstrumentPerformanceCalculator>>();
+        }
+
         [Fact]
         public void ChartPrices_ChartsPricesCorrectly()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-04")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-05")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-04")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-05")).Create(),
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -35,7 +45,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = prices[4].Time
             };
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartPrices(prices, dateRange, frequency);
 
@@ -65,12 +75,9 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartPrices_ChartsPricesCorrectly_WhenOnePriceAppliesToMultipleChartPoints()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -79,7 +86,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = DateTime.Parse("2022-01-05")
             };
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartPrices(prices, dateRange, frequency);
 
@@ -109,12 +116,9 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartPrices_LimitsChartRange_WhenTheEarliestPriceIsAfterTheFirstExpectedChartPoint()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -123,7 +127,7 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = DateTime.Parse("2022-01-05")
             };
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartPrices(prices, dateRange, frequency);
 
@@ -145,16 +149,13 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartProfit_ChartsProfitCorrectly()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-04")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-05")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-04")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-05")).Create(),
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -163,12 +164,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = prices[4].Time
             };
 
-            var profitCalculator = fixture.Freeze<Mock<IInstrumentProfitCalculator>>();
-            profitCalculator
+            _profitCalculator
                 .Setup(c => c.CalculateProfit(It.IsAny<decimal>(), It.IsAny<decimal>()))
                 .Returns<decimal, decimal>((first, second) => second - first);
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartProfit(prices, dateRange, frequency);
 
@@ -198,13 +198,10 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartProfit_ChartsProfitCorrectly_WhenOnePriceAppliesToMultipleChartPoints()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create()
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create()
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -213,12 +210,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = DateTime.Parse("2022-01-05")
             };
 
-            var profitCalculator = fixture.Freeze<Mock<IInstrumentProfitCalculator>>();
-            profitCalculator
+            _profitCalculator
                 .Setup(c => c.CalculateProfit(It.IsAny<decimal>(), It.IsAny<decimal>()))
                 .Returns<decimal, decimal>((first, second) => second - first);
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartProfit(prices, dateRange, frequency);
 
@@ -248,12 +244,9 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartProfit_LimitsChartRange_WhenTheEarliestPriceIsAfterTheFirstExpectedChartPoint()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -262,12 +255,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = DateTime.Parse("2022-01-05")
             };
 
-            var profitCalculator = fixture.Freeze<Mock<IInstrumentProfitCalculator>>();
-            profitCalculator
+            _profitCalculator
                 .Setup(c => c.CalculateProfit(It.IsAny<decimal>(), It.IsAny<decimal>()))
                 .Returns<decimal, decimal>((first, second) => second - first);
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartProfit(prices, dateRange, frequency);
 
@@ -289,16 +281,13 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartPerformance_ChartsPerformanceCorrectly()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-04")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-05")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-04")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-05")).Create(),
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -307,12 +296,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = prices[4].Time
             };
 
-            var performanceCalculator = fixture.Freeze<Mock<IInstrumentPerformanceCalculator>>();
-            performanceCalculator
+            _performanceCalculator
                 .Setup(c => c.CalculatePerformance(It.IsAny<decimal>(), It.IsAny<decimal>()))
                 .Returns<decimal, decimal>((first, second) => second / first);
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartPerformance(prices, dateRange, frequency);
 
@@ -342,13 +330,10 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartPerformance_ChartsPerformanceCorrectly_WhenOnePriceAppliesToMultipleChartPoints()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create()
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create()
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -357,12 +342,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = DateTime.Parse("2022-01-05")
             };
 
-            var performanceCalculator = fixture.Freeze<Mock<IInstrumentPerformanceCalculator>>();
-            performanceCalculator
+            _performanceCalculator
                 .Setup(c => c.CalculatePerformance(It.IsAny<decimal>(), It.IsAny<decimal>()))
                 .Returns<decimal, decimal>((first, second) => second / first);
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartPerformance(prices, dateRange, frequency);
 
@@ -392,12 +376,9 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartPerformance_LimitsChartRange_WhenTheEarliestPriceIsAfterTheFirstExpectedChartPoint()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -406,12 +387,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = DateTime.Parse("2022-01-05")
             };
 
-            var performanceCalculator = fixture.Freeze<Mock<IInstrumentPerformanceCalculator>>();
-            performanceCalculator
+            _performanceCalculator
                 .Setup(c => c.CalculatePerformance(It.IsAny<decimal>(), It.IsAny<decimal>()))
                 .Returns<decimal, decimal>((first, second) => second / first);
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartPerformance(prices, dateRange, frequency);
 
@@ -433,16 +413,13 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartAggregatedProfit_ChartsAggregatedProfitCorrectly()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-04")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-05")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-04")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-05")).Create(),
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -451,12 +428,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = prices[4].Time
             };
 
-            var profitCalculator = fixture.Freeze<Mock<IInstrumentProfitCalculator>>();
-            profitCalculator
+            _profitCalculator
                 .Setup(c => c.CalculateProfit(It.IsAny<decimal>(), It.IsAny<decimal>()))
                 .Returns<decimal, decimal>((first, second) => second - first);
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartAggregatedProfit(prices, dateRange, frequency);
 
@@ -482,13 +458,10 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartAggregatedProfit_ChartsAggregatedProfitCorrectly_WhenOnePriceAppliesToMultipleChartPoints()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create()
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create()
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -497,12 +470,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = DateTime.Parse("2022-01-05")
             };
 
-            var profitCalculator = fixture.Freeze<Mock<IInstrumentProfitCalculator>>();
-            profitCalculator
+            _profitCalculator
                 .Setup(c => c.CalculateProfit(It.IsAny<decimal>(), It.IsAny<decimal>()))
                 .Returns<decimal, decimal>((first, second) => second - first);
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartAggregatedProfit(prices, dateRange, frequency);
 
@@ -528,12 +500,9 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartAggregatedProfit_LimitsChartRange_WhenTheEarliestPriceIsAfterTheFirstExpectedChartPoint()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -542,12 +511,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = DateTime.Parse("2022-01-05")
             };
 
-            var profitCalculator = fixture.Freeze<Mock<IInstrumentProfitCalculator>>();
-            profitCalculator
+            _profitCalculator
                 .Setup(c => c.CalculateProfit(It.IsAny<decimal>(), It.IsAny<decimal>()))
                 .Returns<decimal, decimal>((first, second) => second - first);
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartAggregatedProfit(prices, dateRange, frequency);
 
@@ -565,16 +533,13 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartAggregatedPerformance_ChartsAggregatedPerformanceCorrectly()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-04")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-05")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-04")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-05")).Create(),
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -583,12 +548,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = prices[4].Time
             };
 
-            var performanceCalculator = fixture.Freeze<Mock<IInstrumentPerformanceCalculator>>();
-            performanceCalculator
+            _performanceCalculator
                 .Setup(c => c.CalculatePerformance(It.IsAny<decimal>(), It.IsAny<decimal>()))
                 .Returns<decimal, decimal>((first, second) => first != 0 ? second / first : 0);
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartAggregatedPerformance(prices, dateRange, frequency);
 
@@ -614,13 +578,10 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartAggregatedPerformance_ChartsAggregatedPerformanceCorrectly_WhenOnePriceAppliesToMultipleChartPoints()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create()
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-02")).Create()
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -629,12 +590,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = DateTime.Parse("2022-01-05")
             };
 
-            var performanceCalculator = fixture.Freeze<Mock<IInstrumentPerformanceCalculator>>();
-            performanceCalculator
+            _performanceCalculator
                 .Setup(c => c.CalculatePerformance(It.IsAny<decimal>(), It.IsAny<decimal>()))
                 .Returns<decimal, decimal>((first, second) => first != 0 ? second / first : 0m);
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartAggregatedPerformance(prices, dateRange, frequency);
 
@@ -660,12 +620,9 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
         [Fact]
         public void ChartAggregatedPerformance_LimitsChartRange_WhenTheEarliestPriceIsAfterTheFirstExpectedChartPoint()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
+                _fixture.Build<InstrumentPriceDto>().With(p => p.Time, DateTime.Parse("2022-01-03")).Create(),
             };
             var frequency = AggregationFrequency.Day;
             var dateRange = new DateRangeParams
@@ -674,12 +631,11 @@ namespace PortEval.Tests.Unit.FeatureTests.Common
                 To = DateTime.Parse("2022-01-05")
             };
 
-            var performanceCalculator = fixture.Freeze<Mock<IInstrumentPerformanceCalculator>>();
-            performanceCalculator
+            _performanceCalculator
                 .Setup(c => c.CalculatePerformance(It.IsAny<decimal>(), It.IsAny<decimal>()))
                 .Returns<decimal, decimal>((first, second) => first != 0 ? second / first : 0m);
 
-            var sut = fixture.Create<InstrumentChartDataGenerator>();
+            var sut = _fixture.Create<InstrumentChartDataGenerator>();
 
             var result = sut.ChartAggregatedPerformance(prices, dateRange, frequency);
 

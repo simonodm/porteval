@@ -12,6 +12,6 @@ namespace PortEval.Application.Core.Interfaces.BackgroundJobs
         /// </summary>
         /// <param name="instrumentId">ID of the instrument to retrieve prices for.</param>
         /// <returns>A task representing the asynchronous price download and import operations.</returns>
-        Task Run(int instrumentId);
+        public Task RunAsync(int instrumentId);
     }
 }

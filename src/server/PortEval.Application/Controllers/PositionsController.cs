@@ -1,41 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Interfaces.Services;
-using PortEval.Application.Core.Queries;
 
 namespace PortEval.Application.Controllers
 {
     [Route("positions")]
     [ApiController]
-    public class PositionsController : ControllerBase
+    public class PositionsController : PortEvalControllerBase
     {
         private readonly IPositionService _positionService;
-        private readonly IPositionQueries _positionQueries;
 
-        public PositionsController(IPositionService positionService, IPositionQueries positionQueries)
+        public PositionsController(IPositionService positionService)
         {
             _positionService = positionService;
-            _positionQueries = positionQueries;
         }
 
         // GET api/positions/5
         [HttpGet("{positionId}")]
         public async Task<ActionResult<PositionDto>> GetPosition(int positionId)
         {
-            var position = await _positionQueries.GetPosition(positionId);
-            if (position.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Position {positionId} not found.");
-            }
-
-            return position.Response;
+            var position = await _positionService.GetPositionAsync(positionId);
+            return GenerateActionResult(position);
         }
 
         // GET api/positions/5/value?at=2021-01-01T00:00:00Z
@@ -45,39 +35,24 @@ namespace PortEval.Application.Controllers
         {
             var time = at ?? DateTime.UtcNow;
 
-            var value = await _positionQueries.GetPositionValue(positionId, time);
-            if (value.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Position {positionId} not found.");
-            }
-
-            return value.Response;
+            var value = await _positionService.GetPositionValueAsync(positionId, time);
+            return GenerateActionResult(value);
         }
 
         // GET api/positions/5/profit?from=2021-01-01T00:00:00Z&to=2021-02-01T00:00:00Z
         [HttpGet("{positionId}/profit")]
         public async Task<ActionResult<EntityProfitDto>> GetPositionProfit(int positionId, [FromQuery] DateRangeParams dateRange)
         {
-            var profit = await _positionQueries.GetPositionProfit(positionId, dateRange);
-            if (profit.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Position {positionId} not found.");
-            }
-
-            return profit.Response;
+            var profit = await _positionService.GetPositionProfitAsync(positionId, dateRange);
+            return GenerateActionResult(profit);
         }
 
         // GET api/positions/5/performance?from=2021-01-01T00:00:00Z&to=2021-02-01T00:00:00Z
         [HttpGet("{positionId}/performance")]
         public async Task<ActionResult<EntityPerformanceDto>> GetPositionPerformance(int positionId, [FromQuery] DateRangeParams dateRange)
         {
-            var performance = await _positionQueries.GetPositionPerformance(positionId, dateRange);
-            if (performance.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Position {positionId} not found.");
-            }
-
-            return performance.Response;
+            var performance = await _positionService.GetPositionPerformanceAsync(positionId, dateRange);
+            return GenerateActionResult(performance);
         }
 
         // GET api/positions/5/bep?at=2022-01-01T00:00:00Z
@@ -86,13 +61,8 @@ namespace PortEval.Application.Controllers
         {
             var time = at ?? DateTime.UtcNow;
 
-            var breakEvenPoint = await _positionQueries.GetPositionBreakEvenPoint(positionId, time);
-            if (breakEvenPoint.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Position {positionId} not found.");
-            }
-
-            return breakEvenPoint.Response;
+            var breakEvenPoint = await _positionService.GetPositionBreakEvenPointAsync(positionId, time);
+            return GenerateActionResult(breakEvenPoint);
         }
 
         // GET api/positions/5/value/chart?from=2021-01-01T00:00:00Z&to=2021-02-01T00:00:00Z&frequency=day
@@ -100,13 +70,8 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetPositionChartedValue(int positionId,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency, [FromQuery] string currency = null)
         {
-            var result = await _positionQueries.ChartPositionValue(positionId, dateRange, frequency, currency);
-            if (result.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Position {positionId} not found.");
-            }
-
-            return result.Response.ToList();
+            var result = await _positionService.ChartPositionValueAsync(positionId, dateRange, frequency, currency);
+            return GenerateActionResult(result);
         }
 
         // GET api/positions/5/profit/chart?from=2021-01-01T00:00:00Z&to=2021-02-01T00:00:00Z&frequency=day
@@ -114,13 +79,8 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetPositionChartedProfit(int positionId,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency, [FromQuery] string currency = null)
         {
-            var result = await _positionQueries.ChartPositionProfit(positionId, dateRange, frequency, currency);
-            if (result.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Position {positionId} not found.");
-            }
-
-            return result.Response.ToList();
+            var result = await _positionService.ChartPositionProfitAsync(positionId, dateRange, frequency, currency);
+            return GenerateActionResult(result);
         }
 
         // GET api/positions/5/performance/chart?from=2021-01-01T00:00:00Z&to=2021-02-01T00:00:00Z&frequency=day
@@ -128,13 +88,8 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetPositionChartedPerformance(int positionId,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency)
         {
-            var result = await _positionQueries.ChartPositionPerformance(positionId, dateRange, frequency);
-            if (result.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Position {positionId} not found.");
-            }
-
-            return result.Response.ToList();
+            var result = await _positionService.ChartPositionPerformanceAsync(positionId, dateRange, frequency);
+            return GenerateActionResult(result);
         }
 
         // GET api/positions/5/profit/chart/aggregated?from=2021-01-01T00:00:00Z&to=2021-02-01T00:00:00Z&frequency=day
@@ -142,13 +97,8 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetPositionAggregatedProfit(int positionId,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency, [FromQuery] string currency = null)
         {
-            var result = await _positionQueries.ChartPositionProfitAggregated(positionId, dateRange, frequency, currency);
-            if (result.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Position {positionId} not found.");
-            }
-
-            return result.Response.ToList();
+            var result = await _positionService.ChartPositionAggregatedProfitAsync(positionId, dateRange, frequency, currency);
+            return GenerateActionResult(result);
         }
 
         // GET api/positions/5/performance/chart/aggregated?from=2021-01-01T00:00:00Z&to=2021-02-01T00:00:00Z&frequency=day
@@ -156,56 +106,45 @@ namespace PortEval.Application.Controllers
         public async Task<ActionResult<IEnumerable<EntityChartPointDto>>> GetPositionAggregatedPerformance(int positionId,
             [FromQuery] DateRangeParams dateRange, [FromQuery] AggregationFrequency frequency)
         {
-            var result = await _positionQueries.ChartPositionPerformanceAggregated(positionId, dateRange, frequency);
-            if (result.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Position {positionId} not found.");
-            }
-
-            return result.Response.ToList();
+            var result = await _positionService.ChartPositionAggregatedPerformanceAsync(positionId, dateRange, frequency);
+            return GenerateActionResult(result);
         }
 
         [HttpGet("{positionId}/stats")]
         public async Task<ActionResult<PositionStatisticsDto>> GetPositionStatistics(int positionId)
         {
-            var result = await _positionQueries.GetPositionStatistics(positionId);
-            if (result.Status == QueryStatus.NotFound)
-            {
-                return NotFound($"Position {positionId} not found");
-            }
-
-            return result.Response;
+            var result = await _positionService.GetPositionStatisticsAsync(positionId);
+            return GenerateActionResult(result);
         }
 
         // POST api/positions
         [HttpPost]
-        public async Task<IActionResult> PostPosition([FromBody] PositionDto createRequest)
+        public async Task<ActionResult<PositionDto>> PostPosition([FromBody] PositionDto createRequest)
         {
             var createdPosition =
                 await _positionService.OpenPositionAsync(createRequest);
-            return CreatedAtAction(nameof(GetPosition), new { positionId = createdPosition.Id }, null);
+            return GenerateActionResult(createdPosition, nameof(GetPosition), new { positionId = createdPosition.Response.Id });
         }
 
         // PUT api/positions/5
         [HttpPut("{positionId}")]
-        public async Task<IActionResult> PutPosition(int positionId, [FromBody] PositionDto updateRequest)
+        public async Task<ActionResult<PositionDto>> PutPosition(int positionId, [FromBody] PositionDto updateRequest)
         {
             if (updateRequest.Id != positionId)
             {
                 return BadRequest("URL position id and request body position id don't match.");
             }
 
-            await _positionService.UpdatePositionAsync(updateRequest);
-
-            return Ok();
+            var updatedPosition = await _positionService.UpdatePositionAsync(updateRequest);
+            return GenerateActionResult(updatedPosition);
         }
 
         // DELETE api/positions/5
         [HttpDelete("{positionId}")]
         public async Task<IActionResult> DeletePosition(int positionId)
         {
-            await _positionService.RemovePositionAsync(positionId);
-            return Ok();
+            var response = await _positionService.RemovePositionAsync(positionId);
+            return GenerateActionResult(response);
         }
     }
 }

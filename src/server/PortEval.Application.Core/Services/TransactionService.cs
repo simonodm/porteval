@@ -1,78 +1,144 @@
-﻿using System.Threading.Tasks;
+﻿using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
-using PortEval.Domain.Exceptions;
-using PortEval.Domain.Models.Entities;
+using PortEval.Application.Models.QueryParams;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Services
 {
     /// <inheritdoc cref="ITransactionService"/>
     public class TransactionService : ITransactionService
     {
+        private readonly IPortfolioRepository _portfolioRepository;
         private readonly IPositionRepository _positionRepository;
+        private readonly IInstrumentRepository _instrumentRepository;
+        private readonly ITransactionQueries _transactionDataQueries;
 
-        public TransactionService(IPositionRepository positionRepository)
+        public TransactionService(IPortfolioRepository portfolioRepository, IPositionRepository positionRepository, IInstrumentRepository instrumentRepository, ITransactionQueries transactionDataQueries)
         {
+            _portfolioRepository = portfolioRepository;
             _positionRepository = positionRepository;
+            _instrumentRepository = instrumentRepository;
+            _transactionDataQueries = transactionDataQueries;
         }
 
-        /// <inheritdoc cref="ITransactionService.AddTransactionAsync"/>
-        public async Task<Transaction> AddTransactionAsync(TransactionDto options)
+        /// <inheritdoc />
+        public async Task<OperationResponse<IEnumerable<TransactionDto>>> GetTransactionsAsync(TransactionFilters filters,
+            DateRangeParams dateRange)
         {
-            var position = await FindPosition(options.PositionId);
+            if (filters.PortfolioId != null && !await _portfolioRepository.ExistsAsync(filters.PortfolioId.Value))
+            {
+                return new OperationResponse<IEnumerable<TransactionDto>>
+                {
+                    Status = OperationStatus.Error,
+                    Message = $"Portfolio {filters.PortfolioId} does not exist."
+                };
+            }
+
+            if (filters.InstrumentId != null && !await _instrumentRepository.ExistsAsync(filters.InstrumentId.Value))
+            {
+                return new OperationResponse<IEnumerable<TransactionDto>>
+                {
+                    Status = OperationStatus.Error,
+                    Message = $"Instrument {filters.InstrumentId} does not exist."
+                };
+            }
+
+            if (filters.PositionId != null && !await _positionRepository.ExistsAsync(filters.PositionId.Value))
+            {
+                return new OperationResponse<IEnumerable<TransactionDto>>
+                {
+                    Status = OperationStatus.Error,
+                    Message = $"Position {filters.PositionId} does not exist."
+                };
+            }
+
+            var transactions =
+                await _transactionDataQueries.GetTransactionsAsync(filters, dateRange.From, dateRange.To);
+
+            return new OperationResponse<IEnumerable<TransactionDto>>
+            {
+                Response = transactions
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<OperationResponse<TransactionDto>> GetTransactionAsync(int transactionId)
+        {
+            var transaction = await _transactionDataQueries.GetTransactionAsync(transactionId);
+
+            return new OperationResponse<TransactionDto>
+            {
+                Status = transaction != null ? OperationStatus.Ok : OperationStatus.NotFound,
+                Message = transaction != null ? "" : $"Transaction {transactionId} does not exist.",
+                Response = transaction
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<OperationResponse<TransactionDto>> AddTransactionAsync(TransactionDto options)
+        {
+            var position = await _positionRepository.FindAsync(options.PositionId);
+            if (position == null)
+            {
+                return new OperationResponse<TransactionDto>
+                {
+                    Status = OperationStatus.Error,
+                    Message = $"Position {options.PositionId} does not exist."
+                };
+            }
             var createdTransaction = position.AddTransaction(options.Amount, options.Price, options.Time, options.Note);
             position.IncreaseVersion();
 
             _positionRepository.Update(position);
             await _positionRepository.UnitOfWork.CommitAsync();
 
-            return createdTransaction;
+            return await GetTransactionAsync(createdTransaction.Id);
         }
 
-        /// <inheritdoc cref="ITransactionService.UpdateTransactionAsync"/>
-        public async Task<Transaction> UpdateTransactionAsync(TransactionDto options)
+        /// <inheritdoc />
+        public async Task<OperationResponse<TransactionDto>> UpdateTransactionAsync(TransactionDto options)
         {
-            var position = await FindPosition(options.PositionId);
+            var position = await _positionRepository.FindAsync(options.PositionId);
+            if (position == null)
+            {
+                return new OperationResponse<TransactionDto>
+                {
+                    Status = OperationStatus.Error,
+                    Message = $"Position {options.PositionId} does not exist."
+                };
+            }
 
             var transaction = position.UpdateTransaction(options.Id, options.Amount, options.Price, options.Time, options.Note);
             position.IncreaseVersion();
             _positionRepository.Update(position);
             await _positionRepository.UnitOfWork.CommitAsync();
 
-            return transaction;
+            return await GetTransactionAsync(transaction.Id);
         }
 
-        /// <inheritdoc cref="ITransactionService.DeleteTransactionAsync"/>
-        public async Task DeleteTransactionAsync(int transactionId)
+        /// <inheritdoc />
+        public async Task<OperationResponse> DeleteTransactionAsync(int transactionId)
         {
             var position = await _positionRepository.FindParentPositionAsync(transactionId);
-            if (position == null)
+            var transaction = position?.FindTransaction(transactionId);
+            if (transaction == null)
             {
-                throw new ItemNotFoundException($"Transaction {transactionId} does not exist.");
+                return new OperationResponse
+                {
+                    Status = OperationStatus.Error,
+                    Message = $"Transaction {transactionId} does not exist."
+                };
             }
 
             position.RemoveTransaction(transactionId);
             position.IncreaseVersion();
             _positionRepository.Update(position);
             await _positionRepository.UnitOfWork.CommitAsync();
-        }
 
-        /// <summary>
-        /// Retrieves a position by its ID.
-        /// </summary>
-        /// <param name="positionId">Position ID</param>
-        /// <exception cref="ItemNotFoundException">Thrown if no position was found with the supplied ID.</exception>
-        /// <returns>A task representing the asynchronous search operation. The task result contains the found position entity.</returns>
-        private async Task<Position> FindPosition(int positionId)
-        {
-            var position = await _positionRepository.FindAsync(positionId);
-            if (position == null)
-            {
-                throw new ItemNotFoundException($"Position {positionId} does not exist.");
-            }
-
-            return position;
+            return new OperationResponse();
         }
     }
 }

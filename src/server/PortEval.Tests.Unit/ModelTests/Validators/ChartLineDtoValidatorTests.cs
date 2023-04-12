@@ -11,6 +11,14 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class ChartLineDtoValidatorTests
     {
+        private IFixture _fixture;
+
+        public ChartLineDtoValidatorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         public static IEnumerable<object[]> ValidChartLineDtos = new List<object[]>
         {
             new object[] { ChartLineType.Instrument, 1, 1, null, null, Color.FromArgb(255, 255, 255) },
@@ -23,10 +31,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         public void Validate_ValidatesSuccessfully_WhenLineIsValid(ChartLineType type, int width, int? instrumentId,
             int? portfolioId, int? positionId, Color color)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var line = fixture.Build<ChartLineDto>()
+            var line = _fixture.Build<ChartLineDto>()
                 .With(line => line.Type, type)
                 .With(line => line.Width, width)
                 .With(line => line.Color, color)
@@ -45,10 +50,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenLineWidthIsZero()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var line = fixture.Build<ChartLineDto>()
+            var line = _fixture.Build<ChartLineDto>()
                 .With(line => line.Width, 0)
                 .Create();
 
@@ -63,10 +65,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenLineWidthIsNegative()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var line = fixture.Build<ChartLineDto>()
+            var line = _fixture.Build<ChartLineDto>()
                 .With(line => line.Width, -1)
                 .Create();
 
@@ -81,10 +80,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenLineWidthIsGreaterThanEight()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var line = fixture.Build<ChartLineDto>()
+            var line = _fixture.Build<ChartLineDto>()
                 .With(line => line.Width, 9)
                 .Create();
 
@@ -99,10 +95,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenLineIsInstrumentLineAndInstrumentIdIsNotProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var line = fixture.Build<ChartLineDto>()
+            var line = _fixture.Build<ChartLineDto>()
                 .With(line => line.Type, ChartLineType.Instrument)
                 .With(line => line.InstrumentId, (int?)null)
                 .Create();
@@ -118,10 +111,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenLineIsPortfolioLineAndPortfolioIdIsNotProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var line = fixture.Build<ChartLineDto>()
+            var line = _fixture.Build<ChartLineDto>()
                 .With(line => line.Type, ChartLineType.Portfolio)
                 .With(line => line.PortfolioId, (int?)null)
                 .Create();
@@ -137,10 +127,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenLineIsPositionLineAndPositionIdIsNotProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var line = fixture.Build<ChartLineDto>()
+            var line = _fixture.Build<ChartLineDto>()
                 .With(line => line.Type, ChartLineType.Position)
                 .With(line => line.PositionId, (int?)null)
                 .Create();

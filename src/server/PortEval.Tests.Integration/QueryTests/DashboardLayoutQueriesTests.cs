@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Queries;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Integration.QueryTests
@@ -18,20 +18,19 @@ namespace PortEval.Tests.Integration.QueryTests
         }
 
         [Fact]
-        public async Task GetDashboardLayout_ReturnsDashboardLayoutFromDb()
+        public async Task GetDashboardItemsAsync_ReturnsDashboardItemsFromDb()
         {
-            var queryResult = await _dashboardLayoutQueries.GetDashboardLayout();
+            var queryResult = (await _dashboardLayoutQueries.GetDashboardItemsAsync()).ToList();
 
-            Assert.Equal(QueryStatus.Ok, queryResult.Status);
-            Assert.Equal(2, queryResult.Response.Items.Count);
-            Assert.Contains(queryResult.Response.Items, i =>
+            Assert.Equal(2, queryResult.Count);
+            Assert.Contains(queryResult, i =>
                 i.DashboardPositionX == 0 &&
                 i.DashboardPositionY == 0 &&
                 i.DashboardHeight == 1 &&
                 i.DashboardWidth == 1 &&
                 i.ChartId != default
             );
-            Assert.Contains(queryResult.Response.Items, i =>
+            Assert.Contains(queryResult, i =>
                 i.DashboardPositionX == 1 &&
                 i.DashboardPositionY == 1 &&
                 i.DashboardHeight == 2 &&

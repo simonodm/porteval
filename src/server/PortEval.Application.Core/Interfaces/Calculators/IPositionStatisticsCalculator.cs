@@ -1,6 +1,6 @@
-﻿using System;
-using PortEval.Application.Core.Common;
+﻿using PortEval.Application.Core.Common;
 using PortEval.Application.Models.DTOs;
+using System;
 
 namespace PortEval.Application.Core.Interfaces.Calculators
 {

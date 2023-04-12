@@ -1,5 +1,5 @@
-﻿using System;
-using PortEval.DataFetcher;
+﻿using PortEval.DataFetcher;
+using System;
 using Xunit;
 
 namespace PortEval.Tests.Unit.DataFetcherTests

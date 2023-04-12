@@ -1,6 +1,6 @@
-﻿namespace PortEval.Application.Core.Queries.Models
+﻿namespace PortEval.Infrastructure.Queries.Models
 {
-    internal class ChartLineNameModel
+    public class ChartLineNameModel
     {
         public string PortfolioName { get; set; }
         public string PositionName { get; set; }

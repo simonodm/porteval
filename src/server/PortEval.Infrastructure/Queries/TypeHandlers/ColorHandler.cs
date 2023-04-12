@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Data;
 using System.Drawing;
-using Dapper;
 
-namespace PortEval.Application.Core.Queries.TypeHandlers
+namespace PortEval.Infrastructure.Queries.TypeHandlers
 {
     /// <summary>
     /// Handles conversion of <see cref="Color">Color</see> values to an SQL database.

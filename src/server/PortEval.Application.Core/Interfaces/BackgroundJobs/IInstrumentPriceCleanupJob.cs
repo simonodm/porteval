@@ -11,6 +11,6 @@ namespace PortEval.Application.Core.Interfaces.BackgroundJobs
         /// Executes the job.
         /// </summary>
         /// <returns>A task representing the asynchronous cleanup operation.</returns>
-        Task Run();
+        public Task RunAsync();
     }
 }

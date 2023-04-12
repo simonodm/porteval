@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.Abstractions;
-using System.Linq;
-using System.Threading.Tasks;
-using CsvHelper;
+﻿using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,6 +12,13 @@ using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Enums;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.IO.Abstractions;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.BackgroundJobs
 {
@@ -54,7 +54,7 @@ namespace PortEval.Application.Core.BackgroundJobs
             };
         }
 
-        public async Task Run(Guid importId, string inputFileName, string logPath)
+        public async Task RunAsync(Guid importId, string inputFileName, string logPath)
         {
             _logger.LogInformation($"Processing import {importId}.");
 
@@ -66,7 +66,7 @@ namespace PortEval.Application.Core.BackgroundJobs
 
             try
             {
-                using var fs = _fileSystem.FileStream.Create(inputFileName, FileMode.Open);
+                using var fs = _fileSystem.File.OpenRead(inputFileName);
                 using var reader = new StreamReader(fs);
                 using var csv = new CsvReader(reader, _csvConfig);
                 csv.RegisterImportClassMaps();
@@ -134,13 +134,13 @@ namespace PortEval.Application.Core.BackgroundJobs
         private async Task ProcessImport<TRow>(CsvReader reader, string logPath)
         {
             var processor = _serviceProvider.GetRequiredService<IImportProcessor<TRow>>();
-            var result = await processor.ImportRecords(reader.GetRecords<TRow>().ToList());
+            var result = await processor.ImportRecordsAsync(reader.GetRecords<TRow>().ToList());
             SaveErrorLog(result.ErrorLog, _parsingErrors, logPath);
         }
 
         private void SaveErrorLog<T>(IEnumerable<ProcessedRowErrorLogEntry<T>> processedErrorLog, IEnumerable<RawRowErrorLogEntry> parsingErrorLog, string filename)
         {
-            using var fs = _fileSystem.FileStream.Create(filename, FileMode.Create);
+            using var fs = _fileSystem.File.OpenWrite(filename);
             using var sw = new StreamWriter(fs);
             using var csv = new CsvWriter(sw, _csvConfig);
             csv.RegisterImportClassMaps();

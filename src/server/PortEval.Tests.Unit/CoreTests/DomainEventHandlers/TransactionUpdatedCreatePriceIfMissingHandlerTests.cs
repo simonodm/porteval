@@ -1,13 +1,17 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
-using PortEval.Domain.Events;
-using PortEval.Tests.Unit.Helpers.Extensions;
-using System.Threading.Tasks;
+using Moq;
 using PortEval.Application.Core.Common;
 using PortEval.Application.Core.DomainEventHandlers.TransactionChanged;
+using PortEval.Application.Core.Interfaces.Services;
+using PortEval.Application.Models.DTOs;
+using PortEval.Domain.Events;
+using PortEval.Tests.Unit.Helpers;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
+namespace PortEval.Tests.Unit.CoreTests.DomainEventHandlers
 {
     public class TransactionUpdatedCreatePriceIfMissingHandlerTests
     {
@@ -20,18 +24,24 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
             var domainEvent = fixture.Create<TransactionChangedDomainEvent>();
             var domainEventAdapter =
                 new DomainEventNotificationAdapter<TransactionChangedDomainEvent>(domainEvent);
-            var priceService = fixture.CreateDefaultInstrumentPriceServiceMock();
+            var priceService = fixture.Freeze<Mock<IInstrumentPriceService>>();
+            priceService
+                .Setup(m => m.AddPricePointAsync(It.IsAny<InstrumentPriceDto>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(fixture.Create<InstrumentPriceDto>()));
+            priceService
+                .Setup(m => m.GetInstrumentPriceAsync(It.IsAny<int>(), It.IsAny<DateTime>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<InstrumentPriceDto>());
 
             var sut = fixture.Create<CreateInstrumentPriceIfNotExistsWhenTransactionIsUpdatedDomainEventHandler>();
 
             await sut.Handle(domainEventAdapter, default);
 
             priceService.Verify(s =>
-                s.AddPriceIfNotExistsAsync(
-                    domainEvent.Position.InstrumentId,
-                    domainEvent.Transaction.Time,
-                    domainEvent.Transaction.Price
-                ));
+                s.AddPricePointAsync(It.Is<InstrumentPriceDto>(p =>
+                    p.InstrumentId == domainEvent.Position.InstrumentId &&
+                    p.Time == domainEvent.Transaction.Time &&
+                    p.Price == domainEvent.Transaction.Price
+            )));
         }
     }
 }

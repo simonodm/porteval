@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.BackgroundJobs.Helpers;
 using PortEval.Application.Core.Interfaces;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
@@ -10,6 +6,10 @@ using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Domain;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.BackgroundJobs
 {
@@ -36,7 +36,7 @@ namespace PortEval.Application.Core.BackgroundJobs
         /// Starts the job.
         /// </summary>
         /// <returns>A task representing the asynchronous job processing operation.</returns>
-        public async Task Run()
+        public async Task RunAsync()
         {
             var currentTime = DateTime.UtcNow;
             _logger.LogInformation("Missing exchange rates job started.");
@@ -78,7 +78,7 @@ namespace PortEval.Application.Core.BackgroundJobs
         /// <returns>A task representing the asynchronous exchange rate retrieval and save operations.</returns>
         private async Task ProcessCurrencyRange(IEnumerable<Currency> currencies, Currency currency, TimeRange range, DateTime startTime)
         {
-            var fetchResult = await _fetcher.GetHistoricalDailyExchangeRates(currency.Code, range.From, range.To);
+            var fetchResult = await _fetcher.GetHistoricalDailyExchangeRatesAsync(currency.Code, range.From, range.To);
 
             var currenciesList = currencies.ToList();
             int i = 0;

@@ -2,148 +2,141 @@
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Controllers;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Tests.Unit.Helpers;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Interfaces.Services;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests
 {
     public class CsvExportControllerTests
     {
+        private IFixture _fixture;
+        private Mock<IPortfolioService> _portfolioService;
+        private Mock<IPositionService> _positionService;
+        private Mock<ITransactionService> _transactionService;
+        private Mock<ICsvExportService> _csvService;
+        private Mock<IInstrumentPriceService> _instrumentPriceService;
+        private Mock<IInstrumentService> _instrumentService;
+
+        public CsvExportControllerTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _portfolioService = _fixture.Freeze<Mock<IPortfolioService>>();
+            _positionService = _fixture.Freeze<Mock<IPositionService>>();
+            _transactionService = _fixture.Freeze<Mock<ITransactionService>>();
+            _csvService = _fixture.Freeze<Mock<ICsvExportService>>();
+            _instrumentPriceService = _fixture.Freeze<Mock<IInstrumentPriceService>>();
+            _instrumentService = _fixture.Freeze<Mock<IInstrumentService>>();
+        }
+
         [Fact]
         public async Task GetPortfoliosExport_ReturnsCsvFileWithPortfolioData()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var portfolios = fixture.CreateMany<PortfolioDto>();
-            var portfolioQueries = fixture.Freeze<Mock<IPortfolioQueries>>();
-            portfolioQueries
-                .Setup(m => m.GetPortfolios())
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(portfolios));
-            var csvService = fixture.Freeze<Mock<ICsvExportService>>();
-            csvService
+            var portfolios = _fixture.CreateMany<PortfolioDto>();
+            _portfolioService
+                .Setup(m => m.GetAllPortfoliosAsync())
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(portfolios));
+            _csvService
                 .Setup(m => m.ConvertToCsv(portfolios))
-                .Returns(Encoding.UTF8.GetBytes($"{portfolios.First().Id}"));
+                .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse(Encoding.UTF8.GetBytes($"{portfolios.First().Id}")));
 
-            var sut = fixture.Build<CsvExportController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<CsvExportController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPortfoliosExport();
 
-            portfolioQueries.Verify(m => m.GetPortfolios(), Times.Once());
-            csvService.Verify(m => m.ConvertToCsv(portfolios), Times.Once());
+            _portfolioService.Verify(m => m.GetAllPortfoliosAsync(), Times.Once());
+            _csvService.Verify(m => m.ConvertToCsv(portfolios), Times.Once());
             ControllerTestHelper.AssertFileContentEqual(portfolios.First().Id.ToString(), result);
         }
 
         [Fact]
         public async Task GetPositionsExport_ReturnsCsvFileWithPositionsData()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var positions = fixture.CreateMany<PositionDto>();
-            var positionQueries = fixture.Freeze<Mock<IPositionQueries>>();
-            positionQueries
-                .Setup(m => m.GetAllPositions())
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(positions));
-            var csvService = fixture.Freeze<Mock<ICsvExportService>>();
-            csvService
+            var positions = _fixture.CreateMany<PositionDto>();
+            _positionService
+                .Setup(m => m.GetAllPositionsAsync())
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(positions));
+            _csvService
                 .Setup(m => m.ConvertToCsv(positions))
-                .Returns(Encoding.UTF8.GetBytes($"{positions.First().Id}"));
+                .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse(Encoding.UTF8.GetBytes($"{positions.First().Id}")));
 
-            var sut = fixture.Build<CsvExportController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<CsvExportController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPositionsExport();
 
-            positionQueries.Verify(m => m.GetAllPositions(), Times.Once());
-            csvService.Verify(m => m.ConvertToCsv(positions), Times.Once());
+            _positionService.Verify(m => m.GetAllPositionsAsync(), Times.Once());
+            _csvService.Verify(m => m.ConvertToCsv(positions), Times.Once());
             ControllerTestHelper.AssertFileContentEqual(positions.First().Id.ToString(), result);
         }
 
         [Fact]
         public async Task GetTransactionsExport_ReturnsCsvFileWithTransactionsData()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var dateRange = _fixture.Create<DateRangeParams>();
 
-            var dateRange = fixture.Create<DateRangeParams>();
-
-            var transactions = fixture.CreateMany<TransactionDto>();
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
-            transactionQueries
-                .Setup(m => m.GetTransactions(It.IsAny<TransactionFilters>(), dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(transactions));
-            var csvService = fixture.Freeze<Mock<ICsvExportService>>();
-            csvService
+            var transactions = _fixture.CreateMany<TransactionDto>();
+            _transactionService
+                .Setup(m => m.GetTransactionsAsync(It.IsAny<TransactionFilters>(), dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(transactions));
+            _csvService
                 .Setup(m => m.ConvertToCsv(transactions))
-                .Returns(Encoding.UTF8.GetBytes($"{transactions.First().Id}"));
+                .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse(Encoding.UTF8.GetBytes($"{transactions.First().Id}")));
 
-            var sut = fixture.Build<CsvExportController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<CsvExportController>().OmitAutoProperties().Create();
 
             var result = await sut.GetTransactionsExport(dateRange);
 
-            transactionQueries.Verify(m => m.GetTransactions(It.IsAny<TransactionFilters>(), dateRange), Times.Once());
-            csvService.Verify(m => m.ConvertToCsv(transactions), Times.Once());
+            _transactionService.Verify(m => m.GetTransactionsAsync(It.IsAny<TransactionFilters>(), dateRange), Times.Once());
+            _csvService.Verify(m => m.ConvertToCsv(transactions), Times.Once());
             ControllerTestHelper.AssertFileContentEqual(transactions.First().Id.ToString(), result);
         }
 
         [Fact]
         public async Task GetInstrumentExport_ReturnsCsvFileWithInstrumentsData()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var instruments = fixture.CreateMany<InstrumentDto>();
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-            instrumentQueries
-                .Setup(m => m.GetAllInstruments())
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(instruments));
-            var csvService = fixture.Freeze<Mock<ICsvExportService>>();
-            csvService
+            var instruments = _fixture.CreateMany<InstrumentDto>();
+            _instrumentService
+                .Setup(m => m.GetAllInstrumentsAsync())
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(instruments));
+            _csvService
                 .Setup(m => m.ConvertToCsv(instruments))
-                .Returns(Encoding.UTF8.GetBytes($"{instruments.First().Id}"));
+                .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse(Encoding.UTF8.GetBytes($"{instruments.First().Id}")));
 
-            var sut = fixture.Build<CsvExportController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<CsvExportController>().OmitAutoProperties().Create();
 
             var result = await sut.GetInstrumentExport();
 
-            instrumentQueries.Verify(m => m.GetAllInstruments(), Times.Once());
-            csvService.Verify(m => m.ConvertToCsv(instruments), Times.Once());
+            _instrumentService.Verify(m => m.GetAllInstrumentsAsync(), Times.Once());
+            _csvService.Verify(m => m.ConvertToCsv(instruments), Times.Once());
             ControllerTestHelper.AssertFileContentEqual(instruments.First().Id.ToString(), result);
         }
 
         [Fact]
         public async Task GetPricesExport_ReturnsCsvFileWithPricesData()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var instrumentId = _fixture.Create<int>();
+            var dateRange = _fixture.Create<DateRangeParams>();
+            var prices = _fixture.CreateMany<InstrumentPriceDto>();
 
-            var instrumentId = fixture.Create<int>();
-            var dateRange = fixture.Create<DateRangeParams>();
-            var prices = fixture.CreateMany<InstrumentPriceDto>();
-
-            var instrumentQueries = fixture.Freeze<Mock<IInstrumentQueries>>();
-
-            instrumentQueries
-                .Setup(m => m.GetInstrumentPrices(instrumentId, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(prices));
-            var csvService = fixture.Freeze<Mock<ICsvExportService>>();
-            csvService
+            _instrumentPriceService
+                .Setup(m => m.GetInstrumentPricesAsync(instrumentId, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(prices));
+            _csvService
                 .Setup(m => m.ConvertToCsv(prices))
-                .Returns(Encoding.UTF8.GetBytes($"{prices.First().Id}"));
+                .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse(Encoding.UTF8.GetBytes($"{prices.First().Id}")));
 
-            var sut = fixture.Build<CsvExportController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<CsvExportController>().OmitAutoProperties().Create();
 
             var result = await sut.GetPricesExport(instrumentId, dateRange);
 
-            instrumentQueries.Verify(m => m.GetInstrumentPrices(instrumentId, dateRange), Times.Once());
-            csvService.Verify(m => m.ConvertToCsv(prices), Times.Once());
+            _instrumentPriceService.Verify(m => m.GetInstrumentPricesAsync(instrumentId, dateRange), Times.Once());
+            _csvService.Verify(m => m.ConvertToCsv(prices), Times.Once());
             ControllerTestHelper.AssertFileContentEqual(prices.First().Id.ToString(), result);
         }
     }

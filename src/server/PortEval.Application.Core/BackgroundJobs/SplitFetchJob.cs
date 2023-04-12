@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.Interfaces;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
 using PortEval.Application.Core.Interfaces.Repositories;
@@ -10,6 +7,9 @@ using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.BackgroundJobs
 {
@@ -31,7 +31,7 @@ namespace PortEval.Application.Core.BackgroundJobs
             _logger = loggerFactory.CreateLogger<SplitFetchJob>();
         }
 
-        public async Task Run()
+        public async Task RunAsync()
         {
             _logger.LogInformation("Instrument split fetch job started.");
             var instruments = await _instrumentRepository.ListAllAsync();
@@ -46,7 +46,7 @@ namespace PortEval.Application.Core.BackgroundJobs
                 var existingSplits = await _splitRepository.ListInstrumentSplitsAsync(instrument.Id);
                 var startTime = existingSplits.LastOrDefault()?.Time ?? instrument.TrackingInfo.TrackedSince;
 
-                var splits = await _priceFetcher.GetInstrumentSplits(instrument.Symbol, startTime, DateTime.UtcNow);
+                var splits = await _priceFetcher.GetInstrumentSplitsAsync(instrument.Symbol, startTime, DateTime.UtcNow);
                 if (splits == null)
                 {
                     continue;

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using PortEval.Application.Models.FinancialDataFetcher;
+﻿using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.DataFetcher.Models;
 using PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost;
 using PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost.Models;
 using PortEval.Infrastructure.FinancialDataFetcher.Requests;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Integration.DataFetcherTests
@@ -42,7 +42,7 @@ namespace PortEval.Tests.Integration.DataFetcherTests
             var sut = new DataFetcher.DataFetcher(httpClient);
             sut.RegisterDataSource<ExchangeRateHostApi>();
 
-            var response = await sut.ProcessRequest<HistoricalDailyExchangeRatesRequest, IEnumerable<ExchangeRates>>(request);
+            var response = await sut.ProcessRequestAsync<HistoricalDailyExchangeRatesRequest, IEnumerable<ExchangeRates>>(request);
 
             Assert.Equal(StatusCode.Ok, response.StatusCode);
             Assert.Collection(response.Result, er =>
@@ -76,7 +76,7 @@ namespace PortEval.Tests.Integration.DataFetcherTests
             var sut = new DataFetcher.DataFetcher(httpClient);
             sut.RegisterDataSource<ExchangeRateHostApi>();
 
-            var response = await sut.ProcessRequest<LatestExchangeRatesRequest, ExchangeRates>(request);
+            var response = await sut.ProcessRequestAsync<LatestExchangeRatesRequest, ExchangeRates>(request);
 
             Assert.Equal(StatusCode.Ok, response.StatusCode);
             Assert.Equal(apiMockResponse.Base, response.Result.Currency);

@@ -9,6 +9,14 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class CurrencyDtoValidatorTests
     {
+        private IFixture _fixture;
+
+        public CurrencyDtoValidatorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         public static IEnumerable<object[]> ValidCurrencies = new List<object[]>
         {
             new object[] { "US Dollar", "USD", "$" },
@@ -20,15 +28,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [MemberData(nameof(ValidCurrencies))]
         public void Validate_ValidatesSuccessfully_WhenCurrenciesAreValid(string name, string code, string symbol)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var currency = fixture.Build<CurrencyDto>()
+            var currency = _fixture.Build<CurrencyDto>()
                 .With(c => c.Name, name)
                 .With(c => c.Code, code)
                 .With(c => c.Symbol, symbol)
                 .Create();
-            var validator = fixture.Create<CurrencyDtoValidator>();
+            var validator = _fixture.Create<CurrencyDtoValidator>();
 
             var validationResult = validator.Validate(currency);
 
@@ -42,13 +47,10 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [InlineData("ABCD")]
         public void Validate_FailsValidation_WhenCurrencyCodeIsInvalid(string currencyCode)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var currency = fixture.Build<CurrencyDto>()
+            var currency = _fixture.Build<CurrencyDto>()
                 .With(c => c.Code, currencyCode)
                 .Create();
-            var validator = fixture.Create<CurrencyDtoValidator>();
+            var validator = _fixture.Create<CurrencyDtoValidator>();
 
             var validationResult = validator.Validate(currency);
 
@@ -59,14 +61,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenSymbolIsLongerThanFourCharacters()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var currency = fixture.Build<CurrencyDto>()
+            var currency = _fixture.Build<CurrencyDto>()
                 .With(c => c.Code, "USD")
                 .With(c => c.Symbol, "ABCDE")
                 .Create();
-            var validator = fixture.Create<CurrencyDtoValidator>();
+            var validator = _fixture.Create<CurrencyDtoValidator>();
 
             var validationResult = validator.Validate(currency);
 
@@ -77,15 +76,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenNameIsLongerThanSixtyFourCharacters()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var currency = fixture.Build<CurrencyDto>()
+            var currency = _fixture.Build<CurrencyDto>()
                 .With(c => c.Code, "USD")
                 .With(c => c.Symbol, "$")
-                .With(c => c.Name, string.Join(string.Empty, fixture.CreateMany<string>(10)))
+                .With(c => c.Name, string.Join(string.Empty, _fixture.CreateMany<string>(10)))
                 .Create();
-            var validator = fixture.Create<CurrencyDtoValidator>();
+            var validator = _fixture.Create<CurrencyDtoValidator>();
 
             var validationResult = validator.Validate(currency);
 

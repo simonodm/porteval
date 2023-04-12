@@ -26,7 +26,7 @@ namespace PortEval.Tests.Unit.Helpers
                 },
                 {
                     TemplateType.Prices,
-                    new[] { "Price ID", "Instrument ID", "Price", "Time" }
+                    new[] { "Instrument ID", "Price", "Time" }
                 }
             };
 
@@ -50,7 +50,7 @@ namespace PortEval.Tests.Unit.Helpers
             },
             {
                 TemplateType.Prices,
-                new[] { "5", "3", "124.41", "2022/10/22 00:00" }
+                new[] { "3", "124.41", "2022/10/22 00:00" }
             }
         };
     }

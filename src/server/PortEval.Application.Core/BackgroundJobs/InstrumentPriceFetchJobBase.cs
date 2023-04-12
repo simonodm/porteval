@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces;
+﻿using PortEval.Application.Core.Interfaces;
 using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.BackgroundJobs
 {
@@ -24,11 +24,11 @@ namespace PortEval.Application.Core.BackgroundJobs
 
             if (instrument.Type == InstrumentType.CryptoCurrency)
             {
-                response = await PriceFetcher.GetHistoricalDailyCryptoPrices(instrument.Symbol, instrument.CurrencyCode, from, to);
+                response = await PriceFetcher.GetHistoricalDailyCryptoPricesAsync(instrument.Symbol, instrument.CurrencyCode, from, to);
             }
             else
             {
-                response = await PriceFetcher.GetHistoricalDailyPrices(instrument.Symbol, instrument.CurrencyCode, from, to);
+                response = await PriceFetcher.GetHistoricalDailyPricesAsync(instrument.Symbol, instrument.CurrencyCode, from, to);
             }
 
             return response ?? Enumerable.Empty<PricePoint>();
@@ -41,11 +41,11 @@ namespace PortEval.Application.Core.BackgroundJobs
 
             if (instrument.Type == InstrumentType.CryptoCurrency)
             {
-                response = await PriceFetcher.GetIntradayCryptoPrices(instrument.Symbol, instrument.CurrencyCode, from, to, interval);
+                response = await PriceFetcher.GetIntradayCryptoPricesAsync(instrument.Symbol, instrument.CurrencyCode, from, to, interval);
             }
             else
             {
-                response = await PriceFetcher.GetIntradayPrices(instrument.Symbol, instrument.CurrencyCode, from, to, interval);
+                response = await PriceFetcher.GetIntradayPricesAsync(instrument.Symbol, instrument.CurrencyCode, from, to, interval);
             }
 
             return response ?? Enumerable.Empty<PricePoint>();
@@ -57,11 +57,11 @@ namespace PortEval.Application.Core.BackgroundJobs
 
             if (instrument.Type == InstrumentType.CryptoCurrency)
             {
-                response = await PriceFetcher.GetLatestCryptoPrice(instrument.Symbol, instrument.CurrencyCode);
+                response = await PriceFetcher.GetLatestCryptoPriceAsync(instrument.Symbol, instrument.CurrencyCode);
             }
             else
             {
-                response = await PriceFetcher.GetLatestInstrumentPrice(instrument.Symbol, instrument.CurrencyCode);
+                response = await PriceFetcher.GetLatestInstrumentPriceAsync(instrument.Symbol, instrument.CurrencyCode);
             }
 
             return response;

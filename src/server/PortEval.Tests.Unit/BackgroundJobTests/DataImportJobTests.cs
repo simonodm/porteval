@@ -2,9 +2,14 @@
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
 using Moq;
+using PortEval.Application.Core.BackgroundJobs;
+using PortEval.Application.Core.Common.BulkImportExport;
+using PortEval.Application.Core.Interfaces;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
+using PortEval.Tests.Unit.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,80 +17,68 @@ using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.BackgroundJobs;
-using PortEval.Application.Core.Interfaces;
-using PortEval.Application.Core.Interfaces.Repositories;
 using Xunit;
-using PortEval.Application.Core.Common.BulkImportExport;
 
 namespace PortEval.Tests.Unit.BackgroundJobTests
 {
     public class DataImportJobTests
     {
+        private IFixture _fixture;
+        private Mock<IDataImportRepository> _dataImportRepository;
+        private Mock<IServiceProvider> _serviceProvider;
+        private MockFileSystem _fileSystem;
         private string _storagePath = "/storage/";
+
+        public DataImportJobTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
+            _dataImportRepository = _fixture.CreateDefaultDataImportRepositoryMock();
+            _serviceProvider = GetServiceProviderMockWithImportProcessors(_fixture);
+            _fileSystem = _fixture.Freeze<MockFileSystem>();
+        }
 
         [Fact]
         public async Task Run_ChangesImportStatusToFinished_WhenImportSucceeds()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
-
-            GetServiceProviderMockWithImportProcessors(fixture);
-
             var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note\n,ABC,USD,TestNote"));
+            _fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note\n,ABC,USD,TestNote"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
-            dataImportRepository
-                .Setup(m => m.Update(It.IsAny<DataImport>()))
-                .Returns<DataImport>(d => d);
 
-            var sut = fixture.Create<DataImportJob>();
+            var sut = _fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport.Id, inputPath, logPath);
+            await sut.RunAsync(dataImport.Id, inputPath, logPath);
 
-            dataImportRepository.Verify(m => m.Update(It.Is<DataImport>(i => i.Id == dataImport.Id && i.Status == ImportStatus.Finished)));
+            _dataImportRepository.Verify(m => m.Update(It.Is<DataImport>(i => i.Id == dataImport.Id && i.Status == ImportStatus.Finished)));
         }
 
         [Fact]
         public async Task Run_ImportsPortfoliosFromProvidedFile_WhenPortfolioTemplateTypeIsSelected()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
-
-            GetServiceProviderMockWithImportProcessors(fixture);
-
             var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note\n,ABC,USD,TestNote"));
+            _fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note\n,ABC,USD,TestNote"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
-            dataImportRepository
-                .Setup(m => m.Update(It.IsAny<DataImport>()))
-                .Returns<DataImport>(d => d);
 
-            var portfolioImportProcessor = GetImportProcessorMock<PortfolioDto>(fixture);
+            var portfolioImportProcessor = GetImportProcessorMock<PortfolioDto>(_fixture);
 
-            var sut = fixture.Create<DataImportJob>();
+            var sut = _fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport.Id, inputPath, logPath);
+            await sut.RunAsync(dataImport.Id, inputPath, logPath);
 
-            portfolioImportProcessor.Verify(p => p.ImportRecords(
+            portfolioImportProcessor.Verify(p => p.ImportRecordsAsync(
                 It.Is<IEnumerable<PortfolioDto>>(e => e.Count() == 1 && e.Any(p => p.Name == "ABC" && p.CurrencyCode == "USD" && p.Note == "TestNote"))
             ));
         }
@@ -93,34 +86,23 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_ImportsPositionsFromProvidedFile_WhenPositionTemplateTypeIsSelected()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
-
-            GetServiceProviderMockWithImportProcessors(fixture);
-
             var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Positions);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddFile(inputPath, new MockFileData("Position ID,Instrument ID,Portfolio ID,Note,Time,Amount,Price\n,1,1,TestNote,2022-01-01,5,100"));
+            _fileSystem.AddFile(inputPath, new MockFileData("Position ID,Instrument ID,Portfolio ID,Note,Time,Amount,Price\n,1,1,TestNote,2022-01-01,5,100"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
-            dataImportRepository
-                .Setup(m => m.Update(It.IsAny<DataImport>()))
-                .Returns<DataImport>(d => d);
 
-            var positionImportProcessor = GetImportProcessorMock<PositionDto>(fixture);
+            var positionImportProcessor = GetImportProcessorMock<PositionDto>(_fixture);
 
-            var sut = fixture.Create<DataImportJob>();
+            var sut = _fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport.Id, inputPath, logPath);
+            await sut.RunAsync(dataImport.Id, inputPath, logPath);
 
-            positionImportProcessor.Verify(p => p.ImportRecords(
+            positionImportProcessor.Verify(p => p.ImportRecordsAsync(
                 It.Is<IEnumerable<PositionDto>>(e =>
                     e.Count() == 1 &&
                     e.Any(p => p.InstrumentId == 1 && p.PortfolioId == 1 && p.Note == "TestNote" && p.Time == DateTime.Parse("2022-01-01") && p.Amount == 5m && p.Price == 100m)
@@ -130,34 +112,23 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_ImportsTransactionsFromProvidedFile_WhenTransactionTemplateTypeIsSelected()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
-
-            GetServiceProviderMockWithImportProcessors(fixture);
-
             var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Transactions);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddFile(inputPath, new MockFileData("Transaction ID,Position ID,Price,Amount,Time\n,1,100,-1,2005-04-12 14:59"));
+            _fileSystem.AddFile(inputPath, new MockFileData("Transaction ID,Position ID,Price,Amount,Time\n,1,100,-1,2005-04-12 14:59"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
-            dataImportRepository
-                .Setup(m => m.Update(It.IsAny<DataImport>()))
-                .Returns<DataImport>(d => d);
 
-            var transactionImportProcessor = GetImportProcessorMock<TransactionDto>(fixture);
+            var transactionImportProcessor = GetImportProcessorMock<TransactionDto>(_fixture);
 
-            var sut = fixture.Create<DataImportJob>();
+            var sut = _fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport.Id, inputPath, logPath);
+            await sut.RunAsync(dataImport.Id, inputPath, logPath);
 
-            transactionImportProcessor.Verify(p => p.ImportRecords(
+            transactionImportProcessor.Verify(p => p.ImportRecordsAsync(
                 It.Is<IEnumerable<TransactionDto>>(e =>
                     e.Count() == 1 &&
                     e.Any(t => t.PositionId == 1 && t.Price == 100m && t.Amount == -1m && t.Time == DateTime.Parse("2005-04-12 14:59"))
@@ -167,34 +138,23 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_ImportsInstrumentsFromProvidedFile_WhenInstrumentTemplateTypeIsSelected()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
-
-            GetServiceProviderMockWithImportProcessors(fixture);
-
             var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Instruments);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddFile(inputPath, new MockFileData("Instrument ID,Symbol,Name,Exchange,Type,Currency,Note\n1,AAPL,Apple Inc.,NASDAQ,stock,USD,TestNote"));
+            _fileSystem.AddFile(inputPath, new MockFileData("Instrument ID,Symbol,Name,Exchange,Type,Currency,Note\n1,AAPL,Apple Inc.,NASDAQ,stock,USD,TestNote"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
-            dataImportRepository
-                .Setup(m => m.Update(It.IsAny<DataImport>()))
-                .Returns<DataImport>(d => d);
 
-            var instrumentImportProcessor = GetImportProcessorMock<InstrumentDto>(fixture);
+            var instrumentImportProcessor = GetImportProcessorMock<InstrumentDto>(_fixture);
 
-            var sut = fixture.Create<DataImportJob>();
+            var sut = _fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport.Id, inputPath, logPath);
+            await sut.RunAsync(dataImport.Id, inputPath, logPath);
 
-            instrumentImportProcessor.Verify(p => p.ImportRecords(
+            instrumentImportProcessor.Verify(p => p.ImportRecordsAsync(
                 It.Is<IEnumerable<InstrumentDto>>(e =>
                     e.Count() == 1 &&
                     e.Any(i => i.Id == 1 && i.Symbol == "AAPL" && i.Name == "Apple Inc." &&
@@ -205,34 +165,23 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_ImportsPricesFromProvidedFile_WhenPriceTemplateTypeIsSelected()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
-
-            GetServiceProviderMockWithImportProcessors(fixture);
-
             var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Prices);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddFile(inputPath, new MockFileData("Price ID,Instrument ID,Price,Time\n0,14,39.99,2020-02-29"));
+            _fileSystem.AddFile(inputPath, new MockFileData("Price ID,Instrument ID,Price,Time\n0,14,39.99,2020-02-29"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
-            dataImportRepository
-                .Setup(m => m.Update(It.IsAny<DataImport>()))
-                .Returns<DataImport>(d => d);
 
-            var priceImportProcessor = GetImportProcessorMock<InstrumentPriceDto>(fixture);
+            var priceImportProcessor = GetImportProcessorMock<InstrumentPriceDto>(_fixture);
 
-            var sut = fixture.Create<DataImportJob>();
+            var sut = _fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport.Id, inputPath, logPath);
+            await sut.RunAsync(dataImport.Id, inputPath, logPath);
 
-            priceImportProcessor.Verify(p => p.ImportRecords(
+            priceImportProcessor.Verify(p => p.ImportRecordsAsync(
                 It.Is<IEnumerable<InstrumentPriceDto>>(e =>
                     e.Count() == 1 &&
                     e.Any(p => p.InstrumentId == 14 && p.Price == 39.99m && p.Time == DateTime.Parse("2020-02-29"))
@@ -242,34 +191,25 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_ImportsZeroRecords_WhenNoDataRowsAreProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
-
-            GetServiceProviderMockWithImportProcessors(fixture);
 
             var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
+            var fileSystem = _fixture.Freeze<MockFileSystem>();
             fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
-            dataImportRepository
-                .Setup(m => m.Update(It.IsAny<DataImport>()))
-                .Returns<DataImport>(d => d);
 
-            var portfolioImportProcessor = GetImportProcessorMock<PortfolioDto>(fixture);
+            var portfolioImportProcessor = GetImportProcessorMock<PortfolioDto>(_fixture);
 
-            var sut = fixture.Create<DataImportJob>();
+            var sut = _fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport.Id, inputPath, logPath);
+            await sut.RunAsync(dataImport.Id, inputPath, logPath);
 
-            portfolioImportProcessor.Verify(p => p.ImportRecords(
+            portfolioImportProcessor.Verify(p => p.ImportRecordsAsync(
                 It.Is<IEnumerable<PortfolioDto>>(e => !e.Any())
             ));
         }
@@ -277,44 +217,33 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_ErrorLogContainsRowErrorMessage_WhenRowProcessingFails()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
-
-            GetServiceProviderMockWithImportProcessors(fixture);
-
             var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
-            var fakeErrorLogEntry = fixture.Create<ProcessedRowErrorLogEntry<PortfolioDto>>();
+            var fakeErrorLogEntry = _fixture.Create<ProcessedRowErrorLogEntry<PortfolioDto>>();
             fakeErrorLogEntry.AddError("TestError");
-            var fakeImportResult = fixture
+            var fakeImportResult = _fixture
                 .Build<ImportResult<PortfolioDto>>()
                 .With(r => r.ErrorLog, new List<ProcessedRowErrorLogEntry<PortfolioDto>> { fakeErrorLogEntry })
                 .Create();
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note"));
+            _fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
-            dataImportRepository
-                .Setup(m => m.Update(It.IsAny<DataImport>()))
-                .Returns<DataImport>(d => d);
 
-            var portfolioImportProcessor = GetImportProcessorMock<PortfolioDto>(fixture);
+            var portfolioImportProcessor = GetImportProcessorMock<PortfolioDto>(_fixture);
             portfolioImportProcessor
-                .Setup(m => m.ImportRecords(It.IsAny<IEnumerable<PortfolioDto>>()))
+                .Setup(m => m.ImportRecordsAsync(It.IsAny<IEnumerable<PortfolioDto>>()))
                 .ReturnsAsync(fakeImportResult);
 
-            var sut = fixture.Create<DataImportJob>();
+            var sut = _fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport.Id, inputPath, logPath);
+            await sut.RunAsync(dataImport.Id, inputPath, logPath);
 
-            var logFileLines = fileSystem.File.ReadAllLines(logPath);
+            var logFileLines = _fileSystem.File.ReadAllLines(logPath);
             var errorMessage = logFileLines[0].Split(',')[4];
 
             Assert.NotEmpty(errorMessage);
@@ -324,32 +253,21 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_ErrorLogContainsRowErrorMessage_WhenRowParsingFails()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
-
-            GetServiceProviderMockWithImportProcessors(fixture);
-
             var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note\n,abc,,"));
+            _fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note\n,abc,,"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
-            dataImportRepository
-                .Setup(m => m.Update(It.IsAny<DataImport>()))
-                .Returns<DataImport>(d => d);
 
-            var sut = fixture.Create<DataImportJob>();
+            var sut = _fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport.Id, inputPath, logPath);
+            await sut.RunAsync(dataImport.Id, inputPath, logPath);
 
-            var logFileLines = fileSystem.File.ReadAllLines(logPath);
+            var logFileLines = _fileSystem.File.ReadAllLines(logPath);
             var errorMessage = logFileLines[0].Split(',')[4];
 
             Assert.NotEmpty(errorMessage);
@@ -359,101 +277,67 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_SetsImportStatusToError_WhenInvalidTemplateTypeIsProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
-
-            GetServiceProviderMockWithImportProcessors(fixture);
-
             var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID;Note"));
+            _fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID;Note"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
-            dataImportRepository
-                .Setup(m => m.Update(It.IsAny<DataImport>()))
-                .Returns<DataImport>(d => d);
 
-            var portfolioImportProcessor = GetImportProcessorMock<PortfolioDto>(fixture);
+            GetImportProcessorMock<PortfolioDto>(_fixture);
 
-            var sut = fixture.Create<DataImportJob>();
+            var sut = _fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport.Id, inputPath, logPath);
+            await sut.RunAsync(dataImport.Id, inputPath, logPath);
 
-            dataImportRepository.Verify(r => r.Update(It.Is<DataImport>(d => d.Status == ImportStatus.Error && !string.IsNullOrEmpty(d.StatusDetails))));
+            _dataImportRepository.Verify(r => r.Update(It.Is<DataImport>(d => d.Status == ImportStatus.Error && !string.IsNullOrEmpty(d.StatusDetails))));
         }
 
         [Fact]
         public async Task Run_SetsImportStatusToError_WhenImportThrows()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
-
-            GetServiceProviderMockWithImportProcessors(fixture);
-
             var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note"));
+            _fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note"));
 
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
-            dataImportRepository
-                .Setup(m => m.Update(It.IsAny<DataImport>()))
-                .Returns<DataImport>(d => d);
 
-            var portfolioImportProcessor = GetImportProcessorMock<PortfolioDto>(fixture);
+            var portfolioImportProcessor = GetImportProcessorMock<PortfolioDto>(_fixture);
             portfolioImportProcessor
-                .Setup(m => m.ImportRecords(It.IsAny<IEnumerable<PortfolioDto>>()))
+                .Setup(m => m.ImportRecordsAsync(It.IsAny<IEnumerable<PortfolioDto>>()))
                 .Throws<Exception>();
 
-            var sut = fixture.Create<DataImportJob>();
+            var sut = _fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport.Id, inputPath, logPath);
+            await sut.RunAsync(dataImport.Id, inputPath, logPath);
 
-            dataImportRepository.Verify(r => r.Update(It.Is<DataImport>(d => d.Status == ImportStatus.Error && !string.IsNullOrEmpty(d.StatusDetails))));
+            _dataImportRepository.Verify(r => r.Update(It.Is<DataImport>(d => d.Status == ImportStatus.Error && !string.IsNullOrEmpty(d.StatusDetails))));
         }
 
         [Fact]
         public async Task Run_DeletesInputFileAfterProcessing()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
-
-            GetServiceProviderMockWithImportProcessors(fixture);
-
             var dataImport = new DataImport(Guid.NewGuid(), DateTime.UtcNow, TemplateType.Portfolios);
             var inputPath = Path.Combine(_storagePath, "test.csv");
             var logPath = Path.Combine(_storagePath, "log.csv");
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note"));
-
-            var dataImportRepository = fixture.Freeze<Mock<IDataImportRepository>>();
-            dataImportRepository
+            _fileSystem.AddFile(inputPath, new MockFileData("Portfolio ID,Name,Currency,Note"));
+            _dataImportRepository
                 .Setup(m => m.FindAsync(dataImport.Id))
                 .ReturnsAsync(dataImport);
-            dataImportRepository
-                .Setup(m => m.Update(It.IsAny<DataImport>()))
-                .Returns<DataImport>(d => d);
 
-            var sut = fixture.Create<DataImportJob>();
+            var sut = _fixture.Create<DataImportJob>();
 
-            await sut.Run(dataImport.Id, inputPath, logPath);
+            await sut.RunAsync(dataImport.Id, inputPath, logPath);
 
-            Assert.False(fileSystem.FileExists(inputPath));
+            Assert.False(_fileSystem.FileExists(inputPath));
         }
 
         private static Mock<IServiceProvider> GetServiceProviderMockWithImportProcessors(IFixture fixture)
@@ -488,7 +372,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         {
             var mock = fixture.Freeze<Mock<IImportProcessor<T>>>();
             mock
-                .Setup(m => m.ImportRecords(It.IsAny<IEnumerable<T>>()))
+                .Setup(m => m.ImportRecordsAsync(It.IsAny<IEnumerable<T>>()))
                 .ReturnsAsync(fixture.Create<ImportResult<T>>);
 
             return mock;

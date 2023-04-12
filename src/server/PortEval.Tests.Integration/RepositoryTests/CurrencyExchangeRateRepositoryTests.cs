@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Infrastructure.Repositories;
 using System;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Repositories;
 using Xunit;
 
 namespace PortEval.Tests.Integration.RepositoryTests

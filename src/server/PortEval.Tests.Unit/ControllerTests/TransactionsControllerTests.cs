@@ -3,40 +3,44 @@ using AutoFixture.AutoMoq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PortEval.Application.Controllers;
+using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Interfaces.Services;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ControllerTests
 {
     public class TransactionsControllerTests
     {
+        private IFixture _fixture;
+        private Mock<ITransactionService> _transactionService;
+
+        public TransactionsControllerTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _transactionService = _fixture.Freeze<Mock<ITransactionService>>();
+        }
+
         [Fact]
         public async Task GetTransactions_ReturnsTransactions_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var filters = _fixture.Create<TransactionFilters>();
+            var dateRange = _fixture.Create<DateRangeParams>();
+            var transactions = _fixture.CreateMany<TransactionDto>();
 
-            var filters = fixture.Create<TransactionFilters>();
-            var dateRange = fixture.Create<DateRangeParams>();
-            var transactions = fixture.CreateMany<TransactionDto>();
+            _transactionService
+                .Setup(m => m.GetTransactionsAsync(filters, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(transactions));
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
-            transactionQueries
-                .Setup(m => m.GetTransactions(filters, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(transactions));
-
-            var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetTransactions(filters, dateRange);
 
-            transactionQueries.Verify(m => m.GetTransactions(filters, dateRange));
+            _transactionService.Verify(m => m.GetTransactionsAsync(filters, dateRange));
             Assert.Equal(transactions, result.Value);
         }
 
@@ -44,137 +48,114 @@ namespace PortEval.Tests.Unit.ControllerTests
         [Fact]
         public async Task GetTransactions_ReturnsNotFound_WhenQueryReturnsNotFound()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var filters = _fixture.Create<TransactionFilters>();
+            var dateRange = _fixture.Create<DateRangeParams>();
 
-            var filters = fixture.Create<TransactionFilters>();
-            var dateRange = fixture.Create<DateRangeParams>();
+            _transactionService
+                .Setup(m => m.GetTransactionsAsync(filters, dateRange))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<IEnumerable<TransactionDto>>());
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
-            transactionQueries
-                .Setup(m => m.GetTransactions(filters, dateRange))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<IEnumerable<TransactionDto>>());
-
-            var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetTransactions(filters, dateRange);
 
-            transactionQueries.Verify(m => m.GetTransactions(filters, dateRange));
+            _transactionService.Verify(m => m.GetTransactionsAsync(filters, dateRange));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
         [Fact]
         public async Task GetTransaction_ReturnsTransaction_WhenTransactionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transaction = _fixture.Create<TransactionDto>();
 
-            var transaction = fixture.Create<TransactionDto>();
+            _transactionService
+                .Setup(m => m.GetTransactionAsync(transaction.Id))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(transaction));
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
-            transactionQueries
-                .Setup(m => m.GetTransaction(transaction.Id))
-                .ReturnsAsync(ControllerTestHelper.GenerateSuccessfulQueryResponse(transaction));
-
-            var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetTransaction(transaction.Id);
 
-            transactionQueries.Verify(m => m.GetTransaction(transaction.Id));
+            _transactionService.Verify(m => m.GetTransactionAsync(transaction.Id));
             Assert.Equal(transaction, result.Value);
         }
 
         [Fact]
         public async Task GetTransaction_ReturnsNotFound_TransactionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transactionId = _fixture.Create<int>();
 
-            var transactionId = fixture.Create<int>();
+            _transactionService
+                .Setup(m => m.GetTransactionAsync(transactionId))
+                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<TransactionDto>());
 
-            var transactionQueries = fixture.Freeze<Mock<ITransactionQueries>>();
-            transactionQueries
-                .Setup(m => m.GetTransaction(transactionId))
-                .ReturnsAsync(ControllerTestHelper.GenerateNotFoundQueryResponse<TransactionDto>());
-
-            var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
             var result = await sut.GetTransaction(transactionId);
 
-            transactionQueries.Verify(m => m.GetTransaction(transactionId));
+            _transactionService.Verify(m => m.GetTransactionAsync(transactionId));
             Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
         }
 
         [Fact]
         public async Task PostTransaction_CreatesTransaction()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transaction = _fixture.Create<TransactionDto>();
 
-            var transaction = fixture.Create<TransactionDto>();
-
-            var transactionService = fixture.Freeze<Mock<ITransactionService>>();
-            transactionService
+            _transactionService
                 .Setup(m => m.AddTransactionAsync(transaction))
-                .ReturnsAsync(fixture.Create<Transaction>());
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(transaction));
 
-            var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
             await sut.PostTransaction(transaction);
 
-            transactionService.Verify(m => m.AddTransactionAsync(transaction));
+            _transactionService.Verify(m => m.AddTransactionAsync(transaction));
         }
 
         [Fact]
         public async Task PutTransaction_UpdatesTransaction()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transaction = _fixture.Create<TransactionDto>();
 
-            var transaction = fixture.Create<TransactionDto>();
+            _transactionService
+                .Setup(m => m.UpdateTransactionAsync(transaction))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(transaction));
 
-            var transactionService = fixture.Freeze<Mock<ITransactionService>>();
-
-            var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
             await sut.PutTransaction(transaction.Id, transaction);
 
-            transactionService.Verify(m => m.UpdateTransactionAsync(transaction));
+            _transactionService.Verify(m => m.UpdateTransactionAsync(transaction));
         }
 
         [Fact]
         public async Task PutTransaction_ReturnsBadRequest_WhenQueryParamIdDoesNotMatchBodyId()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transaction = _fixture.Create<TransactionDto>();
 
-            var transaction = fixture.Create<TransactionDto>();
-
-            var transactionService = fixture.Freeze<Mock<ITransactionService>>();
-
-            var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
             var result = await sut.PutTransaction(transaction.Id + 1, transaction);
 
-            transactionService.Verify(m => m.UpdateTransactionAsync(transaction), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+            _transactionService.Verify(m => m.UpdateTransactionAsync(transaction), Times.Never());
+            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
         }
 
         [Fact]
         public async Task DeleteTransaction_DeletesTransaction()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transactionId = _fixture.Create<int>();
 
-            var transactionId = fixture.Create<int>();
+            _transactionService
+                .Setup(m => m.DeleteTransactionAsync(transactionId))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse());
 
-            var transactionService = fixture.Freeze<Mock<ITransactionService>>();
-
-            var sut = fixture.Build<TransactionsController>().OmitAutoProperties().Create();
+            var sut = _fixture.Build<TransactionsController>().OmitAutoProperties().Create();
 
             await sut.DeleteTransaction(transactionId);
 
-            transactionService.Verify(m => m.DeleteTransactionAsync(transactionId));
+            _transactionService.Verify(m => m.DeleteTransactionAsync(transactionId));
         }
     }
 }

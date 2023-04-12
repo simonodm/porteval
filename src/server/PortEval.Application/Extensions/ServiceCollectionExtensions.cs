@@ -4,21 +4,9 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PortEval.Application.Models.DTOs;
-using PortEval.DataFetcher;
-using PortEval.DataFetcher.Interfaces;
-using PortEval.Domain.Services;
-using PortEval.Infrastructure;
-using PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost;
-using PortEval.Infrastructure.FinancialDataFetcher.OpenExchangeRates;
-using PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum;
-using PortEval.Infrastructure.FinancialDataFetcher.Tiingo;
-using PortEval.Infrastructure.Repositories;
-using System;
-using System.Data;
-using System.IO.Abstractions;
 using PortEval.Application.Core.BackgroundJobs;
 using PortEval.Application.Core.Common;
+using PortEval.Application.Core.Common.BulkImportExport;
 using PortEval.Application.Core.Common.Calculators;
 using PortEval.Application.Core.Common.ChartDataGenerators;
 using PortEval.Application.Core.Interfaces;
@@ -28,10 +16,22 @@ using PortEval.Application.Core.Interfaces.ChartDataGenerators;
 using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
-using PortEval.Application.Core.Queries;
-using PortEval.Application.Core.Queries.TypeHandlers;
 using PortEval.Application.Core.Services;
-using PortEval.Application.Core.Common.BulkImportExport;
+using PortEval.Application.Models.DTOs;
+using PortEval.DataFetcher;
+using PortEval.DataFetcher.Interfaces;
+using PortEval.Domain.Services;
+using PortEval.Infrastructure;
+using PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost;
+using PortEval.Infrastructure.FinancialDataFetcher.OpenExchangeRates;
+using PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum;
+using PortEval.Infrastructure.FinancialDataFetcher.Tiingo;
+using PortEval.Infrastructure.Queries;
+using PortEval.Infrastructure.Queries.TypeHandlers;
+using PortEval.Infrastructure.Repositories;
+using System;
+using System.Data;
+using System.IO.Abstractions;
 
 namespace PortEval.Application.Extensions
 {
@@ -44,12 +44,14 @@ namespace PortEval.Application.Extensions
         /// Injects PortEval's application services.
         /// </summary>
         /// <param name="services">ASP.NET service IoC container.</param>
+        /// <param name="configuration">ASP.NET configuration.</param>
         public static void AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IInstrumentService, InstrumentService>();
             services.AddScoped<IPortfolioService, PortfolioService>();
             services.AddScoped<IPositionService, PositionService>();
             services.AddScoped<ICurrencyService, CurrencyService>();
+            services.AddScoped<ICurrencyExchangeRateService, CurrencyExchangeRateService>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IChartService, ChartService>();
             services.AddScoped<IInstrumentPriceService, InstrumentPriceService>();
@@ -61,7 +63,12 @@ namespace PortEval.Application.Extensions
             services.AddScoped<IFileSystem, FileSystem>();
             services.AddScoped<ICsvImportService, CsvImportService>(
                 provider =>
-                    new CsvImportService(provider.GetRequiredService<IDataImportRepository>(), provider.GetRequiredService<IBackgroundJobClient>(), provider.GetRequiredService<IFileSystem>(), fileStoragePath)
+                    new CsvImportService(
+                        provider.GetRequiredService<IDataImportRepository>(),
+                        provider.GetRequiredService<IBackgroundJobClient>(),
+                        provider.GetRequiredService<IFileSystem>(),
+                        provider.GetRequiredService<IDataImportQueries>(),
+                        fileStoragePath)
             );
             services.AddScoped<ICsvExportService, CsvExportService>();
 
@@ -123,7 +130,6 @@ namespace PortEval.Application.Extensions
             services.AddScoped<ITransactionQueries, TransactionQueries>();
             services.AddScoped<IInstrumentQueries, InstrumentQueries>();
             services.AddScoped<ICurrencyQueries, CurrencyQueries>();
-            services.AddScoped<ICurrencyExchangeRateQueries, CurrencyExchangeRateQueries>();
             services.AddScoped<IChartQueries, ChartQueries>();
             services.AddScoped<IDashboardLayoutQueries, DashboardLayoutQueries>();
             services.AddScoped<IDataImportQueries, DataImportQueries>();
@@ -192,7 +198,7 @@ namespace PortEval.Application.Extensions
         /// <param name="services">ASP.NET service IoC container.</param>
         public static void ConfigureDapper(this IServiceCollection services)
         {
-            services.AddScoped<IDbConnectionCreator, PortEvalDbConnection>();
+            services.AddScoped<PortEvalDbConnectionCreator>();
             Dapper.SqlMapper.AddTypeHandler(new ColorHandler());
             Dapper.SqlMapper.AddTypeMap(typeof(DateTime), DbType.DateTime2);
         }

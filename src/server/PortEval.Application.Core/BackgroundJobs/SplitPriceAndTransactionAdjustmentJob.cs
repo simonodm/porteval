@@ -1,11 +1,11 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
 using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Models.Entities;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.BackgroundJobs
 {
@@ -28,7 +28,7 @@ namespace PortEval.Application.Core.BackgroundJobs
             _logger = loggerFactory.CreateLogger<SplitPriceAndTransactionAdjustmentJob>();
         }
 
-        public async Task Run()
+        public async Task RunAsync()
         {
             _logger.LogInformation("Split price and transaction adjustment job started.");
             var nonProcessedSplits = await _splitRepository.ListNonProcessedSplitsAsync();

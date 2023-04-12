@@ -4,15 +4,16 @@ using Hangfire;
 using Hangfire.Common;
 using Hangfire.States;
 using Moq;
-using PortEval.Domain.Events;
-using System.Threading.Tasks;
 using PortEval.Application.Core.Common;
 using PortEval.Application.Core.DomainEventHandlers.InstrumentCreated;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
+using PortEval.Domain.Events;
+using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers.Extensions;
+using System.Threading.Tasks;
 using Xunit;
 
-namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
+namespace PortEval.Tests.Unit.CoreTests.DomainEventHandlers
 {
     public class InstrumentCreatedInitialPriceFetchHandlerTests
     {
@@ -26,7 +27,10 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
             var domainEvent = fixture.Create<InstrumentCreatedDomainEvent>();
             var domainEventAdapter = new DomainEventNotificationAdapter<InstrumentCreatedDomainEvent>(domainEvent);
             var backgroundJobClient = fixture.Freeze<Mock<IBackgroundJobClient>>();
-            fixture.CreateDefaultInstrumentRepositoryMock();
+            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
+            instrumentRepository
+                .Setup(m => m.Update(It.IsAny<Instrument>()))
+                .Returns<Instrument>(i => i);
 
             var sut = fixture.Create<StartInitialPriceFetchWhenInstrumentCreatedDomainEventHandler>();
 
@@ -34,7 +38,8 @@ namespace PortEval.Tests.Unit.FeatureTests.DomainEventHandlers
 
             backgroundJobClient.Verify(c => c.Create(
                 It.Is<Job>(job =>
-                    job.Method.Name == "Run" && (int)job.Args[0] == domainEvent.Instrument.Id &&
+                    job.Method.Name == nameof(IInitialPriceFetchJob.RunAsync) &&
+                    (int)job.Args[0] == domainEvent.Instrument.Id &&
                     job.Type.IsAssignableTo(typeof(IInitialPriceFetchJob))),
                 It.IsAny<EnqueuedState>()
             ));

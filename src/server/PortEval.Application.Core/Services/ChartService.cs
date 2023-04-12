@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
@@ -9,6 +7,9 @@ using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Services
 {
@@ -21,70 +22,129 @@ namespace PortEval.Application.Core.Services
         private readonly IInstrumentRepository _instrumentRepository;
         private readonly ICurrencyRepository _currencyRepository;
 
+        private readonly IChartQueries _chartDataQueries;
+
         public ChartService(IChartRepository chartRepository, ICurrencyRepository currencyRepository, IPositionRepository positionRepository,
-            IPortfolioRepository portfolioRepository, IInstrumentRepository instrumentRepository)
+            IPortfolioRepository portfolioRepository, IInstrumentRepository instrumentRepository, IChartQueries chartDataQueries)
         {
             _chartRepository = chartRepository;
             _currencyRepository = currencyRepository;
             _positionRepository = positionRepository;
             _portfolioRepository = portfolioRepository;
             _instrumentRepository = instrumentRepository;
+            _chartDataQueries = chartDataQueries;
         }
 
-        /// <inheritdoc cref="IChartService.CreateChartAsync" />
-        public async Task<Chart> CreateChartAsync(ChartDto options)
+        /// <inheritdoc />
+        public async Task<OperationResponse<IEnumerable<ChartDto>>> GetAllChartsAsync()
         {
-            await ValidateCurrencyCode(options);
-            ValidateFrequency(options);
-
-            var dateRange = GenerateDateRange(options);
-            var typeConfig = GenerateTypeConfiguration(options);
-
-            var chart = Chart.Create(options.Name, dateRange, typeConfig);
-            chart.ReplaceLines(await ConvertLineDtosToLineEntities(chart, options.Lines));
-            _chartRepository.Add(chart);
-
-            await _chartRepository.UnitOfWork.CommitAsync();
-            return chart;
+            var charts = await _chartDataQueries.GetChartsAsync();
+            return new OperationResponse<IEnumerable<ChartDto>>
+            {
+                Status = OperationStatus.Ok,
+                Response = charts
+            };
         }
 
-        /// <inheritdoc cref="IChartService.UpdateChartAsync" />
-        public async Task<Chart> UpdateChartAsync(ChartDto options)
+        /// <inheritdoc />
+        public async Task<OperationResponse<ChartDto>> GetChartAsync(int chartId)
+        {
+            var chart = await _chartDataQueries.GetChartAsync(chartId);
+            return new OperationResponse<ChartDto>
+            {
+                Response = chart,
+                Status = chart != null ? OperationStatus.Ok : OperationStatus.NotFound,
+                Message = chart != null ? "" : $"Chart {chartId} does not exist."
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<OperationResponse<ChartDto>> CreateChartAsync(ChartDto options)
+        {
+            try
+            {
+                await ValidateCurrencyCode(options);
+                ValidateFrequency(options);
+
+                var dateRange = GenerateDateRange(options);
+                var typeConfig = GenerateTypeConfiguration(options);
+
+                var chart = Chart.Create(options.Name, dateRange, typeConfig);
+                chart.ReplaceLines(await ConvertLineDtosToLineEntities(chart, options.Lines));
+                _chartRepository.Add(chart);
+
+                await _chartRepository.UnitOfWork.CommitAsync();
+                return await GetChartAsync(chart.Id);
+            }
+            catch (PortEvalException ex)
+            {
+                return new OperationResponse<ChartDto>
+                {
+                    Status = OperationStatus.Error,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<OperationResponse<ChartDto>> UpdateChartAsync(ChartDto options)
         {
             var chart = await _chartRepository.FindAsync(options.Id);
             if (chart == null)
             {
-                throw new ItemNotFoundException($"Chart {options.Id} does not exist.");
+                return new OperationResponse<ChartDto>
+                {
+                    Status = OperationStatus.NotFound
+                };
             }
 
-            await ValidateCurrencyCode(options);
-            ValidateFrequency(options);
+            try
+            {
+                await ValidateCurrencyCode(options);
+                ValidateFrequency(options);
 
-            var dateRange = GenerateDateRange(options);
-            var typeConfig = GenerateTypeConfiguration(options);
+                var dateRange = GenerateDateRange(options);
+                var typeConfig = GenerateTypeConfiguration(options);
 
-            chart.Rename(options.Name);
-            chart.SetDateRange(dateRange);
-            chart.SetConfiguration(typeConfig);
-            chart.ReplaceLines(await ConvertLineDtosToLineEntities(chart, options.Lines));
-            chart.IncreaseVersion();
+                chart.Rename(options.Name);
+                chart.SetDateRange(dateRange);
+                chart.SetConfiguration(typeConfig);
+                chart.ReplaceLines(await ConvertLineDtosToLineEntities(chart, options.Lines));
+                chart.IncreaseVersion();
 
-            _chartRepository.Update(chart);
+                _chartRepository.Update(chart);
 
-            await _chartRepository.UnitOfWork.CommitAsync();
-            return chart;
+                await _chartRepository.UnitOfWork.CommitAsync();
+                return await GetChartAsync(options.Id);
+            }
+            catch (PortEvalException ex)
+            {
+                return new OperationResponse<ChartDto>
+                {
+                    Status = OperationStatus.Error,
+                    Message = ex.Message
+                };
+            }
         }
 
-        /// <inheritdoc cref="IChartService.DeleteChartAsync" />
-        public async Task DeleteChartAsync(int id)
+        /// <inheritdoc />
+        public async Task<OperationResponse> DeleteChartAsync(int id)
         {
             if (!await _chartRepository.ExistsAsync(id))
             {
-                throw new ItemNotFoundException($"Chart {id} does not exist.");
+                return new OperationResponse
+                {
+                    Status = OperationStatus.NotFound,
+                    Message = $"Chart {id} does not exist."
+                };
             }
 
             await _chartRepository.DeleteAsync(id);
             await _chartRepository.UnitOfWork.CommitAsync();
+            return new OperationResponse
+            {
+                Status = OperationStatus.Ok
+            };
         }
 
         /// <summary>

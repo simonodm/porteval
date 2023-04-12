@@ -1,31 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using System.Text;
-using PortEval.Application.Core.Queries;
 using Xunit;
 
 namespace PortEval.Tests.Unit.Helpers
 {
     internal static class ControllerTestHelper
     {
-        public static QueryResponse<T> GenerateSuccessfulQueryResponse<T>(T result)
-        {
-            return new QueryResponse<T>
-            {
-                Status = QueryStatus.Ok,
-                Response = result
-            };
-        }
-
-        public static QueryResponse<T> GenerateNotFoundQueryResponse<T>()
-        {
-            return new QueryResponse<T>
-            {
-                Status = QueryStatus.NotFound,
-                Response = default
-            };
-        }
-
         public static void AssertFileContentEqual(string expectedContent, IActionResult actionResult)
         {
             Assert.IsAssignableFrom<FileContentResult>(actionResult);

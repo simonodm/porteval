@@ -1,5 +1,5 @@
-﻿using System;
-using PortEval.Application.Core.Common;
+﻿using PortEval.Application.Core.Common;
+using System;
 
 namespace PortEval.Application.Core.Interfaces.ChartDataGenerators
 {

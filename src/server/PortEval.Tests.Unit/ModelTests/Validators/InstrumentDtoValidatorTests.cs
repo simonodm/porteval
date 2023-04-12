@@ -4,13 +4,20 @@ using FluentValidation;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.Validators;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class InstrumentDtoValidatorTests
     {
+        private IFixture _fixture;
+
+        public InstrumentDtoValidatorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         public static IEnumerable<object[]> ValidInstrumentData = new List<object[]>
         {
             new object[] { "AAPL", "Apple Inc.", "NASDAQ", "USD", "Test Note" },
@@ -23,10 +30,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         public void Validate_ValidatesSuccessfully_WhenInstrumentIsValid(string symbol, string name, string exchange,
             string currencyCode, string note)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var instrument = fixture.Build<InstrumentDto>()
+            var instrument = _fixture.Build<InstrumentDto>()
                 .With(i => i.Symbol, symbol)
                 .With(i => i.Name, name)
                 .With(i => i.Exchange, exchange)
@@ -34,7 +38,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .With(i => i.Note, note)
                 .Create();
 
-            var sut = fixture.Create<InstrumentDtoValidator>();
+            var sut = _fixture.Create<InstrumentDtoValidator>();
 
             var validationResult = sut.Validate(instrument);
 
@@ -48,14 +52,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [InlineData("ABCD")]
         public void Validate_FailsValidation_WhenCurrencyCodeIsNot3Characters(string currencyCode)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var instrument = fixture.Build<InstrumentDto>()
+            var instrument = _fixture.Build<InstrumentDto>()
                 .With(i => i.CurrencyCode, currencyCode)
                 .Create();
 
-            var sut = fixture.Create<InstrumentDtoValidator>();
+            var sut = _fixture.Create<InstrumentDtoValidator>();
             sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(instrument);
@@ -70,14 +71,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [InlineData("ABCDEFGHIJK")]
         public void Validate_FailsValidation_WhenSymbolIsInvalid(string symbol)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var instrument = fixture.Build<InstrumentDto>()
+            var instrument = _fixture.Build<InstrumentDto>()
                 .With(i => i.Symbol, symbol)
                 .Create();
 
-            var sut = fixture.Create<InstrumentDtoValidator>();
+            var sut = _fixture.Create<InstrumentDtoValidator>();
             sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(instrument);
@@ -91,14 +89,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [InlineData(null)]
         public void Validate_FailsValidation_WhenNameIsMissing(string name)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var instrument = fixture.Build<InstrumentDto>()
+            var instrument = _fixture.Build<InstrumentDto>()
                 .With(i => i.Name, name)
                 .Create();
 
-            var sut = fixture.Create<InstrumentDtoValidator>();
+            var sut = _fixture.Create<InstrumentDtoValidator>();
             sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(instrument);
@@ -110,14 +105,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenNameIsLongerThan64Characters()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var instrument = fixture.Build<InstrumentDto>()
-                .With(i => i.Name, string.Join(string.Empty, fixture.CreateMany<string>(10)))
+            var instrument = _fixture.Build<InstrumentDto>()
+                .With(i => i.Name, string.Join(string.Empty, _fixture.CreateMany<string>(10)))
                 .Create();
 
-            var sut = fixture.Create<InstrumentDtoValidator>();
+            var sut = _fixture.Create<InstrumentDtoValidator>();
             sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(instrument);
@@ -129,14 +121,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenExchangeIsLongerThan32Characters()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var instrument = fixture.Build<InstrumentDto>()
-                .With(i => i.Exchange, string.Join(string.Empty, fixture.CreateMany<string>(5)))
+            var instrument = _fixture.Build<InstrumentDto>()
+                .With(i => i.Exchange, string.Join(string.Empty, _fixture.CreateMany<string>(5)))
                 .Create();
 
-            var sut = fixture.Create<InstrumentDtoValidator>();
+            var sut = _fixture.Create<InstrumentDtoValidator>();
             sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(instrument);
@@ -148,14 +137,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenNoteIsLongerThan255Characters()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var instrument = fixture.Build<InstrumentDto>()
-                .With(i => i.Note, string.Join(string.Empty, fixture.CreateMany<string>(50)))
+            var instrument = _fixture.Build<InstrumentDto>()
+                .With(i => i.Note, string.Join(string.Empty, _fixture.CreateMany<string>(50)))
                 .Create();
 
-            var sut = fixture.Create<InstrumentDtoValidator>();
+            var sut = _fixture.Create<InstrumentDtoValidator>();
             sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(instrument);

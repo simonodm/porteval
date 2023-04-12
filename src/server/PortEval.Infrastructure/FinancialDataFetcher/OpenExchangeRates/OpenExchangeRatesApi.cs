@@ -1,11 +1,11 @@
-﻿using System.Net.Http;
+﻿using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.DataFetcher;
 using PortEval.DataFetcher.Responses;
+using PortEval.Infrastructure.FinancialDataFetcher.Extensions;
 using PortEval.Infrastructure.FinancialDataFetcher.OpenExchangeRates.Models;
 using PortEval.Infrastructure.FinancialDataFetcher.Requests;
+using System.Net.Http;
 using System.Threading.Tasks;
-using PortEval.Application.Models.FinancialDataFetcher;
-using PortEval.Infrastructure.FinancialDataFetcher.Extensions;
 
 namespace PortEval.Infrastructure.FinancialDataFetcher.OpenExchangeRates
 {
@@ -17,11 +17,11 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.OpenExchangeRates
         private const string _baseUrl = "https://www.openexchangerates.org/api";
 
         [RequestProcessor(typeof(LatestExchangeRatesRequest), typeof(ExchangeRates))]
-        public async Task<Response<ExchangeRates>> Process(LatestExchangeRatesRequest request)
+        public async Task<Response<ExchangeRates>> ProcessAsync(LatestExchangeRatesRequest request)
         {
             var queryUrl = $"{_baseUrl}/latest.json?app_id={Configuration.Credentials.Token}&base={request.CurrencyCode}";
 
-            var response = await HttpClient.GetJson<LatestExchangeRatesResponseModel>(queryUrl, Configuration.RateLimiter);
+            var response = await HttpClient.GetJsonAsync<LatestExchangeRatesResponseModel>(queryUrl, Configuration.RateLimiter);
 
             return new Response<ExchangeRates>
             {

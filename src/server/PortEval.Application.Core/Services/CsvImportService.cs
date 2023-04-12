@@ -1,64 +1,107 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.IO.Abstractions;
-using System.Threading.Tasks;
-using CsvHelper;
+﻿using CsvHelper;
 using Hangfire;
 using PortEval.Application.Core.Extensions;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
+using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
+using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.IO.Abstractions;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Services
 {
+    /// <inheritdoc cref="ICsvImportService" />
     public class CsvImportService : ICsvImportService
     {
-        private IDataImportRepository _importRepository;
-        private IBackgroundJobClient _jobClient;
-        private IFileSystem _fileSystem;
+        private readonly IDataImportRepository _importRepository;
+        private readonly IDataImportQueries _importDataQueries;
+
+        private readonly IBackgroundJobClient _jobClient;
+        private readonly IFileSystem _fileSystem;
         private readonly string _storagePath;
 
-        public CsvImportService(IDataImportRepository importRepository, IBackgroundJobClient jobClient, IFileSystem fileSystem, string storagePath)
+        public CsvImportService(IDataImportRepository importRepository, IBackgroundJobClient jobClient, IFileSystem fileSystem, IDataImportQueries importDataQueries, string storagePath)
         {
             _importRepository = importRepository;
             _jobClient = jobClient;
             _fileSystem = fileSystem;
             _storagePath = storagePath;
+            _importDataQueries = importDataQueries;
         }
 
-        public async Task<DataImport> StartImport(Stream inputFileStream, TemplateType templateType)
+        /// <inheritdoc />
+        public async Task<OperationResponse<IEnumerable<CsvTemplateImportDto>>> GetAllImportsAsync()
+        {
+            var imports = await _importDataQueries.GetAllImportsAsync();
+
+            return new OperationResponse<IEnumerable<CsvTemplateImportDto>>
+            {
+                Response = imports.Select(AssignErrorLogUrl)
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<OperationResponse<CsvTemplateImportDto>> GetImportAsync(Guid id)
+        {
+            var import = await _importDataQueries.GetImportAsync(id);
+
+            return new OperationResponse<CsvTemplateImportDto>
+            {
+                Status = import != null ? OperationStatus.Ok : OperationStatus.NotFound,
+                Message = import != null ? "" : $"Import {id} does not exist.",
+                Response = import != null ? AssignErrorLogUrl(import) : null
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<OperationResponse<CsvTemplateImportDto>> StartImportAsync(Stream inputFileStream, TemplateType templateType)
         {
             var guid = Guid.NewGuid();
 
             var tempFilePath = GetTemporaryFilePath(guid);
             var logFilePath = GetErrorLogPath(guid);
 
-            await using var fs = _fileSystem.FileStream.Create(tempFilePath, FileMode.Create);
+            await using var fs = _fileSystem.File.OpenWrite(tempFilePath);
             await inputFileStream.CopyToAsync(fs);
             fs.Close();
 
             var importEntry = await SaveNewImportEntry(guid, templateType);
-            _jobClient.Enqueue<IDataImportJob>(job => job.Run(guid, tempFilePath, logFilePath));
+            _jobClient.Enqueue<IDataImportJob>(job => job.RunAsync(guid, tempFilePath, logFilePath));
 
-            return importEntry;
+            return await GetImportAsync(importEntry.Id);
         }
 
-        public Stream TryGetErrorLog(Guid guid)
+        /// <inheritdoc />
+        public OperationResponse<Stream> TryGetErrorLog(Guid guid)
         {
             try
             {
-                return _fileSystem.FileStream.Create(GetErrorLogPath(guid), FileMode.Open);
+                var stream = _fileSystem.File.OpenRead(GetErrorLogPath(guid));
+                return new OperationResponse<Stream>
+                {
+                    Response = stream
+                };
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return new OperationResponse<Stream>
+                {
+                    Status = OperationStatus.Error,
+                    Message = $"Failed to retrieve error log for ID {guid}"
+                };
             }
         }
 
-        public Stream GetCsvTemplate(TemplateType templateType)
+        /// <inheritdoc />
+        public OperationResponse<Stream> GetCsvTemplate(TemplateType templateType)
         {
             var path = GetTemplatePath(templateType);
             if (!_fileSystem.File.Exists(path))
@@ -66,7 +109,10 @@ namespace PortEval.Application.Core.Services
                 GenerateTemplate(path, templateType);
             }
 
-            return _fileSystem.FileStream.Create(path, FileMode.Open);
+            return new OperationResponse<Stream>
+            {
+                Response = _fileSystem.File.OpenRead(path)
+            };
         }
 
         private string GetTemporaryFilePath(Guid guid)
@@ -86,7 +132,7 @@ namespace PortEval.Application.Core.Services
 
         private void GenerateTemplate(string path, TemplateType templateType)
         {
-            using var fs = _fileSystem.FileStream.Create(path, FileMode.Create);
+            using var fs = _fileSystem.File.OpenWrite(path);
             using var sw = new StreamWriter(fs);
             using var csv = new CsvWriter(sw, CultureInfo.InvariantCulture);
             csv.RegisterImportClassMaps();
@@ -103,6 +149,16 @@ namespace PortEval.Application.Core.Services
             await _importRepository.UnitOfWork.CommitAsync();
 
             return importEntry;
+        }
+
+        private CsvTemplateImportDto AssignErrorLogUrl(CsvTemplateImportDto importDto)
+        {
+            if (importDto.ErrorLogAvailable)
+            {
+                importDto.ErrorLogUrl = $"/imports/{importDto.ImportId}/log";
+            }
+
+            return importDto;
         }
     }
 }
