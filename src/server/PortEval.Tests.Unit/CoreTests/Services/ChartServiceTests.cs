@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Core;
@@ -11,17 +7,40 @@ using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Enums;
-using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using PortEval.Tests.Unit.Helpers.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.CoreTests.Services
 {
     public class ChartServiceTests
     {
+        private IFixture _fixture;
+        private Mock<IInstrumentRepository> _instrumentRepository;
+        private Mock<IPortfolioRepository> _portfolioRepository;
+        private Mock<IPositionRepository> _positionRepository;
+        private Mock<ICurrencyRepository> _currencyRepository;
+        private Mock<IChartQueries> _chartQueries;
+        private Mock<IChartRepository> _chartRepository;
+
+        public ChartServiceTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _instrumentRepository = _fixture.CreateDefaultInstrumentRepositoryMock();
+            _portfolioRepository = _fixture.CreateDefaultPortfolioRepositoryMock();
+            _positionRepository = _fixture.CreateDefaultPositionRepositoryMock();
+            _currencyRepository = _fixture.CreateDefaultCurrencyRepositoryMock();
+            _chartQueries = _fixture.CreateDefaultChartQueriesMock();
+            _chartRepository = _fixture.CreateDefaultChartRepositoryMock();
+        }
+
         public static IEnumerable<object[]> WellFormedData => new List<object[]>
         {
             new object[]
@@ -89,17 +108,13 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetAllChartsAsync_ReturnsAllCharts()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var charts = _fixture.CreateMany<ChartDto>();
 
-            var charts = fixture.CreateMany<ChartDto>();
-
-            var chartQueries = fixture.CreateDefaultChartQueriesMock();
-            chartQueries
+            _chartQueries
                 .Setup(m => m.GetChartsAsync())
                 .ReturnsAsync(charts);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var result = await sut.GetAllChartsAsync();
 
@@ -110,17 +125,13 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetChartAsync_ReturnsChart_WhenItExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var chart = _fixture.Create<ChartDto>();
 
-            var chart = fixture.Create<ChartDto>();
-
-            var chartQueries = fixture.CreateDefaultChartQueriesMock();
-            chartQueries
+            _chartQueries
                 .Setup(m => m.GetChartAsync(chart.Id))
                 .ReturnsAsync(chart);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var result = await sut.GetChartAsync(chart.Id);
 
@@ -131,17 +142,13 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetChartAsync_ReturnsNotFound_WhenItDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chartQueries = fixture.CreateDefaultChartQueriesMock();
-            chartQueries
+            _chartQueries
                 .Setup(m => m.GetChartAsync(It.IsAny<int>()))
                 .ReturnsAsync((ChartDto)null);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
-            var result = await sut.GetChartAsync(fixture.Create<int>());
+            var result = await sut.GetChartAsync(_fixture.Create<int>());
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
         }
@@ -152,10 +159,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             DateTime? startDt, DateTime? endDt,
             DateRangeUnit? toDateRangeUnit, int? toDateRangeValue, AggregationFrequency? frequency)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.Type, type)
                 .With(c => c.IsToDate, isToDate)
                 .With(c => c.DateRangeStart, startDt)
@@ -167,16 +171,11 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                         : new ToDateRange((DateRangeUnit)toDateRangeUnit, (int)toDateRangeValue))
                 .Create();
 
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
-                .Setup(m => m.Add(It.IsAny<Chart>()))
-                .Returns<Chart>(c => c);
-            CreateEntityRepositoryMocks(fixture);
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             await sut.CreateChartAsync(chart);
 
-            chartRepository.Verify(r => r.Add(It.Is<Chart>(c =>
+            _chartRepository.Verify(r => r.Add(It.Is<Chart>(c =>
                 ChartDtoMatchesChartEntity(chart, c)
             )));
         }
@@ -187,24 +186,18 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [InlineData(ChartType.AggregatedProfit)]
         public async Task CreatingCurrencyChart_ReturnsError_WhenCurrencyDoesNotExist(ChartType type)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.Type, type)
                 .Create();
 
-            fixture.CreateDefaultChartRepositoryMock();
-            CreateEntityRepositoryMocks(fixture);
-            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
-            currencyRepository
+            _currencyRepository
                 .Setup(r => r.ExistsAsync(chart.CurrencyCode))
                 .ReturnsAsync(false);
-            currencyRepository
+            _currencyRepository
                 .Setup(r => r.FindAsync(chart.CurrencyCode))
                 .ReturnsAsync((Currency)null);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.CreateChartAsync(chart);
         }
@@ -214,18 +207,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [InlineData(ChartType.AggregatedPerformance)]
         public async Task CreatingAggregatedChart_ReturnsError_WhenAggregationFrequencyIsNotProvided(ChartType type)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.Type, type)
                 .With(c => c.Frequency, (AggregationFrequency?)null)
                 .Create();
 
-            fixture.CreateDefaultChartRepositoryMock();
-            CreateEntityRepositoryMocks(fixture);
-
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.CreateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -234,18 +221,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task CreatingToDateRangeChart_ReturnsError_WhenToDateRangeIsNotProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.IsToDate, true)
                 .With(c => c.ToDateRange, (ToDateRange)null)
                 .Create();
 
-            fixture.CreateDefaultChartRepositoryMock();
-            CreateEntityRepositoryMocks(fixture);
-
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.CreateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -254,18 +235,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task CreatingCustomDateRangeChart_ReturnsError_WhenDateRangeStartIsNotProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.IsToDate, false)
                 .With(c => c.DateRangeStart, (DateTime?)null)
                 .Create();
 
-            fixture.CreateDefaultChartRepositoryMock();
-            CreateEntityRepositoryMocks(fixture);
-
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.CreateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -274,18 +249,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task CreatingCustomDateRangeChart_ReturnsError_WhenDateRangeEndIsNotProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.IsToDate, false)
                 .With(c => c.DateRangeEnd, (DateTime?)null)
                 .Create();
 
-            fixture.CreateDefaultChartRepositoryMock();
-            CreateEntityRepositoryMocks(fixture);
-
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.CreateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -294,26 +263,20 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task CreatingChartWithPortfolioLine_ReturnsError_WhenPortfolioDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Create<ChartDto>();
-            var portfolioLine = fixture.Build<ChartLineDto>()
+            var chart = _fixture.Create<ChartDto>();
+            var portfolioLine = _fixture.Build<ChartLineDto>()
                 .With(line => line.Type, ChartLineType.Portfolio)
                 .Create();
             chart.Lines.Add(portfolioLine);
 
-            fixture.CreateDefaultChartRepositoryMock();
-            CreateEntityRepositoryMocks(fixture);
-            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
-            portfolioRepository
+            _portfolioRepository
                 .Setup(r => r.ExistsAsync((int)portfolioLine.PortfolioId))
                 .ReturnsAsync(false);
-            portfolioRepository
+            _portfolioRepository
                 .Setup(r => r.FindAsync((int)portfolioLine.PortfolioId))
                 .ReturnsAsync((Portfolio)null);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.CreateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -322,26 +285,20 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task CreatingChartWithPositionLine_ReturnsError_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Create<ChartDto>();
-            var positionLine = fixture.Build<ChartLineDto>()
+            var chart = _fixture.Create<ChartDto>();
+            var positionLine = _fixture.Build<ChartLineDto>()
                 .With(line => line.Type, ChartLineType.Position)
                 .Create();
             chart.Lines.Add(positionLine);
 
-            fixture.CreateDefaultChartRepositoryMock();
-            CreateEntityRepositoryMocks(fixture);
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            positionRepository
+            _positionRepository
                 .Setup(r => r.ExistsAsync((int)positionLine.PositionId))
                 .ReturnsAsync(false);
-            positionRepository
+            _positionRepository
                 .Setup(r => r.FindAsync((int)positionLine.PositionId))
                 .ReturnsAsync((Position)null);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.CreateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -350,26 +307,20 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task CreatingChartWithInstrumentLine_ReturnsError_WhenInstrumentDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Create<ChartDto>();
-            var instrumentLine = fixture.Build<ChartLineDto>()
+            var chart = _fixture.Create<ChartDto>();
+            var instrumentLine = _fixture.Build<ChartLineDto>()
                 .With(line => line.Type, ChartLineType.Instrument)
                 .Create();
             chart.Lines.Add(instrumentLine);
 
-            fixture.CreateDefaultChartRepositoryMock();
-            CreateEntityRepositoryMocks(fixture);
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            _instrumentRepository
                 .Setup(r => r.ExistsAsync((int)instrumentLine.InstrumentId))
                 .ReturnsAsync(false);
-            instrumentRepository
+            _instrumentRepository
                 .Setup(r => r.FindAsync((int)instrumentLine.InstrumentId))
                 .ReturnsAsync((Instrument)null);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.CreateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -381,10 +332,7 @@ namespace PortEval.Tests.Unit.CoreTests.Services
             DateTime? startDt, DateTime? endDt,
             DateRangeUnit? toDateRangeUnit, int? toDateRangeValue, AggregationFrequency? frequency)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.Type, type)
                 .With(c => c.IsToDate, isToDate)
                 .With(c => c.DateRangeStart, startDt)
@@ -396,20 +344,11 @@ namespace PortEval.Tests.Unit.CoreTests.Services
                         : new ToDateRange((DateRangeUnit)toDateRangeUnit, (int)toDateRangeValue))
                 .Create();
 
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
-                .Setup(r => r.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
-            chartRepository
-                .Setup(r => r.Update(It.IsAny<Chart>()))
-                .Returns<Chart>(c => c);
-            CreateEntityRepositoryMocks(fixture);
-
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             await sut.UpdateChartAsync(chart);
 
-            chartRepository.Verify(r => r.Update(It.Is<Chart>(c =>
+            _chartRepository.Verify(r => r.Update(It.Is<Chart>(c =>
                 ChartDtoMatchesChartEntity(chart, c)
             )));
         }
@@ -420,27 +359,19 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [InlineData(ChartType.AggregatedProfit)]
         public async Task UpdatingCurrencyChart_ReturnsError_WhenCurrencyDoesNotExist(ChartType type)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.Type, type)
                 .Create();
 
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
-                .Setup(r => r.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
-            CreateEntityRepositoryMocks(fixture);
-            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
-            currencyRepository
+
+            _currencyRepository
                 .Setup(r => r.ExistsAsync(chart.CurrencyCode))
                 .ReturnsAsync(false);
-            currencyRepository
+            _currencyRepository
                 .Setup(r => r.FindAsync(chart.CurrencyCode))
                 .ReturnsAsync((Currency)null);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.UpdateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -451,21 +382,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [InlineData(ChartType.AggregatedPerformance)]
         public async Task UpdatingAggregatedChart_ReturnsError_WhenAggregationFrequencyIsNotProvided(ChartType type)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.Type, type)
                 .With(c => c.Frequency, (AggregationFrequency?)null)
                 .Create();
 
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
-                .Setup(r => r.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
-            CreateEntityRepositoryMocks(fixture);
-
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.UpdateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -474,21 +396,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task UpdatingToDateRangeChart_ReturnsError_WhenToDateRangeIsNotProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.IsToDate, true)
                 .With(c => c.ToDateRange, (ToDateRange)null)
                 .Create();
 
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
-                .Setup(r => r.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
-            CreateEntityRepositoryMocks(fixture);
-
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.UpdateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -497,21 +410,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task UpdatingCustomDateRangeChart_ReturnsError_WhenDateRangeStartIsNotProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.IsToDate, false)
                 .With(c => c.DateRangeStart, (DateTime?)null)
                 .Create();
 
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
-                .Setup(r => r.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
-            CreateEntityRepositoryMocks(fixture);
-
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.UpdateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -520,21 +424,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task UpdatingCustomDateRangeChart_ReturnsError_WhenDateRangeEndIsNotProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.IsToDate, false)
                 .With(c => c.DateRangeEnd, (DateTime?)null)
                 .Create();
 
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
-                .Setup(r => r.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
-            CreateEntityRepositoryMocks(fixture);
-
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.UpdateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -543,29 +438,20 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task UpdatingChartWithPortfolioLine_ReturnsError_WhenPortfolioDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Create<ChartDto>();
-            var portfolioLine = fixture.Build<ChartLineDto>()
+            var chart = _fixture.Create<ChartDto>();
+            var portfolioLine = _fixture.Build<ChartLineDto>()
                 .With(line => line.Type, ChartLineType.Portfolio)
                 .Create();
             chart.Lines.Add(portfolioLine);
 
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
-                .Setup(r => r.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
-            CreateEntityRepositoryMocks(fixture);
-            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
-            portfolioRepository
+            _portfolioRepository
                 .Setup(r => r.ExistsAsync((int)portfolioLine.PortfolioId))
                 .ReturnsAsync(false);
-            portfolioRepository
+            _portfolioRepository
                 .Setup(r => r.FindAsync((int)portfolioLine.PortfolioId))
                 .ReturnsAsync((Portfolio)null);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.UpdateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -574,29 +460,20 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task UpdatingChartWithPositionLine_ReturnsError_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Create<ChartDto>();
-            var positionLine = fixture.Build<ChartLineDto>()
+            var chart = _fixture.Create<ChartDto>();
+            var positionLine = _fixture.Build<ChartLineDto>()
                 .With(line => line.Type, ChartLineType.Position)
                 .Create();
             chart.Lines.Add(positionLine);
 
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
-                .Setup(r => r.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
-            CreateEntityRepositoryMocks(fixture);
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            positionRepository
+            _positionRepository
                 .Setup(r => r.ExistsAsync((int)positionLine.PositionId))
                 .ReturnsAsync(false);
-            positionRepository
+            _positionRepository
                 .Setup(r => r.FindAsync((int)positionLine.PositionId))
                 .ReturnsAsync((Position)null);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.UpdateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -605,29 +482,20 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task UpdatingChartWithInstrumentLine_ReturnsError_WhenInstrumentDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Create<ChartDto>();
-            var instrumentLine = fixture.Build<ChartLineDto>()
+            var chart = _fixture.Create<ChartDto>();
+            var instrumentLine = _fixture.Build<ChartLineDto>()
                 .With(line => line.Type, ChartLineType.Instrument)
                 .Create();
             chart.Lines.Add(instrumentLine);
 
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
-                .Setup(r => r.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
-            CreateEntityRepositoryMocks(fixture);
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            _instrumentRepository
                 .Setup(r => r.ExistsAsync((int)instrumentLine.InstrumentId))
                 .ReturnsAsync(false);
-            instrumentRepository
+            _instrumentRepository
                 .Setup(r => r.FindAsync((int)instrumentLine.InstrumentId))
                 .ReturnsAsync((Instrument)null);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.UpdateChartAsync(chart);
             Assert.Equal(OperationStatus.Error, response.Status);
@@ -636,20 +504,16 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task UpdatingChart_ReturnsNotFound_WhenChartDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var chart = _fixture.Create<ChartDto>();
 
-            var chart = fixture.Create<ChartDto>();
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
+            _chartRepository
                 .Setup(r => r.ExistsAsync(chart.Id))
                 .ReturnsAsync(false);
-            chartRepository
+            _chartRepository
                 .Setup(r => r.FindAsync(chart.Id))
                 .ReturnsAsync((Chart)null);
-            CreateEntityRepositoryMocks(fixture);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.UpdateChartAsync(chart);
             Assert.Equal(OperationStatus.NotFound, response.Status);
@@ -658,82 +522,32 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task DeletingChart_DeletesChart_WhenChartExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var id = _fixture.Create<int>();
 
-            var id = fixture.Create<int>();
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
-                .Setup(m => m.ExistsAsync(It.IsAny<int>()))
-                .ReturnsAsync(true);
-            chartRepository
-                .Setup(r => r.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Chart(id, fixture.Create<string>()));
-            CreateEntityRepositoryMocks(fixture);
-
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             await sut.DeleteChartAsync(id);
 
-            chartRepository.Verify(r => r.DeleteAsync(id), Times.Once());
+            _chartRepository.Verify(r => r.DeleteAsync(id), Times.Once());
         }
 
         [Fact]
         public async Task DeletingChart_ReturnsNotFound_WhenChartDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var id = fixture.Create<int>();
-            var chartRepository = fixture.CreateDefaultChartRepositoryMock();
-            chartRepository
+            var id = _fixture.Create<int>();
+            _chartRepository
                 .Setup(r => r.ExistsAsync(id))
                 .ReturnsAsync(false);
-            chartRepository
+            _chartRepository
                 .Setup(r => r.FindAsync(id))
                 .ReturnsAsync((Chart)null);
-            CreateEntityRepositoryMocks(fixture);
 
-            var sut = fixture.Create<ChartService>();
+            var sut = _fixture.Create<ChartService>();
 
             var response = await sut.DeleteChartAsync(id);
             Assert.Equal(OperationStatus.NotFound, response.Status);
         }
 
-        private void CreateEntityRepositoryMocks(IFixture fixture)
-        {
-            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
-            portfolioRepository
-                .Setup(m => m.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Portfolio(id, fixture.Create<string>(), fixture.Create<string>(),
-                    fixture.Create<string>()));
-
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            positionRepository
-                .Setup(m => m.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Position(id, fixture.Create<int>(), fixture.Create<int>(), fixture.Create<string>()));
-
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
-                .Setup(m => m.FindAsync(It.IsAny<int>()))
-                .ReturnsAsync((int id) => new Instrument(
-                    id,
-                    fixture.Create<string>(),
-                    fixture.Create<string>(),
-                    fixture.Create<string>(),
-                    fixture.Create<InstrumentType>(),
-                    fixture.Create<string>(),
-                    fixture.Create<string>())
-                );
-
-            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
-            currencyRepository
-                .Setup(m => m.FindAsync(It.IsAny<string>()))
-                .ReturnsAsync((string code) => new Currency(code, fixture.Create<string>(), fixture.Create<string>()));
-            currencyRepository
-                .Setup(m => m.ExistsAsync(It.IsAny<string>()))
-                .ReturnsAsync(true);
-        }
 
         private bool LineDtosMatchLineEntities(IReadOnlyList<ChartLineDto> dtos, IReadOnlyList<ChartLine> entities)
         {

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using PortEval.Application.Core.Interfaces.Calculators;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using PortEval.Application.Core.Interfaces.Calculators;
 
 namespace PortEval.Application.Core.Common.Calculators
 {

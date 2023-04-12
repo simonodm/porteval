@@ -13,6 +13,14 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class ChartDtoValidatorTests
     {
+        private IFixture _fixture;
+
+        public ChartDtoValidatorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         public static IEnumerable<object[]> ValidCharts => new List<object[]>
         {
             new object[]
@@ -83,10 +91,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
             DateTime? dateRangeStart, DateTime? dateRangeEnd, DateRangeUnit? dateRangeUnit, int? dateRangeValue,
             AggregationFrequency? aggregationFrequency)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.CurrencyCode, "USD")
                 .With(c => c.Type, type)
                 .With(c => c.IsToDate, isToDate)
@@ -100,7 +105,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .With(c => c.Lines, new List<ChartLineDto>())
                 .Create();
 
-            var sut = fixture.Create<ChartDtoValidator>();
+            var sut = _fixture.Create<ChartDtoValidator>();
 
             var validationResult = sut.Validate(chart);
 
@@ -110,15 +115,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenChartIsToDateAndToDateRangeIsNotProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.IsToDate, true)
                 .With(c => c.ToDateRange, (ToDateRange)null)
                 .Create();
 
-            var sut = fixture.Create<ChartDtoValidator>();
+            var sut = _fixture.Create<ChartDtoValidator>();
 
             var validationResult = sut.Validate(chart);
 
@@ -129,15 +131,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenChartIsNotToDateAndDateRangeStartIsNotProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.IsToDate, false)
                 .With(c => c.DateRangeStart, (DateTime?)null)
                 .Create();
 
-            var sut = fixture.Create<ChartDtoValidator>();
+            var sut = _fixture.Create<ChartDtoValidator>();
 
             var validationResult = sut.Validate(chart);
 
@@ -148,15 +147,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenChartIsNotToDateAndDateRangeEndIsNotProvided()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.IsToDate, false)
                 .With(c => c.DateRangeEnd, (DateTime?)null)
                 .Create();
 
-            var sut = fixture.Create<ChartDtoValidator>();
+            var sut = _fixture.Create<ChartDtoValidator>();
 
             var validationResult = sut.Validate(chart);
 
@@ -170,15 +166,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         public void Validate_FailsValidation_WhenChartIsAggregatedAndAggregationFrequencyIsNotProvided(
             ChartType chartType)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.Type, chartType)
                 .With(c => c.Frequency, (AggregationFrequency?)null)
                 .Create();
 
-            var sut = fixture.Create<ChartDtoValidator>();
+            var sut = _fixture.Create<ChartDtoValidator>();
 
             var validationResult = sut.Validate(chart);
 
@@ -192,15 +185,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [InlineData(ChartType.AggregatedProfit)]
         public void Validate_FailsValidation_WhenChartIsCurrencyChartAndCurrencyCodeIsNotProvided(ChartType chartType)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.Type, chartType)
                 .With(c => c.CurrencyCode, (string)null)
                 .Create();
 
-            var sut = fixture.Create<ChartDtoValidator>();
+            var sut = _fixture.Create<ChartDtoValidator>();
 
             var validationResult = sut.Validate(chart);
 
@@ -211,16 +201,13 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenChartDateRangeIsInTheFuture()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.IsToDate, false)
                 .With(c => c.DateRangeStart, DateTime.UtcNow)
                 .With(c => c.DateRangeEnd, DateTime.UtcNow.AddDays(1))
                 .Create();
 
-            var sut = fixture.Create<ChartDtoValidator>();
+            var sut = _fixture.Create<ChartDtoValidator>();
 
             var validationResult = sut.Validate(chart);
 
@@ -231,16 +218,13 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenChartDateRangeEndIsBeforeStart()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.IsToDate, false)
                 .With(c => c.DateRangeStart, DateTime.UtcNow.AddDays(-1))
                 .With(c => c.DateRangeEnd, DateTime.UtcNow.AddDays(-2))
                 .Create();
 
-            var sut = fixture.Create<ChartDtoValidator>();
+            var sut = _fixture.Create<ChartDtoValidator>();
 
             var validationResult = sut.Validate(chart);
 
@@ -251,16 +235,13 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenChartDateRangeEndIsBeforeAllowedStartTime()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.IsToDate, false)
                 .With(c => c.DateRangeStart, PortEvalConstants.FinancialDataStartTime.AddDays(-1))
                 .With(c => c.DateRangeEnd, DateTime.UtcNow.AddDays(-2))
                 .Create();
 
-            var sut = fixture.Create<ChartDtoValidator>();
+            var sut = _fixture.Create<ChartDtoValidator>();
 
             var validationResult = sut.Validate(chart);
 
@@ -274,15 +255,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [InlineData("ABCD")]
         public void Validate_FailsValidation_WhenChartCurrencyIsInvalid(string currencyCode)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.Type, ChartType.Price)
                 .With(c => c.CurrencyCode, currencyCode)
                 .Create();
 
-            var sut = fixture.Create<ChartDtoValidator>();
+            var sut = _fixture.Create<ChartDtoValidator>();
 
             var validationResult = sut.Validate(chart);
 
@@ -295,14 +273,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [InlineData("A")]
         public void Validate_FailsValidation_WhenChartNameIsShorterThanThreeCharacters(string name)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
+            var chart = _fixture.Build<ChartDto>()
                 .With(c => c.Name, name)
                 .Create();
 
-            var sut = fixture.Create<ChartDtoValidator>();
+            var sut = _fixture.Create<ChartDtoValidator>();
 
             var validationResult = sut.Validate(chart);
 
@@ -313,14 +288,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenChartNameIsLongerThanSixtyFourCharacters()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var chart = fixture.Build<ChartDto>()
-                .With(c => c.Name, string.Join(string.Empty, fixture.CreateMany<string>(10)))
+            var chart = _fixture.Build<ChartDto>()
+                .With(c => c.Name, string.Join(string.Empty, _fixture.CreateMany<string>(10)))
                 .Create();
 
-            var sut = fixture.Create<ChartDtoValidator>();
+            var sut = _fixture.Create<ChartDtoValidator>();
 
             var validationResult = sut.Validate(chart);
 

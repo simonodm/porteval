@@ -2,12 +2,12 @@
 using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
+using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.ValueObjects;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Domain.Exceptions;
 
 namespace PortEval.Application.Core.Services
 {

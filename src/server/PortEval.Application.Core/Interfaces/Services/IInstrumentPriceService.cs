@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using PortEval.Application.Models;
 using PortEval.Application.Models.DTOs;
-using System.Threading.Tasks;
 using PortEval.Application.Models.QueryParams;
-using PortEval.Application.Models;
 using PortEval.Domain.Models.Enums;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Interfaces.Services
 {

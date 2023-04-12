@@ -1,26 +1,37 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Core.BackgroundJobs;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.ValueObjects;
 using PortEval.Tests.Unit.Helpers.Extensions;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.BackgroundJobs;
-using PortEval.Application.Core.Interfaces.Repositories;
 using Xunit;
 
 namespace PortEval.Tests.Unit.BackgroundJobTests
 {
     public class SplitPriceAndTransactionAdjustmentJobTests
     {
+        private IFixture _fixture;
+        private Mock<IInstrumentSplitRepository> _splitRepository;
+        private Mock<IInstrumentPriceRepository> _priceRepository;
+        private Mock<IPositionRepository> _positionRepository;
+
+        public SplitPriceAndTransactionAdjustmentJobTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _splitRepository = _fixture.CreateDefaultSplitRepositoryMock();
+            _priceRepository = _fixture.CreateDefaultInstrumentPriceRepositoryMock();
+            _positionRepository = _fixture.CreateDefaultPositionRepositoryMock();
+        }
+
         [Fact]
         public async Task Run_DividesPricesBeforeSplitBySplitFactor_WhenSplitIsNonProcessed()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var firstPrice = 100m;
             var secondPrice = 200m;
 
@@ -35,33 +46,25 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 new InstrumentSplit(1, 1, DateTime.UtcNow, new SplitRatio(1, 5))
             };
 
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListNonProcessedSplitsAsync())
                 .ReturnsAsync(splits);
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListRollbackRequestedSplitsAsync())
                 .ReturnsAsync(Enumerable.Empty<InstrumentSplit>());
-            splitRepository
-                .Setup(r => r.Update(It.IsAny<InstrumentSplit>()))
-                .Returns<InstrumentSplit>(s => s);
-            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
-            priceRepository
+            _priceRepository
                 .Setup(m => m.ListInstrumentPricesAsync(It.IsAny<int>()))
                 .ReturnsAsync(prices);
-            priceRepository
-                .Setup(m => m.Update(It.IsAny<InstrumentPrice>()))
-                .Returns<InstrumentPrice>(p => p);
 
-            var sut = fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
+            var sut = _fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
 
             await sut.RunAsync();
 
-            priceRepository
+            _priceRepository
                 .Verify(r => r.Update(It.Is<InstrumentPrice>(price =>
                     price.Id == prices[0].Id && price.Price == firstPrice / 5
             )));
-            priceRepository
+            _priceRepository
                 .Verify(r => r.Update(It.Is<InstrumentPrice>(price =>
                     price.Id == prices[1].Id && price.Price == secondPrice / 5
             )));
@@ -70,54 +73,40 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_MultipliesTransactionsAmountBySplitFactor_WhenSplitIsNonProcessed()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var firstAmount = 100m;
             var secondAmount = 200m;
 
             var position = new Position(1, 1, 1, "");
-            position.AddTransaction(firstAmount, fixture.Create<decimal>(), DateTime.Parse("2022-01-01"));
-            position.AddTransaction(secondAmount, fixture.Create<decimal>(), DateTime.Parse("2022-02-01"));
+            position.AddTransaction(firstAmount, _fixture.Create<decimal>(), DateTime.Parse("2022-01-01"));
+            position.AddTransaction(secondAmount, _fixture.Create<decimal>(), DateTime.Parse("2022-02-01"));
 
             var splits = new[]
             {
                 new InstrumentSplit(1, 1, DateTime.UtcNow, new SplitRatio(1, 5))
             };
 
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListNonProcessedSplitsAsync())
                 .ReturnsAsync(splits);
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListRollbackRequestedSplitsAsync())
                 .ReturnsAsync(Enumerable.Empty<InstrumentSplit>());
-            splitRepository
-                .Setup(r => r.Update(It.IsAny<InstrumentSplit>()))
-                .Returns<InstrumentSplit>(s => s);
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            positionRepository
+            _positionRepository
                 .Setup(r => r.ListAllInstrumentPositionsAsync(1))
                 .ReturnsAsync(new[] { position });
-            positionRepository
-                .Setup(r => r.Update(It.IsAny<Position>()))
-                .Returns<Position>(p => p);
 
-            var sut = fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
+            var sut = _fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
 
             await sut.RunAsync();
 
             Assert.Equal(position.Transactions.First().Amount, firstAmount * 5);
             Assert.Equal(position.Transactions.Last().Amount, secondAmount * 5);
-            positionRepository.Verify(r => r.Update(position));
+            _positionRepository.Verify(r => r.Update(position));
         }
 
         [Fact]
         public async Task Run_DividesTransactionsPriceBySplitFactor_WhenSplitIsNonProcessed()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var firstPrice = 100m;
             var secondPrice = 200m;
 
@@ -130,39 +119,28 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 new InstrumentSplit(1, 1, DateTime.UtcNow, new SplitRatio(1, 5))
             };
 
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListNonProcessedSplitsAsync())
                 .ReturnsAsync(splits);
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListRollbackRequestedSplitsAsync())
                 .ReturnsAsync(Enumerable.Empty<InstrumentSplit>());
-            splitRepository
-                .Setup(r => r.Update(It.IsAny<InstrumentSplit>()))
-                .Returns<InstrumentSplit>(s => s);
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            positionRepository
+            _positionRepository
                 .Setup(r => r.ListAllInstrumentPositionsAsync(1))
                 .ReturnsAsync(new[] { position });
-            positionRepository
-                .Setup(r => r.Update(It.IsAny<Position>()))
-                .Returns<Position>(p => p);
 
-            var sut = fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
+            var sut = _fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
 
             await sut.RunAsync();
 
             Assert.Equal(position.Transactions.First().Price, firstPrice / 5);
             Assert.Equal(position.Transactions.Last().Price, secondPrice / 5);
-            positionRepository.Verify(r => r.Update(position));
+            _positionRepository.Verify(r => r.Update(position));
         }
 
         [Fact]
         public async Task Run_MultipliesPricesBeforeSplitBySplitFactor_WhenSplitRollbackIsRequested()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var firstPrice = 100m;
             var secondPrice = 200m;
 
@@ -180,33 +158,25 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 split
             };
 
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListRollbackRequestedSplitsAsync())
                 .ReturnsAsync(splits);
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListNonProcessedSplitsAsync())
                 .ReturnsAsync(Enumerable.Empty<InstrumentSplit>());
-            splitRepository
-                .Setup(r => r.Update(It.IsAny<InstrumentSplit>()))
-                .Returns<InstrumentSplit>(s => s);
-            var priceRepository = fixture.CreateDefaultInstrumentPriceRepositoryMock();
-            priceRepository
+            _priceRepository
                 .Setup(m => m.ListInstrumentPricesAsync(It.IsAny<int>()))
                 .ReturnsAsync(prices);
-            priceRepository
-                .Setup(m => m.Update(It.IsAny<InstrumentPrice>()))
-                .Returns<InstrumentPrice>(p => p);
 
-            var sut = fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
+            var sut = _fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
 
             await sut.RunAsync();
 
-            priceRepository
+            _priceRepository
                 .Verify(r => r.Update(It.Is<InstrumentPrice>(price =>
                     price.Id == prices[0].Id && price.Price == firstPrice * 5
             )));
-            priceRepository
+            _priceRepository
                 .Verify(r => r.Update(It.Is<InstrumentPrice>(price =>
                     price.Id == prices[1].Id && price.Price == secondPrice * 5
             )));
@@ -215,15 +185,12 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_DividesTransactionsAmountBySplitFactor_WhenSplitRollbackIsRequested()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var firstAmount = 100m;
             var secondAmount = 200m;
 
             var position = new Position(1, 1, 1, "");
-            position.AddTransaction(firstAmount, fixture.Create<decimal>(), DateTime.Parse("2022-01-01"));
-            position.AddTransaction(secondAmount, fixture.Create<decimal>(), DateTime.Parse("2022-02-01"));
+            position.AddTransaction(firstAmount, _fixture.Create<decimal>(), DateTime.Parse("2022-01-01"));
+            position.AddTransaction(secondAmount, _fixture.Create<decimal>(), DateTime.Parse("2022-02-01"));
 
             var split = new InstrumentSplit(1, 1, DateTime.UtcNow, new SplitRatio(1, 5));
             split.Rollback();
@@ -233,39 +200,28 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 split
             };
 
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListRollbackRequestedSplitsAsync())
                 .ReturnsAsync(splits);
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListNonProcessedSplitsAsync())
                 .ReturnsAsync(Enumerable.Empty<InstrumentSplit>());
-            splitRepository
-                .Setup(r => r.Update(It.IsAny<InstrumentSplit>()))
-                .Returns<InstrumentSplit>(s => s);
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            positionRepository
+            _positionRepository
                 .Setup(r => r.ListAllInstrumentPositionsAsync(1))
                 .ReturnsAsync(new[] { position });
-            positionRepository
-                .Setup(r => r.Update(It.IsAny<Position>()))
-                .Returns<Position>(p => p);
 
-            var sut = fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
+            var sut = _fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
 
             await sut.RunAsync();
 
             Assert.Equal(position.Transactions.First().Amount, firstAmount / 5);
             Assert.Equal(position.Transactions.Last().Amount, secondAmount / 5);
-            positionRepository.Verify(r => r.Update(position));
+            _positionRepository.Verify(r => r.Update(position));
         }
 
         [Fact]
         public async Task Run_MultipliesTransactionsPriceBySplitFactor_WhenSplitRollbackIsRequested()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var firstPrice = 100m;
             var secondPrice = 200m;
 
@@ -281,31 +237,23 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 split
             };
 
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListRollbackRequestedSplitsAsync())
                 .ReturnsAsync(splits);
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListNonProcessedSplitsAsync())
                 .ReturnsAsync(Enumerable.Empty<InstrumentSplit>());
-            splitRepository
-                .Setup(r => r.Update(It.IsAny<InstrumentSplit>()))
-                .Returns<InstrumentSplit>(s => s);
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            positionRepository
+            _positionRepository
                 .Setup(r => r.ListAllInstrumentPositionsAsync(1))
                 .ReturnsAsync(new[] { position });
-            positionRepository
-                .Setup(r => r.Update(It.IsAny<Position>()))
-                .Returns<Position>(p => p);
 
-            var sut = fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
+            var sut = _fixture.Create<SplitPriceAndTransactionAdjustmentJob>();
 
             await sut.RunAsync();
 
             Assert.Equal(position.Transactions.First().Price, firstPrice * 5);
             Assert.Equal(position.Transactions.Last().Price, secondPrice * 5);
-            positionRepository.Verify(r => r.Update(position));
+            _positionRepository.Verify(r => r.Update(position));
         }
     }
 }

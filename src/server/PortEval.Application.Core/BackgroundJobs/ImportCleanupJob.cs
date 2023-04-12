@@ -1,9 +1,9 @@
-﻿using System;
-using System.IO.Abstractions;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
 using PortEval.Application.Core.Interfaces.Repositories;
+using System;
+using System.IO.Abstractions;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.BackgroundJobs
 {

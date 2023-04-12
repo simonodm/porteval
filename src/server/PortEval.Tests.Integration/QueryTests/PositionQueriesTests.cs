@@ -40,7 +40,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetAllPositions_ReturnsAllPositions()
         {
             var queryResult = await _positionQueries.GetAllPositionsAsync();
-            
+
             Assert.Collection(queryResult, AssertIsAAPLPosition, AssertIsBTCPosition);
         }
 
@@ -48,23 +48,15 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetPortfolioPositions_ReturnsOnlyPortfolioPositions()
         {
             var queryResult = await _positionQueries.GetPortfolioPositionsAsync(_firstPortfolioId);
-            
+
             Assert.Collection(queryResult, AssertIsAAPLPosition);
-        }
-
-        [Fact]
-        public async Task GetPortfolioPositions_ReturnsNull_WhenPortfolioDoesNotExist()
-        {
-            var queryResult = await _positionQueries.GetPortfolioPositionsAsync(-1);
-
-            Assert.Null(queryResult);
         }
 
         [Fact]
         public async Task GetPosition_ReturnsCorrectPosition()
         {
             var queryResult = await _positionQueries.GetPositionAsync(_btcPositionId);
-            
+
             AssertIsBTCPosition(queryResult);
         }
 

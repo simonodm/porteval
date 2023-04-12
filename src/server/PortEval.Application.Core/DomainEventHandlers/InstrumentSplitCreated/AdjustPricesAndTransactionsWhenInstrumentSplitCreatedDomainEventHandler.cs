@@ -1,11 +1,11 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.Common;
 using PortEval.Application.Core.Interfaces;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
 using PortEval.Domain.Events;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.DomainEventHandlers.InstrumentSplitCreated
 {

@@ -1,11 +1,11 @@
-﻿using System.Net.Http;
+﻿using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.DataFetcher;
 using PortEval.DataFetcher.Responses;
+using PortEval.Infrastructure.FinancialDataFetcher.Extensions;
 using PortEval.Infrastructure.FinancialDataFetcher.OpenExchangeRates.Models;
 using PortEval.Infrastructure.FinancialDataFetcher.Requests;
+using System.Net.Http;
 using System.Threading.Tasks;
-using PortEval.Application.Models.FinancialDataFetcher;
-using PortEval.Infrastructure.FinancialDataFetcher.Extensions;
 
 namespace PortEval.Infrastructure.FinancialDataFetcher.OpenExchangeRates
 {

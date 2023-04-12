@@ -1,10 +1,10 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using PortEval.Application.Core.Common;
+﻿using PortEval.Application.Core.Common;
 using PortEval.Application.Core.Interfaces;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Events;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.DomainEventHandlers.TransactionAddedToPosition
 {

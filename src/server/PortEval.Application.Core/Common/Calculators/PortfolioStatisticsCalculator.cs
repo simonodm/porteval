@@ -1,8 +1,8 @@
-﻿using System;
+﻿using PortEval.Application.Core.Interfaces.Calculators;
+using PortEval.Application.Models.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using PortEval.Application.Core.Interfaces.Calculators;
-using PortEval.Application.Models.DTOs;
 
 namespace PortEval.Application.Core.Common.Calculators
 {

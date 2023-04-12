@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using PortEval.Application.Models.DTOs;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Models.DTOs;
 
 namespace PortEval.Application.Core.Interfaces.Services
 {

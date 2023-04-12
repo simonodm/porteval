@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Core;
@@ -10,26 +9,35 @@ using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Services;
 using PortEval.Tests.Unit.Helpers.Extensions;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.CoreTests.Services
 {
     public class CurrencyServiceTests
     {
+        private IFixture _fixture;
+        private Mock<ICurrencyQueries> _currencyQueries;
+        private Mock<ICurrencyRepository> _currencyRepository;
+
+        public CurrencyServiceTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _currencyQueries = _fixture.CreateDefaultCurrencyQueriesMock();
+            _currencyRepository = _fixture.CreateDefaultCurrencyRepositoryMock();
+        }
+
         [Fact]
         public async Task GetAllCurrenciesAsync_ReturnsAllCurrencies()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var currencies = _fixture.CreateMany<CurrencyDto>();
 
-            var currencies = fixture.CreateMany<CurrencyDto>();
-
-            var currencyQueriesMock = fixture.CreateDefaultCurrencyQueriesMock();
-            currencyQueriesMock
+            _currencyQueries
                 .Setup(m => m.GetAllCurrenciesAsync())
                 .ReturnsAsync(currencies);
 
-            var sut = fixture.Create<CurrencyService>();
+            var sut = _fixture.Create<CurrencyService>();
 
             var response = await sut.GetAllCurrenciesAsync();
 
@@ -40,17 +48,13 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetCurrencyAsync_ReturnsCorrectCurrency_WhenItExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var currency = _fixture.Create<CurrencyDto>();
 
-            var currency = fixture.Create<CurrencyDto>();
-
-            var currencyQueriesMock = fixture.CreateDefaultCurrencyQueriesMock();
-            currencyQueriesMock
+            _currencyQueries
                 .Setup(m => m.GetCurrencyAsync(currency.Code))
                 .ReturnsAsync(currency);
 
-            var sut = fixture.Create<CurrencyService>();
+            var sut = _fixture.Create<CurrencyService>();
 
             var response = await sut.GetCurrencyAsync(currency.Code);
 
@@ -61,17 +65,13 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetCurrencyAsync_ReturnsNotFound_WhenItDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var currencyQueriesMock = fixture.CreateDefaultCurrencyQueriesMock();
-            currencyQueriesMock
+            _currencyQueries
                 .Setup(m => m.GetCurrencyAsync(It.IsAny<string>()))
                 .ReturnsAsync((CurrencyDto)null);
 
-            var sut = fixture.Create<CurrencyService>();
+            var sut = _fixture.Create<CurrencyService>();
 
-            var response = await sut.GetCurrencyAsync(fixture.Create<string>());
+            var response = await sut.GetCurrencyAsync(_fixture.Create<string>());
 
             Assert.Equal(OperationStatus.NotFound, response.Status);
         }
@@ -79,28 +79,21 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task UpdatingCurrency_ChangesDefaultCurrencyUsingDomainService()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var currencyDto = fixture.Build<CurrencyDto>().With(c => c.IsDefault, true).Create();
+            var currencyDto = _fixture.Build<CurrencyDto>().With(c => c.IsDefault, true).Create();
             var currency = new Currency(currencyDto.Code, currencyDto.Name, currencyDto.Symbol);
-            var defaultCurrency = new Currency(fixture.Create<string>(), fixture.Create<string>(),
-                fixture.Create<string>(), true);
+            var defaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(),
+                _fixture.Create<string>(), true);
 
-            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
-            currencyRepository
+            _currencyRepository
                 .Setup(r => r.FindAsync(currencyDto.Code))
                 .ReturnsAsync(currency);
-            currencyRepository
+            _currencyRepository
                 .Setup(r => r.GetDefaultCurrencyAsync())
                 .ReturnsAsync(defaultCurrency);
-            currencyRepository
-                .Setup(r => r.Update(It.IsAny<Currency>()))
-                .Returns<Currency>(c => c);
 
-            var currencyDomainService = fixture.Freeze<Mock<ICurrencyDomainService>>();
+            var currencyDomainService = _fixture.Freeze<Mock<ICurrencyDomainService>>();
 
-            var sut = fixture.Create<CurrencyService>();
+            var sut = _fixture.Create<CurrencyService>();
 
             await sut.UpdateAsync(currencyDto);
 

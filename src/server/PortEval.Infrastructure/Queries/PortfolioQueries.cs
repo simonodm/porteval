@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Models.DTOs;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PortEval.Infrastructure.Queries
 {

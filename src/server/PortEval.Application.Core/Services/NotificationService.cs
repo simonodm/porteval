@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.Hubs;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Enums;
+using System;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Services
 {

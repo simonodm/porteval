@@ -13,7 +13,6 @@ using PortEval.Application.Extensions;
 using PortEval.Infrastructure;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 using Xunit;
 
 namespace PortEval.Tests.Integration

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Core.Common;
@@ -9,7 +7,8 @@ using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Events;
 using PortEval.Tests.Unit.Helpers;
-using PortEval.Tests.Unit.Helpers.Extensions;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.CoreTests.DomainEventHandlers

@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using PortEval.Infrastructure.Queries.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PortEval.Infrastructure.Queries
 {
@@ -59,7 +59,7 @@ namespace PortEval.Infrastructure.Queries
                           ORDER BY Charts.Name, PortfolioName, PositionName, InstrumentName";
 
             var charts = new Dictionary<int, ChartDto>();
-            return await connection.QueryAsync<ChartDto, ToDateRangeQueryModel, ChartLineDto, ChartLineNameModel, ChartDto>(
+            await connection.QueryAsync<ChartDto, ToDateRangeQueryModel, ChartLineDto, ChartLineNameModel, ChartDto>(
                 query,
                 (chart, tdr, chartLine, lineNames) =>
                 {
@@ -80,6 +80,8 @@ namespace PortEval.Infrastructure.Queries
                     return charts[chart.Id];
                 },
                 splitOn: "ToDateRangeSplit, Width, NameSplit");
+
+            return charts.Values;
         }
 
         public async Task<ChartDto> GetChartAsync(int chartId)
@@ -137,7 +139,7 @@ namespace PortEval.Infrastructure.Queries
                     }
                     return resultChart;
                 },
-                query,
+                new { ChartId = chartId },
                 splitOn: "ToDateRangeSplit, Width, NameSplit");
 
             return resultChart;

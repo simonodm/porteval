@@ -3,18 +3,18 @@ using Moq;
 using PortEval.Application.Core.Common;
 using PortEval.Application.Core.Interfaces;
 using PortEval.Application.Core.Interfaces.Calculators;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.FinancialDataFetcher;
+using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Entities;
+using PortEval.Domain.Models.Enums;
+using PortEval.Domain.Models.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Core.Interfaces.Repositories;
-using PortEval.Application.Models.QueryParams;
-using PortEval.Domain.Models.Enums;
-using PortEval.Domain.Models.ValueObjects;
 
 namespace PortEval.Tests.Unit.Helpers.Extensions
 {
@@ -62,7 +62,7 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
                 .Setup(m => m.GetInversedExchangeRatesAsync(It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<DateRangeParams>()))
                 .ReturnsAsync(fixture.CreateMany<CurrencyExchangeRateDto>());
-            
+
             return mock;
         }
 
@@ -175,9 +175,9 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
 
             return mock;
         }
-        
+
         #endregion
-        
+
         #region Repository Mocks
 
         public static Mock<ICurrencyRepository> CreateDefaultCurrencyRepositoryMock(this IFixture fixture)
@@ -237,7 +237,7 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
                         fixture.Create<string>(),
                         fixture.Create<string>(),
                         fixture.Create<string>(),
-                        fixture.Create<InstrumentType>(),
+                        InstrumentType.Stock,
                         fixture.Create<string>(),
                         fixture.Create<string>()
                     ))
@@ -285,7 +285,7 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
             var mock = fixture.Freeze<Mock<IPositionRepository>>();
             mock
                 .Setup(m => m.ListPortfolioPositionsAsync(It.IsAny<int>()))
-                .Returns(Task.FromResult(fixture.CreateMany<Position>()));
+                .Returns(Task.FromResult((IEnumerable<Position>)new List<Position> { new Position(fixture.Create<int>(), fixture.Create<int>(), fixture.Create<int>(), fixture.Create<string>()) }));
             mock
                 .Setup(m => m.FindAsync(It.IsAny<int>()))
                 .Returns<int>(id => Task.FromResult(new Position(id, fixture.Create<int>(), fixture.Create<int>(), fixture.Create<string>())));
@@ -436,7 +436,7 @@ namespace PortEval.Tests.Unit.Helpers.Extensions
         }
 
         #endregion
-        
+
         public static Mock<IFinancialDataFetcher> CreatePriceFetcherMockReturningHistoricalPrices(this IFixture fixture, Instrument instrument,
             IEnumerable<PricePoint> dailyPrices, IEnumerable<PricePoint> hourlyPrices,
             IEnumerable<PricePoint> fiveMinPrices)

@@ -8,21 +8,26 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class PortfolioDtoValidatorTests
     {
+        private IFixture _fixture;
+
+        public PortfolioDtoValidatorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         [Theory]
         [InlineData("US stocks", "USD", "Test Note")]
         [InlineData("Test Portfolio", "EUR", "")]
         public void Validate_ValidatesSuccessfully_WhenPortfolioIsValid(string name, string currencyCode, string note)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var portfolio = fixture.Build<PortfolioDto>()
+            var portfolio = _fixture.Build<PortfolioDto>()
                 .With(p => p.Name, name)
                 .With(p => p.CurrencyCode, currencyCode)
                 .With(p => p.Note, note)
                 .Create();
 
-            var sut = fixture.Create<PortfolioDtoValidator>();
+            var sut = _fixture.Create<PortfolioDtoValidator>();
 
             var validationResult = sut.Validate(portfolio);
 
@@ -34,14 +39,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [InlineData("")]
         public void Validate_FailsValidation_WhenNameIsMissing(string name)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var portfolio = fixture.Build<PortfolioDto>()
+            var portfolio = _fixture.Build<PortfolioDto>()
                 .With(p => p.Name, name)
                 .Create();
 
-            var sut = fixture.Create<PortfolioDtoValidator>();
+            var sut = _fixture.Create<PortfolioDtoValidator>();
 
             var validationResult = sut.Validate(portfolio);
 
@@ -52,14 +54,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenNameIsLongerThan64Characters()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var portfolio = fixture.Build<PortfolioDto>()
-                .With(p => p.Name, string.Join(string.Empty, fixture.CreateMany<string>(10)))
+            var portfolio = _fixture.Build<PortfolioDto>()
+                .With(p => p.Name, string.Join(string.Empty, _fixture.CreateMany<string>(10)))
                 .Create();
 
-            var sut = fixture.Create<PortfolioDtoValidator>();
+            var sut = _fixture.Create<PortfolioDtoValidator>();
 
             var validationResult = sut.Validate(portfolio);
 
@@ -74,14 +73,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [InlineData("ABCD")]
         public void Validate_FailsValidation_WhenCurrencyCodeIsInvalid(string currencyCode)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var portfolio = fixture.Build<PortfolioDto>()
+            var portfolio = _fixture.Build<PortfolioDto>()
                 .With(p => p.CurrencyCode, currencyCode)
                 .Create();
 
-            var sut = fixture.Create<PortfolioDtoValidator>();
+            var sut = _fixture.Create<PortfolioDtoValidator>();
 
             var validationResult = sut.Validate(portfolio);
 
@@ -92,14 +88,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenNoteIsLongerThan255Characters()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var portfolio = fixture.Build<PortfolioDto>()
-                .With(p => p.Note, string.Join(string.Empty, fixture.CreateMany<string>(50)))
+            var portfolio = _fixture.Build<PortfolioDto>()
+                .With(p => p.Note, string.Join(string.Empty, _fixture.CreateMany<string>(50)))
                 .Create();
 
-            var sut = fixture.Create<PortfolioDtoValidator>();
+            var sut = _fixture.Create<PortfolioDtoValidator>();
 
             var validationResult = sut.Validate(portfolio);
 

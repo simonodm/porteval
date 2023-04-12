@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.Abstractions;
-using System.Linq;
-using System.Threading.Tasks;
-using CsvHelper;
+﻿using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,6 +12,13 @@ using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Enums;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.IO.Abstractions;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.BackgroundJobs
 {

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using PortEval.Application.Core.Extensions;
+using PortEval.Application.Models.QueryParams;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using PortEval.Application.Core.Extensions;
-using PortEval.Application.Models.QueryParams;
 
 namespace PortEval.Application.Core.Common.Calculators
 {

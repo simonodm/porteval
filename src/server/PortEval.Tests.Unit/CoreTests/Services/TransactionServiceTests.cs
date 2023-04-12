@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Core;
@@ -12,164 +9,139 @@ using PortEval.Application.Core.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Events;
-using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers.Extensions;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.CoreTests.Services
 {
     public class TransactionServiceTests
     {
+        private IFixture _fixture;
+        private Mock<IPortfolioRepository> _portfolioRepository;
+        private Mock<IPositionRepository> _positionRepository;
+        private Mock<IInstrumentRepository> _instrumentRepository;
+        private Mock<ITransactionQueries> _transactionQueries;
+
+        public TransactionServiceTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _portfolioRepository = _fixture.CreateDefaultPortfolioRepositoryMock();
+            _positionRepository = _fixture.CreateDefaultPositionRepositoryMock();
+            _instrumentRepository = _fixture.CreateDefaultInstrumentRepositoryMock();
+            _transactionQueries = _fixture.CreateDefaultTransactionQueriesMock();
+        }
+
         [Fact]
         public async Task GetTransactionsAsync_ReturnsCorrectPositionTransactions_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transactions = _fixture.CreateMany<TransactionDto>();
+            var filter = _fixture.Build<TransactionFilters>().With(f => f.PositionId, _fixture.Create<int>()).Create();
 
-            var transactions = fixture.CreateMany<TransactionDto>();
-            var filter = fixture.Build<TransactionFilters>().With(f => f.PositionId, fixture.Create<int>()).Create();
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
-                .Setup(m => m.GetPositionAsync((int)filter.PositionId))
-                .ReturnsAsync(fixture.Create<PositionDto>());
-
-            var transactionQueries = fixture.CreateDefaultTransactionQueriesMock();
-            transactionQueries
+            _transactionQueries
                 .Setup(m => m.GetTransactionsAsync(filter, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(transactions);
 
-            var sut = fixture.Create<TransactionService>();
-            var result = await sut.GetTransactionsAsync(filter, fixture.Create<DateRangeParams>());
+            var sut = _fixture.Create<TransactionService>();
+            var result = await sut.GetTransactionsAsync(filter, _fixture.Create<DateRangeParams>());
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal(transactions, result.Response);
         }
 
         [Fact]
-        public async Task GetTransactionsAsync_ReturnsNotFound_WhenPositionDoesNotExist()
+        public async Task GetTransactionsAsync_ReturnsError_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var filter = _fixture.Build<TransactionFilters>().With(f => f.PositionId, _fixture.Create<int>()).Create();
 
-            var filter = fixture.Build<TransactionFilters>().With(f => f.PositionId, fixture.Create<int>()).Create();
+            _positionRepository
+                .Setup(m => m.ExistsAsync(It.IsAny<int>()))
+                .ReturnsAsync(false);
 
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
-                .Setup(m => m.GetPositionAsync((int)filter.PositionId))
-                .ReturnsAsync((PositionDto)null);
+            var sut = _fixture.Create<TransactionService>();
+            var result = await sut.GetTransactionsAsync(filter, _fixture.Create<DateRangeParams>());
 
-            var sut = fixture.Create<TransactionService>();
-            var result = await sut.GetTransactionsAsync(filter, fixture.Create<DateRangeParams>());
-
-            Assert.Equal(OperationStatus.NotFound, result.Status);
+            Assert.Equal(OperationStatus.Error, result.Status);
         }
 
         [Fact]
         public async Task GetTransactionsAsync_ReturnsInstrumentTransactions_WhenInstrumentExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transactions = _fixture.CreateMany<TransactionDto>();
+            var filter = _fixture.Build<TransactionFilters>().With(f => f.InstrumentId, _fixture.Create<int>()).Create();
 
-            var transactions = fixture.CreateMany<TransactionDto>();
-            var filter = fixture.Build<TransactionFilters>().With(f => f.InstrumentId, fixture.Create<int>()).Create();
-
-            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
-            instrumentQueries
-                .Setup(m => m.GetInstrumentAsync((int)filter.InstrumentId))
-                .ReturnsAsync(fixture.Create<InstrumentDto>());
-
-            var transactionQueries = fixture.CreateDefaultTransactionQueriesMock();
-            transactionQueries
+            _transactionQueries
                 .Setup(m => m.GetTransactionsAsync(filter, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(transactions);
 
-            var sut = fixture.Create<TransactionService>();
-            var result = await sut.GetTransactionsAsync(filter, fixture.Create<DateRangeParams>());
+            var sut = _fixture.Create<TransactionService>();
+            var result = await sut.GetTransactionsAsync(filter, _fixture.Create<DateRangeParams>());
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal(transactions, result.Response);
         }
 
         [Fact]
-        public async Task GetTransactionsAsync_ReturnsNotFound_WhenInstrumentDoesNotExist()
+        public async Task GetTransactionsAsync_ReturnsError_WhenInstrumentDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var filter = _fixture.Build<TransactionFilters>().With(f => f.InstrumentId, _fixture.Create<int>()).Create();
 
-            var filter = fixture.Build<TransactionFilters>().With(f => f.InstrumentId, fixture.Create<int>()).Create();
+            _instrumentRepository
+                .Setup(m => m.ExistsAsync(It.IsAny<int>()))
+                .ReturnsAsync(false);
 
-            var instrumentQueries = fixture.CreateDefaultInstrumentQueriesMock();
-            instrumentQueries
-                .Setup(m => m.GetInstrumentAsync((int)filter.InstrumentId))
-                .ReturnsAsync((InstrumentDto)null);
+            var sut = _fixture.Create<TransactionService>();
+            var result = await sut.GetTransactionsAsync(filter, _fixture.Create<DateRangeParams>());
 
-            var sut = fixture.Create<TransactionService>();
-            var result = await sut.GetTransactionsAsync(filter, fixture.Create<DateRangeParams>());
-
-            Assert.Equal(OperationStatus.NotFound, result.Status);
+            Assert.Equal(OperationStatus.Error, result.Status);
         }
 
         [Fact]
         public async Task GetTransactionsAsync_ReturnsPortfolioTransactions_WhenPortfolioExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transactions = _fixture.CreateMany<TransactionDto>();
+            var filter = _fixture.Build<TransactionFilters>().With(f => f.PositionId, _fixture.Create<int>()).Create();
 
-            var transactions = fixture.CreateMany<TransactionDto>();
-            var filter = fixture.Build<TransactionFilters>().With(f => f.PositionId, fixture.Create<int>()).Create();
-
-            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
-            portfolioQueries
-                .Setup(m => m.GetPortfolioAsync((int)filter.PortfolioId))
-                .ReturnsAsync(fixture.Create<PortfolioDto>());
-
-            var transactionQueries = fixture.CreateDefaultTransactionQueriesMock();
-            transactionQueries
+            _transactionQueries
                 .Setup(m => m.GetTransactionsAsync(filter, It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(transactions);
 
-            var sut = fixture.Create<TransactionService>();
-            var result = await sut.GetTransactionsAsync(filter, fixture.Create<DateRangeParams>());
+            var sut = _fixture.Create<TransactionService>();
+            var result = await sut.GetTransactionsAsync(filter, _fixture.Create<DateRangeParams>());
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal(transactions, result.Response);
         }
 
         [Fact]
-        public async Task GetTransactionsAsync_ReturnsNotFound_WhenPortfolioDoesNotExist()
+        public async Task GetTransactionsAsync_ReturnsError_WhenPortfolioDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var filter = _fixture.Build<TransactionFilters>().With(f => f.PortfolioId, _fixture.Create<int>()).Create();
 
-            var filter = fixture.Build<TransactionFilters>().With(f => f.PortfolioId, fixture.Create<int>()).Create();
+            _portfolioRepository
+                .Setup(m => m.ExistsAsync(It.IsAny<int>()))
+                .ReturnsAsync(false);
 
-            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
-            portfolioQueries
-                .Setup(m => m.GetPortfolioAsync((int)filter.PortfolioId))
-                .ReturnsAsync((PortfolioDto)null);
+            var sut = _fixture.Create<TransactionService>();
+            var result = await sut.GetTransactionsAsync(filter, _fixture.Create<DateRangeParams>());
 
-            var sut = fixture.Create<TransactionService>();
-            var result = await sut.GetTransactionsAsync(filter, fixture.Create<DateRangeParams>());
-
-            Assert.Equal(OperationStatus.NotFound, result.Status);
+            Assert.Equal(OperationStatus.Error, result.Status);
         }
 
         [Fact]
         public async Task GetTransactionAsync_ReturnsTransaction_WhenItExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transaction = _fixture.Create<TransactionDto>();
 
-            var transaction = fixture.Create<TransactionDto>();
-
-            var transactionQueries = fixture.CreateDefaultTransactionQueriesMock();
-            transactionQueries
+            _transactionQueries
                 .Setup(m => m.GetTransactionAsync(transaction.Id))
                 .ReturnsAsync(transaction);
 
-            var sut = fixture.Create<TransactionService>();
+            var sut = _fixture.Create<TransactionService>();
             var result = await sut.GetTransactionAsync(transaction.Id);
 
             Assert.Equal(OperationStatus.Ok, result.Status);
@@ -179,17 +151,13 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetTransactionAsync_ReturnsNotFound_WhenTransactionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transactionId = _fixture.Create<int>();
 
-            var transactionId = fixture.Create<int>();
-
-            var transactionQueries = fixture.CreateDefaultTransactionQueriesMock();
-            transactionQueries
+            _transactionQueries
                 .Setup(m => m.GetTransactionAsync(transactionId))
                 .ReturnsAsync((TransactionDto)null);
 
-            var sut = fixture.Create<TransactionService>();
+            var sut = _fixture.Create<TransactionService>();
             var result = await sut.GetTransactionAsync(transactionId);
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
@@ -198,26 +166,21 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task AddingTransaction_AddsTransactionToPosition_WhenWellFormed()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Create<Position>();
-            var transaction = fixture
+            var position = _fixture.Create<Position>();
+            var transaction = _fixture
                 .Build<TransactionDto>()
                 .With(t => t.PositionId, position.Id)
                 .Create();
 
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            positionRepository
+            _positionRepository
                 .Setup(r => r.FindAsync(position.Id))
                 .ReturnsAsync(position);
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
 
-            var sut = fixture.Create<TransactionService>();
+            var sut = _fixture.Create<TransactionService>();
 
             await sut.AddTransactionAsync(transaction);
 
-            positionRepository.Verify(r => r.Update(It.Is<Position>(p =>
+            _positionRepository.Verify(r => r.Update(It.Is<Position>(p =>
                 p.Id == transaction.PositionId &&
                 p.Transactions.FirstOrDefault(t =>
                     t.Time == transaction.Time && t.Price == transaction.Price && t.Note == transaction.Note) != null
@@ -225,46 +188,39 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         }
 
         [Fact]
-        public async Task AddingTransaction_ThrowsException_WhenPositionDoesNotExist()
+        public async Task AddingTransaction_ReturnsError_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var transaction = _fixture.Create<TransactionDto>();
 
-            var transaction = fixture.Create<TransactionDto>();
-
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
+            var positionRepository = _fixture.CreateDefaultPositionRepositoryMock();
             positionRepository
                 .Setup(r => r.FindAsync(transaction.PositionId))
                 .ReturnsAsync((Position)null);
             positionRepository
                 .Setup(r => r.ExistsAsync(transaction.PositionId))
                 .ReturnsAsync(false);
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
+            _fixture.Freeze<Mock<IInstrumentPriceService>>();
 
-            var sut = fixture.Create<TransactionService>();
+            var sut = _fixture.Create<TransactionService>();
+            var response = await sut.AddTransactionAsync(transaction);
 
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await sut.AddTransactionAsync(transaction));
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
         public async Task AddingTransaction_EmitsTransactionAddedToPositionDomainEvent()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Create<Position>();
-            var transaction = fixture
+            var position = _fixture.Create<Position>();
+            var transaction = _fixture
                 .Build<TransactionDto>()
                 .With(t => t.PositionId, position.Id)
                 .Create();
 
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            positionRepository
+            _positionRepository
                 .Setup(r => r.FindAsync(position.Id))
                 .ReturnsAsync(position);
-            var priceService = fixture.Freeze<Mock<IInstrumentPriceService>>();
 
-            var sut = fixture.Create<TransactionService>();
+            var sut = _fixture.Create<TransactionService>();
 
             await sut.AddTransactionAsync(transaction);
 

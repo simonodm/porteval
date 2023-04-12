@@ -1,10 +1,10 @@
-﻿using System;
+﻿using AutoFixture;
+using AutoFixture.AutoMoq;
+using PortEval.Application.Core.Services;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using AutoFixture;
-using AutoFixture.AutoMoq;
-using PortEval.Application.Core.Services;
 using Xunit;
 
 namespace PortEval.Tests.Unit.CoreTests.Services
@@ -20,12 +20,18 @@ namespace PortEval.Tests.Unit.CoreTests.Services
 
     public class CsvExportServiceTests
     {
+        private IFixture _fixture;
+
+        public CsvExportServiceTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         [Fact]
         public void CsvConversion_GeneratesCorrectHeader()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            var sut = fixture.Create<CsvExportService>();
+            var sut = _fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(Enumerable.Empty<CsvConversionTestType>());
 
@@ -38,10 +44,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public void CsvConversion_GeneratesCorrectNumberOfRows()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            var rows = fixture.CreateMany<CsvConversionTestType>(5);
-            var sut = fixture.Create<CsvExportService>();
+            var rows = _fixture.CreateMany<CsvConversionTestType>(5);
+            var sut = _fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
             var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);
@@ -53,10 +57,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public void CsvConversion_GeneratesCorrectNumberOfColumns()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            var rows = fixture.CreateMany<CsvConversionTestType>(1);
-            var sut = fixture.Create<CsvExportService>();
+            var rows = _fixture.CreateMany<CsvConversionTestType>(1);
+            var sut = _fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
             var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);
@@ -68,10 +70,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public void CsvConversion_SerializesCorrectStringValues()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            var rows = fixture.CreateMany<CsvConversionTestType>(1);
-            var sut = fixture.Create<CsvExportService>();
+            var rows = _fixture.CreateMany<CsvConversionTestType>(1);
+            var sut = _fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
             var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);
@@ -83,10 +83,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public void CsvConversion_SerializesCorrectIntegerValues()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            var rows = fixture.CreateMany<CsvConversionTestType>(1);
-            var sut = fixture.Create<CsvExportService>();
+            var rows = _fixture.CreateMany<CsvConversionTestType>(1);
+            var sut = _fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
             var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);
@@ -98,10 +96,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public void CsvConversion_SerializesCorrectDecimalValues()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            var rows = fixture.CreateMany<CsvConversionTestType>(1);
-            var sut = fixture.Create<CsvExportService>();
+            var rows = _fixture.CreateMany<CsvConversionTestType>(1);
+            var sut = _fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
             var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);
@@ -113,11 +109,8 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public void CsvConversion_SerializesInvariantCultureDateTimeValues()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var rows = fixture.CreateMany<CsvConversionTestType>(1);
-            var sut = fixture.Create<CsvExportService>();
+            var rows = _fixture.CreateMany<CsvConversionTestType>(1);
+            var sut = _fixture.Create<CsvExportService>();
 
             var convertedBytes = sut.ConvertToCsv(rows);
             var bytesAsString = Encoding.Default.GetString(convertedBytes.Response);

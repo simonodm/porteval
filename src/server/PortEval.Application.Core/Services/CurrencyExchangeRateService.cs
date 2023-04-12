@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.ChartDataGenerators;
+﻿using PortEval.Application.Core.Interfaces.ChartDataGenerators;
 using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Services
 {

@@ -1,10 +1,10 @@
-﻿using PortEval.Application.Core.Interfaces.Repositories;
+﻿using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 
 namespace PortEval.Application.Core.Services
 {

@@ -18,7 +18,7 @@ namespace PortEval.Application.Controllers
         {
             _chartService = chartService;
         }
-        
+
         // GET: api/<ChartsController>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ChartDto>>> GetAllCharts()

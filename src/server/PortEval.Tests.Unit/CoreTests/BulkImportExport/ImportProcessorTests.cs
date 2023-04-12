@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using FluentValidation;
 using PortEval.Application.Core.Common.BulkImportExport;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
@@ -60,14 +60,19 @@ namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
 
     public class ImportProcessorTests
     {
+        private IFixture _fixture;
+
+        public ImportProcessorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         [Fact]
         public async Task ProcessingImport_ProcessesEachItem_WhenItemsAreValid()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var data = fixture.CreateMany<TestRow>(5);
-            var sut = fixture.Create<TestImportProcessor>();
+            var data = _fixture.CreateMany<TestRow>(5);
+            var sut = _fixture.Create<TestImportProcessor>();
 
             await sut.ImportRecordsAsync(data);
 
@@ -77,11 +82,8 @@ namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
         [Fact]
         public async Task ProcessingImport_CallsOnImportFinishCallback_WhenSuccessfullyFinished()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var data = fixture.CreateMany<TestRow>(5);
-            var sut = fixture.Create<TestImportProcessor>();
+            var data = _fixture.CreateMany<TestRow>(5);
+            var sut = _fixture.Create<TestImportProcessor>();
 
             await sut.ImportRecordsAsync(data);
 
@@ -91,11 +93,8 @@ namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
         [Fact]
         public async Task ProcessingImport_CallsAsyncOnImportFinishCallback_WhenSuccessfullyFinished()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var data = fixture.CreateMany<TestRow>(5);
-            var sut = fixture.Create<TestImportProcessor>();
+            var data = _fixture.CreateMany<TestRow>(5);
+            var sut = _fixture.Create<TestImportProcessor>();
 
             await sut.ImportRecordsAsync(data);
 
@@ -105,11 +104,8 @@ namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
         [Fact]
         public async Task ProcessingImport_ReturnsErrorLogWithoutErrors_WhenItemsAreValid()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var data = fixture.CreateMany<TestRow>(5);
-            var sut = fixture.Create<TestImportProcessor>();
+            var data = _fixture.CreateMany<TestRow>(5);
+            var sut = _fixture.Create<TestImportProcessor>();
 
             var result = await sut.ImportRecordsAsync(data);
 
@@ -119,14 +115,11 @@ namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
         [Fact]
         public async Task ProcessingImport_ReturnsErrorLogWithErrors_WhenItemsFailToValidate()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var invalidRow = fixture
+            var invalidRow = _fixture
                 .Build<TestRow>()
                 .With(r => r.Name, "")
                 .Create();
-            var sut = fixture.Create<TestImportProcessor>();
+            var sut = _fixture.Create<TestImportProcessor>();
 
             var result = await sut.ImportRecordsAsync(new List<TestRow> { invalidRow });
 
@@ -136,11 +129,8 @@ namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
         [Fact]
         public async Task ProcessingImport_ReturnsErrorLogWithErrors_WhenItemProcessingThrows()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var data = fixture.CreateMany<TestRow>(5);
-            var sut = fixture.Create<TestThrowingImportProcessor>();
+            var data = _fixture.CreateMany<TestRow>(5);
+            var sut = _fixture.Create<TestThrowingImportProcessor>();
 
             var result = await sut.ImportRecordsAsync(data);
 

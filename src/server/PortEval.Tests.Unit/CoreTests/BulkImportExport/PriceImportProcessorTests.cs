@@ -1,40 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Core.Common.BulkImportExport;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Tests.Unit.Helpers;
-using PortEval.Tests.Unit.Helpers.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
 {
     public class PriceImportProcessorTests
     {
+        private IFixture _fixture;
+        private Mock<IInstrumentPriceService> _priceService;
+
+        public PriceImportProcessorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _priceService = _fixture.Freeze<Mock<IInstrumentPriceService>>();
+        }
+
         [Fact]
         public async Task ProcessingImport_CreatesNewPrice_WhenPriceAtSameTimeDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var price = fixture.Build<InstrumentPriceDto>()
+            var price = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.InstrumentId, 1)
                 .With(p => p.Time, DateTime.UtcNow)
                 .Create();
-            var priceService = fixture.Freeze<Mock<IInstrumentPriceService>>();
-            priceService
+            _priceService
                 .Setup(m => m.GetInstrumentPriceAsync(price.InstrumentId, price.Time))
                 .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<InstrumentPriceDto>());
 
-            var sut = fixture.Create<PriceImportProcessor>();
+            var sut = _fixture.Create<PriceImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<InstrumentPriceDto> { price });
 
-            priceService.Verify(s => s.AddPricePointAsync(It.Is<InstrumentPriceDto>(p =>
+            _priceService.Verify(s => s.AddPricePointAsync(It.Is<InstrumentPriceDto>(p =>
                 p.InstrumentId == price.InstrumentId &&
                 p.Time == price.Time &&
                 p.Price == price.Price
@@ -44,39 +49,31 @@ namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
         [Fact]
         public async Task ProcessingImport_DoesNothing_WhenPriceAtSameTimeExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var price = fixture.Build<InstrumentPriceDto>()
+            var price = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.InstrumentId, 1)
                 .With(p => p.Time, DateTime.UtcNow)
                 .Create();
-            var priceService = fixture.Freeze<Mock<IInstrumentPriceService>>();
-            priceService
+            _priceService
                 .Setup(m => m.GetInstrumentPriceAsync(price.InstrumentId, price.Time))
-                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(fixture.Create<InstrumentPriceDto>()));
-            var sut = fixture.Create<PriceImportProcessor>();
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(_fixture.Create<InstrumentPriceDto>()));
+            var sut = _fixture.Create<PriceImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<InstrumentPriceDto> { price });
 
-            priceService.Verify(s => s.AddPricePointAsync(It.IsAny<InstrumentPriceDto>()), Times.Never());
+            _priceService.Verify(s => s.AddPricePointAsync(It.IsAny<InstrumentPriceDto>()), Times.Never());
         }
 
         [Fact]
         public async Task ProcessingImport_DoesNothing_WhenPriceFailsValidation()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var price = fixture.Build<InstrumentPriceDto>()
+            var price = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.InstrumentId, 0)
                 .Create();
-            var priceService = fixture.Freeze<Mock<IInstrumentPriceService>>();
-            var sut = fixture.Create<PriceImportProcessor>();
+            var sut = _fixture.Create<PriceImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<InstrumentPriceDto> { price });
 
-            priceService.Verify(s => s.AddPricePointAsync(It.IsAny<InstrumentPriceDto>()), Times.Never());
+            _priceService.Verify(s => s.AddPricePointAsync(It.IsAny<InstrumentPriceDto>()), Times.Never());
         }
     }
 }

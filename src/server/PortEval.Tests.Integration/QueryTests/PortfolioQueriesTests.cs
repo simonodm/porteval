@@ -30,7 +30,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetPortfolios_ReturnsAllPortfolios()
         {
             var queryResult = await _portfolioQueries.GetAllPortfoliosAsync();
-            
+
             Assert.Collection(queryResult, AssertIsFirstPortfolio, AssertIsSecondPortfolio);
         }
 
@@ -38,7 +38,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetPortfolio_ReturnsCorrectPortfolio_WhenPortfolioExists()
         {
             var queryResult = await _portfolioQueries.GetPortfolioAsync(_firstPortfolioId);
-            
+
             AssertIsFirstPortfolio(queryResult);
         }
 

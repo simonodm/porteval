@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
 using PortEval.Application.Core;
@@ -16,30 +12,95 @@ using PortEval.Application.Core.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain;
-using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
+using PortEval.Tests.Unit.Helpers;
 using PortEval.Tests.Unit.Helpers.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.CoreTests.Services
 {
     public class PositionServiceTests
     {
+        private IFixture _fixture;
+        private Mock<IPortfolioRepository> _portfolioRepository;
+        private Mock<IPositionRepository> _positionRepository;
+        private Mock<IInstrumentRepository> _instrumentRepository;
+
+        private Mock<IPositionQueries> _positionQueries;
+
+        private Mock<ITransactionService> _transactionService;
+        private Mock<IInstrumentPriceService> _priceService;
+        private Mock<ICurrencyExchangeRateService> _exchangeRateService;
+
+        private Mock<IPositionValueCalculator> _valueCalculator;
+        private Mock<IPositionProfitCalculator> _profitCalculator;
+        private Mock<IPositionPerformanceCalculator> _performanceCalculator;
+        private Mock<IPositionBreakEvenPointCalculator> _bepCalculator;
+        private Mock<IPositionStatisticsCalculator> _statisticsCalculator;
+
+        private Mock<IPositionChartDataGenerator> _chartDataGenerator;
+        private Mock<ICurrencyConverter> _currencyConverter;
+
+        public PositionServiceTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _portfolioRepository = _fixture.CreateDefaultPortfolioRepositoryMock();
+            _positionRepository = _fixture.CreateDefaultPositionRepositoryMock();
+            _instrumentRepository = _fixture.CreateDefaultInstrumentRepositoryMock();
+            _positionQueries = _fixture.CreateDefaultPositionQueriesMock();
+
+            _transactionService = _fixture.Freeze<Mock<ITransactionService>>();
+            _transactionService
+                .Setup(m => m.GetTransactionsAsync(It.IsAny<TransactionFilters>(), It.IsAny<DateRangeParams>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(_fixture.CreateMany<TransactionDto>()));
+
+            _priceService = _fixture.Freeze<Mock<IInstrumentPriceService>>();
+            _priceService
+                .Setup(m => m.GetInstrumentPricesAsync(It.IsAny<int>(), It.IsAny<DateRangeParams>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(_fixture.CreateMany<InstrumentPriceDto>()));
+            _priceService
+                .Setup(m => m.GetInstrumentPricesAsync(It.IsAny<InstrumentDto>(), It.IsAny<DateRangeParams>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(_fixture.CreateMany<InstrumentPriceDto>()));
+            _priceService
+                .Setup(m => m.GetInstrumentPriceAsync(It.IsAny<int>(), It.IsAny<DateTime>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(_fixture.Create<InstrumentPriceDto>()));
+
+            _exchangeRateService = _fixture.Freeze<Mock<ICurrencyExchangeRateService>>();
+            _exchangeRateService
+                .Setup(m => m.GetExchangeRatesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateRangeParams>()))
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(_fixture.CreateMany<CurrencyExchangeRateDto>()));
+
+            _valueCalculator = _fixture.Freeze<Mock<IPositionValueCalculator>>();
+            _profitCalculator = _fixture.Freeze<Mock<IPositionProfitCalculator>>();
+            _performanceCalculator = _fixture.Freeze<Mock<IPositionPerformanceCalculator>>();
+            _bepCalculator = _fixture.Freeze<Mock<IPositionBreakEvenPointCalculator>>();
+            _statisticsCalculator = _fixture.Freeze<Mock<IPositionStatisticsCalculator>>();
+
+            _chartDataGenerator = _fixture.Freeze<Mock<IPositionChartDataGenerator>>();
+            _currencyConverter = _fixture.Freeze<Mock<ICurrencyConverter>>();
+            _currencyConverter
+                .Setup(m => m.ConvertChartPoints(It.IsAny<IEnumerable<EntityChartPointDto>>(),
+                    It.IsAny<IEnumerable<CurrencyExchangeRateDto>>()))
+                .Returns<IEnumerable<EntityChartPointDto>, IEnumerable<CurrencyExchangeRateDto>>((points, rates) =>
+                    points);
+        }
+
         [Fact]
         public async Task GetAllPositionsAsync_ReturnsAllPositions()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var positions = _fixture.CreateMany<PositionDto>();
 
-            var positions = fixture.CreateMany<PositionDto>();
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetAllPositionsAsync())
                 .ReturnsAsync(positions);
 
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
             var result = await sut.GetAllPositionsAsync();
 
             Assert.Equal(OperationStatus.Ok, result.Status);
@@ -49,18 +110,14 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPortfolioPositionsAsync_ReturnsPortfolioPositions_WhenPortfolioExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var portfolioId = _fixture.Create<int>();
+            var positions = _fixture.CreateMany<PositionDto>();
 
-            var portfolioId = fixture.Create<int>();
-            var positions = fixture.CreateMany<PositionDto>();
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPortfolioPositionsAsync(portfolioId))
                 .ReturnsAsync(positions);
 
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
             var result = await sut.GetPortfolioPositionsAsync(portfolioId);
 
             Assert.Equal(OperationStatus.Ok, result.Status);
@@ -70,17 +127,13 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPortfolioPositionsAsync_ReturnsNotFound_WhenPortfolioDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var portfolioId = _fixture.Create<int>();
 
-            var portfolioId = fixture.Create<int>();
+            _portfolioRepository
+                .Setup(m => m.ExistsAsync(It.IsAny<int>()))
+                .ReturnsAsync(false);
 
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
-                .Setup(m => m.GetPortfolioPositionsAsync(portfolioId))
-                .ReturnsAsync((PositionDto[]) null);
-
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
             var result = await sut.GetPortfolioPositionsAsync(portfolioId);
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
@@ -89,18 +142,14 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPositionAsync_ReturnsPosition_WhenItExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var positionId = _fixture.Create<int>();
+            var position = _fixture.Create<PositionDto>();
 
-            var positionId = fixture.Create<int>();
-            var position = fixture.Create<PositionDto>();
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(positionId))
                 .ReturnsAsync(position);
 
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
             var result = await sut.GetPositionAsync(positionId);
 
             Assert.Equal(OperationStatus.Ok, result.Status);
@@ -110,17 +159,13 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPositionAsync_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var positionId = _fixture.Create<int>();
 
-            var positionId = fixture.Create<int>();
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(positionId))
-                .ReturnsAsync((PositionDto) null);
+                .ReturnsAsync((PositionDto)null);
 
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
             var result = await sut.GetPositionAsync(positionId);
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
@@ -129,19 +174,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPositionValueAsync_ReturnsCorrectPositionValue_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var value = _fixture.Create<decimal>();
+            var time = _fixture.Create<DateTime>();
 
-            var value = fixture.Create<decimal>();
-            var time = fixture.Create<DateTime>();
-
-            var valueCalculator = fixture.Freeze<Mock<IPositionValueCalculator>>();
-            valueCalculator
+            _valueCalculator
                 .Setup(c => c.CalculateValue(It.IsAny<IEnumerable<PositionPriceRangeData>>(), time))
                 .Returns(value);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.GetPositionValueAsync(fixture.Create<int>(), time);
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.GetPositionValueAsync(_fixture.Create<int>(), time);
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal(value, result.Response.Value);
@@ -151,16 +192,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPositionValueAsync_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
-                .ReturnsAsync((PositionDto) null);
+                .ReturnsAsync((PositionDto)null);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.GetPositionValueAsync(fixture.Create<int>(), fixture.Create<DateTime>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.GetPositionValueAsync(_fixture.Create<int>(), _fixture.Create<DateTime>());
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
         }
@@ -168,19 +205,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPositionProfitAsync_ReturnsCorrectProfit_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var profit = _fixture.Create<decimal>();
+            var dateRange = _fixture.Create<DateRangeParams>();
 
-            var profit = fixture.Create<decimal>();
-            var dateRange = fixture.Create<DateRangeParams>();
-
-            var profitCalculator = fixture.Freeze<Mock<IPositionProfitCalculator>>();
-            profitCalculator
+            _profitCalculator
                 .Setup(c => c.CalculateProfit(It.IsAny<IEnumerable<PositionPriceRangeData>>(), dateRange.From, dateRange.To))
                 .Returns(profit);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.GetPositionProfitAsync(fixture.Create<int>(), dateRange);
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.GetPositionProfitAsync(_fixture.Create<int>(), dateRange);
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal(profit, result.Response.Profit);
@@ -191,16 +224,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPositionProfitAsync_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
-                .ReturnsAsync((PositionDto) null);
+                .ReturnsAsync((PositionDto)null);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.GetPositionProfitAsync(fixture.Create<int>(), fixture.Create<DateRangeParams>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.GetPositionProfitAsync(_fixture.Create<int>(), _fixture.Create<DateRangeParams>());
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
         }
@@ -208,22 +237,18 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPositionPerformanceAsync_ReturnsCorrectPerformance_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var performance = _fixture.Create<decimal>();
+            var dateRange = _fixture.Create<DateRangeParams>();
 
-            var performance = fixture.Create<decimal>();
-            var dateRange = fixture.Create<DateRangeParams>();
-
-            var performanceCalculator = fixture.Freeze<Mock<IPositionPerformanceCalculator>>();
-            performanceCalculator
+            _performanceCalculator
                 .Setup(c => c.CalculatePerformance(It.IsAny<IEnumerable<PositionPriceRangeData>>(), dateRange.From, dateRange.To))
                 .Returns(performance);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.GetPositionProfitAsync(fixture.Create<int>(), dateRange);
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.GetPositionPerformanceAsync(_fixture.Create<int>(), dateRange);
 
             Assert.Equal(OperationStatus.Ok, result.Status);
-            Assert.Equal(performance, result.Response.Profit);
+            Assert.Equal(performance, result.Response.Performance);
             Assert.Equal(dateRange.From, result.Response.From);
             Assert.Equal(dateRange.To, result.Response.To);
         }
@@ -231,16 +256,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPositionPerformanceAsync_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
-                .ReturnsAsync((PositionDto) null);
+                .ReturnsAsync((PositionDto)null);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.GetPositionProfitAsync(fixture.Create<int>(), fixture.Create<DateRangeParams>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.GetPositionProfitAsync(_fixture.Create<int>(), _fixture.Create<DateRangeParams>());
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
         }
@@ -248,19 +269,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPositionBreakEvenPointAsync_ReturnsCorrectBreakEvenPoint_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var breakEvenPoint = _fixture.Create<decimal>();
+            var time = _fixture.Create<DateTime>();
 
-            var breakEvenPoint = fixture.Create<decimal>();
-            var time = fixture.Create<DateTime>();
-
-            var breakEvenPointCalculator = fixture.Freeze<Mock<IPositionBreakEvenPointCalculator>>();
-            breakEvenPointCalculator
+            _bepCalculator
                 .Setup(c => c.CalculatePositionBreakEvenPoint(It.IsAny<IEnumerable<TransactionDto>>()))
                 .Returns(breakEvenPoint);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.GetPositionBreakEvenPointAsync(fixture.Create<int>(), time);
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.GetPositionBreakEvenPointAsync(_fixture.Create<int>(), time);
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal(breakEvenPoint, result.Response.BreakEvenPoint);
@@ -270,16 +287,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPositionBreakEvenPointAsync_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
-                .ReturnsAsync((PositionDto) null);
+                .ReturnsAsync((PositionDto)null);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.GetPositionBreakEvenPointAsync(fixture.Create<int>(), fixture.Create<DateTime>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.GetPositionBreakEvenPointAsync(_fixture.Create<int>(), _fixture.Create<DateTime>());
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
         }
@@ -287,19 +300,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task ChartPositionValueAsync_ReturnsCorrectValueChart_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var valueChart = _fixture.CreateMany<EntityChartPointDto>();
+            var dateRange = _fixture.Create<DateRangeParams>();
 
-            var valueChart = fixture.CreateMany<EntityChartPointDto>();
-            var dateRange = fixture.Create<DateRangeParams>();
-
-            var chartDataGenerator = fixture.Freeze<Mock<IPositionChartDataGenerator>>();
-            chartDataGenerator
+            _chartDataGenerator
                 .Setup(c => c.ChartValue(It.IsAny<PositionPriceListData>(), dateRange, It.IsAny<AggregationFrequency>()))
                 .Returns(valueChart);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.ChartPositionValueAsync(fixture.Create<int>(), dateRange, fixture.Create<AggregationFrequency>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.ChartPositionValueAsync(_fixture.Create<int>(), dateRange, _fixture.Create<AggregationFrequency>());
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal(valueChart, result.Response);
@@ -308,16 +317,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task ChartPositionValueAsync_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
-                .ReturnsAsync((PositionDto) null);
+                .ReturnsAsync((PositionDto)null);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.ChartPositionValueAsync(fixture.Create<int>(), fixture.Create<DateRangeParams>(), fixture.Create<AggregationFrequency>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.ChartPositionValueAsync(_fixture.Create<int>(), _fixture.Create<DateRangeParams>(), _fixture.Create<AggregationFrequency>());
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
         }
@@ -325,19 +330,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task ChartPositionProfitAsync_ReturnsCorrectProfitChart_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var profitChart = _fixture.CreateMany<EntityChartPointDto>();
+            var dateRange = _fixture.Create<DateRangeParams>();
 
-            var profitChart = fixture.CreateMany<EntityChartPointDto>();
-            var dateRange = fixture.Create<DateRangeParams>();
-
-            var chartDataGenerator = fixture.Freeze<Mock<IPositionChartDataGenerator>>();
-            chartDataGenerator
+            _chartDataGenerator
                 .Setup(c => c.ChartProfit(It.IsAny<PositionPriceListData>(), dateRange, It.IsAny<AggregationFrequency>()))
                 .Returns(profitChart);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.ChartPositionProfitAsync(fixture.Create<int>(), dateRange, fixture.Create<AggregationFrequency>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.ChartPositionProfitAsync(_fixture.Create<int>(), dateRange, _fixture.Create<AggregationFrequency>());
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal(profitChart, result.Response);
@@ -346,16 +347,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task ChartPositionProfitAsync_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
-                .ReturnsAsync((PositionDto) null);
+                .ReturnsAsync((PositionDto)null);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.ChartPositionProfitAsync(fixture.Create<int>(), fixture.Create<DateRangeParams>(), fixture.Create<AggregationFrequency>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.ChartPositionProfitAsync(_fixture.Create<int>(), _fixture.Create<DateRangeParams>(), _fixture.Create<AggregationFrequency>());
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
         }
@@ -363,19 +360,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task ChartPositionPerformanceAsync_ReturnsCorrectPerformanceChart_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var performanceChart = _fixture.CreateMany<EntityChartPointDto>();
+            var dateRange = _fixture.Create<DateRangeParams>();
 
-            var performanceChart = fixture.CreateMany<EntityChartPointDto>();
-            var dateRange = fixture.Create<DateRangeParams>();
-
-            var chartDataGenerator = fixture.Freeze<Mock<IPositionChartDataGenerator>>();
-            chartDataGenerator
+            _chartDataGenerator
                 .Setup(c => c.ChartPerformance(It.IsAny<PositionPriceListData>(), dateRange, It.IsAny<AggregationFrequency>()))
                 .Returns(performanceChart);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.ChartPositionPerformanceAsync(fixture.Create<int>(), dateRange, fixture.Create<AggregationFrequency>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.ChartPositionPerformanceAsync(_fixture.Create<int>(), dateRange, _fixture.Create<AggregationFrequency>());
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal(performanceChart, result.Response);
@@ -384,16 +377,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task ChartPositionPerformanceAsync_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
-                .ReturnsAsync((PositionDto) null);
+                .ReturnsAsync((PositionDto)null);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.ChartPositionPerformanceAsync(fixture.Create<int>(), fixture.Create<DateRangeParams>(), fixture.Create<AggregationFrequency>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.ChartPositionPerformanceAsync(_fixture.Create<int>(), _fixture.Create<DateRangeParams>(), _fixture.Create<AggregationFrequency>());
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
         }
@@ -401,19 +390,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task ChartPositionAggregatedProfitAsync_ReturnsCorrectAggregatedProfit_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var aggregatedProfitChart = _fixture.CreateMany<EntityChartPointDto>();
+            var dateRange = _fixture.Create<DateRangeParams>();
 
-            var aggregatedProfitChart = fixture.CreateMany<EntityChartPointDto>();
-            var dateRange = fixture.Create<DateRangeParams>();
-
-            var chartDataGenerator = fixture.Freeze<Mock<IPositionChartDataGenerator>>();
-            chartDataGenerator
+            _chartDataGenerator
                 .Setup(c => c.ChartAggregatedProfit(It.IsAny<PositionPriceListData>(), dateRange, It.IsAny<AggregationFrequency>()))
                 .Returns(aggregatedProfitChart);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.ChartPositionAggregatedProfitAsync(fixture.Create<int>(), dateRange, fixture.Create<AggregationFrequency>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.ChartPositionAggregatedProfitAsync(_fixture.Create<int>(), dateRange, _fixture.Create<AggregationFrequency>());
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal(aggregatedProfitChart, result.Response);
@@ -422,16 +407,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task ChartPositionAggregatedProfitAsync_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
-                .ReturnsAsync((PositionDto) null);
+                .ReturnsAsync((PositionDto)null);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.ChartPositionAggregatedProfitAsync(fixture.Create<int>(), fixture.Create<DateRangeParams>(), fixture.Create<AggregationFrequency>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.ChartPositionAggregatedProfitAsync(_fixture.Create<int>(), _fixture.Create<DateRangeParams>(), _fixture.Create<AggregationFrequency>());
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
         }
@@ -439,19 +420,15 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task ChartPositionAggregatedPerformanceAsync_ReturnsCorrectAggregatedPerformance_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var aggregatedPerformanceChart = _fixture.CreateMany<EntityChartPointDto>();
+            var dateRange = _fixture.Create<DateRangeParams>();
 
-            var aggregatedPerformanceChart = fixture.CreateMany<EntityChartPointDto>();
-            var dateRange = fixture.Create<DateRangeParams>();
-
-            var chartDataGenerator = fixture.Freeze<Mock<IPositionChartDataGenerator>>();
-            chartDataGenerator
+            _chartDataGenerator
                 .Setup(c => c.ChartAggregatedPerformance(It.IsAny<PositionPriceListData>(), dateRange, It.IsAny<AggregationFrequency>()))
                 .Returns(aggregatedPerformanceChart);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.ChartPositionAggregatedPerformanceAsync(fixture.Create<int>(), dateRange, fixture.Create<AggregationFrequency>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.ChartPositionAggregatedPerformanceAsync(_fixture.Create<int>(), dateRange, _fixture.Create<AggregationFrequency>());
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal(aggregatedPerformanceChart, result.Response);
@@ -460,16 +437,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task ChartPositionAggregatedPerformanceAsync_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
-                .ReturnsAsync((PositionDto) null);
+                .ReturnsAsync((PositionDto)null);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.ChartPositionAggregatedPerformanceAsync(fixture.Create<int>(), fixture.Create<DateRangeParams>(), fixture.Create<AggregationFrequency>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.ChartPositionAggregatedPerformanceAsync(_fixture.Create<int>(), _fixture.Create<DateRangeParams>(), _fixture.Create<AggregationFrequency>());
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
         }
@@ -477,24 +450,19 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPortfolioPositionsStatisticsAsync_ReturnsCorrectStatistics_WhenPortfolioExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var positions = _fixture.CreateMany<PositionDto>(2);
+            var statistics = _fixture.Create<PositionStatisticsDto>();
 
-            var positions = fixture.CreateMany<PositionDto>(2);
-            var statistics = fixture.Create<PositionStatisticsDto>();
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries  
+            _positionQueries
                 .Setup(m => m.GetPortfolioPositionsAsync(It.IsAny<int>()))
                 .ReturnsAsync(positions);
 
-            var statisticsCalculator = fixture.Freeze<Mock<IPositionStatisticsCalculator>>();
-            statisticsCalculator
+            _statisticsCalculator
                 .Setup(c => c.CalculateStatistics(It.IsAny<PositionPriceListData>(), It.IsAny<DateTime>()))
                 .Returns(statistics);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.GetPortfolioPositionsStatisticsAsync(fixture.Create<int>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.GetPortfolioPositionsStatisticsAsync(_fixture.Create<int>());
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Collection(result.Response, s => Assert.Equal(statistics, s), s => Assert.Equal(statistics, s));
@@ -503,16 +471,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPortfolioPositionsStatisticsAsync_ReturnsNotFound_WhenPortfolioDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            _portfolioRepository
+                .Setup(m => m.ExistsAsync(It.IsAny<int>()))
+                .ReturnsAsync(false);
 
-            var portfolioQueries = fixture.CreateDefaultPortfolioQueriesMock();
-            portfolioQueries
-                .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
-                .ReturnsAsync((PortfolioDto) null);
-
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.GetPortfolioPositionsStatisticsAsync(fixture.Create<int>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.GetPortfolioPositionsStatisticsAsync(_fixture.Create<int>());
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
         }
@@ -520,24 +484,19 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPositionStatisticsAsync_ReturnsCorrectStatistics_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var position = _fixture.Create<PositionDto>();
+            var statistics = _fixture.Create<PositionStatisticsDto>();
 
-            var position = fixture.Create<PositionDto>();
-            var statistics = fixture.Create<PositionStatisticsDto>();
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
                 .ReturnsAsync(position);
 
-            var statisticsCalculator = fixture.Freeze<Mock<IPositionStatisticsCalculator>>();
-            statisticsCalculator
+            _statisticsCalculator
                 .Setup(c => c.CalculateStatistics(It.IsAny<PositionPriceListData>(), It.IsAny<DateTime>()))
                 .Returns(statistics);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.GetPositionStatisticsAsync(fixture.Create<int>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.GetPositionStatisticsAsync(_fixture.Create<int>());
 
             Assert.Equal(OperationStatus.Ok, result.Status);
             Assert.Equal(statistics, result.Response);
@@ -546,16 +505,12 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task GetPositionStatisticsAsync_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var positionQueries = fixture.CreateDefaultPositionQueriesMock();
-            positionQueries
+            _positionQueries
                 .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
-                .ReturnsAsync((PositionDto) null);
+                .ReturnsAsync((PositionDto)null);
 
-            var sut = fixture.Create<PositionService>();
-            var result = await sut.GetPositionStatisticsAsync(fixture.Create<int>());
+            var sut = _fixture.Create<PositionService>();
+            var result = await sut.GetPositionStatisticsAsync(_fixture.Create<int>());
 
             Assert.Equal(OperationStatus.NotFound, result.Status);
         }
@@ -563,21 +518,13 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         [Fact]
         public async Task OpeningPosition_AddsMatchingPositionToRepository_WhenWellFormed()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var position = _fixture.Create<PositionDto>();
 
-            var position = fixture.Create<PositionDto>();
-
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
-
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
 
             await sut.OpenPositionAsync(position);
 
-            positionRepository.Verify(r => r.Add(It.Is<Position>(p =>
+            _positionRepository.Verify(r => r.Add(It.Is<Position>(p =>
                 p.InstrumentId == position.InstrumentId &&
                 p.PortfolioId == position.PortfolioId &&
                 p.Note == position.Note &&
@@ -589,278 +536,190 @@ namespace PortEval.Tests.Unit.CoreTests.Services
         }
 
         [Fact]
-        public async Task OpeningPosition_ThrowsException_WhenParentPortfolioDoesNotExist()
+        public async Task OpeningPosition_ReturnsError_WhenParentPortfolioDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var position = _fixture.Create<PositionDto>();
 
-            var position = fixture.Create<PositionDto>();
-
-            var portfolioRepository = fixture.CreateDefaultPortfolioRepositoryMock();
-            portfolioRepository
+            _portfolioRepository
                 .Setup(r => r.ExistsAsync(position.PortfolioId))
                 .Returns(Task.FromResult(false));
-            portfolioRepository
+            _portfolioRepository
                 .Setup(r => r.FindAsync(position.PortfolioId))
                 .Returns(Task.FromResult<Portfolio>(null));
-            fixture.CreateDefaultPositionRepositoryMock();
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
 
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
 
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await sut.OpenPositionAsync(position));
+            var response = await sut.OpenPositionAsync(position);
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
-        public async Task OpeningPosition_ThrowsException_WhenInstrumentDoesNotExist()
+        public async Task OpeningPosition_ReturnsError_WhenInstrumentDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var position = _fixture.Create<PositionDto>();
 
-            var position = fixture.Create<PositionDto>();
-
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            fixture.CreateDefaultPositionRepositoryMock();
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            _instrumentRepository
                 .Setup(r => r.ExistsAsync(position.InstrumentId))
                 .Returns(Task.FromResult(false));
-            instrumentRepository
+            _instrumentRepository
                 .Setup(r => r.FindAsync(position.InstrumentId))
                 .Returns(Task.FromResult<Instrument>(null));
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
 
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
 
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await sut.OpenPositionAsync(position));
+            var response = await sut.OpenPositionAsync(position);
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
-        public async Task OpeningPosition_ThrowsException_WhenInstrumentTypeIsIndex()
+        public async Task OpeningPosition_ReturnsError_WhenInstrumentTypeIsIndex()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var position = _fixture.Create<PositionDto>();
 
-            var position = fixture.Create<PositionDto>();
-
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            fixture.CreateDefaultPositionRepositoryMock();
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            _instrumentRepository
                 .Setup(r => r.FindAsync(position.InstrumentId))
                 .Returns(Task.FromResult(
                     new Instrument(
-                        fixture.Create<string>(),
-                        fixture.Create<string>(),
-                        fixture.Create<string>(),
+                        _fixture.Create<string>(),
+                        _fixture.Create<string>(),
+                        _fixture.Create<string>(),
                         InstrumentType.Index,
-                        fixture.Create<string>(),
-                        fixture.Create<string>()
+                        _fixture.Create<string>(),
+                        _fixture.Create<string>()
                     )
                 ));
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
 
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
 
-            await Assert.ThrowsAsync<OperationNotAllowedException>(async () => await sut.OpenPositionAsync(position));
+            var response = await sut.OpenPositionAsync(position);
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
-        public async Task OpeningPosition_ThrowsException_WhenAmountIsNull()
+        public async Task OpeningPosition_ReturnsError_WhenAmountIsNull()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var position = _fixture.Build<PositionDto>().With(p => p.Amount, (decimal?)null).Create();
 
-            var position = fixture.Build<PositionDto>().With(p => p.Amount, (decimal?)null).Create();
+            var sut = _fixture.Create<PositionService>();
 
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            fixture.CreateDefaultPositionRepositoryMock();
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
-
-            var sut = fixture.Create<PositionService>();
-
-            await Assert.ThrowsAsync<OperationNotAllowedException>(async () => await sut.OpenPositionAsync(position));
+            var response = await sut.OpenPositionAsync(position);
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
-        public async Task OpeningPosition_ThrowsException_WhenAmountIsZero()
+        public async Task OpeningPosition_ReturnsError_WhenAmountIsZero()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var position = _fixture.Build<PositionDto>().With(p => p.Amount, 0).Create();
 
-            var position = fixture.Build<PositionDto>().With(p => p.Amount, 0).Create();
+            var sut = _fixture.Create<PositionService>();
 
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            fixture.CreateDefaultPositionRepositoryMock();
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
-
-            var sut = fixture.Create<PositionService>();
-
-            await Assert.ThrowsAsync<OperationNotAllowedException>(async () => await sut.OpenPositionAsync(position));
+            var response = await sut.OpenPositionAsync(position);
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
-        public async Task OpeningPosition_ThrowsException_WhenPriceIsNull()
+        public async Task OpeningPosition_ReturnsError_WhenPriceIsNull()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var position = _fixture.Build<PositionDto>().With(p => p.Price, (decimal?)null).Create();
 
-            var position = fixture.Build<PositionDto>().With(p => p.Price, (decimal?)null).Create();
+            var sut = _fixture.Create<PositionService>();
 
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            fixture.CreateDefaultPositionRepositoryMock();
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
-
-            var sut = fixture.Create<PositionService>();
-
-            await Assert.ThrowsAsync<OperationNotAllowedException>(async () => await sut.OpenPositionAsync(position));
+            var response = await sut.OpenPositionAsync(position);
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
-        public async Task OpeningPosition_ThrowsException_WhenPriceIsZero()
+        public async Task OpeningPosition_ReturnsError_WhenPriceIsZero()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var position = _fixture.Build<PositionDto>().With(p => p.Price, 0).Create();
 
-            var position = fixture.Build<PositionDto>().With(p => p.Price, 0).Create();
+            var sut = _fixture.Create<PositionService>();
 
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            fixture.CreateDefaultPositionRepositoryMock();
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
-
-            var sut = fixture.Create<PositionService>();
-
-            await Assert.ThrowsAsync<OperationNotAllowedException>(async () => await sut.OpenPositionAsync(position));
+            var response = await sut.OpenPositionAsync(position);
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
-        public async Task OpeningPosition_ThrowsException_WhenTimeIsNull()
+        public async Task OpeningPosition_ReturnsError_WhenTimeIsNull()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var position = _fixture.Build<PositionDto>().With(p => p.Time, (DateTime?)null).Create();
 
-            var position = fixture.Build<PositionDto>().With(p => p.Time, (DateTime?)null).Create();
+            var sut = _fixture.Create<PositionService>();
 
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            fixture.CreateDefaultPositionRepositoryMock();
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
-
-            var sut = fixture.Create<PositionService>();
-
-            await Assert.ThrowsAsync<OperationNotAllowedException>(async () => await sut.OpenPositionAsync(position));
+            var response = await sut.OpenPositionAsync(position);
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
-        public async Task OpeningPosition_ThrowsException_WhenTimeIsBeforeMinimumStartTime()
+        public async Task OpeningPosition_ReturnsError_WhenTimeIsBeforeMinimumStartTime()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var position = fixture.Build<PositionDto>()
+            var position = _fixture.Build<PositionDto>()
                 .With(p => p.Time, PortEvalConstants.FinancialDataStartTime.AddDays(-1)).Create();
 
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            fixture.CreateDefaultPositionRepositoryMock();
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
+            var sut = _fixture.Create<PositionService>();
 
-            var sut = fixture.Create<PositionService>();
-
-            await Assert.ThrowsAsync<OperationNotAllowedException>(async () => await sut.OpenPositionAsync(position));
+            var response = await sut.OpenPositionAsync(position);
+            Assert.Equal(OperationStatus.Error, response.Status);
         }
 
         [Fact]
         public async Task UpdatingPosition_UpdatesNote_WhenWellFormed()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var position = _fixture.Create<PositionDto>();
 
-            var position = fixture.Create<PositionDto>();
-
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
-
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
 
             await sut.UpdatePositionAsync(position);
 
-            positionRepository.Verify(r => r.Update(It.Is<Position>(p => p.Note == position.Note)));
+            _positionRepository.Verify(r => r.Update(It.Is<Position>(p => p.Note == position.Note)));
         }
 
         [Fact]
-        public async Task UpdatingPosition_ThrowsException_WhenPositionDoesNotExist()
+        public async Task UpdatingPosition_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var position = _fixture.Create<PositionDto>();
 
-            var position = fixture.Create<PositionDto>();
-
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            positionRepository
+            _positionRepository
                 .Setup(r => r.FindAsync(position.Id))
                 .Returns(Task.FromResult<Position>(null));
-            positionRepository
+            _positionRepository
                 .Setup(r => r.ExistsAsync(position.Id))
                 .Returns(Task.FromResult(false));
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
 
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
 
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await sut.UpdatePositionAsync(position));
+            var response = await sut.UpdatePositionAsync(position);
+            Assert.Equal(OperationStatus.NotFound, response.Status);
         }
 
         [Fact]
         public async Task DeletingPosition_DeletesPosition_WhenPositionExists()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var positionId = _fixture.Create<int>();
 
-            var positionId = fixture.Create<int>();
-
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
-
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
 
             await sut.RemovePositionAsync(positionId);
 
-            positionRepository.Verify(r => r.DeleteAsync(positionId), Times.Once());
+            _positionRepository.Verify(r => r.DeleteAsync(positionId), Times.Once());
         }
 
         [Fact]
-        public async Task DeletingPosition_ThrowsException_WhenPositionDoesNotExist()
+        public async Task DeletingPosition_ReturnsNotFound_WhenPositionDoesNotExist()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var positionId = _fixture.Create<int>();
 
-            var positionId = fixture.Create<int>();
-
-            fixture.CreateDefaultPortfolioRepositoryMock();
-            var positionRepository = fixture.CreateDefaultPositionRepositoryMock();
-            positionRepository
+            _positionRepository
                 .Setup(r => r.ExistsAsync(positionId))
                 .Returns(Task.FromResult(false));
-            positionRepository
+            _positionRepository
                 .Setup(r => r.FindAsync(positionId))
                 .Returns(Task.FromResult<Position>(null));
-            fixture.CreateDefaultInstrumentRepositoryMock();
-            fixture.Freeze<Mock<IInstrumentPriceService>>();
 
-            var sut = fixture.Create<PositionService>();
+            var sut = _fixture.Create<PositionService>();
 
-            await Assert.ThrowsAsync<ItemNotFoundException>(async () => await sut.RemovePositionAsync(positionId));
+            var response = await sut.RemovePositionAsync(positionId);
+            Assert.Equal(OperationStatus.NotFound, response.Status);
         }
     }
 }

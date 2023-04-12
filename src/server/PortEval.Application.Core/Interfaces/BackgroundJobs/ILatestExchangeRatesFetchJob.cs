@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Hangfire;
+﻿using Hangfire;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Interfaces.BackgroundJobs
 {

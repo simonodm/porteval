@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using PortEval.Application.Core.Interfaces.Calculators;
+﻿using PortEval.Application.Core.Interfaces.Calculators;
 using PortEval.Application.Core.Interfaces.ChartDataGenerators;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
+using System.Collections.Generic;
 
 namespace PortEval.Application.Core.Common.ChartDataGenerators
 {

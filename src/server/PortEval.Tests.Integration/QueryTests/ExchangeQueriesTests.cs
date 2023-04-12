@@ -20,7 +20,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetKnownExchanges_ReturnsExchangesFromDb()
         {
             var queryResult = await _exchangeQueries.GetKnownExchangesAsync();
-            
+
             Assert.Collection(queryResult, e =>
             {
                 Assert.Equal("NASDAQ", e.Symbol);

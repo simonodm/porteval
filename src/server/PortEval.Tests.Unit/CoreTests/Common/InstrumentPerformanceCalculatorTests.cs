@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using PortEval.Application.Core.Common.Calculators;
+﻿using PortEval.Application.Core.Common.Calculators;
+using System.Collections.Generic;
 using Xunit;
 
 namespace PortEval.Tests.Unit.CoreTests.Common

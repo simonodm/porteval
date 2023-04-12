@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PortEval.Infrastructure.Queries
 {
@@ -78,7 +78,7 @@ namespace PortEval.Infrastructure.Queries
                           AND Time <= @TimeTo
                           ORDER BY Time";
 
-            return await connection.QueryAsync<InstrumentPriceDto>(query);
+            return await connection.QueryAsync<InstrumentPriceDto>(query, new { InstrumentId = instrumentId, TimeFrom = from, TimeTo = to });
         }
 
         public async Task<int> GetInstrumentPriceCountAsync(int instrumentId, DateTime from, DateTime to,

@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Services;
+﻿using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.Validators;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Common.BulkImportExport
 {

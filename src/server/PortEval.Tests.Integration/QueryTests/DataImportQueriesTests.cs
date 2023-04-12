@@ -25,7 +25,7 @@ namespace PortEval.Tests.Integration.QueryTests
             var queryResult = await _dataImportQueries.GetAllImportsAsync();
 
             var dataImports = queryResult.ToList();
-            
+
             Assert.Collection(dataImports,
                 import =>
                 {
@@ -52,7 +52,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetDataImportById_ReturnsNull_WhenImportDoesNotExist()
         {
             var queryResult = await _dataImportQueries.GetImportAsync(Guid.NewGuid());
-            
+
             Assert.Null(queryResult);
         }
 
@@ -60,7 +60,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetDataImportById_ReturnsImport_WhenItExists()
         {
             var queryResult = await _dataImportQueries.GetImportAsync(Guid.Parse("974c9b22-8276-4121-96ce-6bf3f0f70152"));
-            
+
             Assert.NotNull(queryResult);
             Assert.Equal(TemplateType.Instruments, queryResult.TemplateType);
             Assert.Equal(ImportStatus.Finished, queryResult.Status);

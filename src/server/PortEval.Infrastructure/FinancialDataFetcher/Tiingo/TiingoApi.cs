@@ -1,14 +1,14 @@
-﻿using PortEval.DataFetcher;
+﻿using PortEval.Application.Models.FinancialDataFetcher;
+using PortEval.DataFetcher;
 using PortEval.DataFetcher.Models;
 using PortEval.DataFetcher.Responses;
+using PortEval.Infrastructure.FinancialDataFetcher.Extensions;
 using PortEval.Infrastructure.FinancialDataFetcher.Requests;
 using PortEval.Infrastructure.FinancialDataFetcher.Tiingo.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Models.FinancialDataFetcher;
-using PortEval.Infrastructure.FinancialDataFetcher.Extensions;
 
 namespace PortEval.Infrastructure.FinancialDataFetcher.Tiingo
 {

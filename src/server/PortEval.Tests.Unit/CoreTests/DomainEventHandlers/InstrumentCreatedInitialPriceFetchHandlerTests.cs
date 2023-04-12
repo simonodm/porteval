@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Hangfire;
 using Hangfire.Common;
@@ -8,10 +7,10 @@ using Moq;
 using PortEval.Application.Core.Common;
 using PortEval.Application.Core.DomainEventHandlers.InstrumentCreated;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
-using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Domain.Events;
 using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers.Extensions;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Unit.CoreTests.DomainEventHandlers

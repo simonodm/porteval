@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Models.Enums;
@@ -7,9 +8,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 using Xunit;
-using PortEval.Application.Core;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
@@ -56,7 +55,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetCharts_ReturnsAllChartsFromDb()
         {
             var queryResult = await _chartQueries.GetChartsAsync();
-            
+
             Assert.Collection(queryResult, AssertIsTestPortfolioChart, AssertIsTestPositionInstrumentChart);
         }
 
@@ -64,7 +63,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetChart_ReturnsCorrectChart_WhenChartExists()
         {
             var queryResult = await _chartQueries.GetChartAsync(_portfolioChartId);
-            
+
             AssertIsTestPortfolioChart(queryResult);
         }
 

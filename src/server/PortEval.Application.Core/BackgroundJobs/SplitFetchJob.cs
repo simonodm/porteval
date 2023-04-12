@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.Interfaces;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
 using PortEval.Application.Core.Interfaces.Repositories;
@@ -10,6 +7,9 @@ using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.BackgroundJobs
 {

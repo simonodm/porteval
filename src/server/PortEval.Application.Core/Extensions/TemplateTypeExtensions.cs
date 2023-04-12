@@ -1,6 +1,6 @@
-﻿using System;
-using PortEval.Application.Models.DTOs;
+﻿using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Models.Enums;
+using System;
 
 namespace PortEval.Application.Core.Extensions
 {

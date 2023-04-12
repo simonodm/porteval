@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces;
+﻿using PortEval.Application.Core.Interfaces;
 using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.BackgroundJobs
 {

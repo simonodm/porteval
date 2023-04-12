@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
+﻿using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
@@ -10,6 +7,9 @@ using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Services
 {
@@ -32,7 +32,7 @@ namespace PortEval.Application.Core.Services
             _positionRepository = positionRepository;
             _portfolioRepository = portfolioRepository;
             _instrumentRepository = instrumentRepository;
-            _chartDataQueries = chartDataQueries; 
+            _chartDataQueries = chartDataQueries;
         }
 
         /// <inheritdoc />

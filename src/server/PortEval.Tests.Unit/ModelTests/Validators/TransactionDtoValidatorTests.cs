@@ -1,16 +1,24 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
+using FluentValidation;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.Validators;
 using System;
 using System.Collections.Generic;
-using FluentValidation;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class TransactionDtoValidatorTests
     {
+        private IFixture _fixture;
+
+        public TransactionDtoValidatorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         public static IEnumerable<object[]> ValidTransactionData = new List<object[]>
         {
             new object[] { 1, 1m, 112m, DateTime.Parse("2022-10-04 02:24"), "" },
@@ -23,10 +31,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         public void Validate_ValidatesSuccessfully_WhenTransactionDataIsValid(int positionId, decimal amount,
             decimal price, DateTime time, string note)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var transaction = fixture.Build<TransactionDto>()
+            var transaction = _fixture.Build<TransactionDto>()
                 .With(t => t.PositionId, positionId)
                 .With(t => t.Amount, amount)
                 .With(t => t.Price, price)
@@ -34,7 +39,7 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
                 .With(t => t.Note, note)
                 .Create();
 
-            var sut = fixture.Create<TransactionDtoValidator>();
+            var sut = _fixture.Create<TransactionDtoValidator>();
 
             var validationResult = sut.Validate(transaction);
 
@@ -44,14 +49,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPositionIdIsMissing()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var transaction = fixture.Build<TransactionDto>()
+            var transaction = _fixture.Build<TransactionDto>()
                 .With(t => t.PositionId, 0)
                 .Create();
 
-            var sut = fixture.Create<TransactionDtoValidator>();
+            var sut = _fixture.Create<TransactionDtoValidator>();
 
             var validationResult = sut.Validate(transaction);
 
@@ -62,14 +64,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPriceIsZero()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var transaction = fixture.Build<TransactionDto>()
+            var transaction = _fixture.Build<TransactionDto>()
                 .With(t => t.Price, 0)
                 .Create();
 
-            var sut = fixture.Create<TransactionDtoValidator>();
+            var sut = _fixture.Create<TransactionDtoValidator>();
 
             var validationResult = sut.Validate(transaction);
 
@@ -80,14 +79,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPriceIsNegative()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var transaction = fixture.Build<TransactionDto>()
+            var transaction = _fixture.Build<TransactionDto>()
                 .With(t => t.Price, -1)
                 .Create();
 
-            var sut = fixture.Create<TransactionDtoValidator>();
+            var sut = _fixture.Create<TransactionDtoValidator>();
 
             var validationResult = sut.Validate(transaction);
 
@@ -98,14 +94,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenPriceIsTooLarge()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var transaction = fixture.Build<TransactionDto>()
+            var transaction = _fixture.Build<TransactionDto>()
                 .With(t => t.Price, decimal.MaxValue)
                 .Create();
 
-            var sut = fixture.Create<TransactionDtoValidator>();
+            var sut = _fixture.Create<TransactionDtoValidator>();
 
             var validationResult = sut.Validate(transaction);
 
@@ -116,14 +109,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenAmountIsZero()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var transaction = fixture.Build<TransactionDto>()
+            var transaction = _fixture.Build<TransactionDto>()
                 .With(t => t.Amount, 0)
                 .Create();
 
-            var sut = fixture.Create<TransactionDtoValidator>();
+            var sut = _fixture.Create<TransactionDtoValidator>();
 
             var validationResult = sut.Validate(transaction);
 
@@ -134,14 +124,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenAmountIsTooLarge()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var transaction = fixture.Build<TransactionDto>()
+            var transaction = _fixture.Build<TransactionDto>()
                 .With(t => t.Amount, decimal.MaxValue)
                 .Create();
 
-            var sut = fixture.Create<TransactionDtoValidator>();
+            var sut = _fixture.Create<TransactionDtoValidator>();
 
             var validationResult = sut.Validate(transaction);
 
@@ -152,14 +139,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenNoteIsLongerThan255Characters()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var transaction = fixture.Build<TransactionDto>()
-                .With(t => t.Note, string.Join(string.Empty, fixture.CreateMany<string>(50)))
+            var transaction = _fixture.Build<TransactionDto>()
+                .With(t => t.Note, string.Join(string.Empty, _fixture.CreateMany<string>(50)))
                 .Create();
 
-            var sut = fixture.Create<TransactionDtoValidator>();
+            var sut = _fixture.Create<TransactionDtoValidator>();
             sut.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = sut.Validate(transaction);

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Data;
 using System.Drawing;
-using Dapper;
 
 namespace PortEval.Infrastructure.Queries.TypeHandlers
 {

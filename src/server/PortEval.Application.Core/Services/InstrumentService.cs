@@ -1,5 +1,6 @@
 ﻿using PortEval.Application.Core.Interfaces.Calculators;
 using PortEval.Application.Core.Interfaces.ChartDataGenerators;
+using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models;
@@ -11,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 
 namespace PortEval.Application.Core.Services
 {

@@ -1,36 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using PortEval.Application.Core.Common;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Exceptions;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace PortEval.Tests.Unit.CoreTests.Common
 {
     public class CurrencyConverterTests
     {
+        private IFixture _fixture;
+
+        public CurrencyConverterTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         [Fact]
         public void CombineExchangeRates_CombinesExchangeRatesCorrectly()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var firstExchangeRates = new List<CurrencyExchangeRateDto>
             {
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2021-12-31")).Create(),
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-03")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2021-12-31")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-03")).Create(),
             };
 
             var secondExchangeRates = new List<CurrencyExchangeRateDto>
             {
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2021-12-31")).Create(),
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create()
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2021-12-31")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create()
             };
 
-            var sut = fixture.Create<CurrencyConverter>();
+            var sut = _fixture.Create<CurrencyConverter>();
 
             var result = sut.CombineExchangeRates(firstExchangeRates, secondExchangeRates);
 
@@ -48,26 +53,23 @@ namespace PortEval.Tests.Unit.CoreTests.Common
         [Fact]
         public void ConvertChartPoints_ConvertsChartPointsAccordingToProvidedExchangeRates()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var chartPoints = new List<EntityChartPointDto>
             {
-                new (DateTime.Parse("2021-12-31"), fixture.Create<decimal>()),
-                new (DateTime.Parse("2022-01-01"), fixture.Create<decimal>()),
-                new (DateTime.Parse("2022-01-02"), fixture.Create<decimal>()),
-                new (DateTime.Parse("2022-01-03"), fixture.Create<decimal>()),
-                new (DateTime.Parse("2022-01-04"), fixture.Create<decimal>()),
+                new (DateTime.Parse("2021-12-31"), _fixture.Create<decimal>()),
+                new (DateTime.Parse("2022-01-01"), _fixture.Create<decimal>()),
+                new (DateTime.Parse("2022-01-02"), _fixture.Create<decimal>()),
+                new (DateTime.Parse("2022-01-03"), _fixture.Create<decimal>()),
+                new (DateTime.Parse("2022-01-04"), _fixture.Create<decimal>()),
             };
 
             var exchangeRates = new List<CurrencyExchangeRateDto>
             {
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2021-12-31")).Create(),
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2021-12-31")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
             };
 
-            var sut = fixture.Create<CurrencyConverter>();
+            var sut = _fixture.Create<CurrencyConverter>();
 
             var result = sut.ConvertChartPoints(chartPoints, exchangeRates);
 
@@ -92,25 +94,22 @@ namespace PortEval.Tests.Unit.CoreTests.Common
         [Fact]
         public void ConvertChartPoints_ThrowsException_WhenNoCurrencyExchangeRateIsAvailableForChartPoint()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var chartPoints = new List<EntityChartPointDto>
             {
-                new (DateTime.Parse("2021-12-31"), fixture.Create<decimal>()),
-                new (DateTime.Parse("2022-01-01"), fixture.Create<decimal>()),
-                new (DateTime.Parse("2022-01-02"), fixture.Create<decimal>()),
-                new (DateTime.Parse("2022-01-03"), fixture.Create<decimal>()),
-                new (DateTime.Parse("2022-01-04"), fixture.Create<decimal>()),
+                new (DateTime.Parse("2021-12-31"), _fixture.Create<decimal>()),
+                new (DateTime.Parse("2022-01-01"), _fixture.Create<decimal>()),
+                new (DateTime.Parse("2022-01-02"), _fixture.Create<decimal>()),
+                new (DateTime.Parse("2022-01-03"), _fixture.Create<decimal>()),
+                new (DateTime.Parse("2022-01-04"), _fixture.Create<decimal>()),
             };
 
             var exchangeRates = new List<CurrencyExchangeRateDto>
             {
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
             };
 
-            var sut = fixture.Create<CurrencyConverter>();
+            var sut = _fixture.Create<CurrencyConverter>();
 
             Assert.Throws<ItemNotFoundException>(() => sut.ConvertChartPoints(chartPoints, exchangeRates));
         }
@@ -118,16 +117,13 @@ namespace PortEval.Tests.Unit.CoreTests.Common
         [Fact]
         public void ConvertTransactions_ConvertsTransactionsAccordingToProvidedExchangeRates()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var transactions = new List<TransactionDto>
             {
-                fixture.Build<TransactionDto>()
+                _fixture.Build<TransactionDto>()
                     .With(t => t.Time, DateTime.Parse("2021-12-31"))
                     .With(t => t.Price, 100m)
                     .Create(),
-                fixture.Build<TransactionDto>()
+                _fixture.Build<TransactionDto>()
                     .With(t => t.Time, DateTime.Parse("2022-01-02 13:00"))
                     .With(t => t.Price, 120m)
                     .Create(),
@@ -135,12 +131,12 @@ namespace PortEval.Tests.Unit.CoreTests.Common
 
             var exchangeRates = new List<CurrencyExchangeRateDto>
             {
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2021-12-31")).Create(),
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2021-12-31")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
             };
 
-            var sut = fixture.Create<CurrencyConverter>();
+            var sut = _fixture.Create<CurrencyConverter>();
 
             var result = sut.ConvertTransactions(transactions, exchangeRates);
 
@@ -156,12 +152,9 @@ namespace PortEval.Tests.Unit.CoreTests.Common
         [Fact]
         public void ConvertTransactions_ThrowsException_WhenNoCurrencyExchangeRateIsAvailableForTransaction()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var transactions = new List<TransactionDto>
             {
-                fixture.Build<TransactionDto>()
+                _fixture.Build<TransactionDto>()
                     .With(t => t.Time, DateTime.Parse("2021-12-31"))
                     .With(t => t.Price, 100m)
                     .Create()
@@ -169,11 +162,11 @@ namespace PortEval.Tests.Unit.CoreTests.Common
 
             var exchangeRates = new List<CurrencyExchangeRateDto>
             {
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
             };
 
-            var sut = fixture.Create<CurrencyConverter>();
+            var sut = _fixture.Create<CurrencyConverter>();
 
             Assert.Throws<ItemNotFoundException>(() => sut.ConvertTransactions(transactions, exchangeRates));
         }
@@ -181,16 +174,13 @@ namespace PortEval.Tests.Unit.CoreTests.Common
         [Fact]
         public void ConvertInstrumentPrices_ConvertsPricesAccordingToProvidedExchangeRates()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>()
+                _fixture.Build<InstrumentPriceDto>()
                     .With(t => t.Time, DateTime.Parse("2021-12-31"))
                     .With(t => t.Price, 100m)
                     .Create(),
-                fixture.Build<InstrumentPriceDto>()
+                _fixture.Build<InstrumentPriceDto>()
                     .With(t => t.Time, DateTime.Parse("2022-01-02 13:00"))
                     .With(t => t.Price, 120m)
                     .Create(),
@@ -198,12 +188,12 @@ namespace PortEval.Tests.Unit.CoreTests.Common
 
             var exchangeRates = new List<CurrencyExchangeRateDto>
             {
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2021-12-31")).Create(),
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2021-12-31")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
             };
 
-            var sut = fixture.Create<CurrencyConverter>();
+            var sut = _fixture.Create<CurrencyConverter>();
 
             var result = sut.ConvertInstrumentPrices(prices, exchangeRates);
 
@@ -219,12 +209,9 @@ namespace PortEval.Tests.Unit.CoreTests.Common
         [Fact]
         public void ConvertInstrumentPrices_ThrowsException_WhenNoCurrencyExchangeRateIsAvailableForPrice()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var prices = new List<InstrumentPriceDto>
             {
-                fixture.Build<InstrumentPriceDto>()
+                _fixture.Build<InstrumentPriceDto>()
                     .With(t => t.Time, DateTime.Parse("2021-12-31"))
                     .With(t => t.Price, 100m)
                     .Create()
@@ -232,11 +219,11 @@ namespace PortEval.Tests.Unit.CoreTests.Common
 
             var exchangeRates = new List<CurrencyExchangeRateDto>
             {
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create(),
-                fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-01")).Create(),
+                _fixture.Build<CurrencyExchangeRateDto>().With(r => r.Time, DateTime.Parse("2022-01-02")).Create(),
             };
 
-            var sut = fixture.Create<CurrencyConverter>();
+            var sut = _fixture.Create<CurrencyConverter>();
 
             Assert.Throws<ItemNotFoundException>(() => sut.ConvertInstrumentPrices(prices, exchangeRates));
         }

@@ -1,6 +1,10 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Core.BackgroundJobs;
+using PortEval.Application.Core.Interfaces;
+using PortEval.Application.Core.Interfaces.Repositories;
+using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Tests.Unit.Helpers.Extensions;
@@ -8,29 +12,34 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.BackgroundJobs;
-using PortEval.Application.Core.Interfaces;
-using PortEval.Application.Core.Interfaces.Repositories;
-using PortEval.Application.Models.FinancialDataFetcher;
 using Xunit;
 
 namespace PortEval.Tests.Unit.BackgroundJobTests
 {
     public class MissingExchangeRatesFetchJobTests
     {
+        private IFixture _fixture;
+        private Mock<ICurrencyRepository> _currencyRepository;
+        private Mock<ICurrencyExchangeRateRepository> _exchangeRateRepository;
+
+        public MissingExchangeRatesFetchJobTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _currencyRepository = _fixture.CreateDefaultCurrencyRepositoryMock();
+            _exchangeRateRepository = _fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
+        }
+
         [Fact]
         public async Task Run_ImportsExchangeRatesRetrievedFromPriceFetcher()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var time = DateTime.UtcNow;
             var currency = new Currency("USD", "US Dollar", "US$", true);
             var firstTargetCurrency = new Currency("EUR", "European Euro", "€", false);
             var secondTargetCurrency = new Currency("CZK", "Czech Koruna", "Kč", false);
             var exchangeRates = new List<ExchangeRates>
             {
-                fixture.Build<ExchangeRates>()
+                _fixture.Build<ExchangeRates>()
                     .With(er => er.Currency, currency.Code)
                     .With(er => er.Rates, new Dictionary<string, decimal>
                     {
@@ -43,22 +52,17 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             var correctListSaved = false;
 
-            var priceFetcher = CreatePriceFetcherReturningExchangeRates(fixture, exchangeRates);
-            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
-            currencyRepository
+            CreatePriceFetcherReturningExchangeRates(_fixture, exchangeRates);
+            _currencyRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Currency> { currency, firstTargetCurrency, secondTargetCurrency });
-            currencyRepository
-                .Setup(m => m.Update(It.IsAny<Currency>()))
-                .Returns<Currency>(c => c);
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
-            exchangeRateRepository
+            _exchangeRateRepository
                 .Setup(m => m.ListExchangeRatesAsync(currency.Code))
                 .ReturnsAsync(Enumerable.Empty<CurrencyExchangeRate>());
 
             // MissingExchangeRatesFetchJob clears the list after doing bulk insert, which makes it impossible to verify the correct invokation
             // afterwards. Instead we register a callback which sets the correct flag on invokation and check that flag using Assert
-            exchangeRateRepository
+            _exchangeRateRepository
                 .Setup(m => m.BulkUpsertAsync(It.Is<IList<CurrencyExchangeRate>>(list =>
                     list.Count == 2 &&
                     list.Any(er => er.Time == time && er.CurrencyToCode == firstTargetCurrency.Code && er.ExchangeRate == 1m) &&
@@ -67,7 +71,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 .Returns(Task.Run(() => { }))
                 .Callback(() => correctListSaved = true);
 
-            var sut = fixture.Create<MissingExchangeRatesFetchJob>();
+            var sut = _fixture.Create<MissingExchangeRatesFetchJob>();
 
             await sut.RunAsync();
 
@@ -77,9 +81,6 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_RetrievesOnlyMissingRanges()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var trackingStart = DateTime.Parse("2022-01-09");
             var existingExchangeRateTime = trackingStart.AddDays(2);
             var newImportTime = trackingStart.AddDays(1);
@@ -93,7 +94,7 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             };
             var newExchangeRates = new List<ExchangeRates>
             {
-                fixture.Build<ExchangeRates>()
+                _fixture.Build<ExchangeRates>()
                     .With(er => er.Currency, currency.Code)
                     .With(er => er.Rates, new Dictionary<string, decimal>
                     {
@@ -103,17 +104,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                     .Create()
             };
 
-            var priceFetcher = CreatePriceFetcherReturningExchangeRates(fixture, newExchangeRates);
-            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
-            currencyRepository
+            var priceFetcher = CreatePriceFetcherReturningExchangeRates(_fixture, newExchangeRates);
+            _currencyRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Currency> { currency, targetCurrency });
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
-            exchangeRateRepository
+            _exchangeRateRepository
                 .Setup(m => m.ListExchangeRatesAsync(currency.Code))
                 .ReturnsAsync(existingExchangeRates);
 
-            var sut = fixture.Create<MissingExchangeRatesFetchJob>();
+            var sut = _fixture.Create<MissingExchangeRatesFetchJob>();
 
             await sut.RunAsync();
 
@@ -132,26 +131,24 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_ThrowsException_WhenNoDefaultCurrencyIsSet()
         {
-            var fixture = new Fixture()
+            var _fixture = new Fixture()
                 .Customize(new AutoMoqCustomization());
 
             var currency = new Currency("USD", "US Dollar", "US$", false);
 
-            var priceFetcher = CreatePriceFetcherReturningExchangeRates(fixture, Enumerable.Empty<ExchangeRates>());
-            var currencyRepository = fixture.CreateDefaultCurrencyRepositoryMock();
-            currencyRepository
+            CreatePriceFetcherReturningExchangeRates(_fixture, Enumerable.Empty<ExchangeRates>());
+            _currencyRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(new List<Currency> { currency });
-            var exchangeRateRepository = fixture.CreateDefaultCurrencyExchangeRateRepositoryMock();
 
-            var sut = fixture.Create<MissingExchangeRatesFetchJob>();
+            var sut = _fixture.Create<MissingExchangeRatesFetchJob>();
 
             await Assert.ThrowsAsync<OperationNotAllowedException>(sut.RunAsync);
         }
 
-        private Mock<IFinancialDataFetcher> CreatePriceFetcherReturningExchangeRates(IFixture fixture, IEnumerable<ExchangeRates> exchangeRates)
+        private Mock<IFinancialDataFetcher> CreatePriceFetcherReturningExchangeRates(IFixture _fixture, IEnumerable<ExchangeRates> exchangeRates)
         {
-            var priceFetcher = fixture.Freeze<Mock<IFinancialDataFetcher>>();
+            var priceFetcher = _fixture.Freeze<Mock<IFinancialDataFetcher>>();
             priceFetcher
                 .Setup(m => m.GetHistoricalDailyExchangeRatesAsync(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(exchangeRates);

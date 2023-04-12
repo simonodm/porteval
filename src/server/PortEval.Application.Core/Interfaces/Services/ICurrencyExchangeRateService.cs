@@ -1,8 +1,8 @@
-﻿using System;
+﻿using PortEval.Application.Models.DTOs;
+using PortEval.Application.Models.QueryParams;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Models.DTOs;
-using PortEval.Application.Models.QueryParams;
 
 namespace PortEval.Application.Core.Interfaces.Services;
 

@@ -1,17 +1,25 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
+using FluentValidation;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.Validators;
 using PortEval.Domain;
 using System;
 using System.Collections.Generic;
-using FluentValidation;
 using Xunit;
 
 namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class CurrencyExchangeRateDtoValidatorTests
     {
+        private IFixture _fixture;
+
+        public CurrencyExchangeRateDtoValidatorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         public static IEnumerable<object[]> ValidExchangeRates = new List<object[]>
         {
             new object[] { "USD", "EUR", 1.04, DateTime.Parse("2022-01-01 12:00") },
@@ -24,17 +32,14 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         public void Validate_ValidatesSuccessfully_WhenExchangeRateIsValid(string currencyFrom, string currencyTo,
             decimal exchangeRateValue, DateTime time)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var exchangeRate = fixture.Build<CurrencyExchangeRateDto>()
+            var exchangeRate = _fixture.Build<CurrencyExchangeRateDto>()
                 .With(c => c.CurrencyFromCode, currencyFrom)
                 .With(c => c.CurrencyToCode, currencyTo)
                 .With(c => c.ExchangeRate, exchangeRateValue)
                 .With(c => c.Time, time)
                 .Create();
 
-            var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            var validator = _fixture.Create<CurrencyExchangeRateDtoValidator>();
 
             var validationResult = validator.Validate(exchangeRate);
 
@@ -48,14 +53,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [InlineData("aaaa")]
         public void Validate_FailsValidation_WhenCurrencyFromCodeIsInvalid(string currencyFromCode)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var exchangeRate = fixture.Build<CurrencyExchangeRateDto>()
+            var exchangeRate = _fixture.Build<CurrencyExchangeRateDto>()
                 .With(c => c.CurrencyFromCode, currencyFromCode)
                 .Create();
 
-            var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            var validator = _fixture.Create<CurrencyExchangeRateDtoValidator>();
             validator.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = validator.Validate(exchangeRate);
@@ -71,14 +73,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [InlineData("aaaa")]
         public void Validate_FailsValidation_WhenCurrencyToCodeIsInvalid(string currencyToCode)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var exchangeRate = fixture.Build<CurrencyExchangeRateDto>()
+            var exchangeRate = _fixture.Build<CurrencyExchangeRateDto>()
                 .With(c => c.CurrencyToCode, currencyToCode)
                 .Create();
 
-            var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            var validator = _fixture.Create<CurrencyExchangeRateDtoValidator>();
             validator.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = validator.Validate(exchangeRate);
@@ -90,14 +89,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenTimeIsInTheFuture()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var exchangeRate = fixture.Build<CurrencyExchangeRateDto>()
+            var exchangeRate = _fixture.Build<CurrencyExchangeRateDto>()
                 .With(c => c.Time, DateTime.MaxValue)
                 .Create();
 
-            var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            var validator = _fixture.Create<CurrencyExchangeRateDtoValidator>();
             validator.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = validator.Validate(exchangeRate);
@@ -109,14 +105,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenTimeIsBeforeAllowedStartTime()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var exchangeRate = fixture.Build<CurrencyExchangeRateDto>()
+            var exchangeRate = _fixture.Build<CurrencyExchangeRateDto>()
                 .With(c => c.Time, PortEvalConstants.FinancialDataStartTime.AddDays(-1))
                 .Create();
 
-            var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            var validator = _fixture.Create<CurrencyExchangeRateDtoValidator>();
             validator.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = validator.Validate(exchangeRate);
@@ -128,14 +121,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenExchangeRateIsZero()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var exchangeRate = fixture.Build<CurrencyExchangeRateDto>()
+            var exchangeRate = _fixture.Build<CurrencyExchangeRateDto>()
                 .With(c => c.ExchangeRate, 0)
                 .Create();
 
-            var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            var validator = _fixture.Create<CurrencyExchangeRateDtoValidator>();
             validator.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = validator.Validate(exchangeRate);
@@ -147,14 +137,11 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenExchangeRateIsNegative()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var exchangeRate = fixture.Build<CurrencyExchangeRateDto>()
+            var exchangeRate = _fixture.Build<CurrencyExchangeRateDto>()
                 .With(c => c.ExchangeRate, -1)
                 .Create();
 
-            var validator = fixture.Create<CurrencyExchangeRateDtoValidator>();
+            var validator = _fixture.Create<CurrencyExchangeRateDtoValidator>();
             validator.ClassLevelCascadeMode = CascadeMode.Continue;
 
             var validationResult = validator.Validate(exchangeRate);

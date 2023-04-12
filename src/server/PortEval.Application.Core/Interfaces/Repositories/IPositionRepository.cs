@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using PortEval.Domain.Models.Entities;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Domain.Models.Entities;
 
 namespace PortEval.Application.Core.Interfaces.Repositories
 {

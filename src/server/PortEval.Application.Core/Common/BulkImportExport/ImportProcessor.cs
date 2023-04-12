@@ -1,9 +1,9 @@
-﻿using System;
+﻿using FluentValidation;
+using PortEval.Application.Core.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentValidation;
-using PortEval.Application.Core.Interfaces;
 
 namespace PortEval.Application.Core.Common.BulkImportExport
 {

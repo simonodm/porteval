@@ -7,6 +7,7 @@ using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
+using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using System;
@@ -129,7 +130,7 @@ namespace PortEval.Application.Core.Services
             };
 
             var positionPriceData = await GetPositionPriceRangeDataAsync(position, dateRange);
-            var value = _valueCalculator.CalculateValue(new [] { positionPriceData.Response }, time);
+            var value = _valueCalculator.CalculateValue(new[] { positionPriceData.Response }, time);
 
             return new OperationResponse<EntityValueDto>
             {
@@ -386,6 +387,14 @@ namespace PortEval.Application.Core.Services
         /// <inheritdoc />
         public async Task<OperationResponse<IEnumerable<PositionStatisticsDto>>> GetPortfolioPositionsStatisticsAsync(int portfolioId)
         {
+            if (!await _portfolioRepository.ExistsAsync(portfolioId))
+            {
+                return new OperationResponse<IEnumerable<PositionStatisticsDto>>
+                {
+                    Status = OperationStatus.NotFound,
+                    Message = $"Portfolio {portfolioId} does not exist."
+                };
+            }
             var positions = await _positionDataQueries.GetPortfolioPositionsAsync(portfolioId);
 
             var data = await Task.WhenAll(positions.Select(GetPositionStatistics));
@@ -448,13 +457,24 @@ namespace PortEval.Application.Core.Services
                 };
             }
 
-            var createdPosition = Position.Create(portfolio, instrument, options.Note);
-            createdPosition.AddTransaction(initialTransactionAmount, initialTransactionPrice,
-                initialTransactionTime);
-            _positionRepository.Add(createdPosition);
-            await _positionRepository.UnitOfWork.CommitAsync();
+            try
+            {
+                var createdPosition = Position.Create(portfolio, instrument, options.Note);
+                createdPosition.AddTransaction(initialTransactionAmount, initialTransactionPrice,
+                    initialTransactionTime);
+                _positionRepository.Add(createdPosition);
+                await _positionRepository.UnitOfWork.CommitAsync();
 
-            return await GetPositionAsync(createdPosition.Id);
+                return await GetPositionAsync(createdPosition.Id);
+            }
+            catch (PortEvalException ex)
+            {
+                return new OperationResponse<PositionDto>
+                {
+                    Status = OperationStatus.Error,
+                    Message = ex.Message
+                };
+            }
         }
 
         /// <inheritdoc />

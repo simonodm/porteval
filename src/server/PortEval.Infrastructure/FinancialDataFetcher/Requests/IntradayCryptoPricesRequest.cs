@@ -1,6 +1,6 @@
-﻿using PortEval.DataFetcher.Interfaces;
+﻿using PortEval.Application.Models.FinancialDataFetcher;
+using PortEval.DataFetcher.Interfaces;
 using System;
-using PortEval.Application.Models.FinancialDataFetcher;
 
 namespace PortEval.Infrastructure.FinancialDataFetcher.Requests
 {

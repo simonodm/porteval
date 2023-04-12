@@ -1,4 +1,5 @@
-﻿using PortEval.Application.Core.Interfaces.Repositories;
+﻿using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Models.Entities;
@@ -6,7 +7,6 @@ using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 
 namespace PortEval.Application.Core.Services
 {

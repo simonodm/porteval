@@ -1,6 +1,6 @@
-﻿using System.IO;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PortEval.Application.Core;
+using System.IO;
 
 namespace PortEval.Application.Controllers
 {

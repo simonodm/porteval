@@ -1,22 +1,26 @@
-﻿using PortEval.Application.Core.Interfaces.Repositories;
+﻿using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 
 namespace PortEval.Application.Core.Services
 {
     /// <inheritdoc cref="ITransactionService"/>
     public class TransactionService : ITransactionService
     {
+        private readonly IPortfolioRepository _portfolioRepository;
         private readonly IPositionRepository _positionRepository;
+        private readonly IInstrumentRepository _instrumentRepository;
         private readonly ITransactionQueries _transactionDataQueries;
 
-        public TransactionService(IPositionRepository positionRepository, ITransactionQueries transactionDataQueries)
+        public TransactionService(IPortfolioRepository portfolioRepository, IPositionRepository positionRepository, IInstrumentRepository instrumentRepository, ITransactionQueries transactionDataQueries)
         {
+            _portfolioRepository = portfolioRepository;
             _positionRepository = positionRepository;
+            _instrumentRepository = instrumentRepository;
             _transactionDataQueries = transactionDataQueries;
         }
 
@@ -24,6 +28,33 @@ namespace PortEval.Application.Core.Services
         public async Task<OperationResponse<IEnumerable<TransactionDto>>> GetTransactionsAsync(TransactionFilters filters,
             DateRangeParams dateRange)
         {
+            if (filters.PortfolioId != null && !await _portfolioRepository.ExistsAsync(filters.PortfolioId.Value))
+            {
+                return new OperationResponse<IEnumerable<TransactionDto>>
+                {
+                    Status = OperationStatus.Error,
+                    Message = $"Portfolio {filters.PortfolioId} does not exist."
+                };
+            }
+
+            if (filters.InstrumentId != null && !await _instrumentRepository.ExistsAsync(filters.InstrumentId.Value))
+            {
+                return new OperationResponse<IEnumerable<TransactionDto>>
+                {
+                    Status = OperationStatus.Error,
+                    Message = $"Instrument {filters.InstrumentId} does not exist."
+                };
+            }
+
+            if (filters.PositionId != null && !await _positionRepository.ExistsAsync(filters.PositionId.Value))
+            {
+                return new OperationResponse<IEnumerable<TransactionDto>>
+                {
+                    Status = OperationStatus.Error,
+                    Message = $"Position {filters.PositionId} does not exist."
+                };
+            }
+
             var transactions =
                 await _transactionDataQueries.GetTransactionsAsync(filters, dateRange.From, dateRange.To);
 

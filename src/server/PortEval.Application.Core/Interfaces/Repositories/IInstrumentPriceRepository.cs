@@ -1,7 +1,7 @@
-﻿using System;
+﻿using PortEval.Domain.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Domain.Models.Entities;
 
 namespace PortEval.Application.Core.Interfaces.Repositories
 {

@@ -2,29 +2,39 @@
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
 using Moq;
+using PortEval.Application.Core.BackgroundJobs;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
+using PortEval.Tests.Unit.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Threading.Tasks;
-using PortEval.Application.Core.BackgroundJobs;
-using PortEval.Application.Core.Interfaces.Repositories;
-using PortEval.Tests.Unit.Helpers.Extensions;
 using Xunit;
 
 namespace PortEval.Tests.Unit.BackgroundJobTests
 {
     public class ImportCleanupJobTests
     {
+        private IFixture _fixture;
+        private Mock<IDataImportRepository> _dataImportRepository;
+        private MockFileSystem _fileSystem;
+
+        public ImportCleanupJobTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
+            _dataImportRepository = _fixture.CreateDefaultDataImportRepositoryMock();
+            _fileSystem = _fixture.Freeze<MockFileSystem>();
+        }
+
         [Fact]
         public async Task Run_RemovesImportDatabaseEntriesOlderThan24h()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var importsToRemove = new List<DataImport>
             {
                 new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-24), TemplateType.Portfolios),
@@ -39,30 +49,24 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 
             imports.AddRange(importsToRemove);
 
-            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(imports);
 
-            var sut = fixture.Create<ImportCleanupJob>();
+            var sut = _fixture.Create<ImportCleanupJob>();
 
             await sut.RunAsync();
 
             foreach (var import in importsToRemove)
             {
-                dataImportRepository.Verify(m => m.DeleteAsync(import.Id), Times.Once());
+                _dataImportRepository.Verify(m => m.DeleteAsync(import.Id), Times.Once());
             }
         }
 
         [Fact]
         public async Task Run_RemovesImportFilesOlderThan24h()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var storagePath = "/storage/";
-
-            fixture.Customizations.Add(new TypeRelay(typeof(IFileSystem), typeof(MockFileSystem)));
 
             var importsToRemove = new List<DataImport>
             {
@@ -76,28 +80,26 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 new DataImport(Guid.NewGuid(), DateTime.UtcNow.AddHours(-3), TemplateType.Portfolios),
             };
 
-            var fileSystem = fixture.Freeze<MockFileSystem>();
-            fileSystem.AddDirectory(storagePath);
+            _fileSystem.AddDirectory(storagePath);
 
             imports.AddRange(importsToRemove);
             foreach (var import in imports)
             {
                 import.AddErrorLog(Path.Combine(storagePath, $"{import.Id}_log.csv"));
-                fileSystem.AddFile(import.ErrorLogPath, import.Id.ToString());
+                _fileSystem.AddFile(import.ErrorLogPath, import.Id.ToString());
             }
 
-            var dataImportRepository = fixture.CreateDefaultDataImportRepositoryMock();
-            dataImportRepository
+            _dataImportRepository
                 .Setup(m => m.ListAllAsync())
                 .ReturnsAsync(imports);
 
-            var sut = fixture.Create<ImportCleanupJob>();
+            var sut = _fixture.Create<ImportCleanupJob>();
 
             await sut.RunAsync();
 
             foreach (var import in importsToRemove)
             {
-                Assert.False(fileSystem.FileExists(import.ErrorLogPath));
+                Assert.False(_fileSystem.FileExists(import.ErrorLogPath));
             }
         }
     }

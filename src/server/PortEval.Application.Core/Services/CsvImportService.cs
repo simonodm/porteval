@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.IO.Abstractions;
-using System.Threading.Tasks;
-using CsvHelper;
+﻿using CsvHelper;
 using Hangfire;
 using PortEval.Application.Core.Extensions;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
@@ -14,6 +8,12 @@ using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.IO.Abstractions;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Services
 {

@@ -1,6 +1,10 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Moq;
+using PortEval.Application.Core.BackgroundJobs;
+using PortEval.Application.Core.Interfaces;
+using PortEval.Application.Core.Interfaces.Repositories;
+using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
@@ -9,10 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.BackgroundJobs;
-using PortEval.Application.Core.Interfaces;
-using PortEval.Application.Core.Interfaces.Repositories;
-using PortEval.Application.Models.FinancialDataFetcher;
 using Xunit;
 using Range = Moq.Range;
 
@@ -20,14 +20,23 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
 {
     public class SplitFetchJobTests
     {
-        [Fact]
-        public async Task Run_FetchesSplitsFromPriceFetcherBasedOnInstrumentTrackingInfo_WhenNoOtherSplitsAreInTheRepository()
-        {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+        private IFixture _fixture;
+        private Mock<IInstrumentRepository> _instrumentRepository;
+        private Mock<IInstrumentSplitRepository> _splitRepository;
 
-            var instrument = new Instrument(1, fixture.Create<string>(), fixture.Create<string>(),
-                fixture.Create<string>(), InstrumentType.Stock, fixture.Create<string>(), fixture.Create<string>());
+        public SplitFetchJobTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+            _instrumentRepository = _fixture.CreateDefaultInstrumentRepositoryMock();
+            _splitRepository = _fixture.CreateDefaultSplitRepositoryMock();
+        }
+
+        [Fact]
+        public async Task Run_FetchesSplitsFromPriceFetcherBasedOnInstrumentTrackingInfo__WhenNoOtherSplitsAreInTheRepository()
+        {
+            var instrument = new Instrument(1, _fixture.Create<string>(), _fixture.Create<string>(),
+                _fixture.Create<string>(), InstrumentType.Stock, _fixture.Create<string>(), _fixture.Create<string>());
             instrument.SetTrackingFrom(DateTime.Parse("2020-01-01"), DateTime.Parse("2021-01-01"));
             var instruments = new[]
             {
@@ -41,20 +50,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 Time = DateTime.Parse("2022-01-01")
             };
 
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListInstrumentSplitsAsync(instrument.Id))
                 .ReturnsAsync(Enumerable.Empty<InstrumentSplit>());
-            splitRepository
-                .Setup(r => r.Add(It.IsAny<InstrumentSplit>()))
-                .Returns<InstrumentSplit>(s => s);
-            var priceFetcher = CreatePriceFetcherMockReturningSplitData(fixture, new[] { splitData });
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            var priceFetcher = CreatePriceFetcherMockReturningSplitData(_fixture, new[] { splitData });
+            _instrumentRepository
                 .Setup(r => r.ListAllAsync())
                 .ReturnsAsync(instruments);
 
-            var sut = fixture.Create<SplitFetchJob>();
+            var sut = _fixture.Create<SplitFetchJob>();
 
             await sut.RunAsync();
 
@@ -66,13 +70,10 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         }
 
         [Fact]
-        public async Task Run_FetchesSplitsFromPriceFetcherBasedOnLastSplitTime_WhenAnotherSplitExistsInRepository()
+        public async Task Run_FetchesSplitsFromPriceFetcherBasedOnLastSplitTime__WhenAnotherSplitExistsInRepository()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var instrument = new Instrument(1, fixture.Create<string>(), fixture.Create<string>(),
-                fixture.Create<string>(), InstrumentType.Stock, fixture.Create<string>(), fixture.Create<string>());
+            var instrument = new Instrument(1, _fixture.Create<string>(), _fixture.Create<string>(),
+                _fixture.Create<string>(), InstrumentType.Stock, _fixture.Create<string>(), _fixture.Create<string>());
             instrument.SetTrackingFrom(DateTime.Parse("2020-01-01"), DateTime.Parse("2021-01-01"));
             var instruments = new[]
             {
@@ -89,20 +90,15 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 Time = DateTime.Parse("2022-01-01")
             };
 
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListInstrumentSplitsAsync(instrument.Id))
                 .ReturnsAsync(new[] { existingSplit });
-            splitRepository
-                .Setup(r => r.Add(It.IsAny<InstrumentSplit>()))
-                .Returns<InstrumentSplit>(s => s);
-            var priceFetcher = CreatePriceFetcherMockReturningSplitData(fixture, new[] { splitData });
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            var priceFetcher = CreatePriceFetcherMockReturningSplitData(_fixture, new[] { splitData });
+            _instrumentRepository
                 .Setup(r => r.ListAllAsync())
                 .ReturnsAsync(instruments);
 
-            var sut = fixture.Create<SplitFetchJob>();
+            var sut = _fixture.Create<SplitFetchJob>();
 
             await sut.RunAsync();
 
@@ -116,11 +112,8 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
         [Fact]
         public async Task Run_ImportsRetrievedSplits()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var instrument = new Instrument(1, fixture.Create<string>(), fixture.Create<string>(),
-                fixture.Create<string>(), InstrumentType.Stock, fixture.Create<string>(), fixture.Create<string>());
+            var instrument = new Instrument(1, _fixture.Create<string>(), _fixture.Create<string>(),
+                _fixture.Create<string>(), InstrumentType.Stock, _fixture.Create<string>(), _fixture.Create<string>());
             instrument.SetTrackingFrom(DateTime.Parse("2020-01-01"), DateTime.Parse("2021-01-01"));
             var instruments = new[]
             {
@@ -134,24 +127,19 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
                 Time = DateTime.Parse("2022-01-01")
             };
 
-            var splitRepository = fixture.CreateDefaultSplitRepositoryMock();
-            splitRepository
+            _splitRepository
                 .Setup(r => r.ListInstrumentSplitsAsync(instrument.Id))
                 .ReturnsAsync(Enumerable.Empty<InstrumentSplit>());
-            splitRepository
-                .Setup(r => r.Add(It.IsAny<InstrumentSplit>()))
-                .Returns<InstrumentSplit>(s => s);
-            CreatePriceFetcherMockReturningSplitData(fixture, new[] { splitData });
-            var instrumentRepository = fixture.CreateDefaultInstrumentRepositoryMock();
-            instrumentRepository
+            CreatePriceFetcherMockReturningSplitData(_fixture, new[] { splitData });
+            _instrumentRepository
                 .Setup(r => r.ListAllAsync())
                 .ReturnsAsync(instruments);
 
-            var sut = fixture.Create<SplitFetchJob>();
+            var sut = _fixture.Create<SplitFetchJob>();
 
             await sut.RunAsync();
 
-            splitRepository.Verify(r => r.Add(It.Is<InstrumentSplit>(s =>
+            _splitRepository.Verify(r => r.Add(It.Is<InstrumentSplit>(s =>
                 s.Time == splitData.Time &&
                 s.SplitRatio.Numerator == splitData.Numerator &&
                 s.SplitRatio.Denominator == splitData.Denominator &&
@@ -160,10 +148,10 @@ namespace PortEval.Tests.Unit.BackgroundJobTests
             )));
         }
 
-        private Mock<IFinancialDataFetcher> CreatePriceFetcherMockReturningSplitData(IFixture fixture,
+        private Mock<IFinancialDataFetcher> CreatePriceFetcherMockReturningSplitData(IFixture _fixture,
             IEnumerable<InstrumentSplitData> splitData)
         {
-            var mock = fixture.Freeze<Mock<IFinancialDataFetcher>>();
+            var mock = _fixture.Freeze<Mock<IFinancialDataFetcher>>();
             mock
                 .Setup(m => m.GetInstrumentSplitsAsync(It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(splitData);

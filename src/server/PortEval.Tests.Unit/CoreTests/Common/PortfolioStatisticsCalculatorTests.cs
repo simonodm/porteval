@@ -1,27 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using PortEval.Application.Core.Common;
 using PortEval.Application.Core.Common.Calculators;
 using PortEval.Application.Models.DTOs;
 using PortEval.Tests.Unit.Helpers.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace PortEval.Tests.Unit.CoreTests.Common
 {
     public class PortfolioStatisticsCalculatorTests
     {
+        private IFixture _fixture;
+
+        public PortfolioStatisticsCalculatorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         [Fact]
         public void CalculateStatistics_AssignsPortfolioIdFromSourceDataToResult()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var data = _fixture.Create<PortfolioPositionsPriceListData>();
 
-            var data = fixture.Create<PortfolioPositionsPriceListData>();
-
-            var sut = fixture.Create<PortfolioStatisticsCalculator>();
+            var sut = _fixture.Create<PortfolioStatisticsCalculator>();
 
             var stats = sut.CalculateStatistics(data, DateTime.UtcNow);
 
@@ -31,22 +36,19 @@ namespace PortEval.Tests.Unit.CoreTests.Common
         [Fact]
         public void CalculateStatistics_ReturnsZeroForEachMetric_WhenNoTransactionsAreAvailable()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
+            var price = _fixture.Create<InstrumentPriceDto>();
 
-            var price = fixture.Create<InstrumentPriceDto>();
-
-            var positionPriceListData = fixture
+            var positionPriceListData = _fixture
                 .Build<PositionPriceListData>()
                 .With(p => p.Prices, new[] { price })
                 .With(p => p.Transactions, Enumerable.Empty<TransactionDto>())
                 .Create();
 
-            var portfolioData = fixture.Build<PortfolioPositionsPriceListData>()
+            var portfolioData = _fixture.Build<PortfolioPositionsPriceListData>()
                 .With(p => p.PositionsPriceListData, new[] { positionPriceListData })
                 .Create();
 
-            var sut = fixture.Create<PortfolioStatisticsCalculator>();
+            var sut = _fixture.Create<PortfolioStatisticsCalculator>();
 
             var stats = sut.CalculateStatistics(portfolioData, DateTime.UtcNow);
 
@@ -63,18 +65,15 @@ namespace PortEval.Tests.Unit.CoreTests.Common
         [Fact]
         public void CalculateStatistics_ReturnsCorrectStatistics()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
             var time = DateTime.Parse("2022-12-01");
 
-            var firstInstrumentFirstPrice = fixture.Build<InstrumentPriceDto>()
+            var firstInstrumentFirstPrice = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.Time, DateTime.Parse("2022-01-01"))
                 .Create();
-            var firstInstrumentSecondPrice = fixture.Build<InstrumentPriceDto>()
+            var firstInstrumentSecondPrice = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.Time, time)
                 .Create();
-            var firstTransaction = fixture.Build<TransactionDto>()
+            var firstTransaction = _fixture.Build<TransactionDto>()
                 .With(t => t.Amount, 2)
                 .With(t => t.Time, DateTime.Parse("2022-01-01 13:50"))
                 .Create();
@@ -83,13 +82,13 @@ namespace PortEval.Tests.Unit.CoreTests.Common
                 firstTransaction
             };
 
-            var secondInstrumentFirstPrice = fixture.Build<InstrumentPriceDto>()
+            var secondInstrumentFirstPrice = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.Time, DateTime.Parse("2021-12-31"))
                 .Create();
-            var secondInstrumentSecondPrice = fixture.Build<InstrumentPriceDto>()
+            var secondInstrumentSecondPrice = _fixture.Build<InstrumentPriceDto>()
                 .With(p => p.Time, time)
                 .Create();
-            var secondTransaction = fixture.Build<TransactionDto>()
+            var secondTransaction = _fixture.Build<TransactionDto>()
                 .With(t => t.Amount, 4)
                 .With(t => t.Time, DateTime.Parse("2022-10-04 18:19"))
                 .Create();
@@ -98,13 +97,13 @@ namespace PortEval.Tests.Unit.CoreTests.Common
                 secondTransaction
             };
 
-            var firstPositionPriceListData = fixture
+            var firstPositionPriceListData = _fixture
                 .Build<PositionPriceListData>()
                 .With(p => p.Prices, new[] { firstInstrumentFirstPrice, firstInstrumentSecondPrice })
                 .With(p => p.Transactions, firstTransactions)
                 .Create();
 
-            var secondPositionPriceListData = fixture
+            var secondPositionPriceListData = _fixture
                 .Build<PositionPriceListData>()
                 .With(p => p.Prices, new[] { secondInstrumentFirstPrice, secondInstrumentSecondPrice })
                 .With(p => p.Transactions, secondTransactions)
@@ -113,14 +112,14 @@ namespace PortEval.Tests.Unit.CoreTests.Common
             var firstInstrumentPriceDifference = firstInstrumentSecondPrice.Price - firstInstrumentFirstPrice.Price;
             var secondInstrumentPriceDifference = secondInstrumentSecondPrice.Price - secondInstrumentFirstPrice.Price;
 
-            var portfolioData = fixture.Build<PortfolioPositionsPriceListData>()
+            var portfolioData = _fixture.Build<PortfolioPositionsPriceListData>()
                 .With(p => p.PositionsPriceListData, new[] { firstPositionPriceListData, secondPositionPriceListData })
                 .Create();
 
-            fixture.CreatePositionProfitCalculatorMock();
-            fixture.CreatePositionPerformanceCalculatorMock();
+            _fixture.CreatePositionProfitCalculatorMock();
+            _fixture.CreatePositionPerformanceCalculatorMock();
 
-            var sut = fixture.Create<PortfolioStatisticsCalculator>();
+            var sut = _fixture.Create<PortfolioStatisticsCalculator>();
 
             var stats = sut.CalculateStatistics(portfolioData, time);
 

@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using PortEval.Application.Models.DTOs.Enums;
+﻿using PortEval.Application.Models.DTOs.Enums;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.Interfaces.Services
 {

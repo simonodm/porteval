@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.BackgroundJobs.Helpers;
 using PortEval.Application.Core.Extensions;
 using PortEval.Application.Core.Interfaces;
@@ -14,6 +10,10 @@ using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.Domain;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PortEval.Application.Core.BackgroundJobs
 {
@@ -147,7 +147,7 @@ namespace PortEval.Application.Core.BackgroundJobs
                 };
                 pricesWithStartingPricePrepended = prices.Prepend(rangeStartPricePoint);
             }
-            
+
 
             var newPricePoints = PriceUtils.FillMissingRangePrices(
                 pricesWithStartingPricePrepended,

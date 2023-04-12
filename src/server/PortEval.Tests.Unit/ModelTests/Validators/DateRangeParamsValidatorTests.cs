@@ -11,6 +11,14 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
 {
     public class DateRangeParamsValidatorTests
     {
+        private IFixture _fixture;
+
+        public DateRangeParamsValidatorTests()
+        {
+            _fixture = new Fixture()
+                .Customize(new AutoMoqCustomization());
+        }
+
         public static IEnumerable<object[]> ValidDateRanges = new List<object[]>
         {
             new object[] { DateTime.Parse("2022-01-01"), DateTime.Parse("2022-01-02") },
@@ -24,15 +32,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [MemberData(nameof(ValidDateRanges))]
         public void Validate_ValidatesSuccessfully_WhenProvidedDateRangeIsValid(DateTime from, DateTime to)
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var dateRange = fixture.Build<DateRangeParams>()
+            var dateRange = _fixture.Build<DateRangeParams>()
                 .With(dr => dr.From, from)
                 .With(dr => dr.To, to)
                 .Create();
 
-            var validator = fixture.Create<DateRangeParamsValidator>();
+            var validator = _fixture.Create<DateRangeParamsValidator>();
 
             var validationResult = validator.Validate(dateRange);
 
@@ -42,15 +47,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenDateRangeStartIsLaterThanEnd()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var dateRange = fixture.Build<DateRangeParams>()
+            var dateRange = _fixture.Build<DateRangeParams>()
                 .With(dr => dr.From, DateTime.UtcNow)
                 .With(dr => dr.To, DateTime.MinValue)
                 .Create();
 
-            var validator = fixture.Create<DateRangeParamsValidator>();
+            var validator = _fixture.Create<DateRangeParamsValidator>();
 
             var validationResult = validator.Validate(dateRange);
 
@@ -60,15 +62,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenDateRangeIncludesFutureDate()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var dateRange = fixture.Build<DateRangeParams>()
+            var dateRange = _fixture.Build<DateRangeParams>()
                 .With(dr => dr.From, DateTime.UtcNow)
                 .With(dr => dr.To, DateTime.MaxValue)
                 .Create();
 
-            var validator = fixture.Create<DateRangeParamsValidator>();
+            var validator = _fixture.Create<DateRangeParamsValidator>();
 
             var validationResult = validator.Validate(dateRange);
 
@@ -78,15 +77,12 @@ namespace PortEval.Tests.Unit.ModelTests.Validators
         [Fact]
         public void Validate_FailsValidation_WhenDateRangeIsBeforeAllowedStartTime()
         {
-            var fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-
-            var dateRange = fixture.Build<DateRangeParams>()
+            var dateRange = _fixture.Build<DateRangeParams>()
                 .With(dr => dr.From, PortEvalConstants.FinancialDataStartTime.AddDays(-10))
                 .With(dr => dr.To, PortEvalConstants.FinancialDataStartTime.AddDays(1))
                 .Create();
 
-            var validator = fixture.Create<DateRangeParamsValidator>();
+            var validator = _fixture.Create<DateRangeParamsValidator>();
 
             var validationResult = validator.Validate(dateRange);
 

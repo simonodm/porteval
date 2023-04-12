@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using PortEval.Application.Models.FinancialDataFetcher;
+﻿using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.DataFetcher;
 using PortEval.DataFetcher.Models;
 using PortEval.Infrastructure.FinancialDataFetcher.Requests;
 using PortEval.Infrastructure.FinancialDataFetcher.Tiingo;
 using PortEval.Infrastructure.FinancialDataFetcher.Tiingo.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace PortEval.Tests.Integration.DataFetcherTests

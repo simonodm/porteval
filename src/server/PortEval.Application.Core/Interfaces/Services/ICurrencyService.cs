@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using PortEval.Application.Models.DTOs;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using PortEval.Application.Models.DTOs;
 
 namespace PortEval.Application.Core.Interfaces.Services
 {
@@ -17,7 +17,7 @@ namespace PortEval.Application.Core.Interfaces.Services
         /// Task result contains an <see cref="OperationResponse{T}"/> containing all available currencies.
         /// </returns>
         public Task<OperationResponse<IEnumerable<CurrencyDto>>> GetAllCurrenciesAsync();
-        
+
         /// <summary>
         /// Retrieves a currency by its three-letter code.
         /// </summary>

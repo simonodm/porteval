@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.QueryParams;
 using PortEval.Domain.Models.Enums;
@@ -6,9 +7,7 @@ using PortEval.Infrastructure;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Interfaces.Queries;
 using Xunit;
-using PortEval.Application.Core;
 
 namespace PortEval.Tests.Integration.QueryTests
 {
@@ -37,7 +36,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetAllInstruments_ReturnsAllInstrumentsFromDb()
         {
             var queryResult = await _instrumentQueries.GetAllInstrumentsAsync();
-            
+
             Assert.Collection(queryResult, AssertIsAAPLInstrument, AssertIsBTCInstrument);
         }
 
@@ -63,7 +62,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetInstrument_ReturnsCorrectInstrument_WhenInstrumentExists()
         {
             var queryResult = await _instrumentQueries.GetInstrumentAsync(_appleInstrumentId);
-            
+
             AssertIsAAPLInstrument(queryResult);
         }
 
@@ -79,7 +78,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetInstrumentPrices_ReturnsInstrumentPricesInRange()
         {
             var queryResult = await _instrumentQueries.GetInstrumentPricesAsync(_appleInstrumentId, DateTime.UtcNow.AddDays(-1).AddHours(-1), DateTime.UtcNow);
-            
+
             Assert.Collection(queryResult, AssertIsAAPLYesterdaysPrice, AssertIsAAPLCurrentPrice);
         }
 
@@ -124,7 +123,7 @@ namespace PortEval.Tests.Integration.QueryTests
                 Limit = 300,
                 Page = 1
             }, AggregationFrequency.Day);
-            
+
             Assert.Collection(queryResult, AssertIsBTCCurrentPrice, AssertIsBTCYesterdaysPrice, AssertIsBTCTwoDaysOldPrice);
         }
 
@@ -132,7 +131,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetInstrumentSplits_ReturnsInstrumentSplits()
         {
             var queryResult = await _instrumentQueries.GetInstrumentSplitsAsync(_appleInstrumentId);
-            
+
             Assert.Collection(queryResult, AssertIsAAPLYesterdaysSplit);
         }
 
@@ -140,7 +139,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetInstrumentSplit_ReturnsInstrumentSplit()
         {
             var queryResult = await _instrumentQueries.GetInstrumentSplitAsync(_appleInstrumentId, _appleSplitId);
-            
+
             AssertIsAAPLYesterdaysSplit(queryResult);
         }
 
@@ -148,7 +147,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetInstrumentPrice_ReturnsLatestPriceAtTime_WhenPriceExists()
         {
             var queryResult = await _instrumentQueries.GetInstrumentPriceAsync(_btcInstrumentId, DateTime.UtcNow.AddDays(-1));
-            
+
             AssertIsBTCYesterdaysPrice(queryResult);
         }
 
@@ -164,7 +163,7 @@ namespace PortEval.Tests.Integration.QueryTests
         public async Task GetInstrumentPrice_ReturnsNull_WhenNoPriceAtProvidedTimeExists()
         {
             var queryResult = await _instrumentQueries.GetInstrumentPriceAsync(_btcInstrumentId, DateTime.UtcNow.AddDays(-7));
-            
+
             Assert.Null(queryResult);
         }
 
