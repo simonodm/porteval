@@ -55,7 +55,7 @@ namespace PortEval.Tests.Unit.CoreTests.BulkImportExport
                 .Create();
             _priceService
                 .Setup(m => m.GetInstrumentPriceAsync(price.InstrumentId, price.Time))
-                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(_fixture.Create<InstrumentPriceDto>()));
+                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(price));
             var sut = _fixture.Create<PriceImportProcessor>();
 
             await sut.ImportRecordsAsync(new List<InstrumentPriceDto> { price });
