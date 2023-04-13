@@ -1,12 +1,12 @@
-﻿using Moq;
-using Moq.Protected;
-using Newtonsoft.Json;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Moq;
+using Moq.Protected;
+using Newtonsoft.Json;
 
-namespace PortEval.Tests.Integration.DataFetcherTests
+namespace PortEval.Tests.Integration.FinancialDataSourceTests
 {
     internal static class Helpers
     {
@@ -18,7 +18,7 @@ namespace PortEval.Tests.Integration.DataFetcherTests
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(m =>
-                        m.RequestUri.AbsoluteUri.StartsWith(uri)),
+                        m.RequestUri.ToString().StartsWith(uri)),
                     ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(new HttpResponseMessage
                 {

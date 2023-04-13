@@ -1,14 +1,14 @@
-﻿using PortEval.Application.Models.FinancialDataFetcher;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.DataFetcher.Models;
 using PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost;
 using PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost.Models;
 using PortEval.Infrastructure.FinancialDataFetcher.Requests;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace PortEval.Tests.Integration.DataFetcherTests
+namespace PortEval.Tests.Integration.FinancialDataSourceTests
 {
     public class ExchangeRateHostTests
     {
