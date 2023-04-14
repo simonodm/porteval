@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import LinePreview from './LinePreview';
+import LinePreview from '../charts/LinePreview';
 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -20,12 +20,13 @@ type Props = {
 }
 
 /**
- * Renders a chart line configuration component, enabling modification of chart line's width, dash type, and color.
+ * Renders a chart line configuration form, enabling modification of chart line's width, dash type, and color.
  * 
- * @category Chart
+ * @category Forms
+ * @subcategory Forms
  * @component
  */
-function ChartLineConfigurator({ line: lineProp, onSave }: Props): JSX.Element {
+function ChartLineConfiguratorForm({ line: lineProp, onSave }: Props): JSX.Element {
     const dashTypes: Array<ChartLineDashType> = ['solid', 'dashed', 'dotted'];
     const [line, setLine] = useState(lineProp);
 
@@ -97,4 +98,4 @@ function ChartLineConfigurator({ line: lineProp, onSave }: Props): JSX.Element {
     )
 }
 
-export default ChartLineConfigurator;
+export default ChartLineConfiguratorForm;

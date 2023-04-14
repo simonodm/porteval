@@ -6,7 +6,7 @@ import ChartConfigurator from '../charts/ChartConfigurator';
 import PortfolioPicker from '../charts/PortfolioPicker';
 import InstrumentPicker from '../charts/InstrumentPicker';
 import ModalWrapper from '../modals/ModalWrapper';
-import ChartLineConfigurator from '../charts/ChartLineConfigurator';
+import ChartLineConfiguratorForm from '../forms/ChartLineConfiguratorForm';
 import ChartLineConfigurationContext from '../../context/ChartLineConfigurationContext';
 import PageHeading from '../ui/PageHeading';
 import EditChartMetaForm from '../forms/EditChartMetaForm';
@@ -269,7 +269,7 @@ function ChartView(): JSX.Element {
                     >
                         {
                             modalLine &&
-                                <ChartLineConfigurator
+                                <ChartLineConfiguratorForm
                                     line={modalLine}
                                     onSave={(line) => handleLineSave(line)}
                                 />
