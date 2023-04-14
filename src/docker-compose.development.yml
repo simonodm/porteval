@@ -9,7 +9,7 @@ services:
     ports:
       - "5433:1433"
     volumes:
-      - porteval_db_prod:/var/opt/mssql
+      - porteval_db_dev:/var/opt/mssql
     healthcheck:
       test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$${SA_PASSWORD}" -Q "SELECT 1" -b -o /dev/null
       interval: 5s
@@ -18,34 +18,40 @@ services:
       start_period: 10s
 
   porteval-api:
-    image: porteval-api:1.0.6
+    image: porteval-api:dev
     build:
       context: ./server
+      dockerfile: Dockerfile.development
     depends_on:
       - porteval-db
     ports:
       - "4680:80"
-    env_file:
-      - ./.env
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:80
-      - PORTEVAL_FILE_STORAGE=/app/files
-      - "CUSTOMCONNSTR_PortEvalDb=Server=porteval-db;Database=PortEvalDbContext;User=sa;Password=Hw82@malzsA!;TrustServerCertificate=True"
     volumes:
-      - porteval_file_storage:/app/files
+      - porteval_api_files:/app/files
+    env_file:
+      - ./.env.dev
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - FILE_STORAGE=/app/files
+      - "CUSTOMCONNSTR_PortEvalDb=Server=porteval-db;Database=PortEvalDbContext;User=sa;Password=Hw82@malzsA!;TrustServerCertificate=True"
       
   porteval-web:
-    image: porteval-web:1.0.6
+    image: porteval-web:dev
     build:
       context: ./web
+      dockerfile: Dockerfile.development
     depends_on:
       - porteval-api
     ports:
-      - "3080:80"
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - PORTEVAL_API_URL=http://porteval-api/
+    stdin_open: true
     volumes:
     - ./web:/app
 
 volumes:
-    porteval_db_prod:
-    porteval_file_storage:
+    porteval_db_dev:
+    porteval_api_files:
