@@ -2,6 +2,7 @@
 using PortEval.Domain.Models.ValueObjects;
 using System.Collections.Generic;
 using System.Linq;
+using PortEval.Domain.Exceptions;
 
 namespace PortEval.Domain.Models.Entities
 {
@@ -61,11 +62,31 @@ namespace PortEval.Domain.Models.Entities
 
         public void ReplaceLines(IEnumerable<ChartLine> lines)
         {
-            _lines.Clear();
+            var instrumentLineIds = new HashSet<int>();
+            var positionLineIds = new HashSet<int>();
+            var portfolioLineIds = new HashSet<int>();
+
+            var newLines = new List<ChartLine>();
             foreach (var line in lines)
             {
-                _lines.Add(line);
+                if (line is ChartLineInstrument instrumentLine && !instrumentLineIds.Add(instrumentLine.InstrumentId))
+                {
+                    throw new OperationNotAllowedException($"Instrument with ID {instrumentLine.InstrumentId} is already added to the chart.");
+                }
+                if (line is ChartLinePosition positionLine && !positionLineIds.Add(positionLine.PositionId))
+                {
+                    throw new OperationNotAllowedException($"Position with ID {positionLine.PositionId} is already added to the chart.");
+                }
+                if (line is ChartLinePortfolio portfolioLine && !portfolioLineIds.Add(portfolioLine.PortfolioId))
+                {
+                    throw new OperationNotAllowedException($"Portfolio with ID {portfolioLine.PortfolioId} is already added to the chart.");
+                }
+
+                newLines.Add(line);
             }
+
+            // Replacing lines at this point is safe, because we have already checked for duplicates
+            _lines = newLines;
         }
 
         public void Rename(string name)
