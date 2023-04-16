@@ -1,6 +1,6 @@
 {
-  "name": "web",
-  "version": "1.0.5",
+  "name": "porteval-web",
+  "version": "1.0.6",
   "private": true,
   "dependencies": {
     "@microsoft/signalr": "^7.0.2",
@@ -28,8 +28,8 @@
     "web-vitals": "^3.1.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "SET NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
+    "build": "SET NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "docs": "jsdoc -c jsdoc.json"
@@ -73,8 +73,9 @@
     "eslint-plugin-jest-dom": "^4.0.3",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-testing-library": "^5.10.1",
-    "jsdoc": "^4.0.0",
-    "msw": "^1.0.0"
+    "jsdoc": "^3.6.11",
+    "msw": "^1.0.0",
+    "taffydb": "^2.7.3"
   },
   "jest": {
     "testMatch": [
