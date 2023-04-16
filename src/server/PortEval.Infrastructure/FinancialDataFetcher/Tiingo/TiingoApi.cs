@@ -66,8 +66,6 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Tiingo
             var sortedPrices = result.Result?.OrderByDescending(price => price.Time) ??
                                Enumerable.Empty<TiingoPriceResponseModel>();
 
-            var currentSplitFactor = 1m;
-
             var responseResult = new List<PricePoint>();
 
             foreach (var price in sortedPrices)
@@ -82,13 +80,11 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Tiingo
                     responseResult.Add(new PricePoint
                     {
                         CurrencyCode = "USD",
-                        Price = price.Price / currentSplitFactor,
+                        Price = price.Price,
                         Symbol = symbol,
                         Time = price.Time.ToUniversalTime()
                     });
                 }
-
-                currentSplitFactor *= price.SplitFactor;
             }
 
             return new Response<IEnumerable<PricePoint>>
@@ -173,7 +169,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Tiingo
                 resampleFreq = interval == IntradayInterval.FiveMinutes ? "5min" : "60min";
             }
 
-            List<TiingoPriceResponseModel> prices = new List<TiingoPriceResponseModel>();
+            List<TiingoCryptoPricePoint> prices = new List<TiingoCryptoPricePoint>();
             var lastPriceTime = from;
             var anySuccessful = false;
             var anyUnexpectedError = false;

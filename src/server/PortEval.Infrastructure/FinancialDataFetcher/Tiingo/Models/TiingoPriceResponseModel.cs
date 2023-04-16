@@ -7,9 +7,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Tiingo.Models
     {
         [JsonProperty("date", Required = Required.Always)]
         public DateTime Time { get; set; }
-        [JsonProperty("open", Required = Required.Always)]
+        [JsonProperty("adjOpen", Required = Required.Always)]
         public decimal Price { get; set; }
-        [JsonProperty("splitFactor")]
-        public decimal SplitFactor { get; set; }
     }
 }

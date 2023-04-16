@@ -59,6 +59,52 @@ namespace PortEval.Tests.Integration.FinancialDataSourceTests
         }
 
         [Fact]
+        public async Task ProcessIntradayInstrumentPricesRequest_ReturnsDataFromAlphaVantageIntradayAdjustedEndpoint()
+        {
+            var priceTime = DateTime.Parse("2022-01-01T00:00:00Z").ToUniversalTime();
+            var instrumentSymbol = "AAPL";
+
+            var expectedRequestUri = @$"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={instrumentSymbol}&interval=60min&outputsize=full";
+            var price = new TimeSeriesPriceDataModel
+            {
+                Price = 100m,
+                SplitCoefficient = 1m
+            };
+            var apiMockResponse = new TimeSeriesIntradayResponseModel()
+            {
+                Prices = new Dictionary<string, TimeSeriesPriceDataModel>
+                {
+                    [priceTime.ToString("yyyy-MM-dd")] = price
+                }
+            };
+
+            var httpClient = Helpers.SetupMockHttpClientReturningResponse(expectedRequestUri, apiMockResponse);
+
+            var request = new IntradayInstrumentPricesRequest()
+            {
+                From = DateTime.Parse("2022-01-01"),
+                To = DateTime.Parse("2022-01-03"),
+                Symbol = instrumentSymbol,
+                CurrencyCode = "USD",
+                Interval = IntradayInterval.OneHour
+            };
+
+            var sut = new DataFetcher.DataFetcher(httpClient);
+            sut.RegisterDataSource<AlphaVantageApi>(GetMockConfiguration());
+
+            var response = await sut.ProcessRequestAsync<IntradayInstrumentPricesRequest, IEnumerable<PricePoint>>(request);
+
+            Assert.Equal(StatusCode.Ok, response.StatusCode);
+            Assert.Collection(response.Result, pricePoint =>
+            {
+                Assert.Equal(priceTime, pricePoint.Time);
+                Assert.Equal(price.Price, pricePoint.Price);
+                Assert.Equal("USD", pricePoint.CurrencyCode);
+                Assert.Equal(instrumentSymbol, pricePoint.Symbol);
+            });
+        }
+
+        [Fact]
         public async Task ProcessLatestInstrumentPriceRequest_ReturnsDataFromAlphaVantageQuoteEndpoint()
         {
             var price = new GlobalQuotePriceDataModel

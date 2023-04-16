@@ -15,6 +15,6 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Tiingo.Models
         public string QuoteCurrency { get; set; }
 
         [JsonProperty("priceData")]
-        public List<TiingoPriceResponseModel> Data { get; set; }
+        public List<TiingoCryptoPricePoint> Data { get; set; }
     }
 }

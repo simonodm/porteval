@@ -32,6 +32,7 @@ using PortEval.Infrastructure.Repositories;
 using System;
 using System.Data;
 using System.IO.Abstractions;
+using PortEval.Infrastructure.FinancialDataFetcher.AlphaVantage;
 
 namespace PortEval.Application.Extensions
 {
@@ -231,11 +232,23 @@ namespace PortEval.Application.Extensions
         public static void ConfigurePriceFetcher(this IServiceCollection services, IConfiguration configuration)
         {
             var dataFetcher = new DataFetcher.DataFetcher();
+            var alphaVantageKey = configuration.GetConfigurationValue("PORTEVAL_AlphaVantage_Key");
             var mboumKey = configuration.GetConfigurationValue("PORTEVAL_RapidAPI_Mboum_Key");
             var tiingoKey = configuration.GetConfigurationValue("PORTEVAL_Tiingo_Key");
             var openExchangeRatesKey = configuration.GetConfigurationValue("PORTEVAL_OpenExchangeRates_Key");
 
-            if (tiingoKey != null)
+            if (!string.IsNullOrWhiteSpace(alphaVantageKey))
+            {
+                dataFetcher.RegisterDataSource<AlphaVantageApi>(new DataSourceConfiguration
+                {
+                    Credentials = new DataSourceCredentials
+                    {
+                        Token = alphaVantageKey
+                    }
+                });
+            }
+
+            if (!string.IsNullOrWhiteSpace(tiingoKey))
             {
                 dataFetcher.RegisterDataSource<TiingoApi>(new DataSourceConfiguration
                 {
@@ -246,7 +259,7 @@ namespace PortEval.Application.Extensions
                 });
             }
 
-            if (mboumKey != null)
+            if (!string.IsNullOrWhiteSpace(mboumKey))
             {
                 dataFetcher.RegisterDataSource<MboumApi>(new DataSourceConfiguration
                 {
@@ -257,7 +270,7 @@ namespace PortEval.Application.Extensions
                 });
             }
 
-            if (openExchangeRatesKey != null)
+            if (!string.IsNullOrWhiteSpace(openExchangeRatesKey))
             {
                 dataFetcher.RegisterDataSource<OpenExchangeRatesApi>(new DataSourceConfiguration
                 {

@@ -75,7 +75,7 @@ namespace PortEval.DataFetcher
         /// <returns>Priority API client</returns>
         private DataSource GetPriorityApi()
         {
-            return _priorityApi ?? _eligibleApis[0]; // TODO: design better algorithm for priority selection
+            return _priorityApi ?? _eligibleApis[0];
         }
 
         /// <summary>

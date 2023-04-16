@@ -67,9 +67,9 @@ namespace PortEval.Tests.Integration.FinancialDataSourceTests
                     Ticker = "BTCUSD",
                     BaseCurrency = "BTC",
                     QuoteCurrency = "USD",
-                    Data = new List<TiingoPriceResponseModel>
+                    Data = new List<TiingoCryptoPricePoint>
                     {
-                        new TiingoPriceResponseModel
+                        new TiingoCryptoPricePoint
                         {
                             Time = priceTime,
                             Price = 100m
@@ -117,9 +117,9 @@ namespace PortEval.Tests.Integration.FinancialDataSourceTests
                     Ticker = "BTCUSD",
                     BaseCurrency = "BTC",
                     QuoteCurrency = "USD",
-                    Data = new List<TiingoPriceResponseModel>
+                    Data = new List<TiingoCryptoPricePoint>
                     {
-                        new TiingoPriceResponseModel
+                        new TiingoCryptoPricePoint
                         {
                             Time = priceTime,
                             Price = 100m

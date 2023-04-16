@@ -7,7 +7,7 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.Requests
     /// <summary>
     /// Request for intraday prices of the specified cryptocurrency.
     /// </summary>
-    public class IntradayCryptoPricesRequest : InstrumentDataRequest, ITimeRangeRequest
+    public class IntradayCryptoPricesRequest : InstrumentDataRequest, IInstrumentTimeRangeRequest
     {
         public DateTime From { get; set; }
         public DateTime To { get; set; }

@@ -7,7 +7,6 @@ using PortEval.Infrastructure.FinancialDataFetcher.Extensions;
 using PortEval.Infrastructure.FinancialDataFetcher.Requests;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace PortEval.Infrastructure.FinancialDataFetcher.AlphaVantage
@@ -20,61 +19,31 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.AlphaVantage
         private const string _baseUrl = "https://www.alphavantage.co";
 
         [RequestProcessor(typeof(HistoricalDailyInstrumentPricesRequest), typeof(IEnumerable<PricePoint>))]
-        public async Task<Response<IEnumerable<PricePoint>>> Process(HistoricalDailyInstrumentPricesRequest request)
+        public async Task<Response<IEnumerable<PricePoint>>> ProcessAsync(HistoricalDailyInstrumentPricesRequest request)
         {
             ValidateRange(request.From, request.To);
 
             var queryUrl = $"{_baseUrl}/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={request.Symbol}&outputsize=full&apikey={Configuration.Credentials.Token}";
 
             var response = await HttpClient.GetJsonAsync<TimeSeriesDailyResponseModel>(queryUrl, Configuration.RateLimiter);
-            if (response.Result == null)
-            {
-                return new Response<IEnumerable<PricePoint>>
-                {
-                    StatusCode = StatusCode.OtherError,
-                    ErrorMessage = "Invalid data received."
-                };
-            }
+            return ProcessTimeSeriesResponse(request, response?.Result?.Prices);
+        }
 
-            var result = new List<PricePoint>();
-            var currentSplitFactor = 1m;
-            foreach (var (timeKey, priceData) in response.Result.Prices)
-            {
-                var time = DateTime.Parse(timeKey);
-                time = DateTime.SpecifyKind(time, DateTimeKind.Utc);
+        [RequestProcessor(typeof(IntradayInstrumentPricesRequest), typeof(IEnumerable<PricePoint>))]
+        public async Task<Response<IEnumerable<PricePoint>>> ProcessAsync(IntradayInstrumentPricesRequest request)
+        {
+            var interval = request.Interval == IntradayInterval.FiveMinutes ? "5min" : "60min";
+            var queryUrl =
+                $"{_baseUrl}/query?function=TIME_SERIES_INTRADAY&symbol={request.Symbol}&interval={interval}&outputsize=full&apikey={Configuration.Credentials.Token}";
 
-                if (time < request.From)
-                {
-                    break;
-                }
-                if (time > request.To)
-                {
-                    continue;
-                }
+            var response =
+                await HttpClient.GetJsonAsync<TimeSeriesIntradayResponseModel>(queryUrl, Configuration.RateLimiter);
 
-                var price = priceData.Price;
-                var pricePoint = new PricePoint
-                {
-                    Symbol = request.Symbol,
-                    Time = time,
-                    Price = price / currentSplitFactor,
-                    CurrencyCode = request.CurrencyCode
-                };
-
-                result.Add(pricePoint);
-
-                currentSplitFactor *= priceData.SplitCoefficient;
-            }
-
-            return new Response<IEnumerable<PricePoint>>
-            {
-                StatusCode = StatusCode.Ok,
-                Result = result
-            };
+            return ProcessTimeSeriesResponse(request, response?.Result?.Prices);
         }
 
         [RequestProcessor(typeof(LatestInstrumentPriceRequest), typeof(PricePoint))]
-        public async Task<Response<PricePoint>> Process(LatestInstrumentPriceRequest request)
+        public async Task<Response<PricePoint>> ProcessAsync(LatestInstrumentPriceRequest request)
         {
             var queryUrl = $"{_baseUrl}/query?function=GLOBAL_QUOTE&symbol={request.Symbol}&apikey={Configuration.Credentials.Token}";
 
@@ -110,6 +79,59 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.AlphaVantage
             {
                 StatusCode = StatusCode.Ok,
                 Result = pricePoint
+            };
+        }
+
+        private Response<IEnumerable<PricePoint>> ProcessTimeSeriesResponse(IInstrumentTimeRangeRequest request,
+            Dictionary<string, TimeSeriesPriceDataModel> prices)
+        {
+            var result = new List<PricePoint>();
+            if (prices == null)
+            {
+                return new Response<IEnumerable<PricePoint>>
+                {
+                    StatusCode = StatusCode.OtherError,
+                    ErrorMessage = "Invalid data received."
+                };
+            }
+
+            var splitCoefficient = 1m;
+
+            foreach (var (timeKey, priceData) in prices)
+            {
+                var time = DateTime.Parse(timeKey);
+                time = DateTime.SpecifyKind(time, DateTimeKind.Utc);
+
+                if (time < request.From)
+                {
+                    break;
+                }
+                if (time > request.To)
+                {
+                    continue;
+                }
+                
+                var price = priceData.Price;
+                var pricePoint = new PricePoint
+                {
+                    Symbol = request.Symbol,
+                    Time = time,
+                    Price = price / splitCoefficient,
+                    CurrencyCode = request.CurrencyCode
+                };
+
+                result.Add(pricePoint);
+                
+                if (priceData.SplitCoefficient != 0)
+                {
+                    splitCoefficient *= priceData.SplitCoefficient;
+                }
+            }
+
+            return new Response<IEnumerable<PricePoint>>
+            {
+                StatusCode = StatusCode.Ok,
+                Result = result
             };
         }
 

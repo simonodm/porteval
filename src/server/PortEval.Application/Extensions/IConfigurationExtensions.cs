@@ -9,8 +9,14 @@ namespace PortEval.Application.Extensions
     {
         public static string GetConfigurationValue(this IConfiguration configuration, string key)
         {
+            var configValue = configuration.GetValue(typeof(string), key);
+            if (configValue is string configString && !string.IsNullOrWhiteSpace(configString))
+            {
+                return configString;
+            }
+            
             var envVarValue = Environment.GetEnvironmentVariable(key);
-            if (envVarValue != null)
+            if (!string.IsNullOrWhiteSpace(envVarValue))
             {
                 return envVarValue;
             }
@@ -18,14 +24,13 @@ namespace PortEval.Application.Extensions
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 var registryValue = Registry.GetValue(GetConfigurationRegistryKey(), key, null);
-                if (registryValue != null)
+                if (registryValue is string registryString && !string.IsNullOrWhiteSpace(registryString))
                 {
-                    return registryValue as string;
+                    return registryString;
                 }
             }
-
-            var configValue = configuration.GetValue(typeof(string), key);
-            return configValue as string;
+            
+            return null;
         }
 
         private static string GetConfigurationRegistryKey()
