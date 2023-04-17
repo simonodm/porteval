@@ -30,6 +30,30 @@ namespace PortEval.Infrastructure.Migrations
             DELETE FROM DUPLICATE_PRICES
             WHERE row_num > 1");
 
+            // remove duplicate instruments in two steps - delete matching chart lines first, as there is no cascade delete on them
+            migrationBuilder.Sql(@"WITH DUPLICATE_INSTRUMENTS AS (
+                SELECT *, ROW_NUMBER() OVER (
+                    PARTITION BY [Symbol]
+                    ORDER BY [Id] DESC
+                ) as row_num FROM [dbo].[Instruments]
+            )
+            DELETE FROM [dbo].[ChartLines]
+            WHERE EXISTS (
+	            SELECT * FROM DUPLICATE_INSTRUMENTS
+	            WHERE [Id] = [dbo].[ChartLines].[InstrumentId]
+	            AND row_num > 1
+            )");
+            
+            // delete duplicate instruments
+            migrationBuilder.Sql(@"WITH DUPLICATE_INSTRUMENTS AS (
+                SELECT *, ROW_NUMBER() OVER (
+                    PARTITION BY [Symbol]
+                    ORDER BY [Id] DESC
+                ) as row_num FROM [dbo].[Instruments]
+            )
+            DELETE FROM DUPLICATE_INSTRUMENTS
+            WHERE row_num > 1");
+            
             migrationBuilder.DropIndex(
                 name: "IX_Positions_PortfolioId",
                 table: "Positions");
