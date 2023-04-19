@@ -1,12 +1,20 @@
-﻿using PortEval.DataFetcher.Interfaces;
-using System;
+﻿using System;
 
-namespace PortEval.Infrastructure.FinancialDataFetcher.Requests
+namespace PortEval.Infrastructure.FinancialDataFetcher.Requests;
+
+/// <summary>
+///     A request for instrument splits.
+/// </summary>
+public class InstrumentSplitsRequest : ITimeRangeRequest
 {
-    public class InstrumentSplitsRequest : ITimeRangeRequest
-    {
-        public string Symbol { get; set; }
-        public DateTime From { get; set; }
-        public DateTime To { get; set; }
-    }
+    /// <summary>
+    ///     The ticker symbol of the instrument to retrieve splits for.
+    /// </summary>
+    public string Symbol { get; set; }
+
+    /// <inheritdoc />
+    public DateTime From { get; set; }
+
+    /// <inheritdoc />
+    public DateTime To { get; set; }
 }

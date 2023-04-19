@@ -1,11 +1,13 @@
-﻿namespace PortEval.Domain.Models.Enums
+﻿namespace PortEval.Domain.Models.Enums;
+
+/// <summary>
+///     Represents the template type of a bulk data import.
+/// </summary>
+public enum TemplateType
 {
-    public enum TemplateType
-    {
-        Portfolios,
-        Positions,
-        Transactions,
-        Instruments,
-        Prices
-    }
+    Portfolios,
+    Positions,
+    Transactions,
+    Instruments,
+    Prices
 }

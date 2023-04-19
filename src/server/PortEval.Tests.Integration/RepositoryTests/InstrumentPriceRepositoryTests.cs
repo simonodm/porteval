@@ -1,158 +1,159 @@
-﻿using PortEval.Application.Core.Interfaces.Repositories;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Infrastructure.Repositories;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace PortEval.Tests.Integration.RepositoryTests
+namespace PortEval.Tests.Integration.RepositoryTests;
+
+public class InstrumentPriceRepositoryTests : RepositoryTestBase
 {
-    public class InstrumentPriceRepositoryTests : RepositoryTestBase
+    private readonly Instrument _instrument;
+    private readonly IInstrumentPriceRepository _instrumentPriceRepository;
+
+    public InstrumentPriceRepositoryTests()
     {
-        private readonly IInstrumentPriceRepository _instrumentPriceRepository;
+        _instrumentPriceRepository = new InstrumentPriceRepository(DbContext);
 
-        private readonly Instrument _instrument;
+        DbContext.Add(new Currency("USD", "US Dollar", "$", true));
+        DbContext.Add(new Exchange("NASDAQ", "NASDAQ"));
 
-        public InstrumentPriceRepositoryTests() : base()
-        {
-            _instrumentPriceRepository = new InstrumentPriceRepository(DbContext);
+        _instrument = new Instrument("Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
+        DbContext.Add(_instrument);
+        DbContext.SaveChanges();
+    }
 
-            DbContext.Add(new Currency("USD", "US Dollar", "$", true));
-            DbContext.Add(new Exchange("NASDAQ", "NASDAQ"));
+    [Fact]
+    public async Task ListInstrumentPricesAsync_ReturnsInstrumentPrices()
+    {
+        var first = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
+        var second = new InstrumentPrice(DateTime.UtcNow.AddMinutes(-5), DateTime.UtcNow, 99m, _instrument.Id);
+        DbContext.Add(first);
+        DbContext.Add(second);
+        await DbContext.SaveChangesAsync();
 
-            _instrument = new Instrument("Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
-            DbContext.Add(_instrument);
-            DbContext.SaveChanges();
-        }
+        var prices = await _instrumentPriceRepository.ListInstrumentPricesAsync(_instrument.Id);
 
-        [Fact]
-        public async Task ListInstrumentPricesAsync_ReturnsInstrumentPrices()
-        {
-            var first = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
-            var second = new InstrumentPrice(DateTime.UtcNow.AddMinutes(-5), DateTime.UtcNow, 99m, _instrument.Id);
-            DbContext.Add(first);
-            DbContext.Add(second);
-            await DbContext.SaveChangesAsync();
+        Assert.Collection(prices, price => AssertInstrumentPricesAreEqual(second, price),
+            price => AssertInstrumentPricesAreEqual(first, price));
+    }
 
-            var prices = await _instrumentPriceRepository.ListInstrumentPricesAsync(_instrument.Id);
+    [Fact]
+    public async Task FindPriceAtAsync_ReturnsCorrectInstrumentPrice()
+    {
+        var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
+        DbContext.Add(instrumentPrice);
+        await DbContext.SaveChangesAsync();
 
-            Assert.Collection(prices, price => AssertInstrumentPricesAreEqual(second, price), price => AssertInstrumentPricesAreEqual(first, price));
-        }
+        var foundInstrumentPrice =
+            await _instrumentPriceRepository.FindPriceAtAsync(instrumentPrice.InstrumentId, DateTime.UtcNow);
 
-        [Fact]
-        public async Task FindPriceAtAsync_ReturnsCorrectInstrumentPrice()
-        {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
-            DbContext.Add(instrumentPrice);
-            await DbContext.SaveChangesAsync();
+        AssertInstrumentPricesAreEqual(instrumentPrice, foundInstrumentPrice);
+    }
 
-            var foundInstrumentPrice = await _instrumentPriceRepository.FindPriceAtAsync(instrumentPrice.InstrumentId, DateTime.UtcNow);
+    [Fact]
+    public async Task FindPriceByIdAsync_ReturnsCorrectInstrumentPrice()
+    {
+        var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
+        DbContext.Add(instrumentPrice);
+        await DbContext.SaveChangesAsync();
 
-            AssertInstrumentPricesAreEqual(instrumentPrice, foundInstrumentPrice);
-        }
+        var foundInstrumentPrice =
+            await _instrumentPriceRepository.FindPriceByIdAsync(instrumentPrice.InstrumentId, instrumentPrice.Id);
 
-        [Fact]
-        public async Task FindPriceByIdAsync_ReturnsCorrectInstrumentPrice()
-        {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
-            DbContext.Add(instrumentPrice);
-            await DbContext.SaveChangesAsync();
+        AssertInstrumentPricesAreEqual(instrumentPrice, foundInstrumentPrice);
+    }
 
-            var foundInstrumentPrice = await _instrumentPriceRepository.FindPriceByIdAsync(instrumentPrice.InstrumentId, instrumentPrice.Id);
+    [Fact]
+    public async Task Add_CreatesNewInstrumentPrice()
+    {
+        var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
 
-            AssertInstrumentPricesAreEqual(instrumentPrice, foundInstrumentPrice);
-        }
+        _instrumentPriceRepository.Add(instrumentPrice);
+        await _instrumentPriceRepository.UnitOfWork.CommitAsync();
 
-        [Fact]
-        public async Task Add_CreatesNewInstrumentPrice()
-        {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
+        var createdInstrumentPrice = DbContext.InstrumentPrices.FirstOrDefault();
 
-            _instrumentPriceRepository.Add(instrumentPrice);
-            await _instrumentPriceRepository.UnitOfWork.CommitAsync();
+        AssertInstrumentPricesAreEqual(instrumentPrice, createdInstrumentPrice);
+    }
 
-            var createdInstrumentPrice = DbContext.InstrumentPrices.FirstOrDefault();
+    [Fact]
+    public async Task DeleteAsync_DeletesInstrumentPrice()
+    {
+        var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
+        DbContext.Add(instrumentPrice);
+        await DbContext.SaveChangesAsync();
 
-            AssertInstrumentPricesAreEqual(instrumentPrice, createdInstrumentPrice);
-        }
+        await _instrumentPriceRepository.DeleteAsync(instrumentPrice.InstrumentId, instrumentPrice.Id);
+        await _instrumentPriceRepository.UnitOfWork.CommitAsync();
 
-        [Fact]
-        public async Task DeleteAsync_DeletesInstrumentPrice()
-        {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
-            DbContext.Add(instrumentPrice);
-            await DbContext.SaveChangesAsync();
+        var instrumentPriceDeleted = !DbContext.InstrumentPrices.Any();
 
-            await _instrumentPriceRepository.DeleteAsync(instrumentPrice.InstrumentId, instrumentPrice.Id);
-            await _instrumentPriceRepository.UnitOfWork.CommitAsync();
+        Assert.True(instrumentPriceDeleted);
+    }
 
-            var instrumentPriceDeleted = !DbContext.InstrumentPrices.Any();
+    [Fact]
+    public async Task Delete_DeletesInstrumentPrice()
+    {
+        var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
+        DbContext.Add(instrumentPrice);
+        await DbContext.SaveChangesAsync();
 
-            Assert.True(instrumentPriceDeleted);
-        }
+        _instrumentPriceRepository.Delete(instrumentPrice);
+        await _instrumentPriceRepository.UnitOfWork.CommitAsync();
 
-        [Fact]
-        public async Task Delete_DeletesInstrumentPrice()
-        {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
-            DbContext.Add(instrumentPrice);
-            await DbContext.SaveChangesAsync();
+        var instrumentPriceDeleted = !DbContext.InstrumentPrices.Any();
 
-            _instrumentPriceRepository.Delete(instrumentPrice);
-            await _instrumentPriceRepository.UnitOfWork.CommitAsync();
+        Assert.True(instrumentPriceDeleted);
+    }
 
-            var instrumentPriceDeleted = !DbContext.InstrumentPrices.Any();
+    [Fact]
+    public async Task ExistsAsync_ReturnsTrue_WhenInstrumentPriceWithSpecifiedIdExists()
+    {
+        var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
+        DbContext.InstrumentPrices.Add(instrumentPrice);
+        await DbContext.SaveChangesAsync();
 
-            Assert.True(instrumentPriceDeleted);
-        }
+        var exists = await _instrumentPriceRepository.ExistsAsync(instrumentPrice.InstrumentId, instrumentPrice.Id);
 
-        [Fact]
-        public async Task ExistsAsync_ReturnsTrue_WhenInstrumentPriceWithSpecifiedIdExists()
-        {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
-            DbContext.InstrumentPrices.Add(instrumentPrice);
-            await DbContext.SaveChangesAsync();
+        Assert.True(exists);
+    }
 
-            var exists = await _instrumentPriceRepository.ExistsAsync(instrumentPrice.InstrumentId, instrumentPrice.Id);
+    [Fact]
+    public async Task ExistsAsync_ReturnsTrue_WhenInstrumentPriceAtSpecifiedTimeExists()
+    {
+        var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
+        DbContext.InstrumentPrices.Add(instrumentPrice);
+        await DbContext.SaveChangesAsync();
 
-            Assert.True(exists);
-        }
+        var exists = await _instrumentPriceRepository.ExistsAsync(instrumentPrice.InstrumentId, instrumentPrice.Time);
 
-        [Fact]
-        public async Task ExistsAsync_ReturnsTrue_WhenInstrumentPriceAtSpecifiedTimeExists()
-        {
-            var instrumentPrice = new InstrumentPrice(DateTime.UtcNow, DateTime.UtcNow, 100m, _instrument.Id);
-            DbContext.InstrumentPrices.Add(instrumentPrice);
-            await DbContext.SaveChangesAsync();
+        Assert.True(exists);
+    }
 
-            var exists = await _instrumentPriceRepository.ExistsAsync(instrumentPrice.InstrumentId, instrumentPrice.Time);
+    [Fact]
+    public async Task ExistsAsync_ReturnsFalse_WhenInstrumentPriceWithSpecifiedIdDoesNotExist()
+    {
+        var exists = await _instrumentPriceRepository.ExistsAsync(_instrument.Id, 1);
 
-            Assert.True(exists);
-        }
+        Assert.False(exists);
+    }
 
-        [Fact]
-        public async Task ExistsAsync_ReturnsFalse_WhenInstrumentPriceWithSpecifiedIdDoesNotExist()
-        {
-            var exists = await _instrumentPriceRepository.ExistsAsync(_instrument.Id, 1);
+    [Fact]
+    public async Task ExistsAsync_ReturnsFalse_WhenInstrumentPriceAtSpecifiedTimeDoesNotExist()
+    {
+        var exists = await _instrumentPriceRepository.ExistsAsync(_instrument.Id, DateTime.UtcNow);
 
-            Assert.False(exists);
-        }
+        Assert.False(exists);
+    }
 
-        [Fact]
-        public async Task ExistsAsync_ReturnsFalse_WhenInstrumentPriceAtSpecifiedTimeDoesNotExist()
-        {
-            var exists = await _instrumentPriceRepository.ExistsAsync(_instrument.Id, DateTime.UtcNow);
-
-            Assert.False(exists);
-        }
-
-        private void AssertInstrumentPricesAreEqual(InstrumentPrice expected, InstrumentPrice actual)
-        {
-            Assert.Equal(expected?.InstrumentId, actual?.InstrumentId);
-            Assert.Equal(expected?.Time, actual?.Time);
-            Assert.Equal(expected?.Price, actual?.Price);
-        }
+    private void AssertInstrumentPricesAreEqual(InstrumentPrice expected, InstrumentPrice actual)
+    {
+        Assert.Equal(expected?.InstrumentId, actual?.InstrumentId);
+        Assert.Equal(expected?.Time, actual?.Time);
+        Assert.Equal(expected?.Price, actual?.Price);
     }
 }

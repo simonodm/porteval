@@ -1,33 +1,61 @@
-﻿namespace PortEval.Application.Models.QueryParams
+﻿namespace PortEval.Application.Models.QueryParams;
+
+/// <summary>
+///     Represents transaction filters enabling filtering by a financial entity on which the transaction was executed.
+/// </summary>
+public class TransactionFilters
 {
-    public class TransactionFilters
+    /// <summary>
+    ///     ID of the portfolio to filter transactions by.
+    /// </summary>
+    public int? PortfolioId { get; set; }
+
+    /// <summary>
+    ///     ID of the position to filter transactions by.
+    /// </summary>
+    public int? PositionId { get; set; }
+
+    /// <summary>
+    ///     ID of the instrument to filter transactions by.
+    /// </summary>
+    public int? InstrumentId { get; set; }
+
+    /// <summary>
+    ///     Creates an instance of <see cref="TransactionFilters" /> filtering by the specified portfolio ID.
+    /// </summary>
+    /// <param name="portfolioId">ID of the portfolio to filter transactions by.</param>
+    /// <returns>A <see cref="TransactionFilters" /> instance filtering by the specified portfolio ID.</returns>
+    public static TransactionFilters FromPortfolioId(int portfolioId)
     {
-        public int? PortfolioId { get; set; }
-        public int? PositionId { get; set; }
-        public int? InstrumentId { get; set; }
-
-        public static TransactionFilters FromPortfolioId(int portfolioId)
+        return new TransactionFilters
         {
-            return new TransactionFilters
-            {
-                PortfolioId = portfolioId
-            };
-        }
+            PortfolioId = portfolioId
+        };
+    }
 
-        public static TransactionFilters FromPositionId(int positionId)
+    /// <summary>
+    ///     Creates an instance of <see cref="TransactionFilters" /> filtering by the specified position ID.
+    /// </summary>
+    /// <param name="positionId">ID of the position to filter transactions by.</param>
+    /// <returns>A <see cref="TransactionFilters" /> instance filtering by the specified position ID.</returns>
+    public static TransactionFilters FromPositionId(int positionId)
+    {
+        return new TransactionFilters
         {
-            return new TransactionFilters
-            {
-                PositionId = positionId
-            };
-        }
+            PositionId = positionId
+        };
+    }
 
-        public static TransactionFilters FromInstrumentId(int instrumentId)
+    /// <summary>
+    ///     Creates an instance of <see cref="TransactionFilters" /> filtering by the specified instrument ID.
+    /// </summary>
+    /// <param name="instrumentId">ID of the instrument to filter transactions by.</param>
+    /// <returns>A <see cref="TransactionFilters" /> instance filtering by the specified instrument ID.</returns>
+    public static TransactionFilters FromInstrumentId(int instrumentId)
+    {
+        return new TransactionFilters
         {
-            return new TransactionFilters
-            {
-                InstrumentId = instrumentId
-            };
-        }
+            InstrumentId = instrumentId
+        };
     }
 }

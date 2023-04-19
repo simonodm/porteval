@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.Extensions;
 using PortEval.Application.Core.Interfaces;
@@ -8,74 +10,65 @@ using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Exceptions;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
-using System;
-using System.Threading.Tasks;
 
-namespace PortEval.Application.Core.BackgroundJobs
+namespace PortEval.Application.Core.BackgroundJobs;
+
+/// <inheritdoc cref="ILatestPricesFetchJob" />
+public class LatestPricesFetchJob : InstrumentPriceFetchJobBase, ILatestPricesFetchJob
 {
+    private readonly IInstrumentPriceRepository _instrumentPriceRepository;
+    private readonly IInstrumentRepository _instrumentRepository;
+    private readonly ILogger _logger;
+    private readonly INotificationService _notificationService;
+
     /// <summary>
-    /// Retrieves the latest available prices of all existing instruments. Each price gets rounded down to the nearest 5 minutes.
+    ///     Initializes the job.
     /// </summary>
-    public class LatestPricesFetchJob : InstrumentPriceFetchJobBase, ILatestPricesFetchJob
+    public LatestPricesFetchJob(IFinancialDataFetcher fetcher, IInstrumentRepository instrumentRepository,
+        IInstrumentPriceRepository instrumentPriceRepository,
+        INotificationService notificationService, ILoggerFactory loggerFactory) : base(fetcher)
     {
-        private readonly IInstrumentRepository _instrumentRepository;
-        private readonly IInstrumentPriceRepository _instrumentPriceRepository;
-        private readonly INotificationService _notificationService;
-        private readonly ILogger _logger;
+        _instrumentRepository = instrumentRepository;
+        _instrumentPriceRepository = instrumentPriceRepository;
+        _notificationService = notificationService;
+        _logger = loggerFactory.CreateLogger(typeof(LatestPricesFetchJob));
+    }
 
-        public LatestPricesFetchJob(IFinancialDataFetcher fetcher, IInstrumentRepository instrumentRepository,
-            IInstrumentPriceRepository instrumentPriceRepository,
-            INotificationService notificationService, ILoggerFactory loggerFactory) : base(fetcher)
+    /// <summary>
+    ///     Starts the job.
+    /// </summary>
+    /// <returns>A task representing the asynchronous job processing operation.</returns>
+    public async Task RunAsync()
+    {
+        var startTime = DateTime.UtcNow;
+        _logger.LogInformation("Running latest price fetch job.");
+        var instruments = await _instrumentRepository.ListAllAsync();
+
+        foreach (var instrument in instruments)
         {
-            _instrumentRepository = instrumentRepository;
-            _instrumentPriceRepository = instrumentPriceRepository;
-            _notificationService = notificationService;
-            _logger = loggerFactory.CreateLogger(typeof(LatestPricesFetchJob));
-        }
+            if (instrument.TrackingStatus != InstrumentTrackingStatus.Tracked) continue;
 
-        /// <summary>
-        /// Starts the job.
-        /// </summary>
-        /// <returns>A task representing the asynchronous job processing operation.</returns>
-        public async Task RunAsync()
-        {
-            var startTime = DateTime.UtcNow;
-            _logger.LogInformation("Running latest price fetch job.");
-            var instruments = await _instrumentRepository.ListAllAsync();
+            var fetcherResponse = await FetchLatestPrice(instrument);
+            if (fetcherResponse == null) continue;
 
-            foreach (var instrument in instruments)
+            try
             {
-                if (instrument.TrackingStatus != InstrumentTrackingStatus.Tracked)
-                {
-                    continue;
-                }
+                var price = InstrumentPrice.Create(startTime.RoundDown(TimeSpan.FromMinutes(5)),
+                    fetcherResponse.Price, instrument);
+                _instrumentPriceRepository.Add(price);
 
-                var fetcherResponse = await FetchLatestPrice(instrument);
-                if (fetcherResponse == null)
-                {
-                    continue;
-                }
-
-                try
-                {
-                    var price = InstrumentPrice.Create(startTime.RoundDown(TimeSpan.FromMinutes(5)),
-                        fetcherResponse.Price, instrument);
-                    _instrumentPriceRepository.Add(price);
-
-                    instrument.TrackingInfo.Update(startTime);
-                    instrument.IncreaseVersion();
-                    _instrumentRepository.Update(instrument);
-                }
-                catch (OperationNotAllowedException ex)
-                {
-                    _logger.LogError(ex.Message);
-                }
-
+                instrument.TrackingInfo.Update(startTime);
+                instrument.IncreaseVersion();
+                _instrumentRepository.Update(instrument);
             }
-
-            await _instrumentRepository.UnitOfWork.CommitAsync();
-            _logger.LogInformation("Finished latest price fetch job.");
-            await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable);
+            catch (OperationNotAllowedException ex)
+            {
+                _logger.LogError(ex.Message);
+            }
         }
+
+        await _instrumentRepository.UnitOfWork.CommitAsync();
+        _logger.LogInformation("Finished latest price fetch job.");
+        await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable);
     }
 }

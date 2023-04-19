@@ -1,16 +1,21 @@
-﻿using PortEval.Application.Models.FinancialDataFetcher;
-using PortEval.DataFetcher.Interfaces;
-using System;
+﻿using System;
+using PortEval.Application.Models.FinancialDataFetcher;
 
-namespace PortEval.Infrastructure.FinancialDataFetcher.Requests
+namespace PortEval.Infrastructure.FinancialDataFetcher.Requests;
+
+/// <summary>
+///     Request for the intraday prices of the supplied instrument.
+/// </summary>
+public class IntradayInstrumentPricesRequest : InstrumentDataRequest, IInstrumentTimeRangeRequest
 {
     /// <summary>
-    /// Request for the intraday prices of the supplied instrument.
+    ///     The interval in which to retrieve the intraday prices.
     /// </summary>
-    public class IntradayInstrumentPricesRequest : InstrumentDataRequest, IInstrumentTimeRangeRequest
-    {
-        public DateTime From { get; set; }
-        public DateTime To { get; set; }
-        public IntradayInterval Interval { get; set; } = IntradayInterval.OneHour;
-    }
+    public IntradayInterval Interval { get; set; } = IntradayInterval.OneHour;
+
+    /// <inheritdoc />
+    public DateTime From { get; set; }
+
+    /// <inheritdoc />
+    public DateTime To { get; set; }
 }

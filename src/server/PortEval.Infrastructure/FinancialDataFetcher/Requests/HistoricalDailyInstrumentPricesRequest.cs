@@ -1,14 +1,15 @@
-﻿using PortEval.DataFetcher.Interfaces;
-using System;
+﻿using System;
 
-namespace PortEval.Infrastructure.FinancialDataFetcher.Requests
+namespace PortEval.Infrastructure.FinancialDataFetcher.Requests;
+
+/// <summary>
+///     Request for the historical daily prices of the specified symbol.
+/// </summary>
+public class HistoricalDailyInstrumentPricesRequest : InstrumentDataRequest, IInstrumentTimeRangeRequest
 {
-    /// <summary>
-    /// Request for the historical daily prices of the specified symbol.
-    /// </summary>
-    public class HistoricalDailyInstrumentPricesRequest : InstrumentDataRequest, IInstrumentTimeRangeRequest
-    {
-        public DateTime From { get; set; }
-        public DateTime To { get; set; }
-    }
+    /// <inheritdoc />
+    public DateTime From { get; set; }
+
+    /// <inheritdoc />
+    public DateTime To { get; set; }
 }

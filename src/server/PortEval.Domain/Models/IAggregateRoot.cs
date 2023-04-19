@@ -1,6 +1,5 @@
-﻿namespace PortEval.Domain.Models
+﻿namespace PortEval.Domain.Models;
+
+internal interface IAggregateRoot
 {
-    internal interface IAggregateRoot
-    {
-    }
 }

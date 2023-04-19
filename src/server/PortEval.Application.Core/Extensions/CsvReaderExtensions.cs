@@ -1,26 +1,23 @@
 ﻿using CsvHelper;
-using PortEval.Application.Core.Common.BulkImportExport.ClassMaps;
+using PortEval.Application.Models.DTOs.Converters.ClassMaps;
 
-namespace PortEval.Application.Core.Extensions
+namespace PortEval.Application.Core.Extensions;
+
+/// <summary>
+///     Implements extension methods on CsvHelper's <see cref="CsvReader" /> class.
+/// </summary>
+public static class CsvReaderExtensions
 {
-    public static class CsvReaderExtensions
+    /// <summary>
+    ///     Registers CsvHelper class maps for PortEval's CSV import templates.
+    /// </summary>
+    /// <param name="csv">A <see cref="CsvReader" /> instance to register class maps on.</param>
+    public static void RegisterImportClassMaps(this CsvReader csv)
     {
-        public static void RegisterImportClassMaps(this CsvReader csv)
-        {
-            csv.Context.RegisterClassMap<PortfolioClassMap>();
-            csv.Context.RegisterClassMap<PositionImportClassMap>();
-            csv.Context.RegisterClassMap<TransactionClassMap>();
-            csv.Context.RegisterClassMap<InstrumentClassMap>();
-            csv.Context.RegisterClassMap<InstrumentPriceClassMap>();
-        }
-
-        public static void RegisterExportClassMaps(this CsvReader csv)
-        {
-            csv.Context.RegisterClassMap<PortfolioClassMap>();
-            csv.Context.RegisterClassMap<PositionExportClassMap>();
-            csv.Context.RegisterClassMap<TransactionClassMap>();
-            csv.Context.RegisterClassMap<InstrumentClassMap>();
-            csv.Context.RegisterClassMap<InstrumentPriceClassMap>();
-        }
+        csv.Context.RegisterClassMap<PortfolioClassMap>();
+        csv.Context.RegisterClassMap<PositionImportClassMap>();
+        csv.Context.RegisterClassMap<TransactionClassMap>();
+        csv.Context.RegisterClassMap<InstrumentClassMap>();
+        csv.Context.RegisterClassMap<InstrumentPriceClassMap>();
     }
 }

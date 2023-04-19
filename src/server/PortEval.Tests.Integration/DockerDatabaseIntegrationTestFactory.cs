@@ -1,4 +1,6 @@
-﻿using DotNet.Testcontainers.Builders;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
 using Hangfire;
@@ -11,63 +13,65 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using PortEval.Application.Extensions;
 using PortEval.Infrastructure;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace PortEval.Tests.Integration
+namespace PortEval.Tests.Integration;
+
+public class DockerDatabaseIntegrationTestFactory<TProgram> : WebApplicationFactory<TProgram>, IAsyncLifetime
+    where TProgram : class
 {
-    public class DockerDatabaseIntegrationTestFactory<TProgram> : WebApplicationFactory<TProgram>, IAsyncLifetime
-        where TProgram : class
+    private readonly TestcontainerDatabase _container;
+    private IConfiguration _configuration;
+
+    public DockerDatabaseIntegrationTestFactory()
     {
-        private IConfiguration _configuration;
-        private readonly TestcontainerDatabase _container;
-
-        public DockerDatabaseIntegrationTestFactory()
-        {
-            // Generic ContainerBuilder is being deprecated, however there is no specialized builder available for MSSQL as of Feb 2023
-            // Can possibly be solved using a custom builder/module, but currently it's not necessary
-            _container = new ContainerBuilder<MsSqlTestcontainer>()
-                .WithDatabase(new MsSqlTestcontainerConfiguration
-                {
-                    Password = "localdevpassword#123",
-                })
-                .WithImage("mcr.microsoft.com/mssql/server:2019-latest")
-                .WithCleanUp(true)
-                .Build();
-        }
-
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            var additionalConfigurationKeys = new Dictionary<string, string>
+        // Generic ContainerBuilder is being deprecated, however there is no specialized builder available for MSSQL as of Feb 2023
+        // Can possibly be solved using a custom builder/module, but currently it's not necessary.
+#pragma warning disable CS0618
+        _container = new ContainerBuilder<MsSqlTestcontainer>()
+#pragma warning restore CS0618
+            .WithDatabase(new MsSqlTestcontainerConfiguration
             {
-                { "PortEvalDb:ConnectionString", _container.ConnectionString }
-            };
+                Password = "localdevpassword#123"
+            })
+            .WithImage("mcr.microsoft.com/mssql/server:2019-latest")
+            .WithCleanUp(true)
+            .Build();
+    }
 
-            builder.ConfigureAppConfiguration((context, config) =>
-            {
-                config.AddEnvironmentVariables();
-                config.AddInMemoryCollection(additionalConfigurationKeys);
-                _configuration = config.Build();
-            });
+    public async Task InitializeAsync()
+    {
+        await _container.StartAsync();
+    }
 
-            builder.ConfigureTestServices(services =>
-            {
-                services.RemoveAll<PortEvalDbConnectionCreator>();
-                services.RemoveAll<PortEvalDbContext>();
-                services.ConfigureDapper();
-                services.ConfigureDbContext(_configuration);
-                services.AddQueries();
-                services.AddSingleton<JobStorage>(_ => new SqlServerStorage(_container.ConnectionString));
-            });
-        }
+    public new async Task DisposeAsync()
+    {
+        await _container.DisposeAsync();
+        await base.DisposeAsync();
+    }
 
-        public async Task InitializeAsync() => await _container.StartAsync();
-
-        public new async Task DisposeAsync()
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        var additionalConfigurationKeys = new Dictionary<string, string>
         {
-            await _container.DisposeAsync();
-            await base.DisposeAsync();
-        }
+            { "PortEvalDb:ConnectionString", _container.ConnectionString }
+        };
+
+        builder.ConfigureAppConfiguration((_, config) =>
+        {
+            config.AddEnvironmentVariables();
+            config.AddInMemoryCollection(additionalConfigurationKeys);
+            _configuration = config.Build();
+        });
+
+        builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<PortEvalDbConnectionCreator>();
+            services.RemoveAll<PortEvalDbContext>();
+            services.ConfigureDapper();
+            services.ConfigureDbContext(_configuration);
+            services.AddQueries();
+            services.AddSingleton<JobStorage>(_ => new SqlServerStorage(_container.ConnectionString));
+        });
     }
 }

@@ -1,43 +1,49 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PortEval.Application.Core.Interfaces.Repositories;
-using PortEval.Domain.Models.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using PortEval.Application.Core.Interfaces.Repositories;
+using PortEval.Domain.Models.Entities;
 
-namespace PortEval.Infrastructure.Repositories
+namespace PortEval.Infrastructure.Repositories;
+
+/// <inheritdoc cref="IDashboardItemRepository" />
+public class DashboardItemRepository : IDashboardItemRepository
 {
-    public class DashboardItemRepository : IDashboardItemRepository
+    private readonly PortEvalDbContext _context;
+
+    public DashboardItemRepository(PortEvalDbContext context)
     {
-        public IUnitOfWork UnitOfWork => _context;
-        private readonly PortEvalDbContext _context;
+        _context = context;
+    }
 
-        public DashboardItemRepository(PortEvalDbContext context)
-        {
-            _context = context;
-        }
+    /// <inheritdoc />
+    public IUnitOfWork UnitOfWork => _context;
 
-        public async Task<IEnumerable<DashboardItem>> GetDashboardItemsAsync()
-        {
-            return await _context.DashboardItems
-                .OrderBy(i => i.Position.X)
-                .ThenBy(i => i.Position.Y)
-                .ToListAsync();
-        }
+    /// <inheritdoc />
+    public async Task<IEnumerable<DashboardItem>> GetDashboardItemsAsync()
+    {
+        return await _context.DashboardItems
+            .OrderBy(i => i.Position.X)
+            .ThenBy(i => i.Position.Y)
+            .ToListAsync();
+    }
 
-        public DashboardItem Add(DashboardItem item)
-        {
-            return _context.DashboardItems.Add(item).Entity;
-        }
+    /// <inheritdoc />
+    public DashboardItem Add(DashboardItem item)
+    {
+        return _context.DashboardItems.Add(item).Entity;
+    }
 
-        public DashboardItem Update(DashboardItem item)
-        {
-            return _context.DashboardItems.Update(item).Entity;
-        }
+    /// <inheritdoc />
+    public DashboardItem Update(DashboardItem item)
+    {
+        return _context.DashboardItems.Update(item).Entity;
+    }
 
-        public void Delete(DashboardItem item)
-        {
-            _context.DashboardItems.Remove(item);
-        }
+    /// <inheritdoc />
+    public void Delete(DashboardItem item)
+    {
+        _context.DashboardItems.Remove(item);
     }
 }

@@ -1,14 +1,13 @@
 ﻿using PortEval.Application.Core.Interfaces.Calculators;
 
-namespace PortEval.Application.Core.Common.Calculators
+namespace PortEval.Application.Core.Common.Calculators;
+
+/// <inheritdoc />
+public class InstrumentProfitCalculator : IInstrumentProfitCalculator
 {
     /// <inheritdoc />
-    public class InstrumentProfitCalculator : IInstrumentProfitCalculator
+    public decimal CalculateProfit(decimal priceAtStart, decimal priceAtEnd)
     {
-        /// <inheritdoc />
-        public decimal CalculateProfit(decimal priceAtStart, decimal priceAtEnd)
-        {
-            return priceAtEnd - priceAtStart;
-        }
+        return priceAtEnd - priceAtStart;
     }
 }

@@ -1,10 +1,12 @@
-﻿namespace PortEval.Domain.Models.Enums
+﻿namespace PortEval.Domain.Models.Enums;
+
+/// <summary>
+///     Represents the status of the automatic tracking of an instrument.
+/// </summary>
+public enum InstrumentTrackingStatus
 {
-    public enum InstrumentTrackingStatus
-    {
-        Created,
-        SearchingForPrices,
-        Tracked,
-        Untracked
-    }
+    Created,
+    SearchingForPrices,
+    Tracked,
+    Untracked
 }

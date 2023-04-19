@@ -1,17 +1,15 @@
-﻿using Hangfire;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace PortEval.Application.Core.Interfaces.BackgroundJobs
+namespace PortEval.Application.Core.Interfaces.BackgroundJobs;
+
+/// <summary>
+///     A job responsible for downloading missing instrument prices.
+/// </summary>
+public interface IMissingInstrumentPricesFetchJob
 {
     /// <summary>
-    /// A job responsible for downloading missing instrument prices.
+    ///     Executes the job.
     /// </summary>
-    public interface IMissingInstrumentPricesFetchJob
-    {
-        /// <summary>
-        /// Executes the job.
-        /// </summary>
-        /// <returns>A task representing the asynchronous price download and import operations.</returns>
-        public Task RunAsync();
-    }
+    /// <returns>A task representing the asynchronous price download and import operations.</returns>
+    public Task RunAsync();
 }

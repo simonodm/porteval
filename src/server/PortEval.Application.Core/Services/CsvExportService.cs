@@ -1,29 +1,28 @@
-﻿using CsvHelper;
-using PortEval.Application.Core.Extensions;
-using PortEval.Application.Core.Interfaces.Services;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using CsvHelper;
+using PortEval.Application.Core.Extensions;
+using PortEval.Application.Core.Interfaces.Services;
 
-namespace PortEval.Application.Core.Services
+namespace PortEval.Application.Core.Services;
+
+/// <inheritdoc cref="ICsvExportService" />
+public class CsvExportService : ICsvExportService
 {
-    /// <inheritdoc cref="ICsvExportService" />
-    public class CsvExportService : ICsvExportService
+    /// <inheritdoc />
+    public OperationResponse<byte[]> ConvertToCsv<T>(IEnumerable<T> rows)
     {
-        /// <inheritdoc />
-        public OperationResponse<byte[]> ConvertToCsv<T>(IEnumerable<T> rows)
-        {
-            using var ms = new MemoryStream();
-            using var sw = new StreamWriter(ms);
-            using var csv = new CsvWriter(sw, CultureInfo.InvariantCulture);
-            csv.RegisterExportClassMaps();
+        using var ms = new MemoryStream();
+        using var sw = new StreamWriter(ms);
+        using var csv = new CsvWriter(sw, CultureInfo.InvariantCulture);
+        csv.RegisterExportClassMaps();
 
-            csv.WriteRecords(rows);
-            sw.Flush();
-            return new OperationResponse<byte[]>
-            {
-                Response = ms.ToArray()
-            };
-        }
+        csv.WriteRecords(rows);
+        sw.Flush();
+        return new OperationResponse<byte[]>
+        {
+            Response = ms.ToArray()
+        };
     }
 }

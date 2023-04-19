@@ -1,63 +1,65 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Drawing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PortEval.Domain.Models.Entities;
-using System.Drawing;
 
-namespace PortEval.Infrastructure.Configurations
+namespace PortEval.Infrastructure.Configurations;
+
+internal class ChartLineConfiguration : IEntityTypeConfiguration<ChartLine>
 {
-    internal class ChartLineConfiguration : IEntityTypeConfiguration<ChartLine>
+    public void Configure(EntityTypeBuilder<ChartLine> builder)
     {
-        public void Configure(EntityTypeBuilder<ChartLine> builder)
-        {
-            builder
-                .HasKey(line => line.Id);
-            builder
-                .HasOne(line => line.Chart)
-                .WithMany(c => c.Lines);
-            builder
-                .HasDiscriminator<string>("Line_Type")
-                .HasValue<ChartLinePortfolio>("Portfolio")
-                .HasValue<ChartLinePosition>("Position")
-                .HasValue<ChartLineInstrument>("Instrument");
-            builder
-                .Property(line => line.Color)
-                .HasConversion(
-                    c => c.ToArgb(),
-                    c => Color.FromArgb(c)
-                );
-        }
+        builder
+            .HasKey(line => line.Id);
+        builder
+            .HasOne(line => line.Chart)
+            .WithMany(c => c.Lines);
+        builder
+            .HasDiscriminator<string>("Line_Type")
+            .HasValue<ChartLinePortfolio>("Portfolio")
+            .HasValue<ChartLinePosition>("Position")
+            .HasValue<ChartLineInstrument>("Instrument");
+        builder
+            .Property(line => line.Color)
+            .HasConversion(
+                c => c.ToArgb(),
+                c => Color.FromArgb(c)
+            );
     }
-    internal class ChartLinePortfolioConfiguration : IEntityTypeConfiguration<ChartLinePortfolio>
+}
+
+internal class ChartLinePortfolioConfiguration : IEntityTypeConfiguration<ChartLinePortfolio>
+{
+    public void Configure(EntityTypeBuilder<ChartLinePortfolio> builder)
     {
-        public void Configure(EntityTypeBuilder<ChartLinePortfolio> builder)
-        {
-            builder
-                .HasOne<Portfolio>()
-                .WithMany()
-                .HasForeignKey(line => line.PortfolioId)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
+        builder
+            .HasOne<Portfolio>()
+            .WithMany()
+            .HasForeignKey(line => line.PortfolioId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
-    internal class ChartLinePositionConfiguration : IEntityTypeConfiguration<ChartLinePosition>
+}
+
+internal class ChartLinePositionConfiguration : IEntityTypeConfiguration<ChartLinePosition>
+{
+    public void Configure(EntityTypeBuilder<ChartLinePosition> builder)
     {
-        public void Configure(EntityTypeBuilder<ChartLinePosition> builder)
-        {
-            builder
-                .HasOne<Position>()
-                .WithMany()
-                .HasForeignKey(line => line.PositionId)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
+        builder
+            .HasOne<Position>()
+            .WithMany()
+            .HasForeignKey(line => line.PositionId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
-    internal class ChartLineInstrumentConfiguration : IEntityTypeConfiguration<ChartLineInstrument>
+}
+
+internal class ChartLineInstrumentConfiguration : IEntityTypeConfiguration<ChartLineInstrument>
+{
+    public void Configure(EntityTypeBuilder<ChartLineInstrument> builder)
     {
-        public void Configure(EntityTypeBuilder<ChartLineInstrument> builder)
-        {
-            builder
-                .HasOne<Instrument>()
-                .WithMany()
-                .HasForeignKey(line => line.InstrumentId)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
+        builder
+            .HasOne<Instrument>()
+            .WithMany()
+            .HasForeignKey(line => line.InstrumentId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

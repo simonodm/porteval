@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost.Models
+namespace PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost.Models;
+
+internal class ExchangeRatesLatestResponseModel
 {
-    internal class ExchangeRatesLatestResponseModel
-    {
-        [JsonProperty("base")]
-        public string Base { get; set; }
-        [JsonProperty("rates", Required = Required.Always)]
-        public Dictionary<string, decimal> Rates { get; set; }
-    }
+    [JsonProperty("base")] public string Base { get; set; }
+
+    [JsonProperty("rates", Required = Required.Always)]
+    public Dictionary<string, decimal> Rates { get; set; }
 }

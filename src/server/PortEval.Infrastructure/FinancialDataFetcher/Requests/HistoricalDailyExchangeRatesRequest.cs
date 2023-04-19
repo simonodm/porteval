@@ -1,14 +1,15 @@
-﻿using PortEval.DataFetcher.Interfaces;
-using System;
+﻿using System;
 
-namespace PortEval.Infrastructure.FinancialDataFetcher.Requests
+namespace PortEval.Infrastructure.FinancialDataFetcher.Requests;
+
+/// <summary>
+///     Request for the historical daily exchange rates of the specified currency.
+/// </summary>
+public class HistoricalDailyExchangeRatesRequest : CurrencyDataRequest, ITimeRangeRequest
 {
-    /// <summary>
-    /// Request for the historical daily exchange rates of the specified currency.
-    /// </summary>
-    public class HistoricalDailyExchangeRatesRequest : CurrencyDataRequest, ITimeRangeRequest
-    {
-        public DateTime From { get; set; }
-        public DateTime To { get; set; }
-    }
+    /// <inheritdoc />
+    public DateTime From { get; set; }
+
+    /// <inheritdoc />
+    public DateTime To { get; set; }
 }

@@ -1,9 +1,15 @@
 ﻿using System.Collections.Generic;
 
-namespace PortEval.Application.Core.Common.BulkImportExport
+namespace PortEval.Application.Core.Common.BulkImport;
+
+/// <summary>
+///     Represents the result of a single bulk import.
+/// </summary>
+/// <typeparam name="T">Type of records which were imported.</typeparam>
+public class ImportResult<T>
 {
-    public class ImportResult<T>
-    {
-        public IEnumerable<ProcessedRowErrorLogEntry<T>> ErrorLog { get; set; }
-    }
+    /// <summary>
+    ///     Contains error log entries corresponding to imported records.
+    /// </summary>
+    public IEnumerable<ProcessedRowErrorLogEntry<T>> ErrorLog { get; init; }
 }

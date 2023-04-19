@@ -1,39 +1,42 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.Hubs;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Enums;
-using System;
-using System.Threading.Tasks;
 
-namespace PortEval.Application.Core.Services
+namespace PortEval.Application.Core.Services;
+
+/// <inheritdoc cref="INotificationService" />
+public class NotificationService : INotificationService
 {
-    /// <inheritdoc cref="INotificationService" />
-    public class NotificationService : INotificationService
+    private readonly ILogger _logger;
+    private readonly IHubContext<NotificationHub, INotificationHubClient> _notificationHub;
+
+    /// <summary>
+    ///     Initializes the service.
+    /// </summary>
+    public NotificationService(ILoggerFactory loggerFactory,
+        IHubContext<NotificationHub, INotificationHubClient> notificationHub)
     {
-        private readonly ILogger _logger;
-        private readonly IHubContext<NotificationHub, INotificationHubClient> _notificationHub;
+        _logger = loggerFactory.CreateLogger<NotificationService>();
+        _notificationHub = notificationHub;
+    }
 
-        public NotificationService(ILoggerFactory loggerFactory, IHubContext<NotificationHub, INotificationHubClient> notificationHub)
+    /// <inheritdoc />
+    public async Task<OperationResponse> SendNotificationAsync(NotificationType type, string message = null)
+    {
+        var notification = new NotificationDto
         {
-            _logger = loggerFactory.CreateLogger<NotificationService>();
-            _notificationHub = notificationHub;
-        }
+            Time = DateTime.UtcNow,
+            Type = type,
+            Message = message
+        };
 
-        /// <inheritdoc />
-        public async Task<OperationResponse> SendNotificationAsync(NotificationType type, string message = null)
-        {
-            var notification = new NotificationDto
-            {
-                Time = DateTime.UtcNow,
-                Type = type,
-                Message = message
-            };
-
-            _logger.LogInformation($"Sending notification: {type}, \"{message}\".");
-            await _notificationHub.Clients.All.ReceiveNotification(notification);
-            return new OperationResponse();
-        }
+        _logger.LogInformation($"Sending notification: {type}, \"{message}\".");
+        await _notificationHub.Clients.All.ReceiveNotification(notification);
+        return new OperationResponse();
     }
 }

@@ -1,4 +1,8 @@
-﻿using AutoFixture;
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,200 +12,196 @@ using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Domain.Models.Enums;
 using PortEval.Tests.Unit.Helpers;
-using System;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace PortEval.Tests.Unit.ControllerTests
+namespace PortEval.Tests.Unit.ControllerTests;
+
+public class CsvImportControllerTests
 {
-    public class CsvImportControllerTests
+    private readonly IFixture _fixture;
+    private readonly Mock<ICsvImportService> _importService;
+
+    public CsvImportControllerTests()
     {
-        private IFixture _fixture;
-        private Mock<ICsvImportService> _importService;
+        _fixture = new Fixture()
+            .Customize(new AutoMoqCustomization());
+        _importService = _fixture.Freeze<Mock<ICsvImportService>>();
+    }
 
-        public CsvImportControllerTests()
-        {
-            _fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            _importService = _fixture.Freeze<Mock<ICsvImportService>>();
-        }
+    [Fact]
+    public async Task GetAllImports_ReturnsAllImports()
+    {
+        var imports = _fixture.CreateMany<CsvTemplateImportDto>();
 
-        [Fact]
-        public async Task GetAllImports_ReturnsAllImports()
-        {
-            var imports = _fixture.CreateMany<CsvTemplateImportDto>();
+        _importService
+            .Setup(m => m.GetAllImportsAsync())
+            .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(imports));
 
-            _importService
-                .Setup(m => m.GetAllImportsAsync())
-                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(imports));
+        var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
 
-            var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
+        var result = await sut.GetAllImports();
 
-            var result = await sut.GetAllImports();
+        _importService.Verify(m => m.GetAllImportsAsync(), Times.Once());
+        Assert.Equal(imports, result.Value);
+    }
 
-            _importService.Verify(m => m.GetAllImportsAsync(), Times.Once());
-            Assert.Equal(imports, result.Value);
-        }
+    [Fact]
+    public async Task GetImport_ReturnsMatchingImport_WhenImportExists()
+    {
+        var import = _fixture.Create<CsvTemplateImportDto>();
 
-        [Fact]
-        public async Task GetImport_ReturnsMatchingImport_WhenImportExists()
-        {
-            var import = _fixture.Create<CsvTemplateImportDto>();
+        _importService
+            .Setup(m => m.GetImportAsync(import.ImportId))
+            .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(import));
 
-            _importService
-                .Setup(m => m.GetImportAsync(import.ImportId))
-                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(import));
+        var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
 
-            var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
+        var result = await sut.GetImport(import.ImportId.ToString());
 
-            var result = await sut.GetImport(import.ImportId.ToString());
+        _importService.Verify(m => m.GetImportAsync(import.ImportId), Times.Once());
+        Assert.Equal(import, result.Value);
+    }
 
-            _importService.Verify(m => m.GetImportAsync(import.ImportId), Times.Once());
-            Assert.Equal(import, result.Value);
-        }
+    [Fact]
+    public async Task GetImport_ReturnsNotFound_WhenImportDoesNotExist()
+    {
+        var importId = _fixture.Create<Guid>();
 
-        [Fact]
-        public async Task GetImport_ReturnsNotFound_WhenImportDoesNotExist()
-        {
-            var importId = _fixture.Create<Guid>();
+        _importService
+            .Setup(m => m.GetImportAsync(importId))
+            .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<CsvTemplateImportDto>());
 
-            _importService
-                .Setup(m => m.GetImportAsync(importId))
-                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<CsvTemplateImportDto>());
+        var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
 
-            var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
+        var result = await sut.GetImport(importId.ToString());
 
-            var result = await sut.GetImport(importId.ToString());
+        _importService.Verify(m => m.GetImportAsync(importId), Times.Once());
+        Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
+    }
 
-            _importService.Verify(m => m.GetImportAsync(importId), Times.Once());
-            Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
-        }
+    [Fact]
+    public async Task GetImport_ReturnsBadRequest_WhenProvidedIdIsNotGuid()
+    {
+        var importId = "STR";
 
-        [Fact]
-        public async Task GetImport_ReturnsBadRequest_WhenProvidedIdIsNotGuid()
-        {
-            var importId = "STR";
+        _importService
+            .Setup(m => m.GetImportAsync(It.IsAny<Guid>()))
+            .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<CsvTemplateImportDto>());
 
-            _importService
-                .Setup(m => m.GetImportAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<CsvTemplateImportDto>());
+        var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
 
-            var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
+        var result = await sut.GetImport(importId);
 
-            var result = await sut.GetImport(importId);
+        _importService.Verify(m => m.GetImportAsync(It.IsAny<Guid>()), Times.Never());
+        Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
+    }
 
-            _importService.Verify(m => m.GetImportAsync(It.IsAny<Guid>()), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
-        }
+    [Fact]
+    public void GetImportErrorLog_ReturnsErrorLogFile_WhenItExists()
+    {
+        var testString = _fixture.Create<string>();
+        var importId = _fixture.Create<Guid>();
 
-        [Fact]
-        public void GetImportErrorLog_ReturnsErrorLogFile_WhenItExists()
-        {
-            var testString = _fixture.Create<string>();
-            var importId = _fixture.Create<Guid>();
+        using var ms = new MemoryStream();
+        using var sw = new StreamWriter(ms, Encoding.UTF8);
+        sw.Write(testString);
+        sw.Flush();
+        ms.Seek(0, SeekOrigin.Begin);
 
-            using var ms = new MemoryStream();
-            using var sw = new StreamWriter(ms, Encoding.UTF8);
-            sw.Write(testString);
-            sw.Flush();
-            ms.Seek(0, SeekOrigin.Begin);
+        _importService
+            .Setup(m => m.TryGetErrorLog(importId))
+            .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse<Stream>(ms));
 
-            _importService
-                .Setup(m => m.TryGetErrorLog(importId))
-                .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse<Stream>(ms));
+        var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
 
-            var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
+        var result = sut.GetImportErrorLog(importId.ToString());
 
-            var result = sut.GetImportErrorLog(importId.ToString());
+        _importService.Verify(m => m.TryGetErrorLog(importId), Times.Once());
+        ControllerTestHelper.AssertFileStreamEqual(testString, result);
+    }
 
-            _importService.Verify(m => m.TryGetErrorLog(importId), Times.Once());
-            ControllerTestHelper.AssertFileStreamEqual(testString, result);
-        }
+    [Fact]
+    public void GetImportErrorLog_ReturnsNotFound_WhenItDoesNotExist()
+    {
+        var importId = _fixture.Create<Guid>();
 
-        [Fact]
-        public void GetImportErrorLog_ReturnsNotFound_WhenItDoesNotExist()
-        {
-            var importId = _fixture.Create<Guid>();
+        _importService
+            .Setup(m => m.TryGetErrorLog(importId))
+            .Returns(OperationResponseHelper.GenerateNotFoundOperationResponse<Stream>());
 
-            _importService
-                .Setup(m => m.TryGetErrorLog(importId))
-                .Returns(OperationResponseHelper.GenerateNotFoundOperationResponse<Stream>());
+        var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
 
-            var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
+        var result = sut.GetImportErrorLog(importId.ToString());
 
-            var result = sut.GetImportErrorLog(importId.ToString());
-
-            _importService.Verify(m => m.TryGetErrorLog(importId), Times.Once());
-            Assert.IsAssignableFrom<NotFoundObjectResult>(result);
-        }
+        _importService.Verify(m => m.TryGetErrorLog(importId), Times.Once());
+        Assert.IsAssignableFrom<NotFoundObjectResult>(result);
+    }
 
 
-        [Fact]
-        public void GetImportErrorLog_ReturnsBadRequest_WhenProvidedIdIsNotGuid()
-        {
-            var importId = "STR";
+    [Fact]
+    public void GetImportErrorLog_ReturnsBadRequest_WhenProvidedIdIsNotGuid()
+    {
+        var importId = "STR";
 
-            _importService
-                .Setup(m => m.TryGetErrorLog(It.IsAny<Guid>()))
-                .Returns(OperationResponseHelper.GenerateNotFoundOperationResponse<Stream>());
+        _importService
+            .Setup(m => m.TryGetErrorLog(It.IsAny<Guid>()))
+            .Returns(OperationResponseHelper.GenerateNotFoundOperationResponse<Stream>());
 
-            var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
+        var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
 
-            var result = sut.GetImportErrorLog(importId);
+        var result = sut.GetImportErrorLog(importId);
 
-            _importService.Verify(m => m.TryGetErrorLog(It.IsAny<Guid>()), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result);
-        }
+        _importService.Verify(m => m.TryGetErrorLog(It.IsAny<Guid>()), Times.Never());
+        Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+    }
 
-        [Fact]
-        public void GetImportTemplate_ReturnsImportTemplate()
-        {
-            var templateType = _fixture.Create<TemplateType>();
-            var testString = _fixture.Create<string>();
+    [Fact]
+    public void GetImportTemplate_ReturnsImportTemplate()
+    {
+        var templateType = _fixture.Create<TemplateType>();
+        var testString = _fixture.Create<string>();
 
-            using var ms = new MemoryStream();
-            using var sw = new StreamWriter(ms, Encoding.UTF8);
-            sw.Write(testString);
-            sw.Flush();
-            ms.Seek(0, SeekOrigin.Begin);
+        using var ms = new MemoryStream();
+        using var sw = new StreamWriter(ms, Encoding.UTF8);
+        sw.Write(testString);
+        sw.Flush();
+        ms.Seek(0, SeekOrigin.Begin);
 
-            _importService
-                .Setup(m => m.GetCsvTemplate(templateType))
-                .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse<Stream>(ms));
+        _importService
+            .Setup(m => m.GetCsvTemplate(templateType))
+            .Returns(OperationResponseHelper.GenerateSuccessfulOperationResponse<Stream>(ms));
 
-            var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
+        var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
 
-            var result = sut.GetImportTemplate(templateType);
+        var result = sut.GetImportTemplate(templateType);
 
-            _importService.Verify(m => m.GetCsvTemplate(templateType), Times.Once());
-            ControllerTestHelper.AssertFileStreamEqual(testString, result);
-        }
+        _importService.Verify(m => m.GetCsvTemplate(templateType), Times.Once());
+        ControllerTestHelper.AssertFileStreamEqual(testString, result);
+    }
 
-        [Fact]
-        public async Task UploadFile_StartsImportingFile()
-        {
-            var templateType = _fixture.Create<TemplateType>();
-            var testString = _fixture.Create<string>();
+    [Fact]
+    public async Task UploadFile_StartsImportingFile()
+    {
+        var templateType = _fixture.Create<TemplateType>();
+        var testString = _fixture.Create<string>();
 
-            using var ms = new MemoryStream();
-            using var sw = new StreamWriter(ms, Encoding.UTF8);
-            sw.Write(testString);
-            sw.Flush();
-            ms.Seek(0, SeekOrigin.Begin);
+        using var ms = new MemoryStream();
+        using var sw = new StreamWriter(ms, Encoding.UTF8);
+        sw.Write(testString);
+        sw.Flush();
+        ms.Seek(0, SeekOrigin.Begin);
 
-            var formFile = new FormFile(ms, 0, ms.Length, "test_file", "test_file.csv");
+        var formFile = new FormFile(ms, 0, ms.Length, "test_file", "test_file.csv");
 
-            _importService
-                .Setup(m => m.StartImportAsync(It.IsAny<Stream>(), templateType))
-                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(_fixture.Create<CsvTemplateImportDto>()));
+        _importService
+            .Setup(m => m.StartImportAsync(It.IsAny<Stream>(), templateType))
+            .ReturnsAsync(
+                OperationResponseHelper.GenerateSuccessfulOperationResponse(_fixture.Create<CsvTemplateImportDto>()));
 
-            var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
+        var sut = _fixture.Build<CsvImportController>().OmitAutoProperties().Create();
 
-            await sut.UploadFile(formFile, templateType);
+        await sut.UploadFile(formFile, templateType);
 
-            _importService.Verify(m => m.StartImportAsync(It.IsAny<Stream>(), templateType), Times.Once());
-        }
+        _importService.Verify(m => m.StartImportAsync(It.IsAny<Stream>(), templateType), Times.Once());
     }
 }

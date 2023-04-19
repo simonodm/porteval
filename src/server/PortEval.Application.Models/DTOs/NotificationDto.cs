@@ -1,12 +1,18 @@
-﻿using PortEval.Application.Models.DTOs.Enums;
-using System;
+﻿using System;
+using PortEval.Application.Models.DTOs.Enums;
+using Swashbuckle.AspNetCore.Annotations;
 
-namespace PortEval.Application.Models.DTOs
+namespace PortEval.Application.Models.DTOs;
+
+[SwaggerSchema("Represents a notification emitted by the application.")]
+public class NotificationDto
 {
-    public class NotificationDto
-    {
-        public DateTime Time { get; set; }
-        public NotificationType Type { get; set; }
-        public string Message { get; set; }
-    }
+    [SwaggerSchema("Time of the notification.")]
+    public DateTime Time { get; set; }
+
+    [SwaggerSchema("Type of the notification.")]
+    public NotificationType Type { get; set; }
+
+    [SwaggerSchema("Optional notification message.")]
+    public string Message { get; set; }
 }

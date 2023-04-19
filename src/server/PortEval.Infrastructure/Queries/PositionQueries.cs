@@ -1,25 +1,27 @@
-﻿using Dapper;
-using PortEval.Application.Core.Interfaces.Queries;
-using PortEval.Application.Models.DTOs;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
+using PortEval.Application.Core.Interfaces.Queries;
+using PortEval.Application.Models.DTOs;
 
-namespace PortEval.Infrastructure.Queries
+namespace PortEval.Infrastructure.Queries;
+
+/// <inheritdoc cref="IPositionQueries" />
+public class PositionQueries : IPositionQueries
 {
-    public class PositionQueries : IPositionQueries
+    private readonly PortEvalDbConnectionCreator _connectionCreator;
+
+    public PositionQueries(PortEvalDbConnectionCreator connectionCreator)
     {
-        private readonly PortEvalDbConnectionCreator _connectionCreator;
+        _connectionCreator = connectionCreator;
+    }
 
-        public PositionQueries(PortEvalDbConnectionCreator connectionCreator)
-        {
-            _connectionCreator = connectionCreator;
-        }
-
-        public async Task<IEnumerable<PositionDto>> GetAllPositionsAsync()
-        {
-            using var connection = _connectionCreator.CreateConnection();
-            var query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions
+    /// <inheritdoc />
+    public async Task<IEnumerable<PositionDto>> GetAllPositionsAsync()
+    {
+        using var connection = _connectionCreator.CreateConnection();
+        var query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions
                           LEFT JOIN (
 	                          SELECT [PositionId], SUM([Amount]) AS PositionSize FROM [dbo].[Transactions]
 	                          GROUP BY [PositionId]
@@ -32,17 +34,18 @@ namespace PortEval.Infrastructure.Queries
                           OR p.row_num IS NULL)
                           ORDER BY dbo.Instruments.Symbol";
 
-            return await connection.QueryAsync<PositionDto, InstrumentDto, PositionDto>(query, (p, i) =>
-            {
-                p.Instrument = i;
-                return p;
-            });
-        }
-
-        public async Task<IEnumerable<PositionDto>> GetPortfolioPositionsAsync(int portfolioId)
+        return await connection.QueryAsync<PositionDto, InstrumentDto, PositionDto>(query, (p, i) =>
         {
-            using var connection = _connectionCreator.CreateConnection();
-            var query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions 
+            p.Instrument = i;
+            return p;
+        });
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<PositionDto>> GetPortfolioPositionsAsync(int portfolioId)
+    {
+        using var connection = _connectionCreator.CreateConnection();
+        var query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions 
                           LEFT JOIN (
 	                          SELECT [PositionId], SUM([Amount]) AS PositionSize FROM [dbo].[Transactions]
 	                          GROUP BY [PositionId]
@@ -56,17 +59,18 @@ namespace PortEval.Infrastructure.Queries
                           AND Positions.PortfolioId = @PortfolioId
                           ORDER BY dbo.Instruments.Symbol";
 
-            return await connection.QueryAsync<PositionDto, InstrumentDto, PositionDto>(query, (p, i) =>
-            {
-                p.Instrument = i;
-                return p;
-            }, new { PortfolioId = portfolioId });
-        }
-
-        public async Task<PositionDto> GetPositionAsync(int positionId)
+        return await connection.QueryAsync<PositionDto, InstrumentDto, PositionDto>(query, (p, i) =>
         {
-            using var connection = _connectionCreator.CreateConnection();
-            var query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions
+            p.Instrument = i;
+            return p;
+        }, new { PortfolioId = portfolioId });
+    }
+
+    /// <inheritdoc />
+    public async Task<PositionDto> GetPositionAsync(int positionId)
+    {
+        using var connection = _connectionCreator.CreateConnection();
+        var query = @"SELECT *, TrackingInfo_LastUpdate as LastPriceUpdate FROM dbo.Positions
                           LEFT JOIN (
 	                          SELECT [PositionId], SUM([Amount]) AS PositionSize FROM [dbo].[Transactions]
 	                          GROUP BY [PositionId]
@@ -79,13 +83,12 @@ namespace PortEval.Infrastructure.Queries
                           OR p.row_num IS NULL)
                           AND Positions.Id = @PositionId";
 
-            var result = await connection.QueryAsync<PositionDto, InstrumentDto, PositionDto>(query, (p, i) =>
-            {
-                p.Instrument = i;
-                return p;
-            }, new { PositionId = positionId });
+        var result = await connection.QueryAsync<PositionDto, InstrumentDto, PositionDto>(query, (p, i) =>
+        {
+            p.Instrument = i;
+            return p;
+        }, new { PositionId = positionId });
 
-            return result.FirstOrDefault();
-        }
+        return result.FirstOrDefault();
     }
 }

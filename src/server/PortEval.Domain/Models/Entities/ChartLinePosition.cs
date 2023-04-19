@@ -1,25 +1,41 @@
-﻿using PortEval.Domain.Models.Enums;
-using System.Drawing;
+﻿using System.Drawing;
+using PortEval.Domain.Models.Enums;
 
-namespace PortEval.Domain.Models.Entities
+namespace PortEval.Domain.Models.Entities;
+
+/// <summary>
+///     A chart line representing a position.
+/// </summary>
+public class ChartLinePosition : ChartLine
 {
-    public class ChartLinePosition : ChartLine
+    /// <summary>
+    ///     ID of the position represented by this line.
+    /// </summary>
+    public int PositionId { get; }
+
+    internal ChartLinePosition(int id, int chartId, int width, LineDashType dash, Color color, int positionId) : base(
+        id, chartId, width, dash, color)
     {
-        public int PositionId { get; }
+        PositionId = positionId;
+    }
 
-        internal ChartLinePosition(int id, int chartId, int width, LineDashType dash, Color color, int positionId) : base(id, chartId, width, dash, color)
-        {
-            PositionId = positionId;
-        }
+    internal ChartLinePosition(int chartId, int width, LineDashType dash, Color color, int positionId) : base(chartId,
+        width, dash, color)
+    {
+        PositionId = positionId;
+    }
 
-        internal ChartLinePosition(int chartId, int width, LineDashType dash, Color color, int positionId) : base(chartId, width, dash, color)
-        {
-            PositionId = positionId;
-        }
-
-        public static ChartLinePosition Create(int chartId, int width, LineDashType dash, Color color, Position position)
-        {
-            return new ChartLinePosition(chartId, width, dash, color, position.Id);
-        }
+    /// <summary>
+    ///     A factory method creating the chart line according to the specified parameters.
+    /// </summary>
+    /// <param name="chartId">ID of the parent chart.</param>
+    /// <param name="width">Chart line width in pixels.</param>
+    /// <param name="dash">Chart line dash type.</param>
+    /// <param name="color">Chart line color.</param>
+    /// <param name="position">A reference to the position represented by this line.</param>
+    /// <returns>The newly created position chart line.</returns>
+    public static ChartLinePosition Create(int chartId, int width, LineDashType dash, Color color, Position position)
+    {
+        return new ChartLinePosition(chartId, width, dash, color, position.Id);
     }
 }

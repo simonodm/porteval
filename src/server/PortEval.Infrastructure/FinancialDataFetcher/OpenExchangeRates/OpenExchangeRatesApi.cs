@@ -1,46 +1,45 @@
-﻿using PortEval.Application.Models.FinancialDataFetcher;
+﻿using System.Threading.Tasks;
+using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.DataFetcher;
 using PortEval.DataFetcher.Responses;
 using PortEval.Infrastructure.FinancialDataFetcher.Extensions;
 using PortEval.Infrastructure.FinancialDataFetcher.OpenExchangeRates.Models;
 using PortEval.Infrastructure.FinancialDataFetcher.Requests;
-using System.Net.Http;
-using System.Threading.Tasks;
 
-namespace PortEval.Infrastructure.FinancialDataFetcher.OpenExchangeRates
+namespace PortEval.Infrastructure.FinancialDataFetcher.OpenExchangeRates;
+
+/// <summary>
+///     OpenExchangeRates API client supporting latest exchange rates.
+/// </summary>
+public class OpenExchangeRatesApi : DataSource
 {
-    /// <summary>
-    /// OpenExchangeRates API client supporting latest exchange rates.
-    /// </summary>
-    public class OpenExchangeRatesApi : DataSource
+    private const string BaseUrl = "https://www.openexchangerates.org/api";
+
+    [RequestProcessor(typeof(LatestExchangeRatesRequest), typeof(ExchangeRates))]
+    public async Task<Response<ExchangeRates>> ProcessAsync(LatestExchangeRatesRequest request)
     {
-        private const string _baseUrl = "https://www.openexchangerates.org/api";
+        var queryUrl = $"{BaseUrl}/latest.json?app_id={Configuration.Credentials.Token}&base={request.CurrencyCode}";
 
-        [RequestProcessor(typeof(LatestExchangeRatesRequest), typeof(ExchangeRates))]
-        public async Task<Response<ExchangeRates>> ProcessAsync(LatestExchangeRatesRequest request)
+        var response =
+            await HttpClient.GetJsonAsync<LatestExchangeRatesResponseModel>(queryUrl, Configuration.RateLimiter);
+
+        return new Response<ExchangeRates>
         {
-            var queryUrl = $"{_baseUrl}/latest.json?app_id={Configuration.Credentials.Token}&base={request.CurrencyCode}";
+            StatusCode = response.StatusCode,
+            ErrorMessage = response.ErrorMessage,
+            Result = response.Result != null
+                ? ParseLatestExchangeRatesResponse(response.Result)
+                : null
+        };
+    }
 
-            var response = await HttpClient.GetJsonAsync<LatestExchangeRatesResponseModel>(queryUrl, Configuration.RateLimiter);
-
-            return new Response<ExchangeRates>
-            {
-                StatusCode = response.StatusCode,
-                ErrorMessage = response.ErrorMessage,
-                Result = response.Result != null
-                    ? ParseLatestExchangeRatesResponse(response.Result)
-                    : null
-            };
-        }
-
-        private ExchangeRates ParseLatestExchangeRatesResponse(LatestExchangeRatesResponseModel response)
+    private ExchangeRates ParseLatestExchangeRatesResponse(LatestExchangeRatesResponseModel response)
+    {
+        return new ExchangeRates
         {
-            return new ExchangeRates
-            {
-                Currency = response.Base,
-                Rates = response.Rates,
-                Time = response.Time.ToUniversalTime()
-            };
-        }
+            Currency = response.Base,
+            Rates = response.Rates,
+            Time = response.Time.ToUniversalTime()
+        };
     }
 }

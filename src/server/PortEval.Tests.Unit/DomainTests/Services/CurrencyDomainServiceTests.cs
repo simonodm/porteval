@@ -5,53 +5,59 @@ using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Services;
 using Xunit;
 
-namespace PortEval.Tests.Unit.DomainTests.Services
+namespace PortEval.Tests.Unit.DomainTests.Services;
+
+public class CurrencyDomainServiceTests
 {
-    public class CurrencyDomainServiceTests
+    private readonly IFixture _fixture;
+
+    public CurrencyDomainServiceTests()
     {
-        private IFixture _fixture;
+        _fixture = new Fixture()
+            .Customize(new AutoMoqCustomization());
+    }
 
-        public CurrencyDomainServiceTests()
-        {
-            _fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-        }
+    [Fact]
+    public void ChangeDefaultCurrency_UnsetsPreviousDefaultCurrency()
+    {
+        var newDefaultCurrency =
+            new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
+        var previousDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(),
+            _fixture.Create<string>(), true);
 
-        [Fact]
-        public void ChangeDefaultCurrency_UnsetsPreviousDefaultCurrency()
-        {
-            var newDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
-            var previousDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>(), true);
+        var sut = _fixture.Create<CurrencyDomainService>();
 
-            var sut = _fixture.Create<CurrencyDomainService>();
+        sut.ChangeDefaultCurrency(previousDefaultCurrency, newDefaultCurrency);
 
-            sut.ChangeDefaultCurrency(previousDefaultCurrency, newDefaultCurrency);
+        Assert.False(previousDefaultCurrency.IsDefault);
+    }
 
-            Assert.False(previousDefaultCurrency.IsDefault);
-        }
+    [Fact]
+    public void ChangeDefaultCurrency_ThrowsException_WhenProvidedDefaultCurrencyIsNotDefault()
+    {
+        var newDefaultCurrency =
+            new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
+        var previousDefaultCurrency =
+            new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
 
-        [Fact]
-        public void ChangeDefaultCurrency_ThrowsException_WhenProvidedDefaultCurrencyIsNotDefault()
-        {
-            var newDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
-            var previousDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
+        var sut = _fixture.Create<CurrencyDomainService>();
 
-            var sut = _fixture.Create<CurrencyDomainService>();
+        Assert.Throws<OperationNotAllowedException>(() =>
+            sut.ChangeDefaultCurrency(previousDefaultCurrency, newDefaultCurrency));
+    }
 
-            Assert.Throws<OperationNotAllowedException>(() => sut.ChangeDefaultCurrency(previousDefaultCurrency, newDefaultCurrency));
-        }
+    [Fact]
+    public void ChangeDefaultCurrency_SetsNewDefaultCurrencyAsDefault()
+    {
+        var newDefaultCurrency =
+            new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
+        var previousDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(),
+            _fixture.Create<string>(), true);
 
-        [Fact]
-        public void ChangeDefaultCurrency_SetsNewDefaultCurrencyAsDefault()
-        {
-            var newDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
-            var previousDefaultCurrency = new Currency(_fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>(), true);
+        var sut = _fixture.Create<CurrencyDomainService>();
 
-            var sut = _fixture.Create<CurrencyDomainService>();
+        sut.ChangeDefaultCurrency(previousDefaultCurrency, newDefaultCurrency);
 
-            sut.ChangeDefaultCurrency(previousDefaultCurrency, newDefaultCurrency);
-
-            Assert.True(newDefaultCurrency.IsDefault);
-        }
+        Assert.True(newDefaultCurrency.IsDefault);
     }
 }

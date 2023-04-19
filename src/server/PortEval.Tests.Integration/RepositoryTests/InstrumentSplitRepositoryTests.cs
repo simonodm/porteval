@@ -1,185 +1,183 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Domain.Models.Entities;
 using PortEval.Domain.Models.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using PortEval.Infrastructure.Repositories;
-using System;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace PortEval.Tests.Integration.RepositoryTests
+namespace PortEval.Tests.Integration.RepositoryTests;
+
+public class InstrumentSplitRepositoryTests : RepositoryTestBase
 {
-    public class InstrumentSplitRepositoryTests : RepositoryTestBase
+    private readonly Instrument _instrument;
+    private readonly IInstrumentSplitRepository _splitRepository;
+
+    public InstrumentSplitRepositoryTests()
     {
-        private readonly IInstrumentSplitRepository _splitRepository;
+        _splitRepository = new InstrumentSplitRepository(DbContext);
 
-        private readonly Instrument _instrument;
+        DbContext.Add(new Currency("USD", "US Dollar", "$", true));
+        DbContext.Add(new Exchange("NASDAQ", "NASDAQ"));
 
-        public InstrumentSplitRepositoryTests() : base()
-        {
-            _splitRepository = new InstrumentSplitRepository(DbContext);
+        _instrument = new Instrument("Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
+        DbContext.Add(_instrument);
+        DbContext.SaveChanges();
+    }
 
-            DbContext.Add(new Currency("USD", "US Dollar", "$", true));
-            DbContext.Add(new Exchange("NASDAQ", "NASDAQ"));
+    [Fact]
+    public async Task ListInstrumentSplitsAsync_ReturnsInstrumentSplits()
+    {
+        var first = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-2), new SplitRatio(3, 1));
+        var second = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(1, 3));
 
-            _instrument = new Instrument("Apple Inc.", "AAPL", "NASDAQ", InstrumentType.Stock, "USD", "");
-            DbContext.Add(_instrument);
-            DbContext.SaveChanges();
-        }
+        DbContext.Add(first);
+        DbContext.Add(second);
+        await DbContext.SaveChangesAsync();
 
-        [Fact]
-        public async Task ListInstrumentSplitsAsync_ReturnsInstrumentSplits()
-        {
-            var first = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-2), new SplitRatio(3, 1));
-            var second = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(1, 3));
+        var splits = await _splitRepository.ListInstrumentSplitsAsync(_instrument.Id);
 
-            DbContext.Add(first);
-            DbContext.Add(second);
-            await DbContext.SaveChangesAsync();
+        Assert.Collection(splits,
+            s => AssertInstrumentSplitsAreEqual(first, s),
+            s => AssertInstrumentSplitsAreEqual(second, s)
+        );
+    }
 
-            var splits = await _splitRepository.ListInstrumentSplitsAsync(_instrument.Id);
+    [Fact]
+    public async Task ListNonProcessedSplitsAsync_ReturnsNonProcessedSplits()
+    {
+        var processedSplit = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-2), new SplitRatio(3, 1));
+        processedSplit.MarkAsProcessed();
 
-            Assert.Collection(splits,
-                s => AssertInstrumentSplitsAreEqual(first, s),
-                s => AssertInstrumentSplitsAreEqual(second, s)
-            );
-        }
+        var nonProcessedSplit =
+            new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
 
-        [Fact]
-        public async Task ListNonProcessedSplitsAsync_ReturnsNonProcessedSplits()
-        {
-            var processedSplit = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-2), new SplitRatio(3, 1));
-            processedSplit.MarkAsProcessed();
+        DbContext.Add(processedSplit);
+        DbContext.Add(nonProcessedSplit);
+        await DbContext.SaveChangesAsync();
 
-            var nonProcessedSplit =
-                new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
+        var nonProcessedSplits = await _splitRepository.ListNonProcessedSplitsAsync();
 
-            DbContext.Add(processedSplit);
-            DbContext.Add(nonProcessedSplit);
-            await DbContext.SaveChangesAsync();
+        Assert.Collection(nonProcessedSplits, s => AssertInstrumentSplitsAreEqual(nonProcessedSplit, s));
+    }
 
-            var nonProcessedSplits = await _splitRepository.ListNonProcessedSplitsAsync();
+    [Fact]
+    public async Task ListRollbackRequestedSplitsAsync_ReturnsRollbackRequestedSplits()
+    {
+        var processedSplit = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-2), new SplitRatio(3, 1));
+        processedSplit.MarkAsProcessed();
 
-            Assert.Collection(nonProcessedSplits, s => AssertInstrumentSplitsAreEqual(nonProcessedSplit, s));
-        }
+        var nonProcessedSplit =
+            new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
 
-        [Fact]
-        public async Task ListRollbackRequestedSplitsAsync_ReturnsRollbackRequestedSplits()
-        {
-            var processedSplit = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-2), new SplitRatio(3, 1));
-            processedSplit.MarkAsProcessed();
+        var rollbackRequestedSplit = new InstrumentSplit(_instrument.Id, DateTime.UtcNow, new SplitRatio(99, 1));
+        rollbackRequestedSplit.MarkAsProcessed();
+        rollbackRequestedSplit.Rollback();
 
-            var nonProcessedSplit =
-                new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
+        DbContext.Add(processedSplit);
+        DbContext.Add(nonProcessedSplit);
+        DbContext.Add(rollbackRequestedSplit);
+        await DbContext.SaveChangesAsync();
 
-            var rollbackRequestedSplit = new InstrumentSplit(_instrument.Id, DateTime.UtcNow, new SplitRatio(99, 1));
-            rollbackRequestedSplit.MarkAsProcessed();
-            rollbackRequestedSplit.Rollback();
+        var rollbackRequestedSplits = await _splitRepository.ListRollbackRequestedSplitsAsync();
 
-            DbContext.Add(processedSplit);
-            DbContext.Add(nonProcessedSplit);
-            DbContext.Add(rollbackRequestedSplit);
-            await DbContext.SaveChangesAsync();
+        Assert.Collection(rollbackRequestedSplits, s => AssertInstrumentSplitsAreEqual(rollbackRequestedSplit, s));
+    }
 
-            var rollbackRequestedSplits = await _splitRepository.ListRollbackRequestedSplitsAsync();
+    [Fact]
+    public async Task FindAsync_ReturnsSplit_WhenExists()
+    {
+        var split = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
 
-            Assert.Collection(rollbackRequestedSplits, s => AssertInstrumentSplitsAreEqual(rollbackRequestedSplit, s));
-        }
+        DbContext.Add(split);
+        await DbContext.SaveChangesAsync();
 
-        [Fact]
-        public async Task FindAsync_ReturnsSplit_WhenExists()
-        {
-            var split = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
+        var foundSplit = await _splitRepository.FindAsync(split.Id);
 
-            DbContext.Add(split);
-            await DbContext.SaveChangesAsync();
+        AssertInstrumentSplitsAreEqual(split, foundSplit);
+    }
 
-            var foundSplit = await _splitRepository.FindAsync(split.Id);
+    [Fact]
+    public async Task Add_CreatesNewSplit()
+    {
+        var split = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
+        _splitRepository.Add(split);
+        await _splitRepository.UnitOfWork.CommitAsync();
 
-            AssertInstrumentSplitsAreEqual(split, foundSplit);
-        }
+        var createdSplit = await DbContext.InstrumentSplits.FirstOrDefaultAsync();
+        AssertInstrumentSplitsAreEqual(split, createdSplit);
+    }
 
-        [Fact]
-        public async Task Add_CreatesNewSplit()
-        {
-            var split = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
-            _splitRepository.Add(split);
-            await _splitRepository.UnitOfWork.CommitAsync();
+    [Fact]
+    public async Task Update_UpdatesSplit()
+    {
+        var split = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
+        DbContext.Add(split);
+        await DbContext.SaveChangesAsync();
 
-            var createdSplit = await DbContext.InstrumentSplits.FirstOrDefaultAsync();
-            AssertInstrumentSplitsAreEqual(split, createdSplit);
-        }
+        split.MarkAsProcessed();
+        _splitRepository.Update(split);
+        await _splitRepository.UnitOfWork.CommitAsync();
 
-        [Fact]
-        public async Task Update_UpdatesSplit()
-        {
-            var split = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
-            DbContext.Add(split);
-            await DbContext.SaveChangesAsync();
+        var updatedSplit = await DbContext.InstrumentSplits.FirstOrDefaultAsync();
+        AssertInstrumentSplitsAreEqual(split, updatedSplit);
+    }
 
-            split.MarkAsProcessed();
-            _splitRepository.Update(split);
-            await _splitRepository.UnitOfWork.CommitAsync();
+    [Fact]
+    public async Task DeleteAsync_DeletesSplit_WhenItExists()
+    {
+        var split = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
+        DbContext.Add(split);
+        await DbContext.SaveChangesAsync();
 
-            var updatedSplit = await DbContext.InstrumentSplits.FirstOrDefaultAsync();
-            AssertInstrumentSplitsAreEqual(split, updatedSplit);
-        }
+        await _splitRepository.DeleteAsync(split.Id);
+        await _splitRepository.UnitOfWork.CommitAsync();
 
-        [Fact]
-        public async Task DeleteAsync_DeletesSplit_WhenItExists()
-        {
-            var split = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
-            DbContext.Add(split);
-            await DbContext.SaveChangesAsync();
+        var splitExists = await DbContext.InstrumentSplits.AnyAsync(s => s.Id == split.Id);
 
-            await _splitRepository.DeleteAsync(split.Id);
-            await _splitRepository.UnitOfWork.CommitAsync();
+        Assert.False(splitExists);
+    }
 
-            var splitExists = await DbContext.InstrumentSplits.AnyAsync(s => s.Id == split.Id);
+    [Fact]
+    public async Task Delete_DeletesSplit_WhenItExists()
+    {
+        var split = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
+        DbContext.Add(split);
+        await DbContext.SaveChangesAsync();
 
-            Assert.False(splitExists);
-        }
+        _splitRepository.Delete(split);
+        await _splitRepository.UnitOfWork.CommitAsync();
 
-        [Fact]
-        public async Task Delete_DeletesSplit_WhenItExists()
-        {
-            var split = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
-            DbContext.Add(split);
-            await DbContext.SaveChangesAsync();
+        var splitExists = await DbContext.InstrumentSplits.AnyAsync(s => s.Id == split.Id);
 
-            _splitRepository.Delete(split);
-            await _splitRepository.UnitOfWork.CommitAsync();
+        Assert.False(splitExists);
+    }
 
-            var splitExists = await DbContext.InstrumentSplits.AnyAsync(s => s.Id == split.Id);
+    [Fact]
+    public async Task ExistsAsync_ReturnsTrue_WhenSplitExists()
+    {
+        var split = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
+        DbContext.Add(split);
+        await DbContext.SaveChangesAsync();
 
-            Assert.False(splitExists);
-        }
+        var splitExists = await _splitRepository.ExistsAsync(split.Id);
 
-        [Fact]
-        public async Task ExistsAsync_ReturnsTrue_WhenSplitExists()
-        {
-            var split = new InstrumentSplit(_instrument.Id, DateTime.UtcNow.AddDays(-1), new SplitRatio(2, 1));
-            DbContext.Add(split);
-            await DbContext.SaveChangesAsync();
+        Assert.True(splitExists);
+    }
 
-            var splitExists = await _splitRepository.ExistsAsync(split.Id);
+    [Fact]
+    public async Task ExistsAsync_ReturnsFalse_WhenSplitDoesNotExist()
+    {
+        var splitExists = await _splitRepository.ExistsAsync(999);
+        Assert.False(splitExists);
+    }
 
-            Assert.True(splitExists);
-        }
-
-        [Fact]
-        public async Task ExistsAsync_ReturnsFalse_WhenSplitDoesNotExist()
-        {
-            var splitExists = await _splitRepository.ExistsAsync(999);
-            Assert.False(splitExists);
-        }
-
-        private void AssertInstrumentSplitsAreEqual(InstrumentSplit expected, InstrumentSplit actual)
-        {
-            Assert.Equal(expected?.InstrumentId, actual?.InstrumentId);
-            Assert.Equal(expected?.Time, actual?.Time);
-            Assert.Equal(expected?.SplitRatio.Factor, actual?.SplitRatio.Factor);
-        }
+    private void AssertInstrumentSplitsAreEqual(InstrumentSplit expected, InstrumentSplit actual)
+    {
+        Assert.Equal(expected?.InstrumentId, actual?.InstrumentId);
+        Assert.Equal(expected?.Time, actual?.Time);
+        Assert.Equal(expected?.SplitRatio.Factor, actual?.SplitRatio.Factor);
     }
 }

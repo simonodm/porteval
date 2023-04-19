@@ -1,16 +1,15 @@
 ﻿using System.Threading.Tasks;
 
-namespace PortEval.Application.Core.Interfaces.BackgroundJobs
+namespace PortEval.Application.Core.Interfaces.BackgroundJobs;
+
+/// <summary>
+///     A job responsible for adjusting instrument prices and transactions after a change in instrument splits.
+/// </summary>
+public interface ISplitPriceAndTransactionAdjustmentJob
 {
     /// <summary>
-    /// A job responsible for adjusting instrument prices and transactions after a change in instrument splits.
+    ///     Executes the job.
     /// </summary>
-    public interface ISplitPriceAndTransactionAdjustmentJob
-    {
-        /// <summary>
-        /// Executes the job.
-        /// </summary>
-        /// <returns>A task representing the asynchronous adjustment operation.</returns>
-        public Task RunAsync();
-    }
+    /// <returns>A task representing the asynchronous adjustment operation.</returns>
+    public Task RunAsync();
 }

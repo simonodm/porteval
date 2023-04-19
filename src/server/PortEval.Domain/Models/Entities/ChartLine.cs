@@ -1,43 +1,69 @@
-﻿using PortEval.Domain.Models.Enums;
-using System.Drawing;
+﻿using System.Drawing;
+using PortEval.Domain.Models.Enums;
 
-namespace PortEval.Domain.Models.Entities
+namespace PortEval.Domain.Models.Entities;
+
+/// <summary>
+///     A base class for chart lines.
+/// </summary>
+public abstract class ChartLine : Entity
 {
-    public abstract class ChartLine : Entity
+    /// <summary>
+    ///     ID of the line.
+    /// </summary>
+    public int Id { get; private set; }
+
+    /// <summary>
+    ///     Line width in pixels.
+    /// </summary>
+    public int Width { get; private set; }
+
+    /// <summary>
+    ///     Line dash type.
+    /// </summary>
+    public LineDashType Dash { get; private set; }
+
+    /// <summary>
+    ///     ID of the parent chart.
+    /// </summary>
+    public int ChartId { get; private set; }
+
+    /// <summary>
+    ///     Reference to the parent chart.
+    /// </summary>
+    public Chart Chart { get; }
+
+    /// <summary>
+    ///     Line color.
+    /// </summary>
+    public Color Color { get; private set; }
+
+    /// <summary>
+    ///     Initializes a chart line according to the provided configuration.
+    /// </summary>
+    /// <param name="id">ID of the chart line.</param>
+    /// <param name="chartId">ID of the parent chart.</param>
+    /// <param name="width">Chart line width in pixels.</param>
+    /// <param name="dash">Chart line dash type.</param>
+    /// <param name="color">Chart line color.</param>
+    protected ChartLine(int id, int chartId, int width, LineDashType dash, Color color) : this(chartId, width, dash,
+        color)
     {
-        public int Id { get; private set; }
-        public int Width { get; private set; }
-        public LineDashType Dash { get; private set; }
-        public int ChartId { get; private set; }
-        public Chart Chart { get; private set; }
-        public Color Color { get; private set; }
+        Id = id;
+    }
 
-        protected ChartLine(int id, int chartId, int width, LineDashType dash, Color color) : this(chartId, width, dash, color)
-        {
-            Id = id;
-        }
-
-        protected ChartLine(int chartId, int width, LineDashType dash, Color color)
-        {
-            ChartId = chartId;
-            Width = width;
-            Dash = dash;
-            Color = color;
-        }
-
-        public void SetWidth(int width)
-        {
-            Width = width;
-        }
-
-        public void SetDash(LineDashType dash)
-        {
-            Dash = dash;
-        }
-
-        public void SetColor(Color color)
-        {
-            Color = color;
-        }
+    /// <summary>
+    ///     Initializes a chart line according to the provided configuration.
+    /// </summary>
+    /// <param name="chartId">ID of the parent chart.</param>
+    /// <param name="width">Chart line width in pixels.</param>
+    /// <param name="dash">Chart line dash type.</param>
+    /// <param name="color">Chart line color.</param>
+    protected ChartLine(int chartId, int width, LineDashType dash, Color color)
+    {
+        ChartId = chartId;
+        Width = width;
+        Dash = dash;
+        Color = color;
     }
 }

@@ -1,7 +1,10 @@
-﻿namespace PortEval.Application.Models.DTOs
+﻿using Swashbuckle.AspNetCore.Annotations;
+
+namespace PortEval.Application.Models.DTOs;
+
+[SwaggerSchema("Represents a collection of a position's financial metrics.")]
+public class PositionStatisticsDto : EntityStatisticsDto
 {
-    public class PositionStatisticsDto : EntityStatisticsDto
-    {
-        public decimal BreakEvenPoint { get; set; }
-    }
+    [SwaggerSchema("Position's break-even point.")]
+    public decimal BreakEvenPoint { get; set; }
 }

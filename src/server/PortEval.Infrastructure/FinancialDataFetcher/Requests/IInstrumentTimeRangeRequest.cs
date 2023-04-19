@@ -1,8 +1,7 @@
-﻿namespace PortEval.Infrastructure.FinancialDataFetcher.Requests
+﻿namespace PortEval.Infrastructure.FinancialDataFetcher.Requests;
+
+internal interface IInstrumentTimeRangeRequest : ITimeRangeRequest
 {
-    internal interface IInstrumentTimeRangeRequest : ITimeRangeRequest
-    {
-        public string Symbol { get; set; }
-        public string CurrencyCode { get; set; }
-    }
+    public string Symbol { get; set; }
+    public string CurrencyCode { get; set; }
 }

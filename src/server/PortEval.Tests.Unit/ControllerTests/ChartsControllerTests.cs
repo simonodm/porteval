@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -6,130 +7,128 @@ using PortEval.Application.Controllers;
 using PortEval.Application.Core.Interfaces.Services;
 using PortEval.Application.Models.DTOs;
 using PortEval.Tests.Unit.Helpers;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace PortEval.Tests.Unit.ControllerTests
+namespace PortEval.Tests.Unit.ControllerTests;
+
+public class ChartsControllerTests
 {
-    public class ChartsControllerTests
+    private readonly IFixture _fixture;
+    private readonly Mock<IChartService> _chartService;
+
+    public ChartsControllerTests()
     {
-        private IFixture _fixture;
-        private Mock<IChartService> _chartService;
+        _fixture = new Fixture()
+            .Customize(new AutoMoqCustomization());
+        _chartService = _fixture.Freeze<Mock<IChartService>>();
+    }
 
-        public ChartsControllerTests()
-        {
-            _fixture = new Fixture()
-                .Customize(new AutoMoqCustomization());
-            _chartService = _fixture.Freeze<Mock<IChartService>>();
-        }
+    [Fact]
+    public async Task GetAllCharts_ReturnsCharts()
+    {
+        var charts = _fixture.CreateMany<ChartDto>();
 
-        [Fact]
-        public async Task GetAllCharts_ReturnsCharts()
-        {
-            var charts = _fixture.CreateMany<ChartDto>();
+        _chartService
+            .Setup(m => m.GetAllChartsAsync())
+            .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(charts));
+        var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
-            _chartService
-                .Setup(m => m.GetAllChartsAsync())
-                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(charts));
-            var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
+        var result = await sut.GetAllCharts();
 
-            var result = await sut.GetAllCharts();
+        _chartService.Verify(m => m.GetAllChartsAsync(), Times.Once());
+        Assert.Equal(charts, result.Value);
+    }
 
-            _chartService.Verify(m => m.GetAllChartsAsync(), Times.Once());
-            Assert.Equal(charts, result.Value);
-        }
+    [Fact]
+    public async Task GetChart_ReturnsCorrectChart_WhenChartExists()
+    {
+        var chart = _fixture.Create<ChartDto>();
 
-        [Fact]
-        public async Task GetChart_ReturnsCorrectChart_WhenChartExists()
-        {
-            var chart = _fixture.Create<ChartDto>();
+        _chartService
+            .Setup(m => m.GetChartAsync(chart.Id))
+            .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(chart));
 
-            _chartService
-                .Setup(m => m.GetChartAsync(chart.Id))
-                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(chart));
+        var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
-            var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
+        var result = await sut.GetChart(chart.Id);
 
-            var result = await sut.GetChart(chart.Id);
+        _chartService.Verify(m => m.GetChartAsync(chart.Id), Times.Once());
+        Assert.Equal(chart, result.Value);
+    }
 
-            _chartService.Verify(m => m.GetChartAsync(chart.Id), Times.Once());
-            Assert.Equal(chart, result.Value);
-        }
+    [Fact]
+    public async Task GetChart_ReturnsNotFound_WhenChartDoesNotExist()
+    {
+        var chartId = _fixture.Create<int>();
 
-        [Fact]
-        public async Task GetChart_ReturnsNotFound_WhenChartDoesNotExist()
-        {
-            var chartId = _fixture.Create<int>();
+        _chartService
+            .Setup(m => m.GetChartAsync(It.IsAny<int>()))
+            .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<ChartDto>());
 
-            _chartService
-                .Setup(m => m.GetChartAsync(It.IsAny<int>()))
-                .ReturnsAsync(OperationResponseHelper.GenerateNotFoundOperationResponse<ChartDto>());
+        var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
-            var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
+        var result = await sut.GetChart(chartId);
 
-            var result = await sut.GetChart(chartId);
+        _chartService.Verify(m => m.GetChartAsync(chartId), Times.Once());
+        Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
+    }
 
-            _chartService.Verify(m => m.GetChartAsync(chartId), Times.Once());
-            Assert.IsAssignableFrom<NotFoundObjectResult>(result.Result);
-        }
+    [Fact]
+    public async Task PostChart_CreatesChart()
+    {
+        var chart = _fixture.Create<ChartDto>();
 
-        [Fact]
-        public async Task PostChart_CreatesChart()
-        {
-            var chart = _fixture.Create<ChartDto>();
+        _chartService
+            .Setup(m => m.CreateChartAsync(chart))
+            .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(_fixture.Create<ChartDto>()));
+        var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
-            _chartService
-                .Setup(m => m.CreateChartAsync(chart))
-                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse(_fixture.Create<ChartDto>()));
-            var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
+        await sut.PostChart(chart);
 
-            await sut.PostChart(chart);
+        _chartService.Verify(m => m.CreateChartAsync(chart), Times.Once());
+    }
 
-            _chartService.Verify(m => m.CreateChartAsync(chart), Times.Once());
-        }
+    [Fact]
+    public async Task PutChart_UpdatesChart()
+    {
+        var chart = _fixture.Create<ChartDto>();
 
-        [Fact]
-        public async Task PutChart_UpdatesChart()
-        {
-            var chart = _fixture.Create<ChartDto>();
+        _chartService
+            .Setup(m => m.UpdateChartAsync(chart))
+            .Returns<ChartDto>(c =>
+                Task.FromResult(OperationResponseHelper.GenerateSuccessfulOperationResponse(c)));
+        var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
-            _chartService
-                .Setup(m => m.UpdateChartAsync(chart))
-                .Returns<ChartDto>(c =>
-                    Task.FromResult(OperationResponseHelper.GenerateSuccessfulOperationResponse(c)));
-            var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
+        await sut.PutChart(chart.Id, chart);
 
-            await sut.PutChart(chart.Id, chart);
+        _chartService.Verify(m => m.UpdateChartAsync(chart), Times.Once());
+    }
 
-            _chartService.Verify(m => m.UpdateChartAsync(chart), Times.Once());
-        }
+    [Fact]
+    public async Task PutChart_ReturnsBadRequest_WhenQueryParameterIdAndBodyIdDontMatch()
+    {
+        var chart = _fixture.Create<ChartDto>();
 
-        [Fact]
-        public async Task PutChart_ReturnsBadRequest_WhenQueryParameterIdAndBodyIdDontMatch()
-        {
-            var chart = _fixture.Create<ChartDto>();
+        var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
-            var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
+        var result = await sut.PutChart(chart.Id + 1, chart);
 
-            var result = await sut.PutChart(chart.Id + 1, chart);
+        _chartService.Verify(m => m.UpdateChartAsync(chart), Times.Never());
+        Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
+    }
 
-            _chartService.Verify(m => m.UpdateChartAsync(chart), Times.Never());
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Result);
-        }
+    [Fact]
+    public async Task DeleteChart_DeletesChart()
+    {
+        var chartId = _fixture.Create<int>();
 
-        [Fact]
-        public async Task DeleteChart_DeletesChart()
-        {
-            var chartId = _fixture.Create<int>();
+        _chartService
+            .Setup(m => m.DeleteChartAsync(It.IsAny<int>()))
+            .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse());
+        var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
 
-            _chartService
-                .Setup(m => m.DeleteChartAsync(It.IsAny<int>()))
-                .ReturnsAsync(OperationResponseHelper.GenerateSuccessfulOperationResponse());
-            var sut = _fixture.Build<ChartsController>().OmitAutoProperties().Create();
+        await sut.DeleteChart(chartId);
 
-            await sut.DeleteChart(chartId);
-
-            _chartService.Verify(m => m.DeleteChartAsync(chartId), Times.Once());
-        }
+        _chartService.Verify(m => m.DeleteChartAsync(chartId), Times.Once());
     }
 }

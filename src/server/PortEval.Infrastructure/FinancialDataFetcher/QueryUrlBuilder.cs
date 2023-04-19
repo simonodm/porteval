@@ -1,42 +1,45 @@
 ﻿using System.Text;
 
-namespace PortEval.Infrastructure.FinancialDataFetcher
+namespace PortEval.Infrastructure.FinancialDataFetcher;
+
+/// <summary>
+///     A URL builder allowing addition of query parameters.
+/// </summary>
+public class QueryUrlBuilder
 {
+    private readonly StringBuilder _urlBuilder = new();
+    private bool _queryParamsExist;
+
     /// <summary>
-    /// A URL builder allowing addition of query parameters.
+    ///     Initializes the builder with the specified URL.
     /// </summary>
-    public class QueryUrlBuilder
+    /// <param name="baseUrl">The base url to use during parameter building.</param>
+    public QueryUrlBuilder(string baseUrl)
     {
-        private readonly StringBuilder _urlBuilder = new StringBuilder();
-        private bool _queryParamsExist = false;
+        _urlBuilder.Append(baseUrl);
+    }
 
-        public QueryUrlBuilder(string baseUrl)
-        {
-            _urlBuilder.Append(baseUrl);
-        }
+    /// <summary>
+    ///     Adds a query parameter to the URL with the specified key and value.
+    /// </summary>
+    /// <param name="name">Name of the parameter.</param>
+    /// <param name="value">Value of the parameter.</param>
+    public void AddQueryParam(string name, string value)
+    {
+        if (name == null || value == null) return;
 
-        /// <summary>
-        /// Adds a query parameter to the URL with the specified key and value.
-        /// </summary>
-        /// <param name="name">Name of the parameter.</param>
-        /// <param name="value">Value of the parameter.</param>
-        public void AddQueryParam(string name, string value)
-        {
-            if (name == null || value == null) return;
+        _urlBuilder.Append(_queryParamsExist ? '&' : '?');
+        _urlBuilder.Append($"{name}={value}");
 
-            _urlBuilder.Append(_queryParamsExist ? '&' : '?');
-            _urlBuilder.Append($"{name}={value}");
+        _queryParamsExist = true;
+    }
 
-            _queryParamsExist = true;
-        }
-
-        /// <summary>
-        /// Converts the builder to a URL string containing all added query parameters.
-        /// </summary>
-        /// <returns>A URL string.</returns>
-        public override string ToString()
-        {
-            return _urlBuilder.ToString();
-        }
+    /// <summary>
+    ///     Converts the builder to a URL string containing all added query parameters.
+    /// </summary>
+    /// <returns>A URL string.</returns>
+    public override string ToString()
+    {
+        return _urlBuilder.ToString();
     }
 }

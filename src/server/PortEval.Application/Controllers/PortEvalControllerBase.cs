@@ -1,84 +1,56 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.IO;
+using Microsoft.AspNetCore.Mvc;
 using PortEval.Application.Core;
-using System.IO;
 
-namespace PortEval.Application.Controllers
+namespace PortEval.Application.Controllers;
+
+public abstract class PortEvalControllerBase : ControllerBase
 {
-    public abstract class PortEvalControllerBase : ControllerBase
+    protected ActionResult<T> GenerateActionResult<T>(OperationResponse<T> response)
     {
-        protected ActionResult<T> GenerateActionResult<T>(OperationResponse<T> response)
-        {
-            if (response.Status == OperationStatus.NotFound)
-            {
-                return NotFound(response.Message);
-            }
+        if (response.Status == OperationStatus.NotFound) return NotFound(response.Message);
 
-            if (response.Status == OperationStatus.Error)
-            {
-                return BadRequest(response.Message);
-            }
+        if (response.Status == OperationStatus.Error) return BadRequest(response.Message);
 
-            return response.Response;
-        }
+        return response.Response;
+    }
 
-        protected ActionResult<T> GenerateActionResult<T>(OperationResponse<T> response, string actionName, object routeValues)
-        {
-            if (response.Status == OperationStatus.NotFound)
-            {
-                return NotFound(response.Message);
-            }
+    protected ActionResult<T> GenerateActionResult<T>(OperationResponse<T> response, string actionName,
+        object routeValues)
+    {
+        if (response.Status == OperationStatus.NotFound) return NotFound(response.Message);
 
-            if (response.Status == OperationStatus.Error)
-            {
-                return BadRequest(response.Message);
-            }
+        if (response.Status == OperationStatus.Error) return BadRequest(response.Message);
 
-            return CreatedAtAction(actionName, routeValues, response.Response);
-        }
+        return CreatedAtAction(actionName, routeValues, response.Response);
+    }
 
-        protected IActionResult GenerateActionResult(OperationResponse response)
-        {
-            if (response.Status == OperationStatus.NotFound)
-            {
-                return NotFound(response.Message);
-            }
+    protected IActionResult GenerateActionResult(OperationResponse response)
+    {
+        if (response.Status == OperationStatus.NotFound) return NotFound(response.Message);
 
-            if (response.Status == OperationStatus.Error)
-            {
-                return BadRequest(response.Message);
-            }
+        if (response.Status == OperationStatus.Error) return BadRequest(response.Message);
 
-            return Ok();
-        }
+        return Ok();
+    }
 
-        protected IActionResult GenerateFileActionResult(OperationResponse<Stream> response, string contentType, string fileName)
-        {
-            if (response.Status == OperationStatus.NotFound)
-            {
-                return NotFound(response.Message);
-            }
+    protected IActionResult GenerateFileActionResult(OperationResponse<Stream> response, string contentType,
+        string fileName)
+    {
+        if (response.Status == OperationStatus.NotFound) return NotFound(response.Message);
 
-            if (response.Status == OperationStatus.Error)
-            {
-                return BadRequest(response.Message);
-            }
+        if (response.Status == OperationStatus.Error) return BadRequest(response.Message);
 
-            return File(response.Response, contentType, fileName);
-        }
+        return File(response.Response, contentType, fileName);
+    }
 
-        protected IActionResult GenerateFileActionResult(OperationResponse<byte[]> response, string contentType, string fileName)
-        {
-            if (response.Status == OperationStatus.NotFound)
-            {
-                return NotFound(response.Message);
-            }
+    protected IActionResult GenerateFileActionResult(OperationResponse<byte[]> response, string contentType,
+        string fileName)
+    {
+        if (response.Status == OperationStatus.NotFound) return NotFound(response.Message);
 
-            if (response.Status == OperationStatus.Error)
-            {
-                return BadRequest(response.Message);
-            }
+        if (response.Status == OperationStatus.Error) return BadRequest(response.Message);
 
-            return File(response.Response, contentType, fileName);
-        }
+        return File(response.Response, contentType, fileName);
     }
 }

@@ -1,54 +1,53 @@
 ﻿using PortEval.Application.Core;
 
-namespace PortEval.Tests.Unit.Helpers
+namespace PortEval.Tests.Unit.Helpers;
+
+internal static class OperationResponseHelper
 {
-    internal static class OperationResponseHelper
+    public static OperationResponse<T> GenerateSuccessfulOperationResponse<T>(T result)
     {
-        public static OperationResponse<T> GenerateSuccessfulOperationResponse<T>(T result)
+        return new OperationResponse<T>
         {
-            return new OperationResponse<T>
-            {
-                Response = result
-            };
-        }
+            Response = result
+        };
+    }
 
-        public static OperationResponse GenerateSuccessfulOperationResponse()
-        {
-            return new OperationResponse();
-        }
+    public static OperationResponse GenerateSuccessfulOperationResponse()
+    {
+        return new OperationResponse();
+    }
 
-        public static OperationResponse<T> GenerateNotFoundOperationResponse<T>()
+    public static OperationResponse<T> GenerateNotFoundOperationResponse<T>()
+    {
+        return new OperationResponse<T>
         {
-            return new OperationResponse<T>
-            {
-                Status = OperationStatus.NotFound,
-                Response = default
-            };
-        }
+            Status = OperationStatus.NotFound,
+            Response = default
+        };
+    }
 
-        public static OperationResponse GenerateNotFoundOperationResponse()
+    public static OperationResponse GenerateNotFoundOperationResponse()
+    {
+        return new OperationResponse
         {
-            return new OperationResponse
-            {
-                Status = OperationStatus.NotFound
-            };
-        }
+            Status = OperationStatus.NotFound
+        };
+    }
 
-        public static OperationResponse<T> GenerateErrorOperationResponse<T>()
+    public static OperationResponse<T> GenerateErrorOperationResponse<T>()
+    {
+        return new OperationResponse<T>
         {
-            return new OperationResponse<T>
-            {
-                Status = OperationStatus.Error,
-                Response = default
-            };
-        }
+            Status = OperationStatus.Error,
+            Response = default
+        };
+    }
 
-        public static OperationResponse GenerateErrorOperationResponse()
+    public static OperationResponse GenerateErrorOperationResponse()
+    {
+        return new OperationResponse
         {
-            return new OperationResponse
-            {
-                Status = OperationStatus.Error
-            };
-        }
+            Status = OperationStatus.Error
+        };
     }
 }

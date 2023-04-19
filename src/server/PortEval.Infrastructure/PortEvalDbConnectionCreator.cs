@@ -1,25 +1,31 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using System.Data;
 
-namespace PortEval.Infrastructure
+namespace PortEval.Infrastructure;
+
+/// <summary>
+///     A factory for creating a connection to the PortEval database.
+/// </summary>
+public class PortEvalDbConnectionCreator
 {
+    private readonly string _connectionString;
+
     /// <summary>
-    /// A factory for creating a connection to the PortEval database.
+    ///     Initializes the factory based on the provided configuration object.
     /// </summary>
-    public class PortEvalDbConnectionCreator
+    /// <param name="configuration">The application's configuration.</param>
+    public PortEvalDbConnectionCreator(IConfiguration configuration)
     {
-        private readonly string _connectionString;
+        _connectionString = configuration.GetConnectionString("PortEvalDb");
+    }
 
-        public PortEvalDbConnectionCreator(IConfiguration configuration)
-        {
-            _connectionString = configuration.GetConnectionString("PortEvalDb");
-        }
-
-        /// <summary>
-        /// Creates a connection to the PortEval database.
-        /// </summary>
-        /// <returns>An <see cref="IDbConnection"/> instance connected to the PortEval database.</returns>
-        public IDbConnection CreateConnection() => new SqlConnection(_connectionString);
+    /// <summary>
+    ///     Creates a connection to the PortEval database.
+    /// </summary>
+    /// <returns>An <see cref="IDbConnection" /> instance connected to the PortEval database.</returns>
+    public IDbConnection CreateConnection()
+    {
+        return new SqlConnection(_connectionString);
     }
 }

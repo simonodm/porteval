@@ -1,12 +1,10 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace PortEval.Infrastructure.FinancialDataFetcher.AlphaVantage.Models
+namespace PortEval.Infrastructure.FinancialDataFetcher.AlphaVantage.Models;
+
+internal class TimeSeriesDailyResponseModel
 {
-    internal class TimeSeriesDailyResponseModel
-    {
-        [JsonProperty("Time Series (Daily)", Required = Required.Always)]
-        public Dictionary<string, TimeSeriesPriceDataModel> Prices { get; set; }
-    }
-
+    [JsonProperty("Time Series (Daily)", Required = Required.Always)]
+    public Dictionary<string, TimeSeriesPriceDataModel> Prices { get; set; }
 }

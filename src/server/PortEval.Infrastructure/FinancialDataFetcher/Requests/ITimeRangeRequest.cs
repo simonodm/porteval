@@ -1,11 +1,20 @@
 ﻿using System;
 using PortEval.DataFetcher.Interfaces;
 
-namespace PortEval.Infrastructure.FinancialDataFetcher.Requests
+namespace PortEval.Infrastructure.FinancialDataFetcher.Requests;
+
+/// <summary>
+///     Represents a request for data in some date/time range.
+/// </summary>
+public interface ITimeRangeRequest : IRequest
 {
-    public interface ITimeRangeRequest : IRequest
-    {
-        public DateTime From { get; set; }
-        public DateTime To { get; set; }
-    }
+    /// <summary>
+    ///     The start date/time of the range to retrieve data in.
+    /// </summary>
+    public DateTime From { get; set; }
+
+    /// <summary>
+    ///     The end date/time of the range to retrieve data in.
+    /// </summary>
+    public DateTime To { get; set; }
 }

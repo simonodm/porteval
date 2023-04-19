@@ -1,16 +1,27 @@
 ﻿using PortEval.DataFetcher.Interfaces;
 using PortEval.DataFetcher.Models;
 
-namespace PortEval.DataFetcher.Responses
+namespace PortEval.DataFetcher.Responses;
+
+/// <summary>
+///     Represents an operation's response. Contains operation's status code, error message and retrieved data if the
+///     operation has been successful.
+/// </summary>
+/// <typeparam name="TResult">Retrieved data type</typeparam>
+public class Response<TResult> : IResponse
 {
     /// <summary>
-    /// Represents an operation's response. Contains operation's status code, error message and retrieved data if the operation has been successful.
+    ///     Result of the operation if there is one.
     /// </summary>
-    /// <typeparam name="TResult">Retrieved data type</typeparam>
-    public class Response<TResult> : IResponse
-    {
-        public StatusCode StatusCode { get; set; }
-        public string ErrorMessage { get; set; }
-        public TResult Result { get; set; }
-    }
+    public TResult Result { get; set; }
+
+    /// <summary>
+    ///     Status code representing whether the operation was successful.
+    /// </summary>
+    public StatusCode StatusCode { get; set; }
+
+    /// <summary>
+    ///     Error message if applicable.
+    /// </summary>
+    public string ErrorMessage { get; set; }
 }

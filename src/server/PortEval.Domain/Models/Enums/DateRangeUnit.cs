@@ -1,10 +1,12 @@
-﻿namespace PortEval.Domain.Models.Enums
+﻿namespace PortEval.Domain.Models.Enums;
+
+/// <summary>
+///     Represents the unit used in a date range.
+/// </summary>
+public enum DateRangeUnit
 {
-    public enum DateRangeUnit
-    {
-        DAY,
-        WEEK,
-        MONTH,
-        YEAR
-    }
+    Day,
+    Week,
+    Month,
+    Year
 }

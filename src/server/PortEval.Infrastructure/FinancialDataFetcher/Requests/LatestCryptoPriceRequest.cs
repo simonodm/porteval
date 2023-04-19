@@ -1,9 +1,8 @@
-﻿namespace PortEval.Infrastructure.FinancialDataFetcher.Requests
+﻿namespace PortEval.Infrastructure.FinancialDataFetcher.Requests;
+
+/// <summary>
+///     Request for latest available prices of the supplied cryptocurrency.
+/// </summary>
+public class LatestCryptoPriceRequest : InstrumentDataRequest
 {
-    /// <summary>
-    /// Request for latest available prices of the supplied cryptocurrency.
-    /// </summary>
-    public class LatestCryptoPriceRequest : InstrumentDataRequest
-    {
-    }
 }

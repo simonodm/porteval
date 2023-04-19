@@ -1,21 +1,20 @@
-﻿using PortEval.Application.Models.FinancialDataFetcher;
-using System;
+﻿using System;
+using PortEval.Application.Models.FinancialDataFetcher;
 
-namespace PortEval.Infrastructure.FinancialDataFetcher.Extensions
+namespace PortEval.Infrastructure.FinancialDataFetcher.Extensions;
+
+internal static class IntradayIntervalExtensions
 {
-    internal static class IntradayIntervalExtensions
+    public static TimeSpan ToTimeSpan(this IntradayInterval interval)
     {
-        public static TimeSpan ToTimeSpan(this IntradayInterval interval)
+        switch (interval)
         {
-            switch (interval)
-            {
-                case IntradayInterval.FiveMinutes:
-                    return TimeSpan.FromMinutes(5);
-                case IntradayInterval.OneHour:
-                    return TimeSpan.FromHours(1);
-                default:
-                    throw new Exception($"Unrecognized intraday interval supplied: {interval}.");
-            }
+            case IntradayInterval.FiveMinutes:
+                return TimeSpan.FromMinutes(5);
+            case IntradayInterval.OneHour:
+                return TimeSpan.FromHours(1);
+            default:
+                throw new Exception($"Unrecognized intraday interval supplied: {interval}.");
         }
     }
 }

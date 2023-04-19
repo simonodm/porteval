@@ -1,28 +1,30 @@
-﻿using Dapper;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Dapper;
 using PortEval.Application.Core.Interfaces.Queries;
 using PortEval.Application.Models.DTOs;
 using PortEval.Application.Models.DTOs.Enums;
 using PortEval.Domain.Models.ValueObjects;
 using PortEval.Infrastructure.Queries.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace PortEval.Infrastructure.Queries
+namespace PortEval.Infrastructure.Queries;
+
+/// <inheritdoc cref="IChartQueries" />
+public class ChartQueries : IChartQueries
 {
-    public class ChartQueries : IChartQueries
+    private readonly PortEvalDbConnectionCreator _connectionCreator;
+
+    public ChartQueries(PortEvalDbConnectionCreator connectionCreator)
     {
-        private readonly PortEvalDbConnectionCreator _connectionCreator;
+        _connectionCreator = connectionCreator;
+    }
 
-        public ChartQueries(PortEvalDbConnectionCreator connectionCreator)
-        {
-            _connectionCreator = connectionCreator;
-        }
-
-        public async Task<IEnumerable<ChartDto>> GetChartsAsync()
-        {
-            // Chart queries have surrogate columns ToDateRangeSplit and NameSplit as a workaround to Dapper not splitting on NULL columns
-            using var connection = _connectionCreator.CreateConnection();
-            var query = @"SELECT Charts.Id,
+    /// <inheritdoc />
+    public async Task<IEnumerable<ChartDto>> GetChartsAsync()
+    {
+        // Chart queries have surrogate columns ToDateRangeSplit and NameSplit as a workaround to Dapper not splitting on NULL columns
+        using var connection = _connectionCreator.CreateConnection();
+        var query = @"SELECT Charts.Id,
   		                          Charts.Name,
   		                          Charts.Type,
 		                          Frequency,
@@ -58,36 +60,33 @@ namespace PortEval.Infrastructure.Queries
                           ) AS Instruments ON Lines.InstrumentId = Instruments.Id
                           ORDER BY Charts.Name, PortfolioName, PositionName, InstrumentName";
 
-            var charts = new Dictionary<int, ChartDto>();
-            await connection.QueryAsync<ChartDto, ToDateRangeQueryModel, ChartLineDto, ChartLineNameModel, ChartDto>(
-                query,
-                (chart, tdr, chartLine, lineNames) =>
+        var charts = new Dictionary<int, ChartDto>();
+        await connection.QueryAsync<ChartDto, ToDateRangeQueryModel, ChartLineDto, ChartLineNameModel, ChartDto>(
+            query,
+            (chart, tdr, chartLine, lineNames) =>
+            {
+                if (!charts.ContainsKey(chart.Id))
                 {
-                    if (!charts.ContainsKey(chart.Id))
-                    {
-                        charts[chart.Id] = chart;
-                        chart.Lines = new List<ChartLineDto>();
-                    }
+                    charts[chart.Id] = chart;
+                    chart.Lines = new List<ChartLineDto>();
+                }
 
-                    if (chart.IsToDate != null && (bool)chart.IsToDate)
-                    {
-                        charts[chart.Id].ToDateRange = new ToDateRange(tdr.ToDateRangeUnit, tdr.ToDateRangeValue);
-                    }
-                    if (chartLine != null)
-                    {
-                        charts[chart.Id].Lines.Add(AssignChartLineType(AssignChartLineName(chartLine, lineNames)));
-                    }
-                    return charts[chart.Id];
-                },
-                splitOn: "ToDateRangeSplit, Width, NameSplit");
+                if (chart.IsToDate != null && (bool)chart.IsToDate)
+                    charts[chart.Id].ToDateRange = new ToDateRange(tdr.ToDateRangeUnit, tdr.ToDateRangeValue);
+                if (chartLine != null)
+                    charts[chart.Id].Lines.Add(AssignChartLineType(AssignChartLineName(chartLine, lineNames)));
+                return charts[chart.Id];
+            },
+            splitOn: "ToDateRangeSplit, Width, NameSplit");
 
-            return charts.Values;
-        }
+        return charts.Values;
+    }
 
-        public async Task<ChartDto> GetChartAsync(int chartId)
-        {
-            using var connection = _connectionCreator.CreateConnection();
-            var query = @"SELECT Charts.Id,
+    /// <inheritdoc />
+    public async Task<ChartDto> GetChartAsync(int chartId)
+    {
+        using var connection = _connectionCreator.CreateConnection();
+        var query = @"SELECT Charts.Id,
   		                          Charts.Name,
   		                          Charts.Type,
 		                          Frequency,
@@ -123,44 +122,41 @@ namespace PortEval.Infrastructure.Queries
                           ) AS Instruments ON Lines.InstrumentId = Instruments.Id
                           WHERE Charts.Id = @ChartId";
 
-            ChartDto resultChart = null;
+        ChartDto resultChart = null;
 
-            await connection.QueryAsync<ChartDto, ToDateRangeQueryModel, ChartLineDto, ChartLineNameModel, ChartDto>(
-                query,
-                (chart, tdr, chartLine, lineNames) =>
-                {
-                    resultChart ??= chart;
-                    chart.Lines = new List<ChartLineDto>();
+        await connection.QueryAsync<ChartDto, ToDateRangeQueryModel, ChartLineDto, ChartLineNameModel, ChartDto>(
+            query,
+            (chart, tdr, chartLine, lineNames) =>
+            {
+                resultChart ??= chart;
+                chart.Lines = new List<ChartLineDto>();
 
-                    chart.ToDateRange = new ToDateRange(tdr.ToDateRangeUnit, tdr.ToDateRangeValue);
-                    if (chartLine != null)
-                    {
-                        resultChart.Lines.Add(AssignChartLineType(AssignChartLineName(chartLine, lineNames)));
-                    }
-                    return resultChart;
-                },
-                new { ChartId = chartId },
-                splitOn: "ToDateRangeSplit, Width, NameSplit");
+                chart.ToDateRange = new ToDateRange(tdr.ToDateRangeUnit, tdr.ToDateRangeValue);
+                if (chartLine != null)
+                    resultChart.Lines.Add(AssignChartLineType(AssignChartLineName(chartLine, lineNames)));
+                return resultChart;
+            },
+            new { ChartId = chartId },
+            splitOn: "ToDateRangeSplit, Width, NameSplit");
 
-            return resultChart;
-        }
+        return resultChart;
+    }
 
-        private ChartLineDto AssignChartLineName(ChartLineDto chartLine, ChartLineNameModel lineNames)
-        {
-            if (lineNames.PortfolioName != null) chartLine.Name = lineNames.PortfolioName;
-            else if (lineNames.PositionName != null) chartLine.Name = lineNames.PositionName;
-            else if (lineNames.InstrumentName != null) chartLine.Name = lineNames.InstrumentName;
+    private ChartLineDto AssignChartLineName(ChartLineDto chartLine, ChartLineNameModel lineNames)
+    {
+        if (lineNames.PortfolioName != null) chartLine.Name = lineNames.PortfolioName;
+        else if (lineNames.PositionName != null) chartLine.Name = lineNames.PositionName;
+        else if (lineNames.InstrumentName != null) chartLine.Name = lineNames.InstrumentName;
 
-            return chartLine;
-        }
+        return chartLine;
+    }
 
-        private ChartLineDto AssignChartLineType(ChartLineDto chartLine)
-        {
-            if (chartLine.InstrumentId != null) chartLine.Type = ChartLineType.Instrument;
-            else if (chartLine.PositionId != null) chartLine.Type = ChartLineType.Position;
-            else if (chartLine.PortfolioId != null) chartLine.Type = ChartLineType.Portfolio;
+    private ChartLineDto AssignChartLineType(ChartLineDto chartLine)
+    {
+        if (chartLine.InstrumentId != null) chartLine.Type = ChartLineType.Instrument;
+        else if (chartLine.PositionId != null) chartLine.Type = ChartLineType.Position;
+        else if (chartLine.PortfolioId != null) chartLine.Type = ChartLineType.Portfolio;
 
-            return chartLine;
-        }
+        return chartLine;
     }
 }
