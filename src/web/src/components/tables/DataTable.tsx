@@ -258,7 +258,7 @@ function getColumnCount<T extends Record<string, unknown>>(columns: Array<Column
  */
 function DataTable<T extends Record<string, unknown>>(
     { className, columnDefinitions, data, idSelector, ariaLabel, sortable, expandable, expandElement }: Props<T>
-) {
+): JSX.Element {
     const { breakpoint } = useBreakpoint(RESPONSIVE_BREAKPOINTS, 'lg');
 
     const columns = preprocessColumnDefinitions(columnDefinitions, breakpoint);

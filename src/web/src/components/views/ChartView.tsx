@@ -275,9 +275,10 @@ function ChartView(): JSX.Element {
                         <Row className="mb-5">
                             <Col>
                                 <ChartConfigurator onChange={(c) => {
-                                    setChart(c);
-                                    setIsChanged(true);
-                                }} />
+                                        setChart(c);
+                                        setIsChanged(true);
+                                    }}
+                                />
                             </Col>
                         </Row>
                         <Row className="chart-editor flex-grow-1 gy-5">

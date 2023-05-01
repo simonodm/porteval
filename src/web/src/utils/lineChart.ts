@@ -148,11 +148,11 @@ class SVGLineChart {
     _svg: d3.Selection<SVGGElement, unknown, null, undefined> | null = null;
 
     _xScale: d3.ScaleTime<number, number> | null = null;
-    _xFormat: (x: Date) => string = d3.isoFormat;
-    _xTooltipFormat: (x: Date) => string = d3.isoFormat;
+    _xFormat: (_: Date) => string = d3.isoFormat;
+    _xTooltipFormat: (_: Date) => string = d3.isoFormat;
 
     _yScale: d3.ScaleLinear<number, number> | null = null;
-    _yFormat: (y: number) => string = (num) => `${num}`;
+    _yFormat: (_: number) => string = (num) => `${num}`;
 
     _xInterval = d3.timeDay;
 
