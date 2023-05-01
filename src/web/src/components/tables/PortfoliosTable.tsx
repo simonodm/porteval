@@ -43,6 +43,10 @@ function PortfoliosTable(): JSX.Element {
     const [openPositionPortfolio, setOpenPositionPortfolio] = useState<Portfolio | undefined>(undefined);
     const [openPositionModalIsOpen, setOpenPositionModalIsOpen] = useState(false);
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
+
+    // because removal of a portfolio invalidates portfolios RTK tag, the application immediately attempts to re-fetch
+    // the removed portfolio's positions, which typically results in an error
+    // for this reason, we cache the ID of the last removed portfolio here, and later prevent render of the nested positions' table for that portfolio
     const [removedPortfolioId, setRemovedPortfolioId] = useState<number | undefined>(undefined);
 
     const [userSettings] = useUserSettings();

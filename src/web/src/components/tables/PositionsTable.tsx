@@ -65,6 +65,10 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
     const [createTransactionPosition, setCreateTransactionPosition] = useState<Position | undefined>(undefined);
     const [positionBeingEdited, setPositionBeingEdited] = useState<Position | undefined>(undefined);
 
+    // similar to portfolios' table, we cache the ID of the removed position to prevent re-fetch of its transactions
+    // after RTK tag invalidation caused by removal
+    const [removedPositionId, setRemovedPositionId] = useState<number | undefined>(undefined);
+
     const [userSettings] = useUserSettings();
 
     const isLoaded = checkIsLoaded(positions, positionStats);
@@ -132,6 +136,7 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
                         className="btn-xs"
                         onClick={() => {
                             deletePosition(position);
+                            setRemovedPositionId(position.id);
                         }}
                     >
                         Remove
@@ -276,6 +281,7 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
                         className="btn-xs"
                         onClick={() => {
                             deletePosition(position);
+                            setRemovedPositionId(position.id);
                         }}
                     >
                         Remove
@@ -299,11 +305,14 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
                 ariaLabel={`Portfolio ${portfolioId} positions table`}
                 idSelector={p => p.id}
                 expandElement={p =>
-                    <TransactionsTable
-                        className="w-100 entity-list entity-list-nested"
-                        positionId={p.id}
-                        currencyCode={p.instrument.currencyCode}
-                    />
+                    removedPositionId !== p.id
+                        ? 
+                            <TransactionsTable
+                                className="w-100 entity-list entity-list-nested"
+                                positionId={p.id}
+                                currencyCode={p.instrument.currencyCode}
+                            />
+                        : null
                 }
             />
             <ModalWrapper closeModal={() => setCreateTransactionModalIsOpen(false)} heading="Add new transaction"

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useLayoutEffect } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import LoadingWrapper from '../ui/LoadingWrapper';
 import PortEvalChart from '../charts/PortEvalChart';
 import useGetRouteState from '../../hooks/useGetRouteState';
@@ -54,7 +54,8 @@ function ChartView(): JSX.Element {
     const [createChart] = useCreateChartMutation();
     const [updateChart] = useUpdateChartMutation();
 
-    const [isChanged, setIsChanged] = useState(chartFromState.current);
+    const [isChanged, setIsChanged] = useState(false);
+    const [autosave, setAutosave] = useState(false);
 
     const [lineModalIsOpen, setLineModalIsOpen] = useState(false);
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
@@ -68,7 +69,30 @@ function ChartView(): JSX.Element {
             setChart(chartQuery.data);
             setChartId(chartQuery.data.id.toString())
         }
-    }, [chartQuery?.data])
+    }, [chartQuery?.data]);
+
+    // the following two hooks enable autosave functionality
+    // essentially, the first hook switches `autosave` state to true every five seconds
+    // the second hook then reacts to these changes by actually saving the chart and switching `autosave` back to false
+    // this separation is important, because if the chart saving logic was inside the setInterval callback,
+    // then it would capture the value of `isChanged` during the first render and never reevaluate it again
+    useEffect(() => {
+        const autoSaveInterval = setInterval(() => {
+            setAutosave(true);
+        }, 5000);
+
+        return () => {
+            clearInterval(autoSaveInterval);
+            setAutosave(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if(chart && autosave && isChanged) {
+            handleChartSave(chart);
+            setAutosave(false);
+        }        
+    }, [autosave, isChanged])
 
     const addInstrumentLine = (instrument: Instrument) => {
         const colorIndex = (lastUsedColorCodeIndex + 1) % constants.CHART_LINE_COLOR_CODE_PROGRESSION.length;
@@ -136,7 +160,6 @@ function ChartView(): JSX.Element {
             (lastUsedColorCodeIndex + positions.length) % constants.CHART_LINE_COLOR_CODE_PROGRESSION.length
         );
 
-
         const updatedChart = {
             ...chart,
             lines: [
@@ -144,7 +167,9 @@ function ChartView(): JSX.Element {
                 ...newLines
             ]
         };
-        handleChartSave(updatedChart);
+
+        setChart(updatedChart);
+        setIsChanged(true);
     }
 
     const configureLine = (line: ChartLine) => {
@@ -162,7 +187,8 @@ function ChartView(): JSX.Element {
             lines: chart.lines.filter(existingLine => existingLine !== line)
         };
         
-        handleChartSave(updatedChart);
+        setChart(updatedChart);
+        setIsChanged(true);
     }
 
     const handleLineSave = (line: ChartLine) => {
@@ -184,13 +210,15 @@ function ChartView(): JSX.Element {
             ]
         };
 
-        handleChartSave(updatedChart);
+        setChart(updatedChart);
+        setIsChanged(true);
         setLineModalIsOpen(false);
     }
 
     const handleChartEditSave = (updatedChart: ChartConfig) => {
         setEditModalIsOpen(false);
-        handleChartSave(updatedChart);
+        setChart(updatedChart);
+        setIsChanged(true);
     }
 
     const handleChartSave = (updatedChart: ChartConfig) => {
@@ -207,7 +235,6 @@ function ChartView(): JSX.Element {
             });
         }
 
-        setChart(updatedChart);
         setIsChanged(false);
     }
 
@@ -231,7 +258,7 @@ function ChartView(): JSX.Element {
                     disabled={!isChanged}
                     onClick={() => chart && handleChartSave(chart)}
                 >
-                    Save
+                    {isChanged ? 'Save' : 'Saved'}
                 </Button>
                 <Button
                     variant="primary"
@@ -247,7 +274,10 @@ function ChartView(): JSX.Element {
                     <Container fluid className="chart-view-container d-flex flex-column flex-grow-1 g-0">
                         <Row className="mb-5">
                             <Col>
-                                <ChartConfigurator onChange={handleChartSave} />
+                                <ChartConfigurator onChange={(c) => {
+                                    setChart(c);
+                                    setIsChanged(true);
+                                }} />
                             </Col>
                         </Row>
                         <Row className="chart-editor flex-grow-1 gy-5">
