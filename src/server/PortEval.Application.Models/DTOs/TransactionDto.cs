@@ -28,5 +28,6 @@ public class TransactionDto
     [SwaggerSchema("Value at which the instruments were purchased/sold.")]
     public decimal Price { get; set; }
 
-    [SwaggerSchema("Transaction note.")] public string Note { get; set; }
+    [SwaggerSchema("Transaction note.")]
+    public string Note { get; set; }
 }

@@ -10,9 +10,11 @@ namespace PortEval.Application.Models.QueryParams;
 [SwaggerSchema("Represents a time period.")]
 public class DateRangeParams
 {
-    [SwaggerSchema("Period start.")] public DateTime From { get; set; } = PortEvalConstants.FinancialDataStartTime;
+    [SwaggerSchema("Period start.")]
+    public DateTime From { get; set; } = PortEvalConstants.FinancialDataStartTime;
 
-    [SwaggerSchema("Period end.")] public DateTime To { get; set; } = DateTime.UtcNow;
+    [SwaggerSchema("Period end.")]
+    public DateTime To { get; set; } = DateTime.UtcNow;
 
     public DateRangeParams SetFrom(DateTime from)
     {

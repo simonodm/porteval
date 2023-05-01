@@ -44,7 +44,10 @@ public abstract class PositionBasedStatisticsCalculatorBase
 
         // populate missing start prices by taking the previous one
         // this handles situations when there are no prices between startTimes[i] and startTimes[i-1]
-        for (var i = 1; i < startPrices.Count; i++) startPrices[i] ??= startPrices[i - 1];
+        for (var i = 1; i < startPrices.Count; i++)
+        {
+            startPrices[i] ??= startPrices[i - 1];
+        }
 
         // do the same for the end price
         var endPrice = priceEnumerator.FindNextElementInEnumerator(p => p.Time <= endTime);
@@ -54,6 +57,7 @@ public abstract class PositionBasedStatisticsCalculatorBase
         }
 
         for (var i = 0; i < startTimes.Count; i++)
+        {
             result.Add(new PositionPriceRangeData
             {
                 DateRange = new DateRangeParams { From = startTimes[i], To = endTime },
@@ -62,6 +66,7 @@ public abstract class PositionBasedStatisticsCalculatorBase
                 PriceAtRangeStart = startPrices[i],
                 Transactions = positionPriceListData.Transactions
             });
+        }
 
         return result;
     }

@@ -42,24 +42,24 @@ public class MissingInstrumentPricesFetchJob : InstrumentPriceFetchJobBase, IMis
     /// <inheritdoc />
     public async Task RunAsync()
     {
-        var currentTime = DateTime.UtcNow;
+        var baseTime = DateTime.UtcNow.RoundDown(PriceUtils.FiveMinutes);
         _logger.LogInformation("Starting missing prices fetch.");
 
         var instruments = await _instrumentRepository.ListAllAsync();
 
         foreach (var instrument in instruments)
         {
-            var missingRanges = await GetMissingRanges(instrument, currentTime);
+            var missingRanges = await GetMissingRanges(instrument, baseTime);
 
             foreach (var range in missingRanges)
             {
-                var processedPrices = await ProcessMissingRange(instrument, range, currentTime);
+                var processedPrices = await ProcessMissingRange(instrument, range, baseTime);
                 AdjustInstrumentTrackingBasedOnProcessedPrices(instrument, processedPrices);
             }
 
             if (instrument.TrackingInfo != null)
             {
-                instrument.TrackingInfo.Update(currentTime);
+                instrument.TrackingInfo.Update(baseTime);
                 instrument.IncreaseVersion();
                 _instrumentRepository.Update(instrument);
             }
@@ -82,7 +82,7 @@ public class MissingInstrumentPricesFetchJob : InstrumentPriceFetchJobBase, IMis
             priceTimes,
             time => PriceUtils.GetInstrumentPriceInterval(baseTime, time),
             PortEvalConstants.FinancialDataStartTime,
-            baseTime.RoundDown(PriceUtils.FiveMinutes)
+            baseTime
         );
 
         return missingRanges;

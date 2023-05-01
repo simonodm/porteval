@@ -12,7 +12,9 @@ public class EntityProfitDto
     [SwaggerSchema("Code of the currency in which profit is provided.", ReadOnly = true)]
     public string CurrencyCode { get; set; }
 
-    [SwaggerSchema("Time period start.")] public DateTime From { get; set; }
+    [SwaggerSchema("Time period start.")]
+    public DateTime From { get; set; }
 
-    [SwaggerSchema("Time period end.")] public DateTime To { get; set; }
+    [SwaggerSchema("Time period end.")]
+    public DateTime To { get; set; }
 }

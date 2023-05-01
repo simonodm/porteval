@@ -68,7 +68,11 @@ public static class CsvWriterExtensions
     /// <param name="entry">Entry to write to the file.</param>
     public static void WriteErrorEntry(this CsvWriter csv, RawRowErrorLogEntry entry)
     {
-        foreach (var field in entry.RawRowFields) csv.WriteField(field);
+        foreach (var field in entry.RawRowFields)
+        {
+            csv.WriteField(field);
+        }
+
         csv.WriteErrorField(entry);
         csv.NextRecord();
     }

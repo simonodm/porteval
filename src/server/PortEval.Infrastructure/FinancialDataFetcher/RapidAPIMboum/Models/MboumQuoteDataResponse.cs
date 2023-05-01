@@ -7,9 +7,12 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum.Models;
 /// </summary>
 public class MboumQuoteDataResponse
 {
-    [JsonProperty("currency")] public string Currency { get; set; }
+    [JsonProperty("currency")]
+    public string Currency { get; set; }
 
-    [JsonProperty("exchange")] public string Exchange { get; set; }
+    [JsonProperty("exchange")]
+    public string Exchange { get; set; }
 
-    [JsonProperty("regularMarketPrice")] public decimal RegularMarketPrice { get; set; }
+    [JsonProperty("regularMarketPrice")]
+    public decimal RegularMarketPrice { get; set; }
 }

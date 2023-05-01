@@ -21,7 +21,7 @@ public class OpenExchangeRatesApi : DataSource
         var queryUrlBuilder = new QueryUrlBuilder($"{BaseUrl}/latest.json");
         queryUrlBuilder.AddQueryParam("app_id", Configuration.Credentials.Token);
         queryUrlBuilder.AddQueryParam("base", request.CurrencyCode);
-        
+
         var queryUrl = queryUrlBuilder.ToString();
 
         var response =

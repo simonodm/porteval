@@ -49,7 +49,10 @@ public class DashboardService : IDashboardService
     {
         var existingItems = await _dashboardItemRepository.GetDashboardItemsAsync();
 
-        foreach (var existingItem in existingItems) _dashboardItemRepository.Delete(existingItem);
+        foreach (var existingItem in existingItems)
+        {
+            _dashboardItemRepository.Delete(existingItem);
+        }
 
         var newItemEntities = await GenerateItemEntities(newItems);
         if (newItemEntities.Status != OperationStatus.Ok)
@@ -70,7 +73,10 @@ public class DashboardService : IDashboardService
             };
         }
 
-        foreach (var entity in newItemEntities.Response) _dashboardItemRepository.Add(entity);
+        foreach (var entity in newItemEntities.Response)
+        {
+            _dashboardItemRepository.Add(entity);
+        }
 
         await _dashboardItemRepository.UnitOfWork.CommitAsync();
         return await GetDashboardLayoutAsync();
@@ -118,6 +124,7 @@ public class DashboardService : IDashboardService
         var filledLayoutPositions = new HashSet<(int, int)>();
 
         foreach (var item in items)
+        {
             for (var i = item.Position.X; i < item.Position.X + item.Position.Width; i++)
             for (var j = item.Position.Y; j < item.Position.Y + item.Position.Height; j++)
             {
@@ -128,6 +135,7 @@ public class DashboardService : IDashboardService
 
                 filledLayoutPositions.Add((i, j));
             }
+        }
 
         return false;
     }

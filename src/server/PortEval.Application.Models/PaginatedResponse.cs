@@ -10,7 +10,8 @@ namespace PortEval.Application.Models;
 [SwaggerSchema("Represents a paginated response of multiple objects.")]
 public class PaginatedResponse<TPayload>
 {
-    [SwaggerSchema("Page number.")] public int Page { get; private set; }
+    [SwaggerSchema("Page number.")]
+    public int Page { get; private set; }
 
     [SwaggerSchema("Amount of entities in the page.")]
     public int Count { get; private set; }
@@ -18,7 +19,8 @@ public class PaginatedResponse<TPayload>
     [SwaggerSchema("Total count of entities available.")]
     public int TotalCount { get; private set; }
 
-    [SwaggerSchema("Paginated data.")] public IEnumerable<TPayload> Data { get; private set; }
+    [SwaggerSchema("Paginated data.")]
+    public IEnumerable<TPayload> Data { get; private set; }
 
     /// <summary>
     ///     Initializes the paginated response.

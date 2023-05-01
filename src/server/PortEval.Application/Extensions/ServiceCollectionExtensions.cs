@@ -32,6 +32,7 @@ using PortEval.Infrastructure.FinancialDataFetcher.ExchangeRateHost;
 using PortEval.Infrastructure.FinancialDataFetcher.OpenExchangeRates;
 using PortEval.Infrastructure.FinancialDataFetcher.RapidAPIMboum;
 using PortEval.Infrastructure.FinancialDataFetcher.Tiingo;
+using PortEval.Infrastructure.FinancialDataFetcher.YFinance;
 using PortEval.Infrastructure.Queries;
 using PortEval.Infrastructure.Queries.TypeHandlers;
 using PortEval.Infrastructure.Repositories;
@@ -284,6 +285,7 @@ public static class ServiceCollectionExtensions
             });
         }
 
+        dataFetcher.RegisterDataSource<YahooFinanceApi>();
         dataFetcher.RegisterDataSource<ExchangeRateHostApi>();
         services.AddSingleton<IDataFetcher>(dataFetcher);
         services.AddScoped<IFinancialDataFetcher, FinancialDataFetcher>();

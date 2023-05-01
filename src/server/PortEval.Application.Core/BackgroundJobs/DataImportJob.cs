@@ -153,8 +153,15 @@ public class DataImportJob : IDataImportJob
         csv.RegisterImportClassMaps();
 
         csv.WriteErrorHeaders<T>();
-        foreach (var entry in parsingErrorLog) csv.WriteErrorEntry(entry);
-        foreach (var entry in processedErrorLog) csv.WriteErrorEntry(entry);
+        foreach (var entry in parsingErrorLog)
+        {
+            csv.WriteErrorEntry(entry);
+        }
+
+        foreach (var entry in processedErrorLog)
+        {
+            csv.WriteErrorEntry(entry);
+        }
     }
 
     private void DeleteFile(string filePath)

@@ -109,12 +109,14 @@ public class ExchangeRateHostApi : DataSource
     {
         var result = new List<ExchangeRates>();
         foreach (var (dayKey, exchangeRates) in response.Rates)
+        {
             result.Add(new ExchangeRates
             {
                 Currency = response.Base,
                 Time = DateTime.SpecifyKind(DateTime.Parse(dayKey), DateTimeKind.Utc),
                 Rates = exchangeRates
             });
+        }
 
         return result;
     }

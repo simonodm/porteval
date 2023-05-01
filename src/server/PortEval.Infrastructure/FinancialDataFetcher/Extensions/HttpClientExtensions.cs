@@ -39,7 +39,9 @@ internal static class HttpClientExtensions
             if (headers != null)
             {
                 foreach (var (header, value) in headers)
+                {
                     request.Headers.Add(header, value);
+                }
             }
 
             var response = await httpClient.SendAsync(request);

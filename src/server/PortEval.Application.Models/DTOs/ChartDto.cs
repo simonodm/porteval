@@ -12,7 +12,8 @@ public class ChartDto
     [SwaggerSchema("The chart identifier", ReadOnly = true)]
     public int Id { get; set; }
 
-    [SwaggerSchema("Chart name")] public string Name { get; set; }
+    [SwaggerSchema("Chart name")]
+    public string Name { get; set; }
 
     [SwaggerSchema("Chart date range start. Only applicable when IsToDate is not set to true.", Nullable = true)]
     public DateTime? DateRangeStart { get; set; }

@@ -41,7 +41,7 @@ internal class RequestHandler<TRequest, TResult>
         else
         {
 #if DEBUG
-                _retryPolicy = RetryPolicy.Fast;
+            _retryPolicy = RetryPolicy.Fast;
 #else
             _retryPolicy = RetryPolicy.Standard;
 #endif
@@ -103,10 +103,12 @@ internal class RequestHandler<TRequest, TResult>
         }
 
         foreach (var task in apiTasks)
+        {
             if (task.Result.StatusCode == StatusCode.Ok)
             {
                 return task.Result;
             }
+        }
 
         return new Response<TResult>
         {

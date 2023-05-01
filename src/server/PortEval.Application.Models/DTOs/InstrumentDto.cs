@@ -10,14 +10,17 @@ public class InstrumentDto
     [SwaggerSchema("Instrument identifier.", ReadOnly = true)]
     public int Id { get; set; }
 
-    [SwaggerSchema("Instrument ticker.")] public string Symbol { get; set; }
+    [SwaggerSchema("Instrument ticker.")]
+    public string Symbol { get; set; }
 
-    [SwaggerSchema("Instrument name.")] public string Name { get; set; }
+    [SwaggerSchema("Instrument name.")]
+    public string Name { get; set; }
 
     [SwaggerSchema("Exchange at which the given instrument is traded.")]
     public string Exchange { get; set; }
 
-    [SwaggerSchema("Instrument type.")] public InstrumentType Type { get; set; }
+    [SwaggerSchema("Instrument type.")]
+    public InstrumentType Type { get; set; }
 
     [SwaggerSchema("Current price of the instrument.")]
     public decimal CurrentPrice { get; set; }
@@ -25,7 +28,8 @@ public class InstrumentDto
     [SwaggerSchema("Instrument currency code.")]
     public string CurrencyCode { get; set; }
 
-    [SwaggerSchema("Instrument note.")] public string Note { get; set; }
+    [SwaggerSchema("Instrument note.")]
+    public string Note { get; set; }
 
     [SwaggerSchema("Whether the instrument's prices are tracked and updated automatically.")]
     public InstrumentTrackingStatus TrackingStatus { get; set; }

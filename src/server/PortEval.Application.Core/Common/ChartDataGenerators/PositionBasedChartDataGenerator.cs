@@ -239,7 +239,10 @@ public abstract class PositionBasedChartDataGenerator : ChartDataGeneratorBase
             }
         }
 
-        foreach (var generator in positionChartPointGenerators) generator.Dispose();
+        foreach (var generator in positionChartPointGenerators)
+        {
+            generator.Dispose();
+        }
 
         return result;
     }

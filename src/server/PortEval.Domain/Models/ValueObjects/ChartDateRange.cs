@@ -1,5 +1,6 @@
 ﻿using System;
 using PortEval.Domain.Exceptions;
+using PortEval.Domain.Models.Enums;
 
 namespace PortEval.Domain.Models.ValueObjects;
 
@@ -30,6 +31,15 @@ public class ChartDateRange : ValueObject
     ///     This field is only populated for to-date ranges.
     /// </summary>
     public ToDateRange ToDateRange { get; private set; }
+
+    /// <summary>
+    ///     Initializes a 1Y to-date chart range.
+    /// </summary>
+    public ChartDateRange()
+    {
+        IsToDate = true;
+        ToDateRange = new ToDateRange(DateRangeUnit.Year, 1);
+    }
 
     /// <summary>
     ///     Initializes a fixed from/to chart date range.

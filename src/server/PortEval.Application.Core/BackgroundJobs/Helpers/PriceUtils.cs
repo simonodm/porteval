@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PortEval.Application.Core.Extensions;
 using PortEval.Application.Core.Interfaces.Repositories;
 using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.Domain.Models.Entities;
@@ -78,9 +77,7 @@ internal static class PriceUtils
             var latestPrice = pricePoints
                 .FirstOrDefault(p => p.Time <= range.From);
 
-            var intervalAtRangeStart = intervalFunction(range.From);
-
-            var currentTime = range.From.RoundUp(intervalAtRangeStart);
+            var currentTime = range.From;
             while (latestPrice != null && currentTime < range.To)
             {
                 if (currentTime > range.From)
@@ -167,7 +164,10 @@ internal static class PriceUtils
     private static IEnumerable<TimeRange> SplitRangesAtIntervalChanges(IEnumerable<TimeRange> ranges, DateTime baseTime)
     {
         var queue = new Queue<TimeRange>();
-        foreach (var range in ranges) queue.Enqueue(range);
+        foreach (var range in ranges)
+        {
+            queue.Enqueue(range);
+        }
 
         var result = new List<TimeRange>();
         while (queue.Count > 0)

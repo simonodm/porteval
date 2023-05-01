@@ -14,7 +14,8 @@ public class DashboardItemDto
     [SwaggerSchema("Item width. Values between 1 and 6 are allowed.")]
     public int DashboardWidth { get; set; }
 
-    [SwaggerSchema("Item height.")] public int DashboardHeight { get; set; }
+    [SwaggerSchema("Item height.")]
+    public int DashboardHeight { get; set; }
 
     [SwaggerSchema("Identifier of the chart to display.")]
     public int ChartId { get; set; }

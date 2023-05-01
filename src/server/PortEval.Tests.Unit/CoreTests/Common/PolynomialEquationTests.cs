@@ -18,7 +18,10 @@ public class PolynomialEquationTests
         double precision, double initialGuess)
     {
         var equation = new PolynomialEquation(precision);
-        for (var i = 0; i < coefficients.Length; i++) equation.AddCoefficient(i, coefficients[i]);
+        for (var i = 0; i < coefficients.Length; i++)
+        {
+            equation.AddCoefficient(i, coefficients[i]);
+        }
 
         var result = equation.CalculateRoot(initialGuess);
 

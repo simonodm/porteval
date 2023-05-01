@@ -63,7 +63,9 @@ public class DashboardServiceTests
         await sut.UpdateDashboardLayoutAsync(newDashboardItems);
 
         foreach (var item in existingDashboardItems)
+        {
             _dashboardItemRepository.Verify(r => r.Delete(item), Times.Once());
+        }
     }
 
     [Fact]
@@ -81,6 +83,7 @@ public class DashboardServiceTests
         await sut.UpdateDashboardLayoutAsync(newDashboardItems);
 
         foreach (var item in newDashboardItems)
+        {
             _dashboardItemRepository.Verify(r => r.Add(It.Is<DashboardChartItem>(i =>
                 i.Position.X == item.DashboardPositionX &&
                 i.Position.Y == item.DashboardPositionY &&
@@ -88,6 +91,7 @@ public class DashboardServiceTests
                 i.Position.Height == item.DashboardHeight &&
                 i.ChartId == item.ChartId
             )), Times.Once());
+        }
     }
 
     [Fact]

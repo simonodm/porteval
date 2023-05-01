@@ -7,7 +7,8 @@ namespace PortEval.Application.Models.DTOs;
 [SwaggerSchema("Represents an instrument's split.")]
 public class InstrumentSplitDto
 {
-    [SwaggerSchema("ID of the split.")] public int Id { get; set; }
+    [SwaggerSchema("ID of the split.")]
+    public int Id { get; set; }
 
     [SwaggerSchema("ID of the parent instrument.")]
     public int InstrumentId { get; set; }

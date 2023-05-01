@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.BackgroundJobs.Helpers;
+using PortEval.Application.Core.Extensions;
 using PortEval.Application.Core.Interfaces;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
 using PortEval.Application.Core.Interfaces.Repositories;
@@ -48,17 +49,17 @@ public class InitialPriceFetchJob : InstrumentPriceFetchJobBase, IInitialPriceFe
             return;
         }
 
-        var fetchStart = DateTime.UtcNow;
+        var baseTime = DateTime.UtcNow.RoundDown(PriceUtils.FiveMinutes);
 
-        var prices = await FetchInstrumentPrices(instrument, fetchStart);
+        var prices = await FetchInstrumentPrices(instrument, baseTime);
 
         if (prices.Count != 0)
         {
             var pricesWithMissingRangesFilled = PriceUtils.FillMissingRangePrices(
                 prices,
-                time => PriceUtils.GetInstrumentPriceInterval(fetchStart, time),
+                time => PriceUtils.GetInstrumentPriceInterval(baseTime, time),
                 prices[0].Time,
-                fetchStart);
+                baseTime);
             await SavePrices(instrument, pricesWithMissingRangesFilled);
         }
         else

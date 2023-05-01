@@ -27,9 +27,15 @@ internal static class MediatorExtensions
             .Select(CreateNotificationFromDomainEvent)
             .ToList();
 
-        foreach (var entity in domainEntities) entity.Entity.ClearDomainEvents();
+        foreach (var entity in domainEntities)
+        {
+            entity.Entity.ClearDomainEvents();
+        }
 
-        foreach (var notification in notifications) await mediator.Publish(notification);
+        foreach (var notification in notifications)
+        {
+            await mediator.Publish(notification);
+        }
     }
 
     private static INotification CreateNotificationFromDomainEvent(IDomainEvent domainEvent)

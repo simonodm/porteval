@@ -18,7 +18,8 @@ public class PositionDto
     [SwaggerSchema("Current position size.")]
     public decimal PositionSize { get; set; }
 
-    [SwaggerSchema("Position note.")] public string Note { get; set; }
+    [SwaggerSchema("Position note.")]
+    public string Note { get; set; }
 
     [SwaggerSchema("Instrument which this position represents.")]
     public InstrumentDto Instrument { get; set; }

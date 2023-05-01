@@ -61,7 +61,9 @@ public class MissingExchangeRatesFetchJob : IMissingExchangeRatesFetchJob
             currentTime);
 
         foreach (var range in missingExchangeRates)
+        {
             await ProcessCurrencyRange(currencies, defaultCurrency, range, currentTime);
+        }
 
         _logger.LogInformation("Missing exchange rates job finished.");
     }

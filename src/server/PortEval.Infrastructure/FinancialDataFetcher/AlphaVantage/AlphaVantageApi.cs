@@ -39,7 +39,7 @@ public class AlphaVantageApi : DataSource
     public async Task<Response<IEnumerable<PricePoint>>> ProcessAsync(IntradayInstrumentPricesRequest request)
     {
         var interval = request.Interval == IntradayInterval.FiveMinutes ? "5min" : "60min";
-        
+
         var queryUrlBuilder = new QueryUrlBuilder($"{BaseUrl}/query");
         queryUrlBuilder.AddQueryParam("function", "TIME_SERIES_INTRADAY");
         queryUrlBuilder.AddQueryParam("symbol", request.Symbol);

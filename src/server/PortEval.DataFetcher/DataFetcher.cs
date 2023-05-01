@@ -101,7 +101,7 @@ public class DataFetcher : IDataFetcher
                 $"No \"{expectedHttpClientPropertyName}\" property found on type {type}.");
         }
 
-        configProp.SetValue(api, configuration, null);
+        configProp.SetValue(api, configuration ?? new DataSourceConfiguration(), null);
         httpClientProp.SetValue(api, _httpClient, null);
 
         _registeredClients.Add(api);

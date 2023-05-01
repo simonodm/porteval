@@ -40,9 +40,15 @@ public class SplitPriceAndTransactionAdjustmentJob : ISplitPriceAndTransactionAd
         var nonProcessedSplits = await _splitRepository.ListNonProcessedSplitsAsync();
         var rolledBackSplits = await _splitRepository.ListRollbackRequestedSplitsAsync();
 
-        foreach (var split in nonProcessedSplits) await ProcessSplit(split);
+        foreach (var split in nonProcessedSplits)
+        {
+            await ProcessSplit(split);
+        }
 
-        foreach (var split in rolledBackSplits) await ProcessSplitRollback(split);
+        foreach (var split in rolledBackSplits)
+        {
+            await ProcessSplitRollback(split);
+        }
 
         await _splitRepository.UnitOfWork.CommitAsync();
 
@@ -78,7 +84,10 @@ public class SplitPriceAndTransactionAdjustmentJob : ISplitPriceAndTransactionAd
 
         foreach (var position in positions)
         {
-            foreach (var transaction in position.Transactions) transaction.AdjustForSplit(split);
+            foreach (var transaction in position.Transactions)
+            {
+                transaction.AdjustForSplit(split);
+            }
 
             _positionRepository.Update(position);
         }
@@ -101,7 +110,10 @@ public class SplitPriceAndTransactionAdjustmentJob : ISplitPriceAndTransactionAd
 
         foreach (var position in positions)
         {
-            foreach (var transaction in position.Transactions) transaction.AdjustForSplitRollback(split);
+            foreach (var transaction in position.Transactions)
+            {
+                transaction.AdjustForSplitRollback(split);
+            }
 
             _positionRepository.Update(position);
         }

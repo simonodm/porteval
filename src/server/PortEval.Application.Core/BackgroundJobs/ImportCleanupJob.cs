@@ -33,10 +33,12 @@ public class ImportCleanupJob : IImportCleanupJob
 
         var imports = await _importRepository.ListAllAsync();
         foreach (var import in imports)
+        {
             if (import.Time < DateTime.UtcNow.AddHours(-24))
             {
                 await DeleteImport(import);
             }
+        }
 
         await _importRepository.UnitOfWork.CommitAsync();
 

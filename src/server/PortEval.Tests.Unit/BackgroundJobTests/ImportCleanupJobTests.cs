@@ -58,7 +58,9 @@ public class ImportCleanupJobTests
         await sut.RunAsync();
 
         foreach (var import in importsToRemove)
+        {
             _dataImportRepository.Verify(m => m.DeleteAsync(import.Id), Times.Once());
+        }
     }
 
     [Fact]
@@ -95,6 +97,9 @@ public class ImportCleanupJobTests
 
         await sut.RunAsync();
 
-        foreach (var import in importsToRemove) Assert.False(_fileSystem.FileExists(import.ErrorLogPath));
+        foreach (var import in importsToRemove)
+        {
+            Assert.False(_fileSystem.FileExists(import.ErrorLogPath));
+        }
     }
 }

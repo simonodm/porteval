@@ -6,9 +6,11 @@ namespace PortEval.Application.Models.DTOs;
 
 public class CsvTemplateImportDto
 {
-    [SwaggerSchema("Guid of the import.")] public Guid ImportId { get; set; }
+    [SwaggerSchema("Guid of the import.")]
+    public Guid ImportId { get; set; }
 
-    [SwaggerSchema("Time of import.")] public DateTime Time { get; set; }
+    [SwaggerSchema("Time of import.")]
+    public DateTime Time { get; set; }
 
     [SwaggerSchema("Type of data which were imported.")]
     public TemplateType TemplateType { get; set; }
