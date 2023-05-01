@@ -151,7 +151,7 @@ public class YahooFinanceApi : DataSource
     {
         var timestamps = response?.Chart?.Result?.FirstOrDefault()?.Timestamps;
         var prices = response?.Chart?.Result?.FirstOrDefault()?.Indicators?.QuoteIndicators?.FirstOrDefault()
-            ?.AdjustedClose;
+            ?.Prices;
         var meta = response?.Chart?.Result?.FirstOrDefault()?.Meta;
 
         if (meta == null || timestamps == null || prices == null || timestamps.Count != prices.Count)

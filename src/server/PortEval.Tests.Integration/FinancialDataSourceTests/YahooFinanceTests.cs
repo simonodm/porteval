@@ -37,7 +37,7 @@ public class YahooFinanceTests
                             {
                                 new()
                                 {
-                                    AdjustedClose = new List<decimal?> { price }
+                                    Prices = new List<decimal?> { price }
                                 }
                             }
                         },
@@ -102,7 +102,7 @@ public class YahooFinanceTests
                             {
                                 new()
                                 {
-                                    AdjustedClose = new List<decimal?> { price }
+                                    Prices = new List<decimal?> { price }
                                 }
                             }
                         },

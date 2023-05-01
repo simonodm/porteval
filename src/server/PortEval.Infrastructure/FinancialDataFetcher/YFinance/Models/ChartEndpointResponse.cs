@@ -62,7 +62,6 @@ public class ChartIndicators
 
 public class QuoteIndicator
 {
-    [JsonProperty("close")]
-    public List<decimal?>
-        AdjustedClose { get; set; } // nullable because YFinance sometimes returns nulls in price histories
+    [JsonProperty("open")]
+    public List<decimal?> Prices { get; set; } // nullable because YFinance sometimes returns nulls in price histories
 }
