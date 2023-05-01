@@ -20,7 +20,7 @@ services:
   porteval-api:
     image: porteval-api:dev
     build:
-      context: ./server
+      context: ./src/server
       dockerfile: Dockerfile.development
     depends_on:
       - porteval-db
@@ -39,7 +39,7 @@ services:
   porteval-web:
     image: porteval-web:dev
     build:
-      context: ./web
+      context: ./src/web
       dockerfile: Dockerfile.development
     depends_on:
       - porteval-api
@@ -50,7 +50,7 @@ services:
       - PORTEVAL_API_URL=http://porteval-api/
     stdin_open: true
     volumes:
-    - ./web:/app
+    - ./src/web:/app
 
 volumes:
     porteval_db_dev:

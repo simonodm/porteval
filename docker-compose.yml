@@ -18,9 +18,9 @@ services:
       start_period: 10s
 
   porteval-api:
-    image: porteval-api:1.0.6
+    image: porteval-api:1.0.7
     build:
-      context: ./server
+      context: ./src/server
     depends_on:
       - porteval-db
     ports:
@@ -36,15 +36,15 @@ services:
       - porteval_file_storage:/app/files
       
   porteval-web:
-    image: porteval-web:1.0.6
+    image: porteval-web:1.0.7
     build:
-      context: ./web
+      context: ./src/web
     depends_on:
       - porteval-api
     ports:
       - "3080:80"
     volumes:
-    - ./web:/app
+    - ./src/web:/app
 
 volumes:
     porteval_db_prod:
