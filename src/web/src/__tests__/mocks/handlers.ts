@@ -161,6 +161,18 @@ const getPortfolioPriceChart = () => {
     })
 }
 
+const getPortfolioPerformanceChart = () => {
+    return rest.get('/api/portfolios/:id/performance/chart', (req, res, ctx) => {
+        return res(
+            ctx.status(200),
+            ctx.json([{
+                value: 0,
+                time: '2022-01-01'
+            }])
+        );
+    });
+}
+
 const getPortfolioPositions = () => {
     return rest.get('/api/portfolios/:id/positions', (req, res, ctx) => {
         const { id } = req.params;
@@ -671,6 +683,7 @@ export const handlers = [
     getPortfolioStats(),
     getPortfolioValue(),
     getPortfolioPriceChart(),
+    getPortfolioPerformanceChart(),
     getPortfolioPositions(),
     getPortfolioPositionsStats(),
     getPositionStats(),
