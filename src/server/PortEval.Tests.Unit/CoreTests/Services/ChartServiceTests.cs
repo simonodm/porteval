@@ -552,13 +552,19 @@ public class ChartServiceTests
 
     private bool LineDtosMatchLineEntities(IReadOnlyList<ChartLineDto> dtos, IReadOnlyList<ChartLine> entities)
     {
-        if (dtos.Count != entities.Count) return false;
+        if (dtos.Count != entities.Count)
+        {
+            return false;
+        }
 
         for (var i = 0; i < dtos.Count; i++)
         {
             var dto = dtos[i];
             var entity = entities[i];
-            if (!LineDtoMatchesLineEntity(dto, entity)) return false;
+            if (!LineDtoMatchesLineEntity(dto, entity))
+            {
+                return false;
+            }
         }
 
         return true;

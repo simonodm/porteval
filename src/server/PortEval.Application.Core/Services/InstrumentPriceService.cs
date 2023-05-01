@@ -37,11 +37,13 @@ public class InstrumentPriceService : IInstrumentPriceService
         DateRangeParams dateRange)
     {
         if (!await _instrumentRepository.ExistsAsync(instrumentId))
+        {
             return new OperationResponse<IEnumerable<InstrumentPriceDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {instrumentId} does not exist."
             };
+        }
 
         var prices =
             await _instrumentDataQueries.GetInstrumentPricesAsync(instrumentId, dateRange.From, dateRange.To);
@@ -72,11 +74,13 @@ public class InstrumentPriceService : IInstrumentPriceService
         AggregationFrequency? frequency = null)
     {
         if (!await _instrumentRepository.ExistsAsync(instrumentId))
+        {
             return new OperationResponse<PaginatedResponse<InstrumentPriceDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {instrumentId} does not exist."
             };
+        }
 
         var totalCount = compressed
             ? await _instrumentDataQueries.GetInstrumentPriceCompressedCountAsync(instrumentId, dateRange.From,
@@ -104,11 +108,13 @@ public class InstrumentPriceService : IInstrumentPriceService
     public async Task<OperationResponse<InstrumentPriceDto>> GetInstrumentPriceAsync(int instrumentId, DateTime time)
     {
         if (!await _instrumentRepository.ExistsAsync(instrumentId))
+        {
             return new OperationResponse<InstrumentPriceDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {instrumentId} does not exist."
             };
+        }
 
         var price = await _instrumentDataQueries.GetInstrumentPriceAsync(instrumentId, time);
         return new OperationResponse<InstrumentPriceDto>
@@ -124,18 +130,22 @@ public class InstrumentPriceService : IInstrumentPriceService
     {
         var instrument = await _instrumentRepository.FindAsync(options.InstrumentId);
         if (instrument == null)
+        {
             return new OperationResponse<InstrumentPriceDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {options.InstrumentId} does not exist."
             };
+        }
 
         if (await _instrumentPriceRepository.ExistsAsync(options.InstrumentId, options.Time))
+        {
             return new OperationResponse<InstrumentPriceDto>
             {
                 Status = OperationStatus.Error,
                 Message = $"{instrument.Symbol} already contains a price at {options.Time}."
             };
+        }
 
         var pricePoint = InstrumentPrice.Create(options.Time.RoundDown(TimeSpan.FromMinutes(1)), options.Price,
             instrument);
@@ -149,11 +159,14 @@ public class InstrumentPriceService : IInstrumentPriceService
     public async Task<OperationResponse> DeletePricePointByIdAsync(int instrumentId, int priceId)
     {
         if (!await _instrumentPriceRepository.ExistsAsync(instrumentId, priceId))
+        {
             return new OperationResponse
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Price {priceId} does not exist on instrument {instrumentId}."
             };
+        }
+
         await _instrumentPriceRepository.DeleteAsync(instrumentId, priceId);
         await _instrumentPriceRepository.UnitOfWork.CommitAsync();
         return new OperationResponse();

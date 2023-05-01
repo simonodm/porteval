@@ -33,25 +33,31 @@ public class TransactionService : ITransactionService
         DateRangeParams dateRange)
     {
         if (filters.PortfolioId != null && !await _portfolioRepository.ExistsAsync(filters.PortfolioId.Value))
+        {
             return new OperationResponse<IEnumerable<TransactionDto>>
             {
                 Status = OperationStatus.Error,
                 Message = $"Portfolio {filters.PortfolioId} does not exist."
             };
+        }
 
         if (filters.InstrumentId != null && !await _instrumentRepository.ExistsAsync(filters.InstrumentId.Value))
+        {
             return new OperationResponse<IEnumerable<TransactionDto>>
             {
                 Status = OperationStatus.Error,
                 Message = $"Instrument {filters.InstrumentId} does not exist."
             };
+        }
 
         if (filters.PositionId != null && !await _positionRepository.ExistsAsync(filters.PositionId.Value))
+        {
             return new OperationResponse<IEnumerable<TransactionDto>>
             {
                 Status = OperationStatus.Error,
                 Message = $"Position {filters.PositionId} does not exist."
             };
+        }
 
         var transactions =
             await _transactionDataQueries.GetTransactionsAsync(filters, dateRange.From, dateRange.To);
@@ -80,11 +86,14 @@ public class TransactionService : ITransactionService
     {
         var position = await _positionRepository.FindAsync(options.PositionId);
         if (position == null)
+        {
             return new OperationResponse<TransactionDto>
             {
                 Status = OperationStatus.Error,
                 Message = $"Position {options.PositionId} does not exist."
             };
+        }
+
         var createdTransaction = position.AddTransaction(options.Amount, options.Price, options.Time, options.Note);
         position.IncreaseVersion();
 
@@ -99,11 +108,13 @@ public class TransactionService : ITransactionService
     {
         var position = await _positionRepository.FindAsync(options.PositionId);
         if (position == null)
+        {
             return new OperationResponse<TransactionDto>
             {
                 Status = OperationStatus.Error,
                 Message = $"Position {options.PositionId} does not exist."
             };
+        }
 
         var transaction =
             position.UpdateTransaction(options.Id, options.Amount, options.Price, options.Time, options.Note);
@@ -120,11 +131,13 @@ public class TransactionService : ITransactionService
         var position = await _positionRepository.FindParentPositionAsync(transactionId);
         var transaction = position?.FindTransaction(transactionId);
         if (transaction == null)
+        {
             return new OperationResponse
             {
                 Status = OperationStatus.Error,
                 Message = $"Transaction {transactionId} does not exist."
             };
+        }
 
         position.RemoveTransaction(transactionId);
         position.IncreaseVersion();

@@ -28,7 +28,10 @@ public class PriceImportProcessor : ImportProcessor<InstrumentPriceDto, Instrume
         if (existingPrice.Status == OperationStatus.NotFound || existingPrice.Response.Time != row.Time)
         {
             var newPrice = await _priceService.AddPricePointAsync(row);
-            if (newPrice.Status != OperationStatus.Ok) logEntry.AddError(newPrice.Message);
+            if (newPrice.Status != OperationStatus.Ok)
+            {
+                logEntry.AddError(newPrice.Message);
+            }
 
             logEntry.Data.Id = newPrice.Response?.Id ?? default;
         }

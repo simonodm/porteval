@@ -27,7 +27,10 @@ public static class DateTimeExtensions
     /// <returns>A rounded up <c>DateTime</c>.</returns>
     public static DateTime RoundUp(this DateTime time, TimeSpan timeSpan)
     {
-        if (time.Ticks % timeSpan.Ticks == 0) return time;
+        if (time.Ticks % timeSpan.Ticks == 0)
+        {
+            return time;
+        }
 
         var ticks = time.Ticks + (timeSpan.Ticks - time.Ticks % timeSpan.Ticks);
         return new DateTime(ticks);

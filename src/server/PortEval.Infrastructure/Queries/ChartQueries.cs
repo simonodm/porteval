@@ -72,9 +72,15 @@ public class ChartQueries : IChartQueries
                 }
 
                 if (chart.IsToDate != null && (bool)chart.IsToDate)
+                {
                     charts[chart.Id].ToDateRange = new ToDateRange(tdr.ToDateRangeUnit, tdr.ToDateRangeValue);
+                }
+
                 if (chartLine != null)
+                {
                     charts[chart.Id].Lines.Add(AssignChartLineType(AssignChartLineName(chartLine, lineNames)));
+                }
+
                 return charts[chart.Id];
             },
             splitOn: "ToDateRangeSplit, Width, NameSplit");
@@ -133,7 +139,10 @@ public class ChartQueries : IChartQueries
 
                 chart.ToDateRange = new ToDateRange(tdr.ToDateRangeUnit, tdr.ToDateRangeValue);
                 if (chartLine != null)
+                {
                     resultChart.Lines.Add(AssignChartLineType(AssignChartLineName(chartLine, lineNames)));
+                }
+
                 return resultChart;
             },
             new { ChartId = chartId },
@@ -144,18 +153,36 @@ public class ChartQueries : IChartQueries
 
     private ChartLineDto AssignChartLineName(ChartLineDto chartLine, ChartLineNameModel lineNames)
     {
-        if (lineNames.PortfolioName != null) chartLine.Name = lineNames.PortfolioName;
-        else if (lineNames.PositionName != null) chartLine.Name = lineNames.PositionName;
-        else if (lineNames.InstrumentName != null) chartLine.Name = lineNames.InstrumentName;
+        if (lineNames.PortfolioName != null)
+        {
+            chartLine.Name = lineNames.PortfolioName;
+        }
+        else if (lineNames.PositionName != null)
+        {
+            chartLine.Name = lineNames.PositionName;
+        }
+        else if (lineNames.InstrumentName != null)
+        {
+            chartLine.Name = lineNames.InstrumentName;
+        }
 
         return chartLine;
     }
 
     private ChartLineDto AssignChartLineType(ChartLineDto chartLine)
     {
-        if (chartLine.InstrumentId != null) chartLine.Type = ChartLineType.Instrument;
-        else if (chartLine.PositionId != null) chartLine.Type = ChartLineType.Position;
-        else if (chartLine.PortfolioId != null) chartLine.Type = ChartLineType.Portfolio;
+        if (chartLine.InstrumentId != null)
+        {
+            chartLine.Type = ChartLineType.Instrument;
+        }
+        else if (chartLine.PositionId != null)
+        {
+            chartLine.Type = ChartLineType.Position;
+        }
+        else if (chartLine.PortfolioId != null)
+        {
+            chartLine.Type = ChartLineType.Portfolio;
+        }
 
         return chartLine;
     }

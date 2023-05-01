@@ -61,11 +61,13 @@ public class DataFetcher : IDataFetcher
         var eligibleApis = _registeredClients.Where(CanProcessRequest<TRequest, TResult>).ToList();
 
         if (eligibleApis.Count == 0)
+        {
             return new Response<TResult>
             {
                 StatusCode = StatusCode.OtherError,
                 ErrorMessage = "No eligible API found for the given request."
             };
+        }
 
         var handler = new RequestHandler<TRequest, TResult>(request, eligibleApis, _retryPolicy);
         return await handler.HandleAsync();
@@ -87,13 +89,17 @@ public class DataFetcher : IDataFetcher
         var configProp = type.GetProperty(expectedConfigurationPropertyName,
             BindingFlags.NonPublic | BindingFlags.Instance);
         if (configProp is null)
+        {
             throw new ArgumentException($"No \"{expectedConfigurationPropertyName}\" property found on type {type}.");
+        }
 
         var httpClientProp =
             type.GetProperty(expectedHttpClientPropertyName, BindingFlags.NonPublic | BindingFlags.Instance);
         if (httpClientProp is null)
+        {
             throw new ArgumentException(
                 $"No \"{expectedHttpClientPropertyName}\" property found on type {type}.");
+        }
 
         configProp.SetValue(api, configuration, null);
         httpClientProp.SetValue(api, _httpClient, null);

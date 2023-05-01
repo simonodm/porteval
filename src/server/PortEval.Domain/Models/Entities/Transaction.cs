@@ -58,14 +58,20 @@ public class Transaction : Entity
         string note = "")
     {
         if (time < PortEvalConstants.FinancialDataStartTime)
+        {
             throw new OperationNotAllowedException(
                 $"Transaction time must be later than {PortEvalConstants.FinancialDataStartTime}");
+        }
 
         if (amount == 0)
+        {
             throw new OperationNotAllowedException("Transaction amount cannot be zero.");
+        }
 
         if (price <= 0)
+        {
             throw new OperationNotAllowedException("Transaction price must be above zero.");
+        }
 
         PositionId = positionId;
         Time = time;

@@ -34,11 +34,20 @@ public class TransactionQueries : ITransactionQueries
                       AND Time <= @TimeTo";
         if (filters != null)
         {
-            if (filters.PortfolioId != null) query += " AND Positions.PortfolioId = @PortfolioId";
+            if (filters.PortfolioId != null)
+            {
+                query += " AND Positions.PortfolioId = @PortfolioId";
+            }
 
-            if (filters.PositionId != null) query += " AND Transactions.PositionId = @PositionId";
+            if (filters.PositionId != null)
+            {
+                query += " AND Transactions.PositionId = @PositionId";
+            }
 
-            if (filters.InstrumentId != null) query += " AND Positions.InstrumentId = @InstrumentId";
+            if (filters.InstrumentId != null)
+            {
+                query += " AND Positions.InstrumentId = @InstrumentId";
+            }
         }
 
         query += " ORDER BY Time";

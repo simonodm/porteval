@@ -107,14 +107,22 @@ public class Chart : VersionedEntity, IAggregateRoot
         foreach (var line in lines)
         {
             if (line is ChartLineInstrument instrumentLine && !instrumentLineIds.Add(instrumentLine.InstrumentId))
+            {
                 throw new OperationNotAllowedException(
                     $"Instrument with ID {instrumentLine.InstrumentId} is already added to the chart.");
+            }
+
             if (line is ChartLinePosition positionLine && !positionLineIds.Add(positionLine.PositionId))
+            {
                 throw new OperationNotAllowedException(
                     $"Position with ID {positionLine.PositionId} is already added to the chart.");
+            }
+
             if (line is ChartLinePortfolio portfolioLine && !portfolioLineIds.Add(portfolioLine.PortfolioId))
+            {
                 throw new OperationNotAllowedException(
                     $"Portfolio with ID {portfolioLine.PortfolioId} is already added to the chart.");
+            }
 
             newLines.Add(line);
         }

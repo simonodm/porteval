@@ -56,7 +56,9 @@ public class InstrumentPricesController : PortEvalControllerBase
         [FromBody] InstrumentPriceDto createRequest)
     {
         if (instrumentId != createRequest.InstrumentId)
+        {
             return BadRequest("URL instrument id and request body instrument id don't match.");
+        }
 
         var price = await _priceService.AddPricePointAsync(createRequest);
         return GenerateActionResult(price, nameof(GetInstrumentPriceAt),

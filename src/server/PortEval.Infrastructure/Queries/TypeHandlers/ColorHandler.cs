@@ -19,7 +19,10 @@ public class ColorHandler : SqlMapper.TypeHandler<Color>
     /// <inheritdoc />
     public override Color Parse(object value)
     {
-        if (value is int colorArgb) return Color.FromArgb(colorArgb);
+        if (value is int colorArgb)
+        {
+            return Color.FromArgb(colorArgb);
+        }
 
         throw new ArgumentException($"Cannot map value of type {value.GetType()} to {typeof(Color)}");
     }

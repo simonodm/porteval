@@ -77,7 +77,10 @@ public class PositionRepository : IPositionRepository
     public async Task DeleteAsync(int positionId)
     {
         var foundPosition = await _context.Positions.FirstOrDefaultAsync(p => p.Id == positionId);
-        if (foundPosition != null) Delete(foundPosition);
+        if (foundPosition != null)
+        {
+            Delete(foundPosition);
+        }
     }
 
     /// <inheritdoc />

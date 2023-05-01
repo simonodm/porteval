@@ -50,7 +50,9 @@ public class TransactionsController : PortEvalControllerBase
         [FromBody] TransactionDto updateRequest)
     {
         if (transactionId != updateRequest.Id)
+        {
             return BadRequest("URL transaction id and request body transaction id don't match.");
+        }
 
         var updatedTransaction = await _transactionService.UpdateTransactionAsync(updateRequest);
         return GenerateActionResult(updatedTransaction);

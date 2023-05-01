@@ -28,12 +28,18 @@ public class PositionImportProcessor : ImportProcessor<PositionDto, PositionDtoV
         if (row.Id != default)
         {
             var response = await _positionService.UpdatePositionAsync(row);
-            if (response.Status != OperationStatus.Ok) logEntry.AddError(response.Message);
+            if (response.Status != OperationStatus.Ok)
+            {
+                logEntry.AddError(response.Message);
+            }
         }
         else
         {
             var response = await _positionService.OpenPositionAsync(row);
-            if (response.Status != OperationStatus.Ok) logEntry.AddError(response.Message);
+            if (response.Status != OperationStatus.Ok)
+            {
+                logEntry.AddError(response.Message);
+            }
 
             logEntry.Data.Id = response.Response?.Id ?? default;
         }

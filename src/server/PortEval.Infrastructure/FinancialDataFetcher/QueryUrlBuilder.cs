@@ -26,7 +26,10 @@ public class QueryUrlBuilder
     /// <param name="value">Value of the parameter.</param>
     public void AddQueryParam(string name, string value)
     {
-        if (name == null || value == null) return;
+        if (name == null || value == null)
+        {
+            return;
+        }
 
         _urlBuilder.Append(_queryParamsExist ? '&' : '?');
         _urlBuilder.Append($"{name}={value}");

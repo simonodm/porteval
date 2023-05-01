@@ -29,7 +29,10 @@ internal class RetryableAsyncJob<TResult>
     /// <exception cref="ApplicationException">Thrown if no retries are available as per the retry policy.</exception>
     public async Task<TResult> RetryAsync(CancellationToken cancellationToken)
     {
-        if (!CanRetry()) throw new ApplicationException("Action failed - no retries left.");
+        if (!CanRetry())
+        {
+            throw new ApplicationException("Action failed - no retries left.");
+        }
 
         var currentInterval = _retryPolicy.RetryIntervals[_attempt];
 

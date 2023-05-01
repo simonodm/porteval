@@ -30,7 +30,9 @@ public class CurrencyConverter : ICurrencyConverter
             }
 
             if (previousExchangeRate == null)
+            {
                 throw new ItemNotFoundException($"No exchange rate available at {exchangeRate.Time}.");
+            }
 
             result.Add(new CurrencyExchangeRateDto
             {
@@ -66,7 +68,9 @@ public class CurrencyConverter : ICurrencyConverter
             }
 
             if (previousExchangeRate == null)
+            {
                 throw new ItemNotFoundException($"No exchange rate available at {point.Time}.");
+            }
 
             result.Add(point.ChangeValue(point.Value * previousExchangeRate.ExchangeRate));
         }
@@ -96,7 +100,9 @@ public class CurrencyConverter : ICurrencyConverter
             }
 
             if (previousExchangeRate == null)
+            {
                 throw new ItemNotFoundException($"No exchange rate available at {transaction.Time}.");
+            }
 
             result.Add(new TransactionDto
             {
@@ -136,7 +142,9 @@ public class CurrencyConverter : ICurrencyConverter
             }
 
             if (previousExchangeRate == null)
+            {
                 throw new ItemNotFoundException($"No exchange rate available at {instrumentPrice.Time}.");
+            }
 
             result.Add(new InstrumentPriceDto
             {

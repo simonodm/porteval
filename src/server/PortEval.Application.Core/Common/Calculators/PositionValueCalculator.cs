@@ -14,7 +14,9 @@ public class PositionValueCalculator : IPositionValueCalculator
         foreach (var positionPriceData in positionsPriceData)
         foreach (var transaction in positionPriceData.Transactions)
             if (transaction.Time <= time)
+            {
                 value += transaction.Amount * positionPriceData.PriceAtRangeEnd?.Price ?? 0m;
+            }
 
         return value;
     }

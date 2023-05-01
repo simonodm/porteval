@@ -82,11 +82,13 @@ public class PositionService : IPositionService
     public async Task<OperationResponse<IEnumerable<PositionDto>>> GetPortfolioPositionsAsync(int portfolioId)
     {
         if (!await _portfolioRepository.ExistsAsync(portfolioId))
+        {
             return new OperationResponse<IEnumerable<PositionDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {portfolioId} does not exist."
             };
+        }
 
         var positions = await _positionDataQueries.GetPortfolioPositionsAsync(portfolioId);
         return new OperationResponse<IEnumerable<PositionDto>>
@@ -123,11 +125,13 @@ public class PositionService : IPositionService
     {
         var position = await _positionDataQueries.GetPositionAsync(positionId);
         if (position == null)
+        {
             return new OperationResponse<EntityValueDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Position {positionId} does not exist."
             };
+        }
 
         var dateRange = new DateRangeParams
         {
@@ -155,11 +159,13 @@ public class PositionService : IPositionService
     {
         var position = await _positionDataQueries.GetPositionAsync(positionId);
         if (position == null)
+        {
             return new OperationResponse<EntityProfitDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Position {positionId} does not exist."
             };
+        }
 
         var positionPriceRangeData =
             await GetPositionPriceRangeDataAsync(position, dateRange);
@@ -185,11 +191,13 @@ public class PositionService : IPositionService
     {
         var position = await _positionDataQueries.GetPositionAsync(positionId);
         if (position == null)
+        {
             return new OperationResponse<EntityPerformanceDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Position {positionId} does not exist."
             };
+        }
 
         var positionPriceRangeData =
             await GetPositionPriceRangeDataAsync(position, dateRange);
@@ -215,11 +223,13 @@ public class PositionService : IPositionService
     {
         var position = await _positionDataQueries.GetPositionAsync(positionId);
         if (position == null)
+        {
             return new OperationResponse<PositionBreakEvenPointDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Position {positionId} does not exist."
             };
+        }
 
         var transactions =
             await _transactionService.GetTransactionsAsync(TransactionFilters.FromPositionId(positionId),
@@ -244,11 +254,13 @@ public class PositionService : IPositionService
     {
         var position = await _positionDataQueries.GetPositionAsync(positionId);
         if (position == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Position {positionId} does not exist."
             };
+        }
 
         var positionPriceListData = await GetPositionPriceListDataAsync(position, dateRange.SetFrom(DateTime.MinValue));
         var result = _chartDataGenerator.ChartValue(positionPriceListData.Response, dateRange, frequency);
@@ -275,11 +287,13 @@ public class PositionService : IPositionService
     {
         var position = await _positionDataQueries.GetPositionAsync(positionId);
         if (position == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Position {positionId} does not exist."
             };
+        }
 
         var positionPriceListData = await GetPositionPriceListDataAsync(position, dateRange.SetFrom(DateTime.MinValue));
 
@@ -307,11 +321,13 @@ public class PositionService : IPositionService
     {
         var position = await _positionDataQueries.GetPositionAsync(positionId);
         if (position == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Position {positionId} does not exist."
             };
+        }
 
         var positionPriceListData = await GetPositionPriceListDataAsync(position, dateRange.SetFrom(DateTime.MinValue));
 
@@ -331,11 +347,13 @@ public class PositionService : IPositionService
     {
         var position = await _positionDataQueries.GetPositionAsync(positionId);
         if (position == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Position {positionId} does not exist."
             };
+        }
 
         var positionPriceListData = await GetPositionPriceListDataAsync(position, dateRange.SetFrom(DateTime.MinValue));
 
@@ -364,11 +382,13 @@ public class PositionService : IPositionService
     {
         var position = await _positionDataQueries.GetPositionAsync(positionId);
         if (position == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Position {positionId} does not exist."
             };
+        }
 
         var positionPriceListData = await GetPositionPriceListDataAsync(position, dateRange.SetFrom(DateTime.MinValue));
 
@@ -387,11 +407,14 @@ public class PositionService : IPositionService
         int portfolioId)
     {
         if (!await _portfolioRepository.ExistsAsync(portfolioId))
+        {
             return new OperationResponse<IEnumerable<PositionStatisticsDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {portfolioId} does not exist."
             };
+        }
+
         var positions = await _positionDataQueries.GetPortfolioPositionsAsync(portfolioId);
 
         var data = await Task.WhenAll(positions.Select(GetPositionStatistics));
@@ -407,11 +430,13 @@ public class PositionService : IPositionService
     {
         var position = await _positionDataQueries.GetPositionAsync(positionId);
         if (position == null)
+        {
             return new OperationResponse<PositionStatisticsDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Position {positionId} does not exist."
             };
+        }
 
         return await GetPositionStatistics(position);
     }
@@ -420,11 +445,13 @@ public class PositionService : IPositionService
     public async Task<OperationResponse<PositionDto>> OpenPositionAsync(PositionDto options)
     {
         if (options.Amount == null || options.Price == null || options.Time == null)
+        {
             return new OperationResponse<PositionDto>
             {
                 Status = OperationStatus.Error,
                 Message = "An initial transaction is required when opening a new position."
             };
+        }
 
         var initialTransactionTime = (DateTime)options.Time;
         var initialTransactionPrice = (decimal)options.Price;
@@ -432,19 +459,23 @@ public class PositionService : IPositionService
 
         var portfolio = await _portfolioRepository.FindAsync(options.PortfolioId);
         if (portfolio == null)
+        {
             return new OperationResponse<PositionDto>
             {
                 Status = OperationStatus.Error,
                 Message = $"Portfolio {options.PortfolioId} does not exist."
             };
+        }
 
         var instrument = await _instrumentRepository.FindAsync(options.InstrumentId);
         if (instrument == null)
+        {
             return new OperationResponse<PositionDto>
             {
                 Status = OperationStatus.Error,
                 Message = $"Instrument {options.InstrumentId} does not exist."
             };
+        }
 
         try
         {
@@ -471,11 +502,13 @@ public class PositionService : IPositionService
     {
         var position = await _positionRepository.FindAsync(options.Id);
         if (position == null)
+        {
             return new OperationResponse<PositionDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Position {options.Id} does not exist."
             };
+        }
 
         position.SetNote(options.Note);
         position.IncreaseVersion();
@@ -489,11 +522,14 @@ public class PositionService : IPositionService
     public async Task<OperationResponse> RemovePositionAsync(int positionId)
     {
         if (!await _positionRepository.ExistsAsync(positionId))
+        {
             return new OperationResponse
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Position {positionId} does not exist."
             };
+        }
+
         await _positionRepository.DeleteAsync(positionId);
         await _positionRepository.UnitOfWork.CommitAsync();
         return new OperationResponse();
@@ -510,8 +546,10 @@ public class PositionService : IPositionService
         var firstTransactionTime = transactions?.Response?.FirstOrDefault()?.Time;
         var adjustedDateRange = dateRange;
         if (firstTransactionTime != null)
+        {
             adjustedDateRange =
                 adjustedDateRange.SetFrom(adjustedDateRange.From.GetMax((DateTime)firstTransactionTime));
+        }
 
         var priceAtStart = await _priceService.GetInstrumentPriceAsync(position.InstrumentId, adjustedDateRange.From);
         var priceAtEnd = await _priceService.GetInstrumentPriceAsync(position.InstrumentId, adjustedDateRange.To);

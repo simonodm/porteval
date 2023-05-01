@@ -47,7 +47,10 @@ public class ChartsController : PortEvalControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<ChartDto>> PutChart(int id, [FromBody] ChartDto updateRequest)
     {
-        if (id != updateRequest.Id) return BadRequest("URL chart id and request body chart id don't match.");
+        if (id != updateRequest.Id)
+        {
+            return BadRequest("URL chart id and request body chart id don't match.");
+        }
 
         var updatedChart = await _chartService.UpdateChartAsync(updateRequest);
         return GenerateActionResult(updatedChart);

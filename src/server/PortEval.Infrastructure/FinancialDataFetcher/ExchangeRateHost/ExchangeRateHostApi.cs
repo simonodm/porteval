@@ -31,14 +31,26 @@ public class ExchangeRateHostApi : DataSource
 
         foreach (var task in tasks)
         {
-            if (task.Result.StatusCode == StatusCode.Ok) anySuccessful = true;
-            else if (task.Result.StatusCode == StatusCode.OtherError) anyUnexpectedError = true;
+            if (task.Result.StatusCode == StatusCode.Ok)
+            {
+                anySuccessful = true;
+            }
+            else if (task.Result.StatusCode == StatusCode.OtherError)
+            {
+                anyUnexpectedError = true;
+            }
 
-            if (task.Result.Result != null) result.AddRange(ParseHistoricalDailyResponse(task.Result.Result));
+            if (task.Result.Result != null)
+            {
+                result.AddRange(ParseHistoricalDailyResponse(task.Result.Result));
+            }
         }
 
         var resultStatusCode = StatusCode.Ok;
-        if (!anySuccessful) resultStatusCode = !anyUnexpectedError ? StatusCode.OtherError : StatusCode.ConnectionError;
+        if (!anySuccessful)
+        {
+            resultStatusCode = !anyUnexpectedError ? StatusCode.OtherError : StatusCode.ConnectionError;
+        }
 
         return new Response<IEnumerable<ExchangeRates>>
         {
@@ -51,7 +63,10 @@ public class ExchangeRateHostApi : DataSource
     [RequestProcessor(typeof(LatestExchangeRatesRequest), typeof(ExchangeRates))]
     public async Task<Response<ExchangeRates>> ProcessAsync(LatestExchangeRatesRequest request)
     {
-        var queryUrl = $"{BaseUrl}/latest?base={request.CurrencyCode}";
+        var queryUrlBuilder = new QueryUrlBuilder($"{BaseUrl}/latest");
+        queryUrlBuilder.AddQueryParam("base", request.CurrencyCode);
+
+        var queryUrl = queryUrlBuilder.ToString();
         var response =
             await HttpClient.GetJsonAsync<ExchangeRatesLatestResponseModel>(queryUrl, Configuration?.RateLimiter);
 
@@ -74,8 +89,13 @@ public class ExchangeRateHostApi : DataSource
         {
             var startDate = ranges[i - 1];
             var endDate = i == ranges.Count - 1 ? ranges[i] : ranges[i].AddDays(-1);
-            var queryUrl =
-                $"{BaseUrl}/timeseries?start_date={startDate:yyyy-MM-dd}&end_date={endDate:yyyy-MM-dd}&base={request.CurrencyCode}";
+
+            var queryUrlBuilder = new QueryUrlBuilder($"{BaseUrl}/timeseries");
+            queryUrlBuilder.AddQueryParam("start_date", startDate.ToString("yyyy-MM-dd"));
+            queryUrlBuilder.AddQueryParam("end_date", endDate.ToString("yyyy-MM-dd"));
+            queryUrlBuilder.AddQueryParam("base", request.CurrencyCode);
+
+            var queryUrl = queryUrlBuilder.ToString();
             var task = Task.Run(async () =>
                 await HttpClient.GetJsonAsync<ExchangeRatesTimeSeriesResponseModel>(queryUrl,
                     Configuration?.RateLimiter));

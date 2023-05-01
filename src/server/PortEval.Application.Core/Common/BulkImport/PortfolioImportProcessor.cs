@@ -28,13 +28,20 @@ public class PortfolioImportProcessor : ImportProcessor<PortfolioDto, PortfolioD
         if (row.Id == default)
         {
             var response = await _portfolioService.CreatePortfolioAsync(row);
-            if (response.Status != OperationStatus.Ok) logEntry.AddError(response.Message);
+            if (response.Status != OperationStatus.Ok)
+            {
+                logEntry.AddError(response.Message);
+            }
+
             logEntry.Data.Id = response.Response?.Id ?? default;
         }
         else
         {
             var response = await _portfolioService.UpdatePortfolioAsync(row);
-            if (response.Status != OperationStatus.Ok) logEntry.AddError(response.Message);
+            if (response.Status != OperationStatus.Ok)
+            {
+                logEntry.AddError(response.Message);
+            }
         }
 
         return logEntry;

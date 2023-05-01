@@ -24,16 +24,24 @@ public static class IConfigurationExtensions
     public static string GetConfigurationValue(this IConfiguration configuration, string key)
     {
         var configValue = configuration.GetValue(typeof(string), key);
-        if (configValue is string configString && !string.IsNullOrWhiteSpace(configString)) return configString;
+        if (configValue is string configString && !string.IsNullOrWhiteSpace(configString))
+        {
+            return configString;
+        }
 
         var envVarValue = Environment.GetEnvironmentVariable(key);
-        if (!string.IsNullOrWhiteSpace(envVarValue)) return envVarValue;
+        if (!string.IsNullOrWhiteSpace(envVarValue))
+        {
+            return envVarValue;
+        }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             var registryValue = Registry.GetValue(GetConfigurationRegistryKey(), key, null);
             if (registryValue is string registryString && !string.IsNullOrWhiteSpace(registryString))
+            {
                 return registryString;
+            }
         }
 
         return null;

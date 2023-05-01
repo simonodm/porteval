@@ -26,7 +26,10 @@ public class PositionPerformanceCalculator : IPositionPerformanceCalculator
             .Where(t => t != null)
             .Min();
 
-        if (firstTransactionTime == null) return 0;
+        if (firstTransactionTime == null)
+        {
+            return 0;
+        }
 
         var intervalCountBase = (DateTime)firstTransactionTime < from ? from : (DateTime)firstTransactionTime;
         var interval = GetSinglePointIntervalLength(intervalCountBase, to);
@@ -69,7 +72,10 @@ public class PositionPerformanceCalculator : IPositionPerformanceCalculator
                 equation.CalculateRoot(Math.Pow((double)initialGuess, 1.0 / totalIntervalCount));
             var totalPerformance = Math.Pow(singlePointPerformance, totalIntervalCount);
 
-            if (singlePointPerformance < 0 && totalPerformance > 0) totalPerformance *= -1;
+            if (singlePointPerformance < 0 && totalPerformance > 0)
+            {
+                totalPerformance *= -1;
+            }
 
             return (decimal)totalPerformance - 1;
         }
@@ -104,11 +110,30 @@ public class PositionPerformanceCalculator : IPositionPerformanceCalculator
     private static TimeSpan GetSinglePointIntervalLength(DateTime rangeStart, DateTime rangeEnd)
     {
         var difference = rangeEnd - rangeStart;
-        if (difference >= TimeSpan.FromDays(3650)) return TimeSpan.FromDays(365);
-        if (difference >= TimeSpan.FromDays(365)) return TimeSpan.FromDays(30);
-        if (difference >= TimeSpan.FromDays(30)) return TimeSpan.FromDays(7);
-        if (difference >= TimeSpan.FromDays(2)) return TimeSpan.FromDays(1);
-        if (difference >= TimeSpan.FromHours(2)) return TimeSpan.FromHours(1);
+        if (difference >= TimeSpan.FromDays(3650))
+        {
+            return TimeSpan.FromDays(365);
+        }
+
+        if (difference >= TimeSpan.FromDays(365))
+        {
+            return TimeSpan.FromDays(30);
+        }
+
+        if (difference >= TimeSpan.FromDays(30))
+        {
+            return TimeSpan.FromDays(7);
+        }
+
+        if (difference >= TimeSpan.FromDays(2))
+        {
+            return TimeSpan.FromDays(1);
+        }
+
+        if (difference >= TimeSpan.FromHours(2))
+        {
+            return TimeSpan.FromHours(1);
+        }
 
         return TimeSpan.FromMinutes(5);
     }

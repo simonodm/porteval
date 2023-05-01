@@ -66,7 +66,10 @@ public class DataImportJob : IDataImportJob
         _logger.LogInformation($"Processing import {importId}.");
 
         var importEntry = await _importRepository.FindAsync(importId);
-        if (importEntry == null) return;
+        if (importEntry == null)
+        {
+            return;
+        }
 
         try
         {
@@ -156,6 +159,9 @@ public class DataImportJob : IDataImportJob
 
     private void DeleteFile(string filePath)
     {
-        if (_fileSystem.File.Exists(filePath)) _fileSystem.File.Delete(filePath);
+        if (_fileSystem.File.Exists(filePath))
+        {
+            _fileSystem.File.Delete(filePath);
+        }
     }
 }

@@ -104,7 +104,10 @@ public abstract class ChartDataGeneratorBase
     private DateTime LimitRangeStart(DateTime rangeStart, DateTime rangeEnd, AggregationFrequency frequency)
     {
         var maxDuration = FrequencyRangeLimits[frequency];
-        if (rangeEnd - rangeStart <= maxDuration) return rangeStart;
+        if (rangeEnd - rangeStart <= maxDuration)
+        {
+            return rangeStart;
+        }
 
         return rangeEnd - maxDuration;
     }

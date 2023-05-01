@@ -71,11 +71,15 @@ public class InitialPriceFetchJob : InstrumentPriceFetchJobBase, IInitialPriceFe
 
         _logger.LogInformation($"First price fetch for instrument {instrumentId} finished.");
         if (prices.Count > 0)
+        {
             await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable,
                 $"Price download finished for {instrument.Symbol}.");
+        }
         else
+        {
             await _notificationService.SendNotificationAsync(NotificationType.NewDataAvailable,
                 $"No prices found for {instrument.Symbol}.");
+        }
     }
 
     /// <summary>
@@ -111,11 +115,17 @@ public class InitialPriceFetchJob : InstrumentPriceFetchJobBase, IInitialPriceFe
         var minTime = DateTime.UtcNow;
         foreach (var pricePoint in prices)
         {
-            if (pricePoint.Price <= 0m) continue;
+            if (pricePoint.Price <= 0m)
+            {
+                continue;
+            }
 
             pricesToAdd.Add(InstrumentPrice.Create(pricePoint.Time, pricePoint.Price, instrument));
 
-            if (pricePoint.Time < minTime) minTime = pricePoint.Time;
+            if (pricePoint.Time < minTime)
+            {
+                minTime = pricePoint.Time;
+            }
         }
 
         instrument.SetTrackingFrom(minTime);

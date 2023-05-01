@@ -39,7 +39,9 @@ public class InstrumentSplitsController : PortEvalControllerBase
         [FromBody] InstrumentSplitDto splitData)
     {
         if (instrumentId != splitData.InstrumentId)
+        {
             return BadRequest($"Query parameter {nameof(instrumentId)} and body instrument ID don't match.");
+        }
 
         var createdSplit = await _splitService.CreateSplitAsync(splitData);
         return GenerateActionResult(createdSplit, nameof(GetInstrumentSplit),
@@ -52,7 +54,9 @@ public class InstrumentSplitsController : PortEvalControllerBase
         [FromBody] InstrumentSplitDto splitData)
     {
         if (instrumentId != splitData.InstrumentId)
+        {
             return BadRequest($"Query parameter {nameof(instrumentId)} and body instrument ID don't match.");
+        }
 
         var updatedSplit = await _splitService.UpdateSplitAsync(instrumentId, splitData);
         return GenerateActionResult(updatedSplit);

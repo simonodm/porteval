@@ -27,7 +27,10 @@ internal static class IEnumeratorExtensions
             {
                 previousElement = enumerator.Current;
                 callback?.Invoke(previousElement);
-                if (!enumerator.MoveNext()) return previousElement;
+                if (!enumerator.MoveNext())
+                {
+                    return previousElement;
+                }
             }
 
             return previousElement;

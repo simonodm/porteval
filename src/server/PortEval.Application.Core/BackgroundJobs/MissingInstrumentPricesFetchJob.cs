@@ -159,7 +159,10 @@ public class MissingInstrumentPricesFetchJob : InstrumentPriceFetchJobBase, IMis
         var pricesToAdd = new List<InstrumentPrice>();
         foreach (var pricePoint in prices)
         {
-            if (!((pricePoint.Time > range.From) & (pricePoint.Time < range.To)) || pricePoint.Price <= 0m) continue;
+            if (!((pricePoint.Time > range.From) & (pricePoint.Time < range.To)) || pricePoint.Price <= 0m)
+            {
+                continue;
+            }
 
             pricesToAdd.Add(InstrumentPrice.Create(pricePoint.Time, pricePoint.Price, instrument));
         }
@@ -170,12 +173,19 @@ public class MissingInstrumentPricesFetchJob : InstrumentPriceFetchJobBase, IMis
     private void AdjustInstrumentTrackingBasedOnProcessedPrices(Instrument instrument,
         List<InstrumentPrice> processedPrices)
     {
-        if (processedPrices.Count == 0) return;
+        if (processedPrices.Count == 0)
+        {
+            return;
+        }
 
         if (instrument.TrackingInfo == null || instrument.TrackingInfo.StartTime > processedPrices[0].Time)
+        {
             instrument.SetTrackingFrom(processedPrices[0].Time);
+        }
 
         if (instrument.TrackingStatus != InstrumentTrackingStatus.Tracked)
+        {
             instrument.SetTrackingStatus(InstrumentTrackingStatus.Tracked);
+        }
     }
 }

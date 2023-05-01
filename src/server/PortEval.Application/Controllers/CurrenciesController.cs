@@ -37,7 +37,10 @@ public class CurrenciesController : PortEvalControllerBase
     [HttpPut("{code}")]
     public async Task<ActionResult<CurrencyDto>> UpdateCurrency(string code, [FromBody] CurrencyDto options)
     {
-        if (code != options.Code) return BadRequest("URL currency code and body request currency code don't match.");
+        if (code != options.Code)
+        {
+            return BadRequest("URL currency code and body request currency code don't match.");
+        }
 
         var updatedCurrency = await _currencyService.UpdateAsync(options);
         return GenerateActionResult(updatedCurrency);

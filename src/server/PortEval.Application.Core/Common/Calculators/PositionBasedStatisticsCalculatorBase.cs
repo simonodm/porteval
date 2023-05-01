@@ -48,7 +48,10 @@ public abstract class PositionBasedStatisticsCalculatorBase
 
         // do the same for the end price
         var endPrice = priceEnumerator.FindNextElementInEnumerator(p => p.Time <= endTime);
-        if (endPrice == null) endPrice = startPrices.LastOrDefault(p => p != null);
+        if (endPrice == null)
+        {
+            endPrice = startPrices.LastOrDefault(p => p != null);
+        }
 
         for (var i = 0; i < startTimes.Count; i++)
             result.Add(new PositionPriceRangeData

@@ -142,7 +142,10 @@ public class InstrumentChartDataGenerator : ChartDataGeneratorBase, IInstrumentC
         DateRangeParams originalRange)
     {
         var firstPrice = prices.FirstOrDefault();
-        if (firstPrice != null) return originalRange.SetFrom(originalRange.From.GetMax(firstPrice.Time));
+        if (firstPrice != null)
+        {
+            return originalRange.SetFrom(originalRange.From.GetMax(firstPrice.Time));
+        }
 
         return originalRange;
     }

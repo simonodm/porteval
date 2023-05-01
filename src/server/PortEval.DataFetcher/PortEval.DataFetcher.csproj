@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <NoWarn>1591;1701;1702;IL2121</NoWarn>
+        <NoWarn>1591;1701;1702;IL2121</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <NoWarn>1591;1701;1702;IL2121</NoWarn>
+        <NoWarn>1591;1701;1702;IL2121</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3-beta1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3-beta1"/>
     </ItemGroup>
 
 </Project>

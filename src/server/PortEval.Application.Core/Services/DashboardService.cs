@@ -53,18 +53,22 @@ public class DashboardService : IDashboardService
 
         var newItemEntities = await GenerateItemEntities(newItems);
         if (newItemEntities.Status != OperationStatus.Ok)
+        {
             return new OperationResponse<DashboardLayoutDto>
             {
                 Status = newItemEntities.Status,
                 Message = newItemEntities.Message
             };
+        }
 
         if (OverlapsExist(newItemEntities.Response))
+        {
             return new OperationResponse<DashboardLayoutDto>
             {
                 Status = OperationStatus.Error,
                 Message = "Dashboard layout overlaps detected."
             };
+        }
 
         foreach (var entity in newItemEntities.Response) _dashboardItemRepository.Add(entity);
 
@@ -81,11 +85,13 @@ public class DashboardService : IDashboardService
             {
                 var chart = await _chartRepository.FindAsync(item.ChartId);
                 if (chart == null)
+                {
                     return new OperationResponse<List<DashboardItem>>
                     {
                         Status = OperationStatus.Error,
                         Message = $"Chart {item.ChartId} does not exist."
                     };
+                }
 
                 var position = new DashboardPosition(item.DashboardPositionX, item.DashboardPositionY,
                     item.DashboardWidth, item.DashboardHeight);
@@ -115,7 +121,11 @@ public class DashboardService : IDashboardService
             for (var i = item.Position.X; i < item.Position.X + item.Position.Width; i++)
             for (var j = item.Position.Y; j < item.Position.Y + item.Position.Height; j++)
             {
-                if (filledLayoutPositions.Contains((i, j))) return true;
+                if (filledLayoutPositions.Contains((i, j)))
+                {
+                    return true;
+                }
+
                 filledLayoutPositions.Add((i, j));
             }
 

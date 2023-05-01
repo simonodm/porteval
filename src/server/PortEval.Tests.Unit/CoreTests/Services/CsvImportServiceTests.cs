@@ -40,12 +40,17 @@ internal class CsvImportServiceStoragePathArg : ISpecimenBuilder
     {
         var pi = request as ParameterInfo;
 
-        if (pi == null) return new NoSpecimen();
+        if (pi == null)
+        {
+            return new NoSpecimen();
+        }
 
         if (pi.Member.DeclaringType != typeof(CsvImportService) ||
             pi.ParameterType != typeof(string) ||
             pi.Name != "storagePath")
+        {
             return new NoSpecimen();
+        }
 
         return _storagePath;
     }

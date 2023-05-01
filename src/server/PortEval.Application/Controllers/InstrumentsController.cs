@@ -116,7 +116,10 @@ public class InstrumentsController : PortEvalControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<InstrumentDto>> PutInstrument(int id, [FromBody] InstrumentDto updateRequest)
     {
-        if (id != updateRequest.Id) return BadRequest("URL id and request body id don't match.");
+        if (id != updateRequest.Id)
+        {
+            return BadRequest("URL id and request body id don't match.");
+        }
 
         var updatedInstrument = await _instrumentService.UpdateInstrumentAsync(updateRequest);
         return GenerateActionResult(updatedInstrument);

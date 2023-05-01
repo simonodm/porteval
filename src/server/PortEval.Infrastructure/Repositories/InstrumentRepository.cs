@@ -54,7 +54,10 @@ public class InstrumentRepository : IInstrumentRepository
     public async Task DeleteAsync(int instrumentId)
     {
         var foundInstrumentEntity = await _context.Instruments.FirstOrDefaultAsync(i => i.Id == instrumentId);
-        if (foundInstrumentEntity != null) Delete(foundInstrumentEntity);
+        if (foundInstrumentEntity != null)
+        {
+            Delete(foundInstrumentEntity);
+        }
     }
 
     /// <inheritdoc cref="IInstrumentRepository.Delete" />

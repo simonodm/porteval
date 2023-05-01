@@ -77,7 +77,10 @@ public class InstrumentPriceRepository : IInstrumentPriceRepository
         var foundPrice = await _context.InstrumentPrices
             .FirstOrDefaultAsync(price => price.InstrumentId == instrumentId && price.Id == priceId);
 
-        if (foundPrice != null) Delete(foundPrice);
+        if (foundPrice != null)
+        {
+            Delete(foundPrice);
+        }
     }
 
     /// <inheritdoc />

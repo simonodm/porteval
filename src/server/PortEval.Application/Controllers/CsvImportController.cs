@@ -31,7 +31,10 @@ public class CsvImportController : PortEvalControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<CsvTemplateImportDto>> GetImport(string id)
     {
-        if (!Guid.TryParse(id, out var guid)) return BadRequest("Invalid import log id provided.");
+        if (!Guid.TryParse(id, out var guid))
+        {
+            return BadRequest("Invalid import log id provided.");
+        }
 
         var result = await _importService.GetImportAsync(guid);
         return GenerateActionResult(result);
@@ -40,7 +43,10 @@ public class CsvImportController : PortEvalControllerBase
     [HttpGet("{id}/log")]
     public IActionResult GetImportErrorLog(string id)
     {
-        if (!Guid.TryParse(id, out var guid)) return BadRequest("Invalid import log id provided.");
+        if (!Guid.TryParse(id, out var guid))
+        {
+            return BadRequest("Invalid import log id provided.");
+        }
 
         var fileStream = _importService.TryGetErrorLog(guid);
         return GenerateFileActionResult(fileStream, "text/csv", "error-log.csv");

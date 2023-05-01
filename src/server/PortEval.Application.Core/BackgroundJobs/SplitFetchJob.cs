@@ -43,13 +43,19 @@ public class SplitFetchJob : ISplitFetchJob
 
         foreach (var instrument in instruments)
         {
-            if (instrument.TrackingStatus != InstrumentTrackingStatus.Tracked) continue;
+            if (instrument.TrackingStatus != InstrumentTrackingStatus.Tracked)
+            {
+                continue;
+            }
 
             var existingSplits = await _splitRepository.ListInstrumentSplitsAsync(instrument.Id);
             var startTime = existingSplits.LastOrDefault()?.Time ?? instrument.TrackingInfo.TrackedSince;
 
             var splits = await _priceFetcher.GetInstrumentSplitsAsync(instrument.Symbol, startTime, DateTime.UtcNow);
-            if (splits == null) continue;
+            if (splits == null)
+            {
+                continue;
+            }
 
             foreach (var split in splits)
             {

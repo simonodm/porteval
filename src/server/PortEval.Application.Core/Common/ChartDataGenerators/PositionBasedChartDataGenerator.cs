@@ -225,7 +225,10 @@ public abstract class PositionBasedChartDataGenerator : ChartDataGeneratorBase
             foreach (var generator in positionChartPointGenerators)
             {
                 var nextChartPointData = generator.GetNextRangeData();
-                if (nextChartPointData != null) chartPointDataList.Add(nextChartPointData);
+                if (nextChartPointData != null)
+                {
+                    chartPointDataList.Add(nextChartPointData);
+                }
             }
 
             if (chartPointDataList.Count > 0)
@@ -249,7 +252,10 @@ public abstract class PositionBasedChartDataGenerator : ChartDataGeneratorBase
         foreach (var data in positionsPriceListData)
         {
             var firstTransaction = data.Transactions.FirstOrDefault();
-            if (firstTransaction != null && firstTransaction.Time < min) min = firstTransaction.Time;
+            if (firstTransaction != null && firstTransaction.Time < min)
+            {
+                min = firstTransaction.Time;
+            }
         }
 
         return originalDateRange.SetFrom(originalDateRange.From.GetMax(min));

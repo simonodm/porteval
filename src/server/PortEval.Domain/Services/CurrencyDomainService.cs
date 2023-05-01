@@ -10,7 +10,9 @@ public class CurrencyDomainService : ICurrencyDomainService
     public void ChangeDefaultCurrency(Currency previousDefaultCurrency, Currency newDefaultCurrency)
     {
         if (!previousDefaultCurrency.IsDefault)
+        {
             throw new OperationNotAllowedException($"{nameof(previousDefaultCurrency)} is not default.");
+        }
 
         previousDefaultCurrency.UnsetDefault();
         newDefaultCurrency.SetAsDefault();

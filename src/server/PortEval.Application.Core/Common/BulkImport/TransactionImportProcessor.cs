@@ -28,12 +28,18 @@ public class TransactionImportProcessor : ImportProcessor<TransactionDto, Transa
         if (row.Id != default)
         {
             var response = await _transactionService.UpdateTransactionAsync(row);
-            if (response.Status != OperationStatus.Ok) logEntry.AddError(response.Message);
+            if (response.Status != OperationStatus.Ok)
+            {
+                logEntry.AddError(response.Message);
+            }
         }
         else
         {
             var response = await _transactionService.AddTransactionAsync(row);
-            if (response.Status != OperationStatus.Ok) logEntry.AddError(response.Message);
+            if (response.Status != OperationStatus.Ok)
+            {
+                logEntry.AddError(response.Message);
+            }
 
             logEntry.Data.Id = response.Response?.Id ?? default;
         }

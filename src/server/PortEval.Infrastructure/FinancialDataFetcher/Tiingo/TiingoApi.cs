@@ -73,9 +73,13 @@ public class TiingoApi : DataSource
 
         foreach (var price in sortedPrices)
         {
-            if (price.Time < from) break;
+            if (price.Time < from)
+            {
+                break;
+            }
 
             if (price.Time <= to)
+            {
                 responseResult.Add(new PricePoint
                 {
                     CurrencyCode = "USD",
@@ -83,6 +87,7 @@ public class TiingoApi : DataSource
                     Symbol = symbol,
                     Time = price.Time.ToUniversalTime()
                 });
+            }
         }
 
         return new Response<IEnumerable<PricePoint>>
@@ -166,7 +171,10 @@ public class TiingoApi : DataSource
 
         var endDate = to.Date.AddDays(1).ToString("yyyy-M-d");
         var resampleFreq = "1day";
-        if (interval != null) resampleFreq = interval == IntradayInterval.FiveMinutes ? "5min" : "60min";
+        if (interval != null)
+        {
+            resampleFreq = interval == IntradayInterval.FiveMinutes ? "5min" : "60min";
+        }
 
         var prices = new List<TiingoCryptoPricePoint>();
         var lastPriceTime = from;
@@ -192,12 +200,16 @@ public class TiingoApi : DataSource
                 if (result.Result?.FirstOrDefault()?.Data?.FirstOrDefault() != null)
                 {
                     if (result.Result.First().Data.Last().Time == lastPriceTime) // b)
+                    {
                         break;
+                    }
 
                     prices.AddRange(result.Result.First().Data);
                     lastPriceTime = prices[^1].Time;
                     if (lastPriceTime >= to - ResampleFreqToTimeSpan(resampleFreq)) // a)
+                    {
                         break;
+                    }
                 }
                 else if (prices.Count == 0 && lastPriceTime < to - TimeSpan.FromDays(365)) // d)
                 {
@@ -211,9 +223,14 @@ public class TiingoApi : DataSource
             else // c)
             {
                 if (lastPriceTime < to - TimeSpan.FromDays(daysToAddOnFailure))
+                {
                     lastPriceTime += TimeSpan.FromDays(daysToAddOnFailure);
+                }
                 else
+                {
                     break;
+                }
+
                 if (result.StatusCode == StatusCode.OtherError)
                 {
                     anyUnexpectedError = true;
@@ -257,7 +274,10 @@ public class TiingoApi : DataSource
 
     private string GetCryptoTicker(string symbol, string currencyCode)
     {
-        if (symbol.Substring(symbol.Length - 3, 3) == currencyCode) return symbol;
+        if (symbol.Substring(symbol.Length - 3, 3) == currencyCode)
+        {
+            return symbol;
+        }
 
         return symbol + currencyCode;
     }

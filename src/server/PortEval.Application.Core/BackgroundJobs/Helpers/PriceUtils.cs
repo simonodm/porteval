@@ -84,6 +84,7 @@ internal static class PriceUtils
             while (latestPrice != null && currentTime < range.To)
             {
                 if (currentTime > range.From)
+                {
                     result.Add(new PricePoint
                     {
                         CurrencyCode = latestPrice.CurrencyCode,
@@ -91,6 +92,7 @@ internal static class PriceUtils
                         Symbol = latestPrice.Symbol,
                         Time = currentTime
                     });
+                }
 
                 currentTime += range.Interval;
             }
@@ -108,9 +110,15 @@ internal static class PriceUtils
     /// <returns>A <c>TimeSpan</c> representing the interval to maintain.</returns>
     public static TimeSpan GetInstrumentPriceInterval(DateTime baseTime, DateTime targetTime)
     {
-        if (baseTime - targetTime <= TimeSpan.FromDays(1)) return FiveMinutes;
+        if (baseTime - targetTime <= TimeSpan.FromDays(1))
+        {
+            return FiveMinutes;
+        }
 
-        if (baseTime - targetTime <= TimeSpan.FromDays(5)) return OneHour;
+        if (baseTime - targetTime <= TimeSpan.FromDays(5))
+        {
+            return OneHour;
+        }
 
         return OneDay;
     }
@@ -137,15 +145,20 @@ internal static class PriceUtils
         ICurrencyExchangeRateRepository exchangeRateRepository, Instrument instrument, PricePoint pricePoint)
     {
         var price = pricePoint.Price;
-        if (pricePoint.CurrencyCode == instrument.CurrencyCode) return price;
+        if (pricePoint.CurrencyCode == instrument.CurrencyCode)
+        {
+            return price;
+        }
 
         var conversionRate =
             await exchangeRateRepository.GetExchangeRateAtAsync(pricePoint.CurrencyCode, instrument.CurrencyCode,
                 pricePoint.Time);
 
         if (conversionRate == null)
+        {
             throw new ApplicationException(
                 $"No conversion rate from {pricePoint.CurrencyCode} to {instrument.CurrencyCode} found at {pricePoint.Time}");
+        }
 
         var convertedPrice = pricePoint.Price * conversionRate.ExchangeRate;
         return convertedPrice;

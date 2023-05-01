@@ -46,10 +46,16 @@ public class LatestPricesFetchJob : InstrumentPriceFetchJobBase, ILatestPricesFe
 
         foreach (var instrument in instruments)
         {
-            if (instrument.TrackingStatus != InstrumentTrackingStatus.Tracked) continue;
+            if (instrument.TrackingStatus != InstrumentTrackingStatus.Tracked)
+            {
+                continue;
+            }
 
             var fetcherResponse = await FetchLatestPrice(instrument);
-            if (fetcherResponse == null) continue;
+            if (fetcherResponse == null)
+            {
+                continue;
+            }
 
             try
             {

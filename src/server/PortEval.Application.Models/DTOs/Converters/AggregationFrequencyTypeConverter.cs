@@ -15,7 +15,9 @@ public class AggregationFrequencyTypeConverter : TypeConverter
     public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
     {
         if (value is string s && AggregationFrequencyStringValues.StringToEnumMap.TryGetValue(s, out var from))
+        {
             return from;
+        }
 
         return base.ConvertFrom(context, culture, value);
     }
@@ -24,7 +26,9 @@ public class AggregationFrequencyTypeConverter : TypeConverter
         Type destinationType)
     {
         if (value.GetType() == typeof(AggregationFrequency) && destinationType == typeof(string))
+        {
             return AggregationFrequencyStringValues.EnumToStringMap[(AggregationFrequency)value];
+        }
 
         return base.ConvertTo(context, culture, value, destinationType);
     }

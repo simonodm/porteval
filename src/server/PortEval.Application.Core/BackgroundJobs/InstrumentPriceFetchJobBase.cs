@@ -41,11 +41,15 @@ public abstract class InstrumentPriceFetchJobBase
         IEnumerable<PricePoint> response;
 
         if (instrument.Type == InstrumentType.CryptoCurrency)
+        {
             response = await _priceFetcher.GetHistoricalDailyCryptoPricesAsync(instrument.Symbol,
                 instrument.CurrencyCode, from, to);
+        }
         else
+        {
             response = await _priceFetcher.GetHistoricalDailyPricesAsync(instrument.Symbol, instrument.CurrencyCode,
                 from, to);
+        }
 
         return response ?? Enumerable.Empty<PricePoint>();
     }
@@ -67,11 +71,15 @@ public abstract class InstrumentPriceFetchJobBase
         IEnumerable<PricePoint> response;
 
         if (instrument.Type == InstrumentType.CryptoCurrency)
+        {
             response = await _priceFetcher.GetIntradayCryptoPricesAsync(instrument.Symbol, instrument.CurrencyCode,
                 from, to, interval);
+        }
         else
+        {
             response = await _priceFetcher.GetIntradayPricesAsync(instrument.Symbol, instrument.CurrencyCode, from, to,
                 interval);
+        }
 
         return response ?? Enumerable.Empty<PricePoint>();
     }
@@ -89,9 +97,13 @@ public abstract class InstrumentPriceFetchJobBase
         PricePoint response;
 
         if (instrument.Type == InstrumentType.CryptoCurrency)
+        {
             response = await _priceFetcher.GetLatestCryptoPriceAsync(instrument.Symbol, instrument.CurrencyCode);
+        }
         else
+        {
             response = await _priceFetcher.GetLatestInstrumentPriceAsync(instrument.Symbol, instrument.CurrencyCode);
+        }
 
         return response;
     }

@@ -157,7 +157,10 @@ public class PortfoliosController : PortEvalControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<PortfolioDto>> PutPortfolio(int id, [FromBody] PortfolioDto updateRequest)
     {
-        if (id != updateRequest.Id) return BadRequest("URL portfolio id and request body id don't match.");
+        if (id != updateRequest.Id)
+        {
+            return BadRequest("URL portfolio id and request body id don't match.");
+        }
 
         var updatedPortfolio = await _portfolioService.UpdatePortfolioAsync(updateRequest);
         return GenerateActionResult(updatedPortfolio);

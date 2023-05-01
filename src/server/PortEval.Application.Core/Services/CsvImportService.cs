@@ -110,13 +110,18 @@ public class CsvImportService : ICsvImportService
     {
         var path = GetTemplatePath(templateType);
         if (string.IsNullOrWhiteSpace(path))
+        {
             return new OperationResponse<Stream>
             {
                 Status = OperationStatus.Error,
                 Message = "Failed to retrieve the template."
             };
+        }
 
-        if (!_fileSystem.File.Exists(path)) GenerateTemplate(path, templateType);
+        if (!_fileSystem.File.Exists(path))
+        {
+            GenerateTemplate(path, templateType);
+        }
 
         return new OperationResponse<Stream>
         {
@@ -162,7 +167,10 @@ public class CsvImportService : ICsvImportService
 
     private CsvTemplateImportDto AssignErrorLogUrl(CsvTemplateImportDto importDto)
     {
-        if (importDto.ErrorLogAvailable) importDto.ErrorLogUrl = $"/imports/{importDto.ImportId}/log";
+        if (importDto.ErrorLogAvailable)
+        {
+            importDto.ErrorLogUrl = $"/imports/{importDto.ImportId}/log";
+        }
 
         return importDto;
     }

@@ -39,9 +39,15 @@ public class ChartDateRange : ValueObject
     /// <exception cref="OperationNotAllowedException">Thrown if the range is invalid.</exception>
     public ChartDateRange(DateTime start, DateTime end)
     {
-        if (end < start) throw new OperationNotAllowedException("Chart date range start cannot be later than the end.");
+        if (end < start)
+        {
+            throw new OperationNotAllowedException("Chart date range start cannot be later than the end.");
+        }
+
         if ((end - start).TotalDays < 1)
+        {
             throw new OperationNotAllowedException("Chart date range cannot be less than 1 day.");
+        }
 
         Start = start;
         End = end;

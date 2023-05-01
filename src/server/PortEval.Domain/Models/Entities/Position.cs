@@ -62,7 +62,9 @@ public class Position : VersionedEntity, IAggregateRoot
     public static Position Create(Portfolio portfolio, Instrument instrument, string note)
     {
         if (instrument.Type == InstrumentType.Index)
+        {
             throw new OperationNotAllowedException("Cannot open a position for an index.");
+        }
 
         return new Position(portfolio.Id, instrument.Id, note);
     }
@@ -94,8 +96,10 @@ public class Position : VersionedEntity, IAggregateRoot
         var transaction = Transaction.Create(Id, time, amount, price, note);
 
         if (GetAmountAt(time) + transaction.Amount < 0)
+        {
             throw new OperationNotAllowedException(
                 $"Failed to add transaction to position {Id}: position amount cannot fall below zero.");
+        }
 
         _transactions.Add(transaction);
         AddDomainEvent(new TransactionAddedToPositionDomainEvent(transaction, this));
@@ -119,11 +123,16 @@ public class Position : VersionedEntity, IAggregateRoot
     public Transaction UpdateTransaction(int id, decimal amount, decimal price, DateTime time, string note)
     {
         var transaction = FindTransaction(id);
-        if (transaction == null) throw new ItemNotFoundException($"Transaction {id} not found in position {Id}.");
+        if (transaction == null)
+        {
+            throw new ItemNotFoundException($"Transaction {id} not found in position {Id}.");
+        }
 
         if ((transaction.Time > time && GetAmountAt(time) + amount < 0)
             || (transaction.Time <= time && GetAmountAt(time) - transaction.Amount + amount < 0))
+        {
             throw new OperationNotAllowedException("Position amount cannot fall below zero.");
+        }
 
         transaction.SetTime(time);
         transaction.SetAmount(amount);
@@ -147,7 +156,9 @@ public class Position : VersionedEntity, IAggregateRoot
     {
         var transaction = FindTransaction(transactionId);
         if (transaction == null)
+        {
             throw new ItemNotFoundException($"Position {Id} does not contain transaction {transactionId}.");
+        }
 
         // It is necessary to check whether removing the transaction causes position amount to fall below zero at any point after the transaction.
         var amount = GetAmountAt(transaction.Time) - transaction.Amount;
@@ -155,8 +166,10 @@ public class Position : VersionedEntity, IAggregateRoot
         {
             amount += existingTransaction.Amount;
             if (amount < 0)
+            {
                 throw new OperationNotAllowedException(
                     $"Failed to remove transaction {transactionId}: position amount cannot fall below zero.");
+            }
         }
 
         _transactions.Remove(transaction);

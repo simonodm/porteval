@@ -89,7 +89,9 @@ internal class DbContextDataSeeder
         var instrumentsList = instruments.ToList();
 
         if (portfoliosList.Count < 2 || instrumentsList.Count < 2)
+        {
             throw new ArgumentException("Not enough portfolios or instruments provided to seed positions.");
+        }
 
         var positions = new List<Position>
         {
@@ -107,7 +109,10 @@ internal class DbContextDataSeeder
     {
         var positionsList = positions.ToList();
 
-        if (positionsList.Count < 2) throw new ArgumentException("Not enough positions provided to seed transactions.");
+        if (positionsList.Count < 2)
+        {
+            throw new ArgumentException("Not enough positions provided to seed transactions.");
+        }
 
         var transactions = new List<Transaction>
         {
@@ -143,7 +148,9 @@ internal class DbContextDataSeeder
         var instrumentsList = instruments.ToList();
 
         if (instrumentsList.Count < 2)
+        {
             throw new ArgumentException("Not enough instruments provided to seed transactions.");
+        }
 
         var prices = new List<InstrumentPrice>
         {
@@ -186,7 +193,9 @@ internal class DbContextDataSeeder
         var instrumentsList = instruments.ToList();
 
         if (portfoliosList.Count == 0 || positionsList.Count == 0 || instrumentsList.Count == 0)
+        {
             throw new ArgumentException("Too few portfolios, positions, or instruments to seed chart data.");
+        }
 
         var chart1 = new Chart("Portfolio chart", new ChartDateRange(new ToDateRange(DateRangeUnit.Month, 1)),
             ChartTypeSettings.PriceChart("USD"));

@@ -131,7 +131,10 @@ public class MboumApi : DataSource
 
     private InstrumentSplitData ConvertHistoricalSplitDataItemToInstrumentSplitData(MboumSplit split)
     {
-        if (split == null) return null;
+        if (split == null)
+        {
+            return null;
+        }
 
         return new InstrumentSplitData
         {

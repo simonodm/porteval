@@ -46,9 +46,12 @@ public abstract class ImportProcessor<TRecord, TValidator> : IImportProcessor<TR
         {
             var validationResult = Validator.Validate(record);
             if (!validationResult.IsValid)
+            {
                 errorLog.Add(new ProcessedRowErrorLogEntry<TRecord>(record,
                     validationResult.Errors.Select(error => error.ErrorMessage)));
+            }
             else
+            {
                 try
                 {
                     var processResult = await ProcessItem(record);
@@ -58,10 +61,14 @@ public abstract class ImportProcessor<TRecord, TValidator> : IImportProcessor<TR
                 {
                     errorLog.Add(new ProcessedRowErrorLogEntry<TRecord>(record, ex.Message));
                 }
+            }
         }
 
         OnImportFinish?.Invoke();
-        if (OnImportFinishAsync != null) await OnImportFinishAsync();
+        if (OnImportFinishAsync != null)
+        {
+            await OnImportFinishAsync();
+        }
 
         return new ImportResult<TRecord>
         {

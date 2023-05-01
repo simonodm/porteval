@@ -81,7 +81,8 @@ public class DataImportJobTests
 
         portfolioImportProcessor.Verify(p => p.ImportRecordsAsync(
             It.Is<IEnumerable<PortfolioDto>>(e =>
-                e.Count() == 1 && e.Any(dto => dto.Name == "ABC" && dto.CurrencyCode == "USD" && dto.Note == "TestNote"))
+                e.Count() == 1 && e.Any(dto =>
+                    dto.Name == "ABC" && dto.CurrencyCode == "USD" && dto.Note == "TestNote"))
         ));
     }
 

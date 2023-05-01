@@ -139,7 +139,9 @@ public class PositionsController : PortEvalControllerBase
     public async Task<ActionResult<PositionDto>> PutPosition(int positionId, [FromBody] PositionDto updateRequest)
     {
         if (updateRequest.Id != positionId)
+        {
             return BadRequest("URL position id and request body position id don't match.");
+        }
 
         var updatedPosition = await _positionService.UpdatePositionAsync(updateRequest);
         return GenerateActionResult(updatedPosition);

@@ -61,10 +61,15 @@ public class InstrumentPriceCleanupJob : IInstrumentPriceCleanupJob
             currentAnchor ??= price;
             var interval = PriceUtils.GetInstrumentPriceInterval(startTime, price.Time);
 
-            if (currentAnchor.Time + interval < price.Time) currentAnchor = previousPrice;
+            if (currentAnchor.Time + interval < price.Time)
+            {
+                currentAnchor = previousPrice;
+            }
 
             if (previousPrice != null && currentAnchor != previousPrice)
+            {
                 _instrumentPriceRepository.Delete(previousPrice);
+            }
 
             previousPrice = price;
         }

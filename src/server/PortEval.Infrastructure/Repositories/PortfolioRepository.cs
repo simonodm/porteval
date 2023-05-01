@@ -55,7 +55,10 @@ public class PortfolioRepository : IPortfolioRepository
     public async Task DeleteAsync(int portfolioId)
     {
         var foundPortfolioEntity = await _context.Portfolios.FirstOrDefaultAsync(p => p.Id == portfolioId);
-        if (foundPortfolioEntity != null) Delete(foundPortfolioEntity);
+        if (foundPortfolioEntity != null)
+        {
+            Delete(foundPortfolioEntity);
+        }
     }
 
     /// <inheritdoc />

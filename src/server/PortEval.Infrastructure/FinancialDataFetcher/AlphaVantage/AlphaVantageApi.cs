@@ -23,8 +23,13 @@ public class AlphaVantageApi : DataSource
     {
         ValidateRange(request.From, request.To);
 
-        var queryUrl =
-            $"{BaseUrl}/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={request.Symbol}&outputsize=full&apikey={Configuration.Credentials.Token}";
+        var queryUrlBuilder = new QueryUrlBuilder($"{BaseUrl}/query");
+        queryUrlBuilder.AddQueryParam("function", "TIME_SERIES_DAILY_ADJUSTED");
+        queryUrlBuilder.AddQueryParam("symbol", request.Symbol);
+        queryUrlBuilder.AddQueryParam("outputsize", "full");
+        queryUrlBuilder.AddQueryParam("apikey", Configuration.Credentials.Token);
+
+        var queryUrl = queryUrlBuilder.ToString();
 
         var response = await HttpClient.GetJsonAsync<TimeSeriesDailyResponseModel>(queryUrl, Configuration.RateLimiter);
         return ProcessTimeSeriesResponse(request, response?.Result?.Prices);
@@ -34,8 +39,15 @@ public class AlphaVantageApi : DataSource
     public async Task<Response<IEnumerable<PricePoint>>> ProcessAsync(IntradayInstrumentPricesRequest request)
     {
         var interval = request.Interval == IntradayInterval.FiveMinutes ? "5min" : "60min";
-        var queryUrl =
-            $"{BaseUrl}/query?function=TIME_SERIES_INTRADAY&symbol={request.Symbol}&interval={interval}&outputsize=full&apikey={Configuration.Credentials.Token}";
+        
+        var queryUrlBuilder = new QueryUrlBuilder($"{BaseUrl}/query");
+        queryUrlBuilder.AddQueryParam("function", "TIME_SERIES_INTRADAY");
+        queryUrlBuilder.AddQueryParam("symbol", request.Symbol);
+        queryUrlBuilder.AddQueryParam("interval", interval);
+        queryUrlBuilder.AddQueryParam("outputsize", "full");
+        queryUrlBuilder.AddQueryParam("apikey", Configuration.Credentials.Token);
+
+        var queryUrl = queryUrlBuilder.ToString();
 
         var response =
             await HttpClient.GetJsonAsync<TimeSeriesIntradayResponseModel>(queryUrl, Configuration.RateLimiter);
@@ -46,24 +58,32 @@ public class AlphaVantageApi : DataSource
     [RequestProcessor(typeof(LatestInstrumentPriceRequest), typeof(PricePoint))]
     public async Task<Response<PricePoint>> ProcessAsync(LatestInstrumentPriceRequest request)
     {
-        var queryUrl =
-            $"{BaseUrl}/query?function=GLOBAL_QUOTE&symbol={request.Symbol}&apikey={Configuration.Credentials.Token}";
+        var queryUrlBuilder = new QueryUrlBuilder($"{BaseUrl}/query");
+        queryUrlBuilder.AddQueryParam("function", "GLOBAL_QUOTE");
+        queryUrlBuilder.AddQueryParam("symbol", request.Symbol);
+        queryUrlBuilder.AddQueryParam("apikey", Configuration.Credentials.Token);
+
+        var queryUrl = queryUrlBuilder.ToString();
 
         var response = await HttpClient.GetJsonAsync<GlobalQuoteResponseModel>(queryUrl, Configuration.RateLimiter);
 
         if (response.StatusCode != StatusCode.Ok)
+        {
             return new Response<PricePoint>
             {
                 StatusCode = response.StatusCode,
                 ErrorMessage = response.ErrorMessage
             };
+        }
 
         if (response.Result == null)
+        {
             return new Response<PricePoint>
             {
                 StatusCode = StatusCode.OtherError,
                 ErrorMessage = "Invalid data received."
             };
+        }
 
         var pricePoint = new PricePoint
         {
@@ -85,11 +105,13 @@ public class AlphaVantageApi : DataSource
     {
         var result = new List<PricePoint>();
         if (prices == null)
+        {
             return new Response<IEnumerable<PricePoint>>
             {
                 StatusCode = StatusCode.OtherError,
                 ErrorMessage = "Invalid data received."
             };
+        }
 
         var splitCoefficient = 1m;
 
@@ -98,8 +120,15 @@ public class AlphaVantageApi : DataSource
             var time = DateTime.Parse(timeKey);
             time = DateTime.SpecifyKind(time, DateTimeKind.Utc);
 
-            if (time < request.From) break;
-            if (time > request.To) continue;
+            if (time < request.From)
+            {
+                break;
+            }
+
+            if (time > request.To)
+            {
+                continue;
+            }
 
             var price = priceData.Price;
             var pricePoint = new PricePoint
@@ -112,7 +141,10 @@ public class AlphaVantageApi : DataSource
 
             result.Add(pricePoint);
 
-            if (priceData.SplitCoefficient != 0) splitCoefficient *= priceData.SplitCoefficient;
+            if (priceData.SplitCoefficient != 0)
+            {
+                splitCoefficient *= priceData.SplitCoefficient;
+            }
         }
 
         return new Response<IEnumerable<PricePoint>>
@@ -125,6 +157,8 @@ public class AlphaVantageApi : DataSource
     private void ValidateRange(DateTime from, DateTime to)
     {
         if (to < from)
+        {
             throw new ArgumentException($"Argument {nameof(from)} cannot be later than argument {nameof(to)}");
+        }
     }
 }

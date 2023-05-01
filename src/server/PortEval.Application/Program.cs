@@ -24,7 +24,10 @@ public class Program
         try
         {
             var dbContext = services.GetRequiredService<PortEvalDbContext>();
-            if (dbContext.Database.IsSqlServer()) dbContext.Database.Migrate();
+            if (dbContext.Database.IsSqlServer())
+            {
+                dbContext.Database.Migrate();
+            }
         }
         catch (Exception ex)
         {

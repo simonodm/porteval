@@ -27,24 +27,30 @@ internal static class HttpClientExtensions
         try
         {
             if (rateLimiter != null && !rateLimiter.AllowRequest())
+            {
                 return new Response<TResult>
                 {
                     StatusCode = StatusCode.RateLimitExceeded,
                     ErrorMessage = "Request limit exceeded."
                 };
+            }
 
             using var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             if (headers != null)
+            {
                 foreach (var (header, value) in headers)
                     request.Headers.Add(header, value);
+            }
 
             var response = await httpClient.SendAsync(request);
             if (response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
                 return new Response<TResult>
                 {
                     StatusCode = StatusCode.RateLimitExceeded,
                     ErrorMessage = "API returned 429 Too Many Requests"
                 };
+            }
 
             var responseToken = JToken.Parse(await response.Content.ReadAsStringAsync());
             var data = responseToken.ToObject<TResult>();

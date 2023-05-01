@@ -49,9 +49,15 @@ public class InstrumentRangeDataGenerator : IInstrumentRangeDataGenerator
 
         _previousPrice = _currentPrice;
         var nextPrice = _priceEnumerator.FindNextElementInEnumerator(p => p.Time <= currentRange.To);
-        if (nextPrice != null) _currentPrice = nextPrice;
+        if (nextPrice != null)
+        {
+            _currentPrice = nextPrice;
+        }
 
-        if (_currentPrice == null) return null;
+        if (_currentPrice == null)
+        {
+            return null;
+        }
 
         return new InstrumentPriceRangeData
         {

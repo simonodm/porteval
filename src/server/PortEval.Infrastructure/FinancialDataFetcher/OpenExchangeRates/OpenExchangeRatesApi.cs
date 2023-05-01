@@ -18,7 +18,11 @@ public class OpenExchangeRatesApi : DataSource
     [RequestProcessor(typeof(LatestExchangeRatesRequest), typeof(ExchangeRates))]
     public async Task<Response<ExchangeRates>> ProcessAsync(LatestExchangeRatesRequest request)
     {
-        var queryUrl = $"{BaseUrl}/latest.json?app_id={Configuration.Credentials.Token}&base={request.CurrencyCode}";
+        var queryUrlBuilder = new QueryUrlBuilder($"{BaseUrl}/latest.json");
+        queryUrlBuilder.AddQueryParam("app_id", Configuration.Credentials.Token);
+        queryUrlBuilder.AddQueryParam("base", request.CurrencyCode);
+        
+        var queryUrl = queryUrlBuilder.ToString();
 
         var response =
             await HttpClient.GetJsonAsync<LatestExchangeRatesResponseModel>(queryUrl, Configuration.RateLimiter);

@@ -60,14 +60,20 @@ public class PositionRangeDataGenerator : IPositionRangeDataGenerator
 
         _previousPrice = _currentPrice;
         var nextPrice = _priceEnumerator.FindNextElementInEnumerator(p => p.Time <= currentRange.To);
-        if (nextPrice != null) _currentPrice = nextPrice;
+        if (nextPrice != null)
+        {
+            _currentPrice = nextPrice;
+        }
 
         _transactionEnumerator.FindNextElementInEnumerator(
             t => t.Time <= currentRange.To,
             t => _currentTransactions.Add(t)
         );
 
-        if (_currentPrice == null || _currentTransactions.Count == 0) return null;
+        if (_currentPrice == null || _currentTransactions.Count == 0)
+        {
+            return null;
+        }
 
         return new PositionPriceRangeData
         {

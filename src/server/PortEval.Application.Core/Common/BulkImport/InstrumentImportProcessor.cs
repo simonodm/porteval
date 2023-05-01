@@ -28,12 +28,18 @@ public class InstrumentImportProcessor : ImportProcessor<InstrumentDto, Instrume
         if (row.Id != default)
         {
             var response = await _instrumentService.UpdateInstrumentAsync(row);
-            if (response.Status != OperationStatus.Ok) logEntry.AddError(response.Message);
+            if (response.Status != OperationStatus.Ok)
+            {
+                logEntry.AddError(response.Message);
+            }
         }
         else
         {
             var response = await _instrumentService.CreateInstrumentAsync(row);
-            if (response.Status != OperationStatus.Ok) logEntry.AddError(response.Message);
+            if (response.Status != OperationStatus.Ok)
+            {
+                logEntry.AddError(response.Message);
+            }
 
             logEntry.Data.Id = response.Response?.Id ?? default;
         }

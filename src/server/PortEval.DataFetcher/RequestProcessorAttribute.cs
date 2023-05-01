@@ -52,6 +52,8 @@ public class RequestProcessorAttribute : Attribute
     private static void ValidateTypeIsRequest(Type type)
     {
         if (!type.IsAssignableTo(typeof(IRequest)))
+        {
             throw new ArgumentException($"{type} does not implement {nameof(IRequest)}.");
+        }
     }
 }

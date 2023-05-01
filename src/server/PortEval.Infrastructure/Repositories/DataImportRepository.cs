@@ -48,7 +48,10 @@ public class DataImportRepository : IDataImportRepository
     public async Task DeleteAsync(Guid id)
     {
         var importEntry = await _context.Imports.FirstOrDefaultAsync(i => i.Id == id);
-        if (importEntry != null) Delete(importEntry);
+        if (importEntry != null)
+        {
+            Delete(importEntry);
+        }
     }
 
     /// <inheritdoc />

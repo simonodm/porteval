@@ -15,7 +15,9 @@ public class ColorJsonConverter : JsonConverter<Color>
             int.TryParse($"{hexValue[1]}{hexValue[2]}", NumberStyles.HexNumber, null, out var red) &&
             int.TryParse($"{hexValue[3]}{hexValue[4]}", NumberStyles.HexNumber, null, out var green) &&
             int.TryParse($"{hexValue[5]}{hexValue[6]}", NumberStyles.HexNumber, null, out var blue))
+        {
             return Color.FromArgb(red, green, blue);
+        }
 
         throw new OperationNotAllowedException($"Invalid hex value color: {hexValue}.");
     }
@@ -29,7 +31,10 @@ public class ColorJsonConverter : JsonConverter<Color>
         JsonSerializer serializer)
     {
         var value = reader.Value;
-        if (value is string hexValue) return HexToColor(hexValue);
+        if (value is string hexValue)
+        {
+            return HexToColor(hexValue);
+        }
 
         throw new JsonSerializationException($"Cannot convert type {value?.GetType()} to color.");
     }

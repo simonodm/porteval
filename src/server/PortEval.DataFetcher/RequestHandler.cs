@@ -27,7 +27,11 @@ internal class RequestHandler<TRequest, TResult>
     {
         _request = request;
 
-        if (eligibleApis.Count == 0) throw new ArgumentException("No eligible API clients passed to request handler.");
+        if (eligibleApis.Count == 0)
+        {
+            throw new ArgumentException("No eligible API clients passed to request handler.");
+        }
+
         _eligibleApis = eligibleApis;
 
         if (retryPolicy != null)
@@ -58,7 +62,10 @@ internal class RequestHandler<TRequest, TResult>
     {
         var priorityApi = GetPriorityApi();
         var result = await ProcessUsingDataSourceAsync(priorityApi);
-        if (result.StatusCode == StatusCode.Ok) return result;
+        if (result.StatusCode == StatusCode.Ok)
+        {
+            return result;
+        }
 
         return await TryAllEligibleApisAsync();
     }
@@ -97,7 +104,9 @@ internal class RequestHandler<TRequest, TResult>
 
         foreach (var task in apiTasks)
             if (task.Result.StatusCode == StatusCode.Ok)
+            {
                 return task.Result;
+            }
 
         return new Response<TResult>
         {
@@ -128,7 +137,10 @@ internal class RequestHandler<TRequest, TResult>
                         return jobResult;
                     }
 
-                    if (jobResult.StatusCode != StatusCode.ConnectionError) return jobResult;
+                    if (jobResult.StatusCode != StatusCode.ConnectionError)
+                    {
+                        return jobResult;
+                    }
                 }
 
                 return new Response<TResult>
@@ -167,11 +179,13 @@ internal class RequestHandler<TRequest, TResult>
         });
 
         if (methodToCall == null)
+        {
             return new Response<TResult>
             {
                 StatusCode = StatusCode.OtherError,
                 ErrorMessage = $"API unable to process request of type {nameof(TRequest)}."
             };
+        }
 
         if (methodToCall.ReturnType.IsAssignableTo(typeof(Task<Response<TResult>>)))
         {
@@ -180,7 +194,9 @@ internal class RequestHandler<TRequest, TResult>
         }
 
         if (methodToCall.ReturnType.IsAssignableTo(typeof(Response<TResult>)))
+        {
             return (Response<TResult>)methodToCall.Invoke(dataSource, new object[] { _request });
+        }
 
         throw new InvalidOperationException(
             $"{methodToCall.Name} has an unrecognized return type {methodToCall.ReturnType}.");

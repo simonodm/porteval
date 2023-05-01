@@ -85,11 +85,13 @@ public class PortfolioService : IPortfolioService
     {
         var portfolio = await _portfolioDataQueries.GetPortfolioAsync(portfolioId);
         if (portfolio == null)
+        {
             return new OperationResponse<EntityValueDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {portfolioId} does not exist."
             };
+        }
 
         var dateRange = new DateRangeParams
         {
@@ -119,11 +121,13 @@ public class PortfolioService : IPortfolioService
     {
         var portfolio = await _portfolioDataQueries.GetPortfolioAsync(portfolioId);
         if (portfolio == null)
+        {
             return new OperationResponse<EntityProfitDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {portfolioId} does not exist."
             };
+        }
 
         var portfolioPositionsPriceRangeData = await GetPositionsPriceRangeData(portfolio, dateRange);
         var profit = _profitCalculator.CalculateProfit(portfolioPositionsPriceRangeData.PositionsPriceRangeData,
@@ -150,11 +154,13 @@ public class PortfolioService : IPortfolioService
     {
         var portfolio = await _portfolioDataQueries.GetPortfolioAsync(portfolioId);
         if (portfolio == null)
+        {
             return new OperationResponse<EntityPerformanceDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {portfolioId} does not exist."
             };
+        }
 
         var portfolioPositionsPriceRangeData = await GetPositionsPriceRangeData(portfolio, dateRange);
         var performance =
@@ -179,11 +185,13 @@ public class PortfolioService : IPortfolioService
     {
         var portfolio = await _portfolioDataQueries.GetPortfolioAsync(portfolioId);
         if (portfolio == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {portfolioId} does not exist."
             };
+        }
 
         var positionsPriceData = await GetPositionsPriceListData(portfolio, dateRange.SetFrom(DateTime.MinValue));
         var result = _chartDataGenerator.ChartValue(positionsPriceData, dateRange, frequency);
@@ -208,11 +216,13 @@ public class PortfolioService : IPortfolioService
     {
         var portfolio = await _portfolioDataQueries.GetPortfolioAsync(portfolioId);
         if (portfolio == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {portfolioId} does not exist."
             };
+        }
 
         var positionsPriceData = await GetPositionsPriceListData(portfolio, dateRange.SetFrom(DateTime.MinValue));
         var result = _chartDataGenerator.ChartProfit(positionsPriceData, dateRange, frequency);
@@ -237,11 +247,13 @@ public class PortfolioService : IPortfolioService
     {
         var portfolio = await _portfolioDataQueries.GetPortfolioAsync(portfolioId);
         if (portfolio == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {portfolioId} does not exist."
             };
+        }
 
         var positionsPriceData = await GetPositionsPriceListData(portfolio, dateRange.SetFrom(DateTime.MinValue));
         var result = _chartDataGenerator.ChartPerformance(positionsPriceData, dateRange, frequency);
@@ -260,11 +272,13 @@ public class PortfolioService : IPortfolioService
     {
         var portfolio = await _portfolioDataQueries.GetPortfolioAsync(portfolioId);
         if (portfolio == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {portfolioId} does not exist."
             };
+        }
 
         var positionsPriceData = await GetPositionsPriceListData(portfolio, dateRange.SetFrom(DateTime.MinValue));
         var result = _chartDataGenerator.ChartAggregatedProfit(positionsPriceData, dateRange, frequency);
@@ -289,11 +303,13 @@ public class PortfolioService : IPortfolioService
     {
         var portfolio = await _portfolioDataQueries.GetPortfolioAsync(portfolioId);
         if (portfolio == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {portfolioId} does not exist."
             };
+        }
 
         var positionsPriceData = await GetPositionsPriceListData(portfolio, dateRange.SetFrom(DateTime.MinValue));
         var result = _chartDataGenerator.ChartAggregatedPerformance(positionsPriceData, dateRange, frequency);
@@ -323,11 +339,13 @@ public class PortfolioService : IPortfolioService
     {
         var portfolio = await _portfolioDataQueries.GetPortfolioAsync(portfolioId);
         if (portfolio == null)
+        {
             return new OperationResponse<EntityStatisticsDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {portfolioId} does not exist."
             };
+        }
 
         return await GetPortfolioStatistics(portfolio);
     }
@@ -336,11 +354,13 @@ public class PortfolioService : IPortfolioService
     public async Task<OperationResponse<PortfolioDto>> CreatePortfolioAsync(PortfolioDto options)
     {
         if (!await _currencyRepository.ExistsAsync(options.CurrencyCode))
+        {
             return new OperationResponse<PortfolioDto>
             {
                 Status = OperationStatus.Error,
                 Message = $"Currency {options.CurrencyCode} does not exist."
             };
+        }
 
         var portfolio = _portfolioRepository.Add(Portfolio.Create(options.Name, options.Note, options.CurrencyCode));
         await _portfolioRepository.UnitOfWork.CommitAsync();
@@ -352,18 +372,22 @@ public class PortfolioService : IPortfolioService
     {
         var portfolio = await _portfolioRepository.FindAsync(options.Id);
         if (portfolio == null)
+        {
             return new OperationResponse<PortfolioDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {options.Id} does not exist."
             };
+        }
 
         if (!await _currencyRepository.ExistsAsync(options.CurrencyCode))
+        {
             return new OperationResponse<PortfolioDto>
             {
                 Status = OperationStatus.Error,
                 Message = $"Currency {options.CurrencyCode} does not exist."
             };
+        }
 
         portfolio.Rename(options.Name);
         portfolio.SetNote(options.Note);
@@ -379,11 +403,13 @@ public class PortfolioService : IPortfolioService
     public async Task<OperationResponse> DeletePortfolioAsync(int id)
     {
         if (!await _portfolioRepository.ExistsAsync(id))
+        {
             return new OperationResponse
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Portfolio {id} does not exist."
             };
+        }
 
         await _portfolioRepository.DeleteAsync(id);
         await _portfolioRepository.UnitOfWork.CommitAsync();

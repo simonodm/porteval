@@ -31,19 +31,23 @@ public class CurrencyExchangeRateService : ICurrencyExchangeRateService
     {
         var baseCurrency = await _currencyDataQueries.GetCurrencyAsync(currencyFrom);
         if (baseCurrency == null)
+        {
             return new OperationResponse<CurrencyExchangeRateDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Currency {currencyFrom} does not exist."
             };
+        }
 
         var targetCurrency = await _currencyDataQueries.GetCurrencyAsync(currencyTo);
         if (targetCurrency == null)
+        {
             return new OperationResponse<CurrencyExchangeRateDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Currency {currencyTo} does not exist."
             };
+        }
 
         var exchangeRate = await _currencyDataQueries.GetCurrencyExchangeRateAsync(currencyFrom, currencyTo, time);
         return new OperationResponse<CurrencyExchangeRateDto>
@@ -62,11 +66,13 @@ public class CurrencyExchangeRateService : ICurrencyExchangeRateService
     {
         var currency = await _currencyDataQueries.GetCurrencyAsync(currencyCode);
         if (currency == null)
+        {
             return new OperationResponse<IEnumerable<CurrencyExchangeRateDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Currency {currencyCode} does not exist."
             };
+        }
 
         var exchangeRates = await _currencyDataQueries.GetDirectExchangeRatesAsync(currencyCode, time);
 
@@ -84,19 +90,23 @@ public class CurrencyExchangeRateService : ICurrencyExchangeRateService
     {
         var baseCurrency = await _currencyDataQueries.GetCurrencyAsync(currencyFrom);
         if (baseCurrency == null)
+        {
             return new OperationResponse<IEnumerable<CurrencyExchangeRateDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Currency {currencyFrom} does not exist."
             };
+        }
 
         var targetCurrency = await _currencyDataQueries.GetCurrencyAsync(currencyTo);
         if (targetCurrency == null)
+        {
             return new OperationResponse<IEnumerable<CurrencyExchangeRateDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Currency {currencyTo} does not exist."
             };
+        }
 
         IEnumerable<CurrencyExchangeRateDto> result;
 
@@ -112,11 +122,13 @@ public class CurrencyExchangeRateService : ICurrencyExchangeRateService
         {
             var defaultCurrency = await _currencyDataQueries.GetDefaultCurrencyAsync();
             if (defaultCurrency == null)
+            {
                 return new OperationResponse<IEnumerable<CurrencyExchangeRateDto>>
                 {
                     Status = OperationStatus.Error,
                     Message = "No default currency is set."
                 };
+            }
 
             var baseToDefaultExchangeRates =
                 await _currencyDataQueries.GetInversedExchangeRatesAsync(currencyFrom, defaultCurrency.Code,

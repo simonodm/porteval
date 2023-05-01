@@ -96,10 +96,12 @@ public class ChartService : IChartService
     {
         var chart = await _chartRepository.FindAsync(options.Id);
         if (chart == null)
+        {
             return new OperationResponse<ChartDto>
             {
                 Status = OperationStatus.NotFound
             };
+        }
 
         try
         {
@@ -134,11 +136,13 @@ public class ChartService : IChartService
     public async Task<OperationResponse> DeleteChartAsync(int id)
     {
         if (!await _chartRepository.ExistsAsync(id))
+        {
             return new OperationResponse
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Chart {id} does not exist."
             };
+        }
 
         await _chartRepository.DeleteAsync(id);
         await _chartRepository.UnitOfWork.CommitAsync();
@@ -159,8 +163,12 @@ public class ChartService : IChartService
     {
         if (options.Type == ChartType.Price || options.Type == ChartType.Profit ||
             options.Type == ChartType.AggregatedProfit)
+        {
             if (!await _currencyRepository.ExistsAsync(options.CurrencyCode))
+            {
                 throw new ItemNotFoundException($"Currency {options.CurrencyCode} not found.");
+            }
+        }
     }
 
     /// <summary>
@@ -171,9 +179,15 @@ public class ChartService : IChartService
     /// <exception cref="OperationNotAllowedException">Thrown if no frequency is set in the DTO.</exception>
     private void ValidateFrequency(ChartDto options)
     {
-        if (options.Type != ChartType.AggregatedPerformance && options.Type != ChartType.AggregatedProfit) return;
+        if (options.Type != ChartType.AggregatedPerformance && options.Type != ChartType.AggregatedProfit)
+        {
+            return;
+        }
+
         if (options.Frequency == null)
+        {
             throw new OperationNotAllowedException("Chart frequency must be set for aggregated charts.");
+        }
     }
 
     /// <summary>
@@ -186,14 +200,20 @@ public class ChartService : IChartService
     {
         if (options.IsToDate != null && (bool)options.IsToDate)
         {
-            if (options.ToDateRange != null) return new ChartDateRange(options.ToDateRange);
+            if (options.ToDateRange != null)
+            {
+                return new ChartDateRange(options.ToDateRange);
+            }
+
             throw new OperationNotAllowedException(
                 $"{nameof(options.ToDateRange)} cannot be null when {nameof(options.IsToDate)} is true.");
         }
 
         if (options.DateRangeStart == null || options.DateRangeEnd == null)
+        {
             throw new OperationNotAllowedException(
                 $"{nameof(options.DateRangeStart)} and {nameof(options.DateRangeEnd)} must be set when {nameof(options.IsToDate)} is not set to true.");
+        }
 
         return new ChartDateRange((DateTime)options.DateRangeStart, (DateTime)options.DateRangeEnd);
     }
@@ -272,11 +292,16 @@ public class ChartService : IChartService
     private async Task<ChartLinePortfolio> GeneratePortfolioLineAsync(Chart chart, ChartLineDto lineDto)
     {
         if (lineDto.PortfolioId == null)
+        {
             throw new OperationNotAllowedException($"{nameof(lineDto.PortfolioId)} cannot be null.");
+        }
 
         var portfolioId = (int)lineDto.PortfolioId;
         var portfolio = await _portfolioRepository.FindAsync(portfolioId);
-        if (portfolio == null) throw new ItemNotFoundException($"Portfolio {portfolioId} does not exist.");
+        if (portfolio == null)
+        {
+            throw new ItemNotFoundException($"Portfolio {portfolioId} does not exist.");
+        }
 
         return ChartLinePortfolio.Create(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, portfolio);
     }
@@ -290,11 +315,16 @@ public class ChartService : IChartService
     private async Task<ChartLine> GeneratePositionLineAsync(Chart chart, ChartLineDto lineDto)
     {
         if (lineDto.PositionId == null)
+        {
             throw new OperationNotAllowedException("Position id must be set to create a position chart line.");
+        }
 
         var positionId = (int)lineDto.PositionId;
         var position = await _positionRepository.FindAsync(positionId);
-        if (position == null) throw new ItemNotFoundException($"Position {positionId} does not exist.");
+        if (position == null)
+        {
+            throw new ItemNotFoundException($"Position {positionId} does not exist.");
+        }
 
         return ChartLinePosition.Create(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, position);
     }
@@ -308,12 +338,17 @@ public class ChartService : IChartService
     private async Task<ChartLine> GenerateInstrumentLineAsync(Chart chart, ChartLineDto lineDto)
     {
         if (lineDto.InstrumentId == null)
+        {
             throw new OperationNotAllowedException("Instrument id must be set to create an instrument chart line.");
+        }
 
         var instrumentId = (int)lineDto.InstrumentId;
 
         var instrument = await _instrumentRepository.FindAsync(instrumentId);
-        if (instrument == null) throw new ItemNotFoundException($"Instrument {instrumentId} does not exist.");
+        if (instrument == null)
+        {
+            throw new ItemNotFoundException($"Instrument {instrumentId} does not exist.");
+        }
 
         return ChartLineInstrument.Create(chart.Id, lineDto.Width, lineDto.Dash, lineDto.Color, instrument);
     }

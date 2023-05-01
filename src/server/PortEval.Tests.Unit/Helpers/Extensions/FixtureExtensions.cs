@@ -495,7 +495,8 @@ internal static class FixtureExtensions
         var mock = fixture.Freeze<Mock<IDashboardItemRepository>>();
         mock
             .Setup(m => m.GetDashboardItemsAsync())
-            .ReturnsAsync(fixture.Build<DashboardChartItem>().FromFactory(() => new DashboardChartItem(1, 1, new DashboardPosition(0, 0, 1, 1))).CreateMany());
+            .ReturnsAsync(fixture.Build<DashboardChartItem>()
+                .FromFactory(() => new DashboardChartItem(1, 1, new DashboardPosition(0, 0, 1, 1))).CreateMany());
         mock
             .Setup(m => m.Add(It.IsAny<DashboardItem>()))
             .Returns<DashboardItem>(i => i);

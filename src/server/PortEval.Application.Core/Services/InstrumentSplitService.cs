@@ -32,11 +32,13 @@ public class InstrumentSplitService : IInstrumentSplitService
     public async Task<OperationResponse<IEnumerable<InstrumentSplitDto>>> GetInstrumentSplitsAsync(int instrumentId)
     {
         if (!await _instrumentRepository.ExistsAsync(instrumentId))
+        {
             return new OperationResponse<IEnumerable<InstrumentSplitDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {instrumentId} does not exist."
             };
+        }
 
         var splits = await _instrumentDataQueries.GetInstrumentSplitsAsync(instrumentId);
         return new OperationResponse<IEnumerable<InstrumentSplitDto>>
@@ -49,11 +51,13 @@ public class InstrumentSplitService : IInstrumentSplitService
     public async Task<OperationResponse<InstrumentSplitDto>> GetInstrumentSplitAsync(int instrumentId, int splitId)
     {
         if (!await _instrumentRepository.ExistsAsync(instrumentId))
+        {
             return new OperationResponse<InstrumentSplitDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {instrumentId} does not exist."
             };
+        }
 
         var split = await _instrumentDataQueries.GetInstrumentSplitAsync(instrumentId, splitId);
         return new OperationResponse<InstrumentSplitDto>
@@ -69,11 +73,13 @@ public class InstrumentSplitService : IInstrumentSplitService
     {
         var instrument = await _instrumentRepository.FindAsync(options.InstrumentId);
         if (instrument == null)
+        {
             return new OperationResponse<InstrumentSplitDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {options.InstrumentId} does not exist."
             };
+        }
 
         var ratio = new SplitRatio(options.SplitRatioDenominator, options.SplitRatioNumerator);
         var newSplit = InstrumentSplit.Create(instrument, options.Time, ratio);
@@ -90,18 +96,22 @@ public class InstrumentSplitService : IInstrumentSplitService
     {
         var split = await _splitRepository.FindAsync(options.Id);
         if (split == null)
+        {
             return new OperationResponse<InstrumentSplitDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Split {options.Id} does not exist."
             };
+        }
 
         if (split.InstrumentId != instrumentId)
+        {
             return new OperationResponse<InstrumentSplitDto>
             {
                 Status = OperationStatus.Error,
                 Message = $"Split {options.Id} does not belong to instrument {instrumentId}."
             };
+        }
 
         if (split.ProcessingStatus == InstrumentSplitProcessingStatus.Processed &&
             options.Status == InstrumentSplitProcessingStatus.RollbackRequested)

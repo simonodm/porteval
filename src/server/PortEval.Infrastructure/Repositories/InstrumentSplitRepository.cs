@@ -72,7 +72,10 @@ public class InstrumentSplitRepository : IInstrumentSplitRepository
     public async Task DeleteAsync(int splitId)
     {
         var foundSplit = await _context.InstrumentSplits.FirstOrDefaultAsync(s => s.Id == splitId);
-        if (foundSplit != default) Delete(foundSplit);
+        if (foundSplit != default)
+        {
+            Delete(foundSplit);
+        }
     }
 
     /// <inheritdoc />

@@ -41,11 +41,15 @@ public class InstrumentPrice : VersionedEntity, IAggregateRoot
     internal InstrumentPrice(DateTime time, DateTime creationTime, decimal price, int instrumentId)
     {
         if (time < PortEvalConstants.FinancialDataStartTime)
+        {
             throw new InvalidOperationException(
                 $"Price time must be later than {PortEvalConstants.FinancialDataStartTime}");
+        }
 
         if (price <= 0)
+        {
             throw new InvalidOperationException("Instrument price must be above zero.");
+        }
 
         Time = time;
         CreationTime = creationTime;
@@ -71,7 +75,10 @@ public class InstrumentPrice : VersionedEntity, IAggregateRoot
     /// <param name="split">The split to adjust for.</param>
     public void AdjustForSplit(InstrumentSplit split)
     {
-        if (split.Time > CreationTime && split.Time > Time) Price /= split.SplitRatio.Factor;
+        if (split.Time > CreationTime && split.Time > Time)
+        {
+            Price /= split.SplitRatio.Factor;
+        }
     }
 
     /// <summary>
@@ -80,6 +87,9 @@ public class InstrumentPrice : VersionedEntity, IAggregateRoot
     /// <param name="split">The split to adjust for.</param>
     public void AdjustForSplitRollback(InstrumentSplit split)
     {
-        if (split.Time > CreationTime && split.Time > Time) Price *= split.SplitRatio.Factor;
+        if (split.Time > CreationTime && split.Time > Time)
+        {
+            Price *= split.SplitRatio.Factor;
+        }
     }
 }

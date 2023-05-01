@@ -54,7 +54,10 @@ public class ChartRepository : IChartRepository
     public async Task DeleteAsync(int chartId)
     {
         var foundChartEntity = await _context.Charts.FirstOrDefaultAsync(c => c.Id == chartId);
-        if (foundChartEntity != null) Delete(foundChartEntity);
+        if (foundChartEntity != null)
+        {
+            Delete(foundChartEntity);
+        }
     }
 
     /// <inheritdoc cref="IChartRepository.Delete" />

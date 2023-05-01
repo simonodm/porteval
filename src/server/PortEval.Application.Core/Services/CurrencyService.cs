@@ -52,11 +52,13 @@ public class CurrencyService : ICurrencyService
     {
         var currencyEntity = await _currencyRepository.FindAsync(options.Code);
         if (currencyEntity == null)
+        {
             return new OperationResponse<CurrencyDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Currency {options.Code} does not exist."
             };
+        }
 
         var defaultCurrency = await _currencyRepository.GetDefaultCurrencyAsync();
 

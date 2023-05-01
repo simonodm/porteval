@@ -241,6 +241,7 @@ public static class ServiceCollectionExtensions
         var openExchangeRatesKey = configuration.GetConfigurationValue("PORTEVAL_OpenExchangeRates_Key");
 
         if (!string.IsNullOrWhiteSpace(alphaVantageKey))
+        {
             dataFetcher.RegisterDataSource<AlphaVantageApi>(new DataSourceConfiguration
             {
                 Credentials = new DataSourceCredentials
@@ -248,8 +249,10 @@ public static class ServiceCollectionExtensions
                     Token = alphaVantageKey
                 }
             });
+        }
 
         if (!string.IsNullOrWhiteSpace(tiingoKey))
+        {
             dataFetcher.RegisterDataSource<TiingoApi>(new DataSourceConfiguration
             {
                 Credentials = new DataSourceCredentials
@@ -257,8 +260,10 @@ public static class ServiceCollectionExtensions
                     Token = tiingoKey
                 }
             });
+        }
 
         if (!string.IsNullOrWhiteSpace(mboumKey))
+        {
             dataFetcher.RegisterDataSource<MboumApi>(new DataSourceConfiguration
             {
                 Credentials = new DataSourceCredentials
@@ -266,8 +271,10 @@ public static class ServiceCollectionExtensions
                     Token = mboumKey
                 }
             });
+        }
 
         if (!string.IsNullOrWhiteSpace(openExchangeRatesKey))
+        {
             dataFetcher.RegisterDataSource<OpenExchangeRatesApi>(new DataSourceConfiguration
             {
                 Credentials = new DataSourceCredentials
@@ -275,6 +282,7 @@ public static class ServiceCollectionExtensions
                     Token = openExchangeRatesKey
                 }
             });
+        }
 
         dataFetcher.RegisterDataSource<ExchangeRateHostApi>();
         services.AddSingleton<IDataFetcher>(dataFetcher);

@@ -47,7 +47,11 @@ public class PolynomialEquation
         while (i < IterationLimit)
         {
             x = previousX - ConvertToFunction(previousX) / CalculateDerivative(previousX);
-            if (Math.Abs(x - previousX) <= _precision) return x;
+            if (Math.Abs(x - previousX) <= _precision)
+            {
+                return x;
+            }
+
             previousX = x;
             i++;
         }
@@ -79,7 +83,10 @@ public class PolynomialEquation
 
     private double ApplyPowerRule(double exponent, double coefficient, double x)
     {
-        if (exponent == 0) return 0;
+        if (exponent == 0)
+        {
+            return 0;
+        }
 
         return exponent * coefficient * Math.Pow(x, exponent - 1);
     }

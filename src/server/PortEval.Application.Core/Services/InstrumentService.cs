@@ -108,11 +108,13 @@ public class InstrumentService : IInstrumentService
     {
         var instrument = await _instrumentDataQueries.GetInstrumentAsync(instrumentId);
         if (instrument == null)
+        {
             return new OperationResponse<EntityProfitDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {instrumentId} does not exist."
             };
+        }
 
         var firstPrice =
             (await _priceService.GetInstrumentPriceAsync(instrumentId, dateRange.From)).Response?.Price ?? 0m;
@@ -140,11 +142,13 @@ public class InstrumentService : IInstrumentService
     {
         var instrument = await _instrumentDataQueries.GetInstrumentAsync(instrumentId);
         if (instrument == null)
+        {
             return new OperationResponse<EntityPerformanceDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {instrumentId} does not exist."
             };
+        }
 
         var firstPrice =
             (await _priceService.GetInstrumentPriceAsync(instrumentId, dateRange.From)).Response?.Price ?? 0m;
@@ -171,11 +175,13 @@ public class InstrumentService : IInstrumentService
     {
         var instrument = await _instrumentDataQueries.GetInstrumentAsync(instrumentId);
         if (instrument == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {instrumentId} does not exist."
             };
+        }
 
         var prices =
             await _instrumentDataQueries.GetInstrumentPricesAsync(instrumentId, DateTime.MinValue, dateRange.To);
@@ -201,11 +207,13 @@ public class InstrumentService : IInstrumentService
     {
         var instrument = await _instrumentDataQueries.GetInstrumentAsync(instrumentId);
         if (instrument == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {instrumentId} does not exist."
             };
+        }
 
         var prices =
             await _instrumentDataQueries.GetInstrumentPricesAsync(instrumentId, DateTime.MinValue, dateRange.To);
@@ -232,11 +240,13 @@ public class InstrumentService : IInstrumentService
     {
         var instrument = await _instrumentDataQueries.GetInstrumentAsync(instrumentId);
         if (instrument == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {instrumentId} does not exist."
             };
+        }
 
         var prices =
             await _instrumentDataQueries.GetInstrumentPricesAsync(instrumentId, DateTime.MinValue, dateRange.To);
@@ -256,11 +266,13 @@ public class InstrumentService : IInstrumentService
     {
         var instrument = await _instrumentDataQueries.GetInstrumentAsync(instrumentId);
         if (instrument == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {instrumentId} does not exist."
             };
+        }
 
         var prices =
             await _instrumentDataQueries.GetInstrumentPricesAsync(instrumentId, DateTime.MinValue, dateRange.To);
@@ -287,11 +299,13 @@ public class InstrumentService : IInstrumentService
     {
         var instrument = await _instrumentDataQueries.GetInstrumentAsync(instrumentId);
         if (instrument == null)
+        {
             return new OperationResponse<IEnumerable<EntityChartPointDto>>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {instrumentId} does not exist."
             };
+        }
 
         var prices =
             await _instrumentDataQueries.GetInstrumentPricesAsync(instrumentId, DateTime.MinValue, dateRange.To);
@@ -308,18 +322,22 @@ public class InstrumentService : IInstrumentService
     public async Task<OperationResponse<InstrumentDto>> CreateInstrumentAsync(InstrumentDto options)
     {
         if (!await _currencyRepository.ExistsAsync(options.CurrencyCode))
+        {
             return new OperationResponse<InstrumentDto>
             {
                 Status = OperationStatus.Error,
                 Message = $"Currency {options.CurrencyCode} does not exist."
             };
+        }
 
         if (await _instrumentRepository.ExistsAsync(options.Symbol))
+        {
             return new OperationResponse<InstrumentDto>
             {
                 Status = OperationStatus.Error,
                 Message = $"An instrument with symbol {options.Symbol} already exists."
             };
+        }
 
         await CreateExchangeIfDoesNotExistAsync(options.Exchange);
 
@@ -336,11 +354,13 @@ public class InstrumentService : IInstrumentService
     {
         var existingInstrument = await _instrumentRepository.FindAsync(options.Id);
         if (existingInstrument == null)
+        {
             return new OperationResponse<InstrumentDto>
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {options.Id} does not exist."
             };
+        }
 
         await CreateExchangeIfDoesNotExistAsync(options.Exchange);
 
@@ -357,11 +377,13 @@ public class InstrumentService : IInstrumentService
     public async Task<OperationResponse> DeleteAsync(int id)
     {
         if (!await _instrumentRepository.ExistsAsync(id))
+        {
             return new OperationResponse
             {
                 Status = OperationStatus.NotFound,
                 Message = $"Instrument {id} does not exist."
             };
+        }
 
         await _instrumentRepository.DeleteAsync(id);
         await _instrumentRepository.UnitOfWork.CommitAsync();

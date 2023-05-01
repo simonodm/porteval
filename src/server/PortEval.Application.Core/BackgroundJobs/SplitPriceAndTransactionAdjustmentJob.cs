@@ -47,16 +47,20 @@ public class SplitPriceAndTransactionAdjustmentJob : ISplitPriceAndTransactionAd
         await _splitRepository.UnitOfWork.CommitAsync();
 
         if (nonProcessedSplits.Any())
+        {
             await _notificationService.SendNotificationAsync(
                 NotificationType.NewDataAvailable,
                 "Prices and transactions have been adjusted following an instrument split."
             );
+        }
 
         if (rolledBackSplits.Any())
+        {
             await _notificationService.SendNotificationAsync(
                 NotificationType.NewDataAvailable,
                 "Prices and transactions have been adjusted following an instrument split rollback."
             );
+        }
 
         _logger.LogInformation("Split price and transaction adjustment job finished.");
     }

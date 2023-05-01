@@ -43,7 +43,10 @@ public class MissingExchangeRatesFetchJob : IMissingExchangeRatesFetchJob
         var currencies = await _currencyRepository.ListAllAsync();
         var defaultCurrency = currencies.FirstOrDefault(c => c.IsDefault);
 
-        if (defaultCurrency == default) throw new OperationNotAllowedException("No default currency is set.");
+        if (defaultCurrency == default)
+        {
+            throw new OperationNotAllowedException("No default currency is set.");
+        }
 
         var exchangeRates = await _exchangeRateRepository.ListExchangeRatesAsync(defaultCurrency.Code);
 
@@ -82,21 +85,33 @@ public class MissingExchangeRatesFetchJob : IMissingExchangeRatesFetchJob
         var minTime = DateTime.UtcNow;
         foreach (var exchangeRateData in fetchResult)
         {
-            if (exchangeRateData.Time < range.From || exchangeRateData.Time > range.To) continue;
+            if (exchangeRateData.Time < range.From || exchangeRateData.Time > range.To)
+            {
+                continue;
+            }
 
             foreach (var (targetCurrencyCode, exchangeRate) in exchangeRateData.Rates)
             {
                 var targetCurrency = currenciesList.FirstOrDefault(c => c.Code == targetCurrencyCode);
-                if (targetCurrency == null || currency.Code == targetCurrency.Code) continue;
+                if (targetCurrency == null || currency.Code == targetCurrency.Code)
+                {
+                    continue;
+                }
 
                 newExchangeRates.Add(CurrencyExchangeRate.Create(exchangeRateData.Time, exchangeRate, currency,
                     targetCurrency));
-                if (exchangeRateData.Time < minTime) minTime = exchangeRateData.Time;
+                if (exchangeRateData.Time < minTime)
+                {
+                    minTime = exchangeRateData.Time;
+                }
             }
 
             i++;
             // limited to 1000 days per insert to preserve application memory
-            if (i < 1000) continue;
+            if (i < 1000)
+            {
+                continue;
+            }
 
             await _exchangeRateRepository.BulkUpsertAsync(newExchangeRates);
             newExchangeRates.Clear();
