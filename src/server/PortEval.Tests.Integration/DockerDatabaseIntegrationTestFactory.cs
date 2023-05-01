@@ -8,6 +8,7 @@ using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -52,9 +53,13 @@ public class DockerDatabaseIntegrationTestFactory<TProgram> : WebApplicationFact
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        var connectionStringBuilder = new SqlConnectionStringBuilder(_container.ConnectionString);
+        connectionStringBuilder.TrustServerCertificate = true;
+        connectionStringBuilder.InitialCatalog = "PortEvalDbContext";
+        var connectionString = connectionStringBuilder.ConnectionString;
         var additionalConfigurationKeys = new Dictionary<string, string>
         {
-            { "PortEvalDb:ConnectionString", _container.ConnectionString }
+            { "ConnectionStrings:PortEvalDb", connectionString }
         };
 
         builder.ConfigureAppConfiguration((_, config) =>
@@ -71,7 +76,7 @@ public class DockerDatabaseIntegrationTestFactory<TProgram> : WebApplicationFact
             services.ConfigureDapper();
             services.ConfigureDbContext(_configuration);
             services.AddQueries();
-            services.AddSingleton<JobStorage>(_ => new SqlServerStorage(_container.ConnectionString));
+            services.AddSingleton<JobStorage>(_ => new SqlServerStorage(connectionString));
         });
     }
 }

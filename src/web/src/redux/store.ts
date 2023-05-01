@@ -2,6 +2,7 @@ import rtkQueryErrorDisplay from './middleware/rtkQueryErrorDisplay';
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { portEvalApi } from './api/portEvalApi';
+import { ToolkitStore } from '@reduxjs/toolkit/dist/configureStore';
 
 /**
  * Configures PortEval's Redux store with optional initial state.
@@ -10,7 +11,7 @@ import { portEvalApi } from './api/portEvalApi';
  * @param preloadedState Initial state
  * @returns A Redux store representing PortEval's application state.
  */
-const setupStore = (preloadedState: Record<string, unknown>) => {
+const setupStore = (preloadedState: Record<string, unknown>): ToolkitStore => {
     const store = configureStore({
         reducer: {
             [portEvalApi.reducerPath]: portEvalApi.reducer,
