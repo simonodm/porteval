@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -103,14 +104,20 @@ public class Startup
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PortEvalAPI v1"));
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
                 Authorization = new[] { new HangfireDevAuthorizationFilter() }
             });
         }
 
+        app.UseSwagger();
+        
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("./swagger/v1/swagger.json", "PortEval API v1");
+            c.RoutePrefix = string.Empty;
+        });
+        
         app.UseCors();
 
         app.ConfigureExceptionMiddleware();
