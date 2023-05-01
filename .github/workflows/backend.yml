@@ -1,1 +1,29 @@
+name: Build and test backend
 
+on:
+  push:
+    branches: [ "gh-actions" ]
+    paths: 
+      - '/src/server/**/*'
+  pull_request:
+    branches: [ "gh-actions" ]
+    paths: 
+      - '/src/server/**/*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+    - name: Restore dependencies
+      run: dotnet restore src/server
+    - name: Build
+      run: dotnet build --no-restore src/server/PortEval.Application
+    - name: Unit tests
+      run: dotnet test --no-build --verbosity normal src/server/PortEval.Tests.Unit
