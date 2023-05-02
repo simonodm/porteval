@@ -16,7 +16,7 @@ public static class DateTimeExtensions
     public static DateTime RoundDown(this DateTime time, TimeSpan timeSpan)
     {
         var ticks = time.Ticks - time.Ticks % timeSpan.Ticks;
-        return new DateTime(ticks);
+        return new DateTime(ticks, time.Kind);
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ public static class DateTimeExtensions
         }
 
         var ticks = time.Ticks + (timeSpan.Ticks - time.Ticks % timeSpan.Ticks);
-        return new DateTime(ticks);
+        return new DateTime(ticks, time.Kind);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ public static class DateTimeExtensions
     /// <returns>The smaller <c>DateTime</c></returns>
     public static DateTime GetMin(this DateTime time, DateTime otherTime)
     {
-        return new DateTime(Math.Min(time.Ticks, otherTime.Ticks));
+        return new DateTime(Math.Min(time.Ticks, otherTime.Ticks), time.Kind);
     }
 
     /// <summary>
@@ -55,6 +55,6 @@ public static class DateTimeExtensions
     /// <returns>The larger <c>DateTime</c></returns>
     public static DateTime GetMax(this DateTime time, DateTime otherTime)
     {
-        return new DateTime(Math.Max(time.Ticks, otherTime.Ticks));
+        return new DateTime(Math.Max(time.Ticks, otherTime.Ticks), time.Kind);
     }
 }

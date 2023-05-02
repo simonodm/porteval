@@ -195,7 +195,7 @@ public class YahooFinanceApi : DataSource
         var result = new List<InstrumentSplitData>();
         foreach (var (_, split) in splits)
         {
-            var splitDate = DateTimeOffset.FromUnixTimeSeconds(split.Timestamp).DateTime;
+            var splitDate = DateTimeOffset.FromUnixTimeSeconds(split.Timestamp).UtcDateTime;
             if (splitDate < from || splitDate > to)
             {
                 continue;
