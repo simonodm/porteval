@@ -1,5 +1,14 @@
-[![Build/test backend](https://github.com/simonodm/porteval/actions/workflows/backend.yml/badge.svg)](https://github.com/simonodm/porteval/actions/workflows/backend.yml)
-[![Build/test web](https://github.com/simonodm/porteval/actions/workflows/web.yml/badge.svg)](https://github.com/simonodm/porteval/actions/workflows/web.yml)
+<p align="center">
+    <img src="./docs/img/web-view.png" />
+    <a href="https://github.com/simonodm/porteval/actions/workflows/backend.yml">
+        <img src="https://github.com/simonodm/porteval/actions/workflows/backend.yml/badge.svg" />
+    </a>
+    <a href="https://github.com/simonodm/porteval/actions/workflows/web.yml">
+        <img src="https://github.com/simonodm/porteval/actions/workflows/web.yml/badge.svg" />
+    </a>
+</p>
+
+---
 
 # PortEval
 
