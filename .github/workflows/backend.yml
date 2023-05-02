@@ -2,11 +2,11 @@ name: Build/test backend
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
     paths: 
       - '/src/server/**'
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
     paths: 
       - '/src/server/**'
   workflow_dispatch:
