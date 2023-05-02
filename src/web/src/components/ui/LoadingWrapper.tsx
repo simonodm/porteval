@@ -47,7 +47,7 @@ function LoadingWrapper({ children, isLoaded, isError, displayLoadingOnQueryRefr
         );
     }
     if(isError) {
-        return <div className="error-wrapper">An error has occured.</div>;
+        return <div className="error-wrapper">An error has occured. Try refreshing the page.</div>;
     }
 
     return (

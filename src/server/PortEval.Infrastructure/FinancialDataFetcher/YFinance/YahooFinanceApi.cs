@@ -155,7 +155,7 @@ public class YahooFinanceApi : DataSource
             var timestamp = timestamps[i];
             var price = prices[i];
 
-            var priceDate = DateTimeOffset.FromUnixTimeSeconds(timestamp).DateTime;
+            var priceDate = DateTimeOffset.FromUnixTimeSeconds(timestamp).UtcDateTime;
             if (priceDate < from || priceDate > to || price == null)
             {
                 continue;
