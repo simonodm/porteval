@@ -165,6 +165,7 @@ class SVGLineChart {
     _d3Lines: Array<d3.Line<LineChartLineDataPoint>> = [];
     _container: HTMLElement | null = null;
     
+    _tooltipOverlay: d3.Selection<SVGRectElement, unknown, null, undefined> | null = null;
     _tooltip: d3.Selection<HTMLDivElement, unknown, null, undefined> | null = null;
     _tooltipLine: d3.Selection<SVGLineElement, unknown, null, undefined> | null = null;
     _tooltipCallback: TooltipCallback = () => null;
@@ -462,19 +463,19 @@ class SVGLineChart {
     }
 
     _setupTooltip() {
-        const overlay = this._prepareTooltipContainer();
-        if(overlay === undefined) {
+        this._prepareTooltipContainer();
+        if(!this._tooltipOverlay) {
             return;
         }
 
         const memoizedFindClosestPoints = twoArgumentMemo(this._findClosestDataPoints);
         const memoizedTooltipCallback = twoArgumentMemo(this._tooltipCallback);
 
-        overlay.on(
+        this._tooltipOverlay.on('mouseout', () => this._clearTooltip());
+        this._tooltipOverlay.on(
             'mousemove',
             (e) => this._handleTooltipMouseMove(e, memoizedFindClosestPoints, memoizedTooltipCallback)
         );
-        overlay.on('mouseout', this._clearTooltip);
     }
 
     _getContainerOffset(): [number, number] {
@@ -484,8 +485,8 @@ class SVGLineChart {
         return [containerRect.top, containerRect.left];
     }
 
-    _prepareTooltipContainer(): d3.Selection<SVGRectElement, unknown, null, unknown> | undefined {
-        if(!this._container || !this._svg) return undefined;
+    _prepareTooltipContainer(): void {
+        if(!this._container || !this._svg) return;
         this._tooltip = d3.select(this._container).append('div')
             .style('position', 'absolute')
             .style('background-color', '#fff')
@@ -494,12 +495,10 @@ class SVGLineChart {
             .style('border', '2px solid gray')
             .style('border-radius', '3px')
         this._tooltipLine = this._svg.append('line')
-        const overlay = this._svg.append('rect')
+        this._tooltipOverlay = this._svg.append('rect')
             .attr('width', this._width)
             .attr('height', this._height)
             .attr('opacity', 0);
-
-        return overlay;
     }
 
     _handleTooltipMouseMove(
@@ -568,10 +567,10 @@ class SVGLineChart {
     }
 
     _clearTooltip(): void {
-        if(this._tooltip) {
+        if(this._tooltip != null) {
             this._tooltip.style('display', 'none');
         }
-        if(this._tooltipLine) {
+        if(this._tooltipLine != null) {
             this._tooltipLine.attr('stroke', 'none');
         }
     }
