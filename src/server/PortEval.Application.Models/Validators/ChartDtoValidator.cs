@@ -11,7 +11,7 @@ public class ChartDtoValidator : AbstractValidator<ChartDto>
     public ChartDtoValidator()
     {
         RuleFor(c => c.Name)
-            .MinimumLength(3)
+            .MinimumLength(1)
             .MaximumLength(64);
         RuleFor(c => c.DateRangeStart)
             .NotEmpty()

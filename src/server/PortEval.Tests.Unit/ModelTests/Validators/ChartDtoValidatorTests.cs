@@ -268,13 +268,11 @@ public class ChartDtoValidatorTests
         Assert.Contains(validationResult.Errors, e => e.PropertyName == nameof(chart.CurrencyCode));
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("A")]
-    public void Validate_FailsValidation_WhenChartNameIsShorterThanThreeCharacters(string name)
+    [Fact]
+    public void Validate_FailsValidation_WhenChartNameIsEmpty()
     {
         var chart = _fixture.Build<ChartDto>()
-            .With(c => c.Name, name)
+            .With(c => c.Name, "")
             .Create();
 
         var sut = _fixture.Create<ChartDtoValidator>();

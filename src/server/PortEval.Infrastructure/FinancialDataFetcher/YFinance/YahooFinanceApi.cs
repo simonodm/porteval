@@ -23,7 +23,7 @@ public class YahooFinanceApi : DataSource
     [RequestProcessor(typeof(HistoricalDailyInstrumentPricesRequest), typeof(IEnumerable<PricePoint>))]
     public async Task<Response<IEnumerable<PricePoint>>> ProcessAsync(HistoricalDailyInstrumentPricesRequest request)
     {
-        var response = await GetHistoricalDataFromChartEndpoint(request.Symbol, request.From, "1d");
+        var response = await GetHistoricalDataFromChartEndpoint(request.Symbol, request.From, request.To, "1d");
         return ExtractPrices(response.Result, request.From, request.To);
     }
 
@@ -31,7 +31,7 @@ public class YahooFinanceApi : DataSource
     public async Task<Response<IEnumerable<PricePoint>>> ProcessAsync(IntradayInstrumentPricesRequest request)
     {
         var interval = request.Interval == IntradayInterval.OneHour ? "60m" : "5m";
-        var response = await GetHistoricalDataFromChartEndpoint(request.Symbol, request.From, interval);
+        var response = await GetHistoricalDataFromChartEndpoint(request.Symbol, request.From, request.To, interval);
         return ExtractPrices(response.Result, request.From, request.To);
     }
 
@@ -44,7 +44,7 @@ public class YahooFinanceApi : DataSource
     [RequestProcessor(typeof(InstrumentSplitsRequest), typeof(IEnumerable<InstrumentSplitData>))]
     public async Task<Response<IEnumerable<InstrumentSplitData>>> ProcessAsync(InstrumentSplitsRequest request)
     {
-        var response = await GetHistoricalDataFromChartEndpoint(request.Symbol, request.From, "1d");
+        var response = await GetHistoricalDataFromChartEndpoint(request.Symbol, request.From, request.To);
         return ExtractSplits(response.Result, request.From, request.To);
     }
 
@@ -52,7 +52,7 @@ public class YahooFinanceApi : DataSource
     public async Task<Response<IEnumerable<PricePoint>>> ProcessAsync(HistoricalDailyCryptoPricesRequest request)
     {
         var yahooFinanceTicker = GetYahooCryptoTicker(request.Symbol, request.CurrencyCode);
-        var response = await GetHistoricalDataFromChartEndpoint(yahooFinanceTicker, request.From, "1d");
+        var response = await GetHistoricalDataFromChartEndpoint(yahooFinanceTicker, request.From, request.To);
         return ExtractPrices(response.Result, request.From, request.To);
     }
 
@@ -61,7 +61,7 @@ public class YahooFinanceApi : DataSource
     {
         var yahooFinanceTicker = GetYahooCryptoTicker(request.Symbol, request.CurrencyCode);
         var interval = request.Interval == IntradayInterval.OneHour ? "60m" : "5m";
-        var response = await GetHistoricalDataFromChartEndpoint(yahooFinanceTicker, request.From, interval);
+        var response = await GetHistoricalDataFromChartEndpoint(yahooFinanceTicker, request.From, request.To, interval);
         return ExtractPrices(response.Result, request.From, request.To);
     }
 
@@ -118,28 +118,11 @@ public class YahooFinanceApi : DataSource
     }
 
     private async Task<Response<ChartEndpointResponse>> GetHistoricalDataFromChartEndpoint(string symbol, DateTime from,
-        string interval)
+        DateTime to, string interval = "1d")
     {
-        var requestRangeLength = DateTime.UtcNow - from;
-        var rangeParam = "10y";
-
-        if (requestRangeLength < TimeSpan.FromDays(365 * 5))
-        {
-            rangeParam = "5y";
-        }
-
-        if (requestRangeLength < TimeSpan.FromDays(365))
-        {
-            rangeParam = "1y";
-        }
-
-        if (requestRangeLength < TimeSpan.FromDays(30))
-        {
-            rangeParam = "1mo";
-        }
-
         var queryUrlBuilder = new QueryUrlBuilder($"{BaseUrlV8}/chart/{symbol}");
-        queryUrlBuilder.AddQueryParam("range", rangeParam);
+        queryUrlBuilder.AddQueryParam("period1", new DateTimeOffset(from).ToUnixTimeSeconds().ToString());
+        queryUrlBuilder.AddQueryParam("period2", new DateTimeOffset(to).ToUnixTimeSeconds().ToString());
         queryUrlBuilder.AddQueryParam("interval", interval);
         queryUrlBuilder.AddQueryParam("events", "splits");
 

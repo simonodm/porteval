@@ -236,6 +236,10 @@ public static class ServiceCollectionExtensions
     public static void ConfigurePriceFetcher(this IServiceCollection services, IConfiguration configuration)
     {
         var dataFetcher = new DataFetcher.DataFetcher();
+        
+        dataFetcher.RegisterDataSource<YahooFinanceApi>();
+        dataFetcher.RegisterDataSource<ExchangeRateHostApi>();
+        
         var alphaVantageKey = configuration.GetConfigurationValue("PORTEVAL_AlphaVantage_Key");
         var mboumKey = configuration.GetConfigurationValue("PORTEVAL_RapidAPI_Mboum_Key");
         var tiingoKey = configuration.GetConfigurationValue("PORTEVAL_Tiingo_Key");
@@ -285,8 +289,6 @@ public static class ServiceCollectionExtensions
             });
         }
 
-        dataFetcher.RegisterDataSource<YahooFinanceApi>();
-        dataFetcher.RegisterDataSource<ExchangeRateHostApi>();
         services.AddSingleton<IDataFetcher>(dataFetcher);
         services.AddScoped<IFinancialDataFetcher, FinancialDataFetcher>();
     }

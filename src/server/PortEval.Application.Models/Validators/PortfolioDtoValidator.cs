@@ -9,7 +9,7 @@ public class PortfolioDtoValidator : AbstractValidator<PortfolioDto>
     {
         RuleFor(p => p.Name)
             .NotEmpty()
-            .MinimumLength(3)
+            .MinimumLength(1)
             .MaximumLength(64);
         RuleFor(p => p.Note)
             .MaximumLength(255);
