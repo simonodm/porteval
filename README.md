@@ -1,3 +1,6 @@
+[![Build/test backend](https://github.com/simonodm/porteval/actions/workflows/backend.yml/badge.svg)](https://github.com/simonodm/porteval/actions/workflows/backend.yml)
+[![Build/test web](https://github.com/simonodm/porteval/actions/workflows/web.yml/badge.svg)](https://github.com/simonodm/porteval/actions/workflows/web.yml)
+
 # PortEval
 
 PortEval is a full stack web application allowing investors to aggregate, track, and evaluate their investment portfolios.
