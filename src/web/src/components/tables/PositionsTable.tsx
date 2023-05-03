@@ -155,7 +155,7 @@ function PositionsTable({ className, portfolioId }: Props): JSX.Element {
         {
             id: 'exchange',
             header: 'Exchange',
-            accessor: p => p.instrument.exchange
+            accessor: p => p.instrument.exchange ?? ''
         },
         {
             id: 'currency',

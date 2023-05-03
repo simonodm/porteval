@@ -80,18 +80,16 @@ node_modules/
 .vs/
 src/server/.vs/PortEval/DesignTimeBuild/.dtbcache.v2
 
-app/server/PortEval.Application/.config/
+src/server/PortEval.Application/.config/
 
 *.DotSettings
 
-app/.env
+src/.env
 
-app/.env.dev
+src/.env.dev
 
-app/server/PortEval.Setup/ProductInstallFiles.wxs
-
-app/web/build/
-app/**/docs/
+src/web/build/
+src/**/docs/
 
 *.aux
 *.lof

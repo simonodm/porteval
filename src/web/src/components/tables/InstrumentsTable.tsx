@@ -94,7 +94,7 @@ function InstrumentsTable(): JSX.Element {
         {
             id: 'exchange',
             header: 'Exchange',
-            accessor: i => i.exchange
+            accessor: i => i.exchange ?? ''
         },
         {
             id: 'symbol',

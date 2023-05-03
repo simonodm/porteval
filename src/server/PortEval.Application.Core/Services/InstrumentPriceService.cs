@@ -36,7 +36,8 @@ public class InstrumentPriceService : IInstrumentPriceService
     public async Task<OperationResponse<IEnumerable<InstrumentPriceDto>>> GetInstrumentPricesAsync(int instrumentId,
         DateRangeParams dateRange)
     {
-        if (!await _instrumentRepository.ExistsAsync(instrumentId))
+        var instrument = await _instrumentDataQueries.GetInstrumentAsync(instrumentId);
+        if (instrument == null)
         {
             return new OperationResponse<IEnumerable<InstrumentPriceDto>>
             {
@@ -73,7 +74,8 @@ public class InstrumentPriceService : IInstrumentPriceService
         bool compressed = false,
         AggregationFrequency? frequency = null)
     {
-        if (!await _instrumentRepository.ExistsAsync(instrumentId))
+        var instrument = await _instrumentDataQueries.GetInstrumentAsync(instrumentId);
+        if (instrument == null)
         {
             return new OperationResponse<PaginatedResponse<InstrumentPriceDto>>
             {
@@ -107,7 +109,8 @@ public class InstrumentPriceService : IInstrumentPriceService
     /// <inheritdoc />
     public async Task<OperationResponse<InstrumentPriceDto>> GetInstrumentPriceAsync(int instrumentId, DateTime time)
     {
-        if (!await _instrumentRepository.ExistsAsync(instrumentId))
+        var instrument = await _instrumentDataQueries.GetInstrumentAsync(instrumentId);
+        if (instrument == null)
         {
             return new OperationResponse<InstrumentPriceDto>
             {

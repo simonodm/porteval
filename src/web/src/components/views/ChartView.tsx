@@ -255,10 +255,10 @@ function ChartView(): JSX.Element {
                     variant="primary"
                     size="sm"
                     className="float-right"
-                    disabled={!isChanged}
+                    disabled={!isChanged && chartId !== undefined}
                     onClick={() => chart && handleChartSave(chart)}
                 >
-                    {isChanged ? 'Save' : 'Saved'}
+                    {isChanged || chartId === undefined ? 'Save' : 'Saved'}
                 </Button>
                 <Button
                     variant="primary"

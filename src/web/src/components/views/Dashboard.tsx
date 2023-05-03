@@ -99,6 +99,7 @@ function Dashboard(): JSX.Element {
                 </Button>           
             </PageHeading>
             <ResponsiveGridLayout
+                autoSize={false}
                 className="layout"
                 cols={{
                     lg: 6,
@@ -107,6 +108,7 @@ function Dashboard(): JSX.Element {
                     xs: 1,
                     xxs: 1
                 }}
+                compactType={null}
                 droppingItem={{i: droppingItemId.toString(), w: 1, h: 1}}
                 isBounded={true}
                 isDraggable={isEditable}

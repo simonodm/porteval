@@ -1,5 +1,5 @@
 .layout {
-    min-height: 600px;
+    flex-grow: 1;
 }
 
 .editable-grid-item .chart {

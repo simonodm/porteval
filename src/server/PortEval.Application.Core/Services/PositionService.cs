@@ -28,7 +28,7 @@ public class PositionService : IPositionService
     private readonly IInstrumentRepository _instrumentRepository;
     private readonly IPositionPerformanceCalculator _performanceCalculator;
     private readonly IPortfolioRepository _portfolioRepository;
-
+    private readonly IPortfolioQueries _portfolioQueries;
     private readonly IPositionQueries _positionDataQueries;
     private readonly IPositionRepository _positionRepository;
     private readonly IInstrumentPriceService _priceService;
@@ -42,7 +42,7 @@ public class PositionService : IPositionService
     /// <summary>
     ///     Initializes the service.
     /// </summary>
-    public PositionService(IPortfolioRepository portfolioRepository,
+    public PositionService(IPortfolioRepository portfolioRepository, IPortfolioQueries portfolioQueries,
         IPositionRepository positionRepository, IInstrumentRepository instrumentRepository,
         IPositionQueries positionDataQueries, ITransactionService transactionService,
         IInstrumentPriceService priceService, ICurrencyExchangeRateService exchangeRateService,
@@ -65,6 +65,7 @@ public class PositionService : IPositionService
         _currencyConverter = currencyConverter;
         _positionRepository = positionRepository;
         _portfolioRepository = portfolioRepository;
+        _portfolioQueries = portfolioQueries;
     }
 
     /// <inheritdoc />
@@ -81,7 +82,8 @@ public class PositionService : IPositionService
     /// <inheritdoc />
     public async Task<OperationResponse<IEnumerable<PositionDto>>> GetPortfolioPositionsAsync(int portfolioId)
     {
-        if (!await _portfolioRepository.ExistsAsync(portfolioId))
+        var portfolio = await _portfolioQueries.GetPortfolioAsync(portfolioId);
+        if (portfolio == null)
         {
             return new OperationResponse<IEnumerable<PositionDto>>
             {
@@ -406,7 +408,8 @@ public class PositionService : IPositionService
     public async Task<OperationResponse<IEnumerable<PositionStatisticsDto>>> GetPortfolioPositionsStatisticsAsync(
         int portfolioId)
     {
-        if (!await _portfolioRepository.ExistsAsync(portfolioId))
+        var portfolio = await _portfolioQueries.GetPortfolioAsync(portfolioId);
+        if (portfolio == null)
         {
             return new OperationResponse<IEnumerable<PositionStatisticsDto>>
             {

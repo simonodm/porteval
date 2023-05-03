@@ -11,20 +11,22 @@ namespace PortEval.Application.Core.Services;
 /// <inheritdoc cref="ITransactionService" />
 public class TransactionService : ITransactionService
 {
-    private readonly IInstrumentRepository _instrumentRepository;
-    private readonly IPortfolioRepository _portfolioRepository;
+    private readonly IInstrumentQueries _instrumentDataQueries;
+    private readonly IPortfolioQueries _portfolioDataQueries;
+    private readonly IPositionQueries _positionDataQueries;
     private readonly IPositionRepository _positionRepository;
     private readonly ITransactionQueries _transactionDataQueries;
 
     /// <summary>
     ///     Initializes the service.
     /// </summary>
-    public TransactionService(IPortfolioRepository portfolioRepository, IPositionRepository positionRepository,
-        IInstrumentRepository instrumentRepository, ITransactionQueries transactionDataQueries)
+    public TransactionService(IPortfolioQueries portfolioQueries, IPositionQueries positionQueries, IPositionRepository positionRepository,
+        IInstrumentQueries instrumentDataQueries, ITransactionQueries transactionDataQueries)
     {
-        _portfolioRepository = portfolioRepository;
+        _portfolioDataQueries = portfolioQueries;
         _positionRepository = positionRepository;
-        _instrumentRepository = instrumentRepository;
+        _positionDataQueries = positionQueries;
+        _instrumentDataQueries = instrumentDataQueries;
         _transactionDataQueries = transactionDataQueries;
     }
 
@@ -32,7 +34,7 @@ public class TransactionService : ITransactionService
     public async Task<OperationResponse<IEnumerable<TransactionDto>>> GetTransactionsAsync(TransactionFilters filters,
         DateRangeParams dateRange)
     {
-        if (filters.PortfolioId != null && !await _portfolioRepository.ExistsAsync(filters.PortfolioId.Value))
+        if (filters.PortfolioId != null && await _portfolioDataQueries.GetPortfolioAsync(filters.PortfolioId.Value) == null)
         {
             return new OperationResponse<IEnumerable<TransactionDto>>
             {
@@ -41,7 +43,7 @@ public class TransactionService : ITransactionService
             };
         }
 
-        if (filters.InstrumentId != null && !await _instrumentRepository.ExistsAsync(filters.InstrumentId.Value))
+        if (filters.InstrumentId != null && await _instrumentDataQueries.GetInstrumentAsync(filters.InstrumentId.Value) == null)
         {
             return new OperationResponse<IEnumerable<TransactionDto>>
             {
@@ -50,7 +52,7 @@ public class TransactionService : ITransactionService
             };
         }
 
-        if (filters.PositionId != null && !await _positionRepository.ExistsAsync(filters.PositionId.Value))
+        if (filters.PositionId != null && await _positionDataQueries.GetPositionAsync(filters.PositionId.Value) == null)
         {
             return new OperationResponse<IEnumerable<TransactionDto>>
             {

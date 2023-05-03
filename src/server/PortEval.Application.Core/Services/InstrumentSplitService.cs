@@ -31,7 +31,8 @@ public class InstrumentSplitService : IInstrumentSplitService
     /// <inheritdoc />
     public async Task<OperationResponse<IEnumerable<InstrumentSplitDto>>> GetInstrumentSplitsAsync(int instrumentId)
     {
-        if (!await _instrumentRepository.ExistsAsync(instrumentId))
+        var instrument = await _instrumentDataQueries.GetInstrumentAsync(instrumentId);
+        if (instrument == null)
         {
             return new OperationResponse<IEnumerable<InstrumentSplitDto>>
             {
@@ -50,7 +51,8 @@ public class InstrumentSplitService : IInstrumentSplitService
     /// <inheritdoc />
     public async Task<OperationResponse<InstrumentSplitDto>> GetInstrumentSplitAsync(int instrumentId, int splitId)
     {
-        if (!await _instrumentRepository.ExistsAsync(instrumentId))
+        var instrument = await _instrumentDataQueries.GetInstrumentAsync(instrumentId);
+        if (instrument == null)
         {
             return new OperationResponse<InstrumentSplitDto>
             {
