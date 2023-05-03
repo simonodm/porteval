@@ -37,7 +37,7 @@ public static class CsvWriterExtensions
     }
 
     /// <summary>
-    ///     Writes CSV headers to an error log file of an import of records of type <see cref="T" />.
+    ///     Writes CSV headers to an error log file of an import of records of type <typeparamref name="T"/>.
     /// </summary>
     /// <param name="csv">A <see cref="CsvWriter" /> instance to write headers to.</param>
     /// <typeparam name="T">Type of imported records.</typeparam>

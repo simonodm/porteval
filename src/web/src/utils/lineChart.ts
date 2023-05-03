@@ -567,10 +567,10 @@ class SVGLineChart {
     }
 
     _clearTooltip(): void {
-        if(this._tooltip != null) {
+        if(this._tooltip !== null) {
             this._tooltip.style('display', 'none');
         }
-        if(this._tooltipLine != null) {
+        if(this._tooltipLine !== null) {
             this._tooltipLine.attr('stroke', 'none');
         }
     }

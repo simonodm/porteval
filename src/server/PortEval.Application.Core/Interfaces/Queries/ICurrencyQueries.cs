@@ -47,7 +47,7 @@ public interface ICurrencyQueries
     /// <param name="time">Time of the exchange rate.</param>
     /// <returns>
     ///     A task representing the asynchronous query.
-    ///     Task result contains the last available exchange rate with time earlier than <see cref="time" /> if it exists,
+    ///     Task result contains the last available exchange rate with time earlier than <paramref name="time"/> if it exists,
     ///     <c>null</c> otherwise.
     /// </returns>
     Task<CurrencyExchangeRateDto> GetCurrencyExchangeRateAsync(string currencyFrom, string currencyTo,
