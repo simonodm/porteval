@@ -172,8 +172,10 @@ const instrumentApi = portEvalApi.injectEndpoints({
             invalidatesTags: (result, error, arg) =>
                 !error
                     ? [
+                        'Instruments',
                         'PortfolioCalculations',
                         'PositionCalculations',
+                        { type: 'Instrument', id: arg.instrumentId },
                         { type: 'InstrumentPrices', id: arg.instrumentId },
                         { type: 'InstrumentCalculations', id: arg.instrumentId }
                     ]
