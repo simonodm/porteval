@@ -19,8 +19,14 @@ public class YahooFinanceTests
         var priceTime = DateTime.Parse("2022-01-01T00:00:00Z").ToUniversalTime();
         var instrumentSymbol = "AAPL";
 
+        var from = DateTime.Parse("2022-01-01");
+        var to = DateTime.Parse("2022-01-03");
+
+        var period1 = new DateTimeOffset(from).ToUnixTimeSeconds();
+        var period2 = new DateTimeOffset(to).ToUnixTimeSeconds();
+        
         var expectedRequestUri =
-            @$"https://query1.finance.yahoo.com/v8/finance/chart/{instrumentSymbol}?range=5y&interval=1d";
+            @$"https://query1.finance.yahoo.com/v8/finance/chart/{instrumentSymbol}?period1={period1}&period2={period2}&interval=1d";
         var price = 100m;
         var timestamp = new DateTimeOffset(priceTime).ToUnixTimeSeconds();
         var apiMockResponse = new ChartEndpointResponse
@@ -56,8 +62,8 @@ public class YahooFinanceTests
 
         var request = new HistoricalDailyInstrumentPricesRequest
         {
-            From = DateTime.Parse("2022-01-01"),
-            To = DateTime.Parse("2022-01-03"),
+            From = from,
+            To = to,
             Symbol = instrumentSymbol,
             CurrencyCode = "USD"
         };
@@ -84,8 +90,14 @@ public class YahooFinanceTests
         var priceTime = DateTime.Parse("2022-01-01T00:00:00Z").ToUniversalTime();
         var instrumentSymbol = "AAPL";
 
+        var from = DateTime.Parse("2022-01-01");
+        var to = DateTime.Parse("2022-01-03");
+
+        var period1 = new DateTimeOffset(from).ToUnixTimeSeconds();
+        var period2 = new DateTimeOffset(to).ToUnixTimeSeconds();
+        
         var expectedRequestUri =
-            @$"https://query1.finance.yahoo.com/v8/finance/chart/{instrumentSymbol}?range=5y&interval=60m";
+            @$"https://query1.finance.yahoo.com/v8/finance/chart/{instrumentSymbol}?period1={period1}&period2={period2}&interval=60m";
         var price = 100m;
         var timestamp = new DateTimeOffset(priceTime).ToUnixTimeSeconds();
         var apiMockResponse = new ChartEndpointResponse
@@ -121,8 +133,8 @@ public class YahooFinanceTests
 
         var request = new IntradayInstrumentPricesRequest
         {
-            From = DateTime.Parse("2022-01-01"),
-            To = DateTime.Parse("2022-01-03"),
+            From = from,
+            To = to,
             Symbol = instrumentSymbol,
             CurrencyCode = "USD",
             Interval = IntradayInterval.OneHour
@@ -193,8 +205,14 @@ public class YahooFinanceTests
 
         var instrumentSymbol = "AAPL";
 
+        var from = DateTime.Parse("2022-01-01");
+        var to = DateTime.Parse("2022-01-03");
+
+        var period1 = new DateTimeOffset(from).ToUnixTimeSeconds();
+        var period2 = new DateTimeOffset(to).ToUnixTimeSeconds();
+        
         var expectedRequestUri =
-            @$"https://query1.finance.yahoo.com/v8/finance/chart/{instrumentSymbol}?range=5y&interval=1d&events=splits";
+            @$"https://query1.finance.yahoo.com/v8/finance/chart/{instrumentSymbol}?period1={period1}&period2={period2}&interval=1d&events=splits";
 
         var split = new ChartEndpointSplit
         {
@@ -233,8 +251,8 @@ public class YahooFinanceTests
         var request = new InstrumentSplitsRequest
         {
             Symbol = instrumentSymbol,
-            From = DateTime.Parse("2021-01-01"),
-            To = DateTime.Parse("2023-01-01")
+            From = from,
+            To = to
         };
 
         var sut = new DataFetcher.DataFetcher(httpClient);

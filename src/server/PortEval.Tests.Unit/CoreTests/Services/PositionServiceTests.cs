@@ -36,6 +36,7 @@ public class PositionServiceTests
     private readonly Mock<IPositionPerformanceCalculator> _performanceCalculator;
     private readonly Mock<IPortfolioRepository> _portfolioRepository;
 
+    private readonly Mock<IPortfolioQueries> _portfolioQueries;
     private readonly Mock<IPositionQueries> _positionQueries;
     private readonly Mock<IPositionRepository> _positionRepository;
     private readonly Mock<IInstrumentPriceService> _priceService;
@@ -54,6 +55,7 @@ public class PositionServiceTests
         _positionRepository = _fixture.CreateDefaultPositionRepositoryMock();
         _instrumentRepository = _fixture.CreateDefaultInstrumentRepositoryMock();
         _positionQueries = _fixture.CreateDefaultPositionQueriesMock();
+        _portfolioQueries = _fixture.CreateDefaultPortfolioQueriesMock();
 
         _transactionService = _fixture.Freeze<Mock<ITransactionService>>();
         _transactionService
@@ -118,7 +120,7 @@ public class PositionServiceTests
     {
         var portfolioId = _fixture.Create<int>();
         var positions = _fixture.CreateMany<PositionDto>();
-
+        
         _positionQueries
             .Setup(m => m.GetPortfolioPositionsAsync(portfolioId))
             .ReturnsAsync(positions);
@@ -135,9 +137,9 @@ public class PositionServiceTests
     {
         var portfolioId = _fixture.Create<int>();
 
-        _portfolioRepository
-            .Setup(m => m.ExistsAsync(It.IsAny<int>()))
-            .ReturnsAsync(false);
+        _portfolioQueries
+            .Setup(m => m.GetPortfolioAsync(portfolioId))
+            .ReturnsAsync((PortfolioDto)null);
 
         var sut = _fixture.Create<PositionService>();
         var result = await sut.GetPortfolioPositionsAsync(portfolioId);
@@ -492,9 +494,9 @@ public class PositionServiceTests
     [Fact]
     public async Task GetPortfolioPositionsStatisticsAsync_ReturnsNotFound_WhenPortfolioDoesNotExist()
     {
-        _portfolioRepository
-            .Setup(m => m.ExistsAsync(It.IsAny<int>()))
-            .ReturnsAsync(false);
+        _portfolioQueries
+            .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
+            .ReturnsAsync((PortfolioDto)null);
 
         var sut = _fixture.Create<PositionService>();
         var result = await sut.GetPortfolioPositionsStatisticsAsync(_fixture.Create<int>());

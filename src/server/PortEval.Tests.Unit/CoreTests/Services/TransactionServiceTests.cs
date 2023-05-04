@@ -21,8 +21,9 @@ namespace PortEval.Tests.Unit.CoreTests.Services;
 public class TransactionServiceTests
 {
     private readonly IFixture _fixture;
-    private readonly Mock<IInstrumentRepository> _instrumentRepository;
-    private readonly Mock<IPortfolioRepository> _portfolioRepository;
+    private readonly Mock<IInstrumentQueries> _instrumentQueries;
+    private readonly Mock<IPortfolioQueries> _portfolioQueries;
+    private readonly Mock<IPositionQueries> _positionQueries;
     private readonly Mock<IPositionRepository> _positionRepository;
     private readonly Mock<ITransactionQueries> _transactionQueries;
 
@@ -30,9 +31,10 @@ public class TransactionServiceTests
     {
         _fixture = new Fixture()
             .Customize(new AutoMoqCustomization());
-        _portfolioRepository = _fixture.CreateDefaultPortfolioRepositoryMock();
+        _portfolioQueries = _fixture.CreateDefaultPortfolioQueriesMock();
+        _positionQueries = _fixture.CreateDefaultPositionQueriesMock();
         _positionRepository = _fixture.CreateDefaultPositionRepositoryMock();
-        _instrumentRepository = _fixture.CreateDefaultInstrumentRepositoryMock();
+        _instrumentQueries = _fixture.CreateDefaultInstrumentQueriesMock();
         _transactionQueries = _fixture.CreateDefaultTransactionQueriesMock();
     }
 
@@ -58,9 +60,9 @@ public class TransactionServiceTests
     {
         var filter = _fixture.Build<TransactionFilters>().With(f => f.PositionId, _fixture.Create<int>()).Create();
 
-        _positionRepository
-            .Setup(m => m.ExistsAsync(It.IsAny<int>()))
-            .ReturnsAsync(false);
+        _positionQueries
+            .Setup(m => m.GetPositionAsync(It.IsAny<int>()))
+            .ReturnsAsync((PositionDto)null);
 
         var sut = _fixture.Create<TransactionService>();
         var result = await sut.GetTransactionsAsync(filter, _fixture.Create<DateRangeParams>());
@@ -90,9 +92,9 @@ public class TransactionServiceTests
     {
         var filter = _fixture.Build<TransactionFilters>().With(f => f.InstrumentId, _fixture.Create<int>()).Create();
 
-        _instrumentRepository
-            .Setup(m => m.ExistsAsync(It.IsAny<int>()))
-            .ReturnsAsync(false);
+        _instrumentQueries
+            .Setup(m => m.GetInstrumentAsync(It.IsAny<int>()))
+            .ReturnsAsync((InstrumentDto)null);
 
         var sut = _fixture.Create<TransactionService>();
         var result = await sut.GetTransactionsAsync(filter, _fixture.Create<DateRangeParams>());
@@ -122,9 +124,9 @@ public class TransactionServiceTests
     {
         var filter = _fixture.Build<TransactionFilters>().With(f => f.PortfolioId, _fixture.Create<int>()).Create();
 
-        _portfolioRepository
-            .Setup(m => m.ExistsAsync(It.IsAny<int>()))
-            .ReturnsAsync(false);
+        _portfolioQueries
+            .Setup(m => m.GetPortfolioAsync(It.IsAny<int>()))
+            .ReturnsAsync((PortfolioDto)null);
 
         var sut = _fixture.Create<TransactionService>();
         var result = await sut.GetTransactionsAsync(filter, _fixture.Create<DateRangeParams>());
