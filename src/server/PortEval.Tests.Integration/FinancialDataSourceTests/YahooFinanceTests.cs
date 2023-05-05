@@ -161,22 +161,35 @@ public class YahooFinanceTests
         var instrumentSymbol = "AAPL";
         var price = 100m;
 
-        var apiMockResponse = new QuoteEndpointResponse
+        var apiMockResponse = new ChartEndpointResponse
         {
-            QuoteSummary = new YahooFinanceResponse<List<Quote>>
+            Chart = new YahooFinanceResponse<List<ChartEndpointResult>>
             {
-                Result = new List<Quote>
+                Result = new List<ChartEndpointResult>
                 {
                     new()
                     {
-                        Currency = "USD",
-                        Price = price
+                        Indicators = new ChartIndicators
+                        {
+                            QuoteIndicators = new List<QuoteIndicator>
+                            {
+                                new()
+                                {
+                                    Prices = new List<decimal?> { price }
+                                }
+                            }
+                        },
+                        Meta = new TickerMeta
+                        {
+                            Symbol = instrumentSymbol,
+                            Currency = "USD"
+                        }
                     }
                 }
             }
         };
 
-        var expectedRequestUri = @$"https://query2.finance.yahoo.com/v7/finance/quote?symbols={instrumentSymbol}";
+        var expectedRequestUri = @$"https://query1.finance.yahoo.com/v8/finance/chart/{instrumentSymbol}";
 
         var httpClient = Helpers.SetupMockHttpClientReturningResponse(expectedRequestUri, apiMockResponse);
 

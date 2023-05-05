@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PortEval.Application.Core.Extensions;
 using PortEval.Application.Models.FinancialDataFetcher;
 using PortEval.DataFetcher;
 using PortEval.DataFetcher.Models;
@@ -17,13 +18,12 @@ namespace PortEval.Infrastructure.FinancialDataFetcher.YFinance;
 /// </summary>
 public class YahooFinanceApi : DataSource
 {
-    private const string BaseUrlV7 = "https://query2.finance.yahoo.com/v7/finance";
     private const string BaseUrlV8 = "https://query1.finance.yahoo.com/v8/finance";
 
     [RequestProcessor(typeof(HistoricalDailyInstrumentPricesRequest), typeof(IEnumerable<PricePoint>))]
     public async Task<Response<IEnumerable<PricePoint>>> ProcessAsync(HistoricalDailyInstrumentPricesRequest request)
     {
-        var response = await GetHistoricalDataFromChartEndpoint(request.Symbol, request.From, request.To, "1d");
+        var response = await GetDataFromChartEndpoint(request.Symbol, request.From, request.To, "1d");
         return ExtractPrices(response.Result, request.From, request.To);
     }
 
@@ -31,7 +31,7 @@ public class YahooFinanceApi : DataSource
     public async Task<Response<IEnumerable<PricePoint>>> ProcessAsync(IntradayInstrumentPricesRequest request)
     {
         var interval = request.Interval == IntradayInterval.OneHour ? "60m" : "5m";
-        var response = await GetHistoricalDataFromChartEndpoint(request.Symbol, request.From, request.To, interval);
+        var response = await GetDataFromChartEndpoint(request.Symbol, request.From, request.To, interval);
         return ExtractPrices(response.Result, request.From, request.To);
     }
 
@@ -44,7 +44,7 @@ public class YahooFinanceApi : DataSource
     [RequestProcessor(typeof(InstrumentSplitsRequest), typeof(IEnumerable<InstrumentSplitData>))]
     public async Task<Response<IEnumerable<InstrumentSplitData>>> ProcessAsync(InstrumentSplitsRequest request)
     {
-        var response = await GetHistoricalDataFromChartEndpoint(request.Symbol, request.From, request.To);
+        var response = await GetDataFromChartEndpoint(request.Symbol, request.From, request.To);
         return ExtractSplits(response.Result, request.From, request.To);
     }
 
@@ -52,7 +52,7 @@ public class YahooFinanceApi : DataSource
     public async Task<Response<IEnumerable<PricePoint>>> ProcessAsync(HistoricalDailyCryptoPricesRequest request)
     {
         var yahooFinanceTicker = GetYahooCryptoTicker(request.Symbol, request.CurrencyCode);
-        var response = await GetHistoricalDataFromChartEndpoint(yahooFinanceTicker, request.From, request.To);
+        var response = await GetDataFromChartEndpoint(yahooFinanceTicker, request.From, request.To);
         return ExtractPrices(response.Result, request.From, request.To);
     }
 
@@ -61,7 +61,7 @@ public class YahooFinanceApi : DataSource
     {
         var yahooFinanceTicker = GetYahooCryptoTicker(request.Symbol, request.CurrencyCode);
         var interval = request.Interval == IntradayInterval.OneHour ? "60m" : "5m";
-        var response = await GetHistoricalDataFromChartEndpoint(yahooFinanceTicker, request.From, request.To, interval);
+        var response = await GetDataFromChartEndpoint(yahooFinanceTicker, request.From, request.To, interval);
         return ExtractPrices(response.Result, request.From, request.To);
     }
 
@@ -74,50 +74,40 @@ public class YahooFinanceApi : DataSource
 
     private async Task<Response<PricePoint>> GetCurrentPrice(string symbol)
     {
-        var urlBuilder = new QueryUrlBuilder($"{BaseUrlV7}/quote");
-        urlBuilder.AddQueryParam("symbols", symbol);
-        urlBuilder.AddQueryParam("lang", "en-US");
-        urlBuilder.AddQueryParam("region", "US");
-        urlBuilder.AddQueryParam("corsDomain", "finance.yahoo.com");
-
-        var url = urlBuilder.ToString();
-
-        var result = await HttpClient.GetJsonAsync<QuoteEndpointResponse>(url, Configuration.RateLimiter);
-        if (result.StatusCode != StatusCode.Ok)
-        {
-            return new Response<PricePoint>
-            {
-                StatusCode = result.StatusCode,
-                ErrorMessage = result.ErrorMessage
-            };
-        }
-
-        var response = result.Result.QuoteSummary.Result.FirstOrDefault();
-        if (response == null)
+        // While YFinance provides a `quote` endpoint, it is significantly less reliable than the `chart` endpoint used here,
+        // see https://stackoverflow.com/questions/76059562/yahoo-finance-api-get-quotes-returns-invalid-cookie
+        
+        var now = DateTime.UtcNow;
+        var response = await GetDataFromChartEndpoint(symbol, now.AddDays(-1), now, "5m");
+        var quotes = response.Result?.Chart?.Result?.FirstOrDefault()?.Indicators?.QuoteIndicators?.FirstOrDefault()
+            ?.Prices;
+        var meta = response.Result?.Chart?.Result?.FirstOrDefault()?.Meta;
+        var price = quotes?.LastOrDefault(x => x != null);
+        if (meta == null || price == null)
         {
             return new Response<PricePoint>
             {
                 StatusCode = StatusCode.OtherError,
-                ErrorMessage = "Invalid data received."
+                ErrorMessage = "Invalid data retrieved"
             };
         }
 
         var pricePoint = new PricePoint
         {
-            CurrencyCode = response.Currency,
+            CurrencyCode = meta.Currency,
+            Price = price.Value,
             Symbol = symbol,
-            Price = response.Price,
-            Time = DateTime.UtcNow
+            Time = now
         };
-
+        
         return new Response<PricePoint>
         {
             StatusCode = StatusCode.Ok,
             Result = pricePoint
         };
     }
-
-    private async Task<Response<ChartEndpointResponse>> GetHistoricalDataFromChartEndpoint(string symbol, DateTime from,
+    
+    private async Task<Response<ChartEndpointResponse>> GetDataFromChartEndpoint(string symbol, DateTime from,
         DateTime to, string interval = "1d")
     {
         var queryUrlBuilder = new QueryUrlBuilder($"{BaseUrlV8}/chart/{symbol}");

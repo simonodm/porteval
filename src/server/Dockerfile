@@ -14,6 +14,7 @@ COPY ["PortEval.DataFetcher/PortEval.DataFetcher.csproj", "PortEval.DataFetcher/
 
 RUN dotnet restore "PortEval.Application/PortEval.Application.csproj"
 COPY . .
+RUN chmod +x ./wait-for-it.sh
 WORKDIR "/app/PortEval.Application"
 RUN dotnet build "PortEval.Application.csproj" -c Release -o /app/build
 
@@ -23,4 +24,5 @@ RUN dotnet publish "PortEval.Application.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "PortEval.Application.dll"]
+COPY --from=build /app/wait-for-it.sh .
+ENTRYPOINT ["./wait-for-it.sh", "porteval-db:1433", "--timeout=120", "--", "dotnet", "PortEval.Application.dll"]
