@@ -42,7 +42,7 @@ namespace PortEval.Application.Extensions;
 /// <summary>
 ///     Contains extension methods for PortEval's service configurations.
 /// </summary>
-public static class ServiceCollectionExtensions
+public static class ServiceRegistrationExtensions
 {
     /// <summary>
     ///     Injects PortEval's application services.
@@ -291,5 +291,28 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IDataFetcher>(dataFetcher);
         services.AddScoped<IFinancialDataFetcher, FinancialDataFetcher>();
+    }
+    
+    public static void ScheduleBackgroundJobs(this IServiceProvider serviceProvider)
+    {
+        var recurringJobManager = serviceProvider.GetRequiredService<IRecurringJobManager>();
+
+        recurringJobManager.AddOrUpdate<ILatestPricesFetchJob>("latest_prices", job => job.RunAsync(), "*/5 * * * *");
+        recurringJobManager.AddOrUpdate<IMissingInstrumentPricesFetchJob>("fetch_missing_prices", job => job.RunAsync(),
+            Cron.Daily);
+        recurringJobManager.AddOrUpdate<IMissingExchangeRatesFetchJob>("fetch_missing_exchange_rates",
+            job => job.RunAsync(), Cron.Daily);
+        recurringJobManager.AddOrUpdate<IInstrumentPriceCleanupJob>("db_cleanup", job => job.RunAsync(), Cron.Daily);
+        recurringJobManager.AddOrUpdate<IImportCleanupJob>("import_cleanup", job => job.RunAsync(), Cron.Daily);
+        recurringJobManager.AddOrUpdate<ISplitFetchJob>("split_fetch", job => job.RunAsync(), Cron.Daily);
+        recurringJobManager.AddOrUpdate<ISplitPriceAndTransactionAdjustmentJob>("split_price_adjustment",
+            job => job.RunAsync(), Cron.Daily);
+
+        recurringJobManager.Trigger("db_cleanup");
+        recurringJobManager.Trigger("fetch_missing_prices");
+        recurringJobManager.Trigger("fetch_missing_exchange_rates");
+        recurringJobManager.Trigger("import_cleanup");
+        recurringJobManager.Trigger("split_price_adjustment");
+        recurringJobManager.Trigger("split_fetch");
     }
 }

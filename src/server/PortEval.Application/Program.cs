@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PortEval.Application.Core.Interfaces.BackgroundJobs;
+using PortEval.Application.Extensions;
 using PortEval.Infrastructure;
 using Serilog;
 
@@ -31,7 +32,7 @@ public class Program
         }
         catch (Exception ex)
         {
-            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+            var logger = services.GetRequiredService<ILogger<Program>>();
             logger.LogError(ex, "An error occurred while migrating or seeding the database.");
 
             throw;
@@ -39,7 +40,7 @@ public class Program
 
         try
         {
-            ScheduleBackgroundJobs(scope);
+            services.ScheduleBackgroundJobs();
         }
         catch (Exception ex)
         {
@@ -60,33 +61,10 @@ public class Program
         }
     }
 
-    public static IHostBuilder CreateHostBuilder(string[] args)
+    private static IHostBuilder CreateHostBuilder(string[] args)
     {
         return Host.CreateDefaultBuilder(args)
             .UseSerilog()
             .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
-    }
-
-    private static void ScheduleBackgroundJobs(IServiceScope scope)
-    {
-        var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
-
-        recurringJobManager.AddOrUpdate<ILatestPricesFetchJob>("latest_prices", job => job.RunAsync(), "*/5 * * * *");
-        recurringJobManager.AddOrUpdate<IMissingInstrumentPricesFetchJob>("fetch_missing_prices", job => job.RunAsync(),
-            Cron.Daily);
-        recurringJobManager.AddOrUpdate<IMissingExchangeRatesFetchJob>("fetch_missing_exchange_rates",
-            job => job.RunAsync(), Cron.Daily);
-        recurringJobManager.AddOrUpdate<IInstrumentPriceCleanupJob>("db_cleanup", job => job.RunAsync(), Cron.Daily);
-        recurringJobManager.AddOrUpdate<IImportCleanupJob>("import_cleanup", job => job.RunAsync(), Cron.Daily);
-        recurringJobManager.AddOrUpdate<ISplitFetchJob>("split_fetch", job => job.RunAsync(), Cron.Daily);
-        recurringJobManager.AddOrUpdate<ISplitPriceAndTransactionAdjustmentJob>("split_price_adjustment",
-            job => job.RunAsync(), Cron.Daily);
-
-        recurringJobManager.Trigger("db_cleanup");
-        recurringJobManager.Trigger("fetch_missing_prices");
-        recurringJobManager.Trigger("fetch_missing_exchange_rates");
-        recurringJobManager.Trigger("import_cleanup");
-        recurringJobManager.Trigger("split_price_adjustment");
-        recurringJobManager.Trigger("split_fetch");
     }
 }

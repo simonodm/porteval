@@ -9,10 +9,10 @@ namespace PortEval.Application.Extensions;
 public static class ExceptionMiddlewareExtensions
 {
     /// <summary>
-    ///     Configures the default exception middleware.
+    ///     Configures the custom exception middleware.
     /// </summary>
     /// <param name="app">ASP.NET application builder.</param>
-    public static void ConfigureExceptionMiddleware(this IApplicationBuilder app)
+    public static void UseCustomExceptionMiddleware(this IApplicationBuilder app)
     {
         app.UseMiddleware<ExceptionMiddleware>();
     }

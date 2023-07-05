@@ -110,8 +110,9 @@ public class Startup
             });
         }
 
-        app.UseSwagger();
+        app.UseCustomExceptionMiddleware();
         
+        app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
             c.SwaggerEndpoint("./swagger/v1/swagger.json", "PortEval API v1");
@@ -119,15 +120,9 @@ public class Startup
         });
         
         app.UseCors();
-
-        app.ConfigureExceptionMiddleware();
-
         app.UseHttpsRedirection();
-
+        
         app.UseRouting();
-
-        app.UseAuthorization();
-
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();

@@ -8,7 +8,7 @@ namespace PortEval.Application.Extensions;
 /// <summary>
 ///     Implements extension methods on <see cref="IConfiguration" /> configuration object.
 /// </summary>
-public static class IConfigurationExtensions
+public static class ConfigurationExtensions
 {
     /// <summary>
     ///     Retrieves a text configuration value by key, searching all possible sources of the configuration value.
